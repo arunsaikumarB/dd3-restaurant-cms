@@ -19,7 +19,7 @@ export const PUBLIC_OFFERS_FALLBACK: PublicOffer[] = [
     banner: FALLBACK_BANNER,
     discount: "15% OFF",
     start_date: "2026-06-01",
-    end_date: "2026-12-31",
+    end_date: "2099-12-31",
     created_at: "2026-06-01T00:00:00.000Z",
   },
   {
@@ -29,7 +29,7 @@ export const PUBLIC_OFFERS_FALLBACK: PublicOffer[] = [
     banner: "/showcase/tandoori.jpg",
     discount: "$10 OFF",
     start_date: "2026-06-15",
-    end_date: "2026-12-31",
+    end_date: "2099-12-31",
     created_at: "2026-06-15T00:00:00.000Z",
   },
 ];

@@ -7,6 +7,7 @@ import AdminButton from "../components/ui/Button";
 import AdminInput from "../components/ui/Input";
 import { useAuth } from "../../hooks/useAuth";
 import { signInWithEmail, ADMIN_DASHBOARD_PATH } from "../../lib/supabase/middleware";
+import { isAdminDevBypassEnabled } from "../../lib/supabase/env";
 import { SITE } from "../../constants/site";
 import "../admin.css";
 
@@ -28,7 +29,11 @@ function LoginForm() {
     setError(null);
 
     if (!configured) {
-      navigate(ADMIN_DASHBOARD_PATH);
+      if (isAdminDevBypassEnabled()) {
+        navigate(ADMIN_DASHBOARD_PATH);
+        return;
+      }
+      setError("Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
       return;
     }
 
@@ -98,9 +103,9 @@ function LoginForm() {
             </AdminButton>
           </form>
 
-          {!configured && (
+          {!configured && isAdminDevBypassEnabled() && (
             <p className={`mt-6 text-center text-xs ${dark ? "text-white/30" : "text-admin-muted/70"}`}>
-              Supabase not configured — sign in bypasses to dashboard
+              Supabase not configured — sign in bypasses to dashboard (dev only)
             </p>
           )}
         </div>

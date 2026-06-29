@@ -79,7 +79,7 @@ export async function fetchPublicGalleryData(): Promise<PublicGalleryItem[]> {
   inflightRequest = (async () => {
     try {
       const supabaseGallery = await fetchSupabasePublicGallery();
-      if (supabaseGallery !== null) {
+      if (supabaseGallery !== null && supabaseGallery.length > 0) {
         cachedGallery = supabaseGallery;
         cacheExpiresAt = Date.now() + CACHE_TTL_MS;
         return supabaseGallery;

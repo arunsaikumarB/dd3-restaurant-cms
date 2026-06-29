@@ -173,7 +173,10 @@ export async function fetchHomepageBundle(): Promise<HomepageBundle> {
       cacheExpiresAt = Date.now() + CACHE_TTL_MS;
       return bundle;
     } catch {
-      return getHomepageFallbacks();
+      const fallback = getHomepageFallbacks();
+      cachedBundle = fallback;
+      cacheExpiresAt = Date.now() + CACHE_TTL_MS;
+      return fallback;
     } finally {
       inflightRequest = null;
     }

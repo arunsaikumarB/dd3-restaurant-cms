@@ -15,14 +15,25 @@ function AnimatedRating({ value }: { value: number }) {
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
+    let frameId = 0;
+    let cancelled = false;
     const duration = 1400;
     const start = performance.now();
+
     const tick = (now: number) => {
+      if (cancelled) return;
       const progress = Math.min((now - start) / duration, 1);
       setDisplay(Number((value * progress).toFixed(1)));
-      if (progress < 1) requestAnimationFrame(tick);
+      if (progress < 1) {
+        frameId = requestAnimationFrame(tick);
+      }
     };
-    requestAnimationFrame(tick);
+
+    frameId = requestAnimationFrame(tick);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frameId);
+    };
   }, [value]);
 
   return (
@@ -145,7 +156,14 @@ export default function TestimonialsPage() {
                   ))}
                 </div>
               </>
-            ) : null}
+            ) : (
+              <div className="rounded-[28px] border border-cocoa/10 bg-white/60 p-12 text-center">
+                <p className="font-serif text-2xl text-cocoa">Reviews coming soon</p>
+                <p className="mt-3 text-cocoa/60">
+                  Guest testimonials will appear here once published.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -160,6 +178,13 @@ export default function TestimonialsPage() {
           />
           {loading ? (
             <ReviewsGridSkeleton />
+          ) : reviews.length === 0 ? (
+            <div className="mt-14 rounded-[24px] border border-cocoa/10 bg-ivory p-12 text-center">
+              <p className="font-serif text-2xl text-cocoa">No reviews yet</p>
+              <p className="mt-3 text-cocoa/60">
+                Be the first to share your experience with us.
+              </p>
+            </div>
           ) : (
             <div className="mt-14 grid gap-5 md:grid-cols-2">
               {reviews.map((item, i) => (

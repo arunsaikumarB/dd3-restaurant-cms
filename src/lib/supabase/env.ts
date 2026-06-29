@@ -31,3 +31,8 @@ export function getSupabaseServiceRoleKey(): string {
 export function isSupabaseConfigured(): boolean {
   return Boolean(getSupabaseUrl() && getSupabaseAnonKey());
 }
+
+/** Allow unauthenticated admin access only during local dev without Supabase env vars. */
+export function isAdminDevBypassEnabled(): boolean {
+  return import.meta.env.DEV && !isSupabaseConfigured();
+}

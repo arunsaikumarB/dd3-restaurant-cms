@@ -136,9 +136,13 @@ export default function MenuPage() {
 
         {!loading && !error && data && filteredCategories.length === 0 && (
           <div className="rounded-[24px] border border-cocoa/10 bg-white/60 p-12 text-center">
-            <p className="font-serif text-2xl text-cocoa">No dishes found</p>
+            <p className="font-serif text-2xl text-cocoa">
+              {data.categories.length === 0 ? "Menu coming soon" : "No dishes found"}
+            </p>
             <p className="mt-3 text-cocoa/60">
-              Try a different search term or category filter.
+              {data.categories.length === 0
+                ? "Our menu is being updated. Please check back shortly."
+                : "Try a different search term or category filter."}
             </p>
           </div>
         )}

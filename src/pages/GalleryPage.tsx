@@ -24,6 +24,13 @@ export default function GalleryPage() {
       <section className="page-content-start mx-auto max-w-[1400px] px-6 pb-20 md:px-10 lg:px-16">
         {loading ? (
           <GalleryPageSkeleton />
+        ) : images.length === 0 ? (
+          <div className="rounded-[24px] border border-cocoa/10 bg-white/60 p-12 text-center">
+            <p className="font-serif text-2xl text-cocoa">Gallery coming soon</p>
+            <p className="mt-3 text-cocoa/60">
+              New photos will appear here as they are added.
+            </p>
+          </div>
         ) : (
           <GalleryGrid images={images} columns={3} />
         )}

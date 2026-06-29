@@ -42,7 +42,7 @@ function filterPublicOffers(rows: PublicOffer[]): PublicOffer[] {
 }
 
 export function getPublicOffersFallback(): PublicOffer[] {
-  return filterPublicOffers(PUBLIC_OFFERS_FALLBACK);
+  return sortPublicOffers(PUBLIC_OFFERS_FALLBACK);
 }
 
 async function fetchSupabasePublicOffers(): Promise<PublicOffer[] | null> {
@@ -69,7 +69,7 @@ export async function fetchPublicOffersData(): Promise<PublicOffer[]> {
   inflightRequest = (async () => {
     try {
       const supabaseOffers = await fetchSupabasePublicOffers();
-      if (supabaseOffers !== null) {
+      if (supabaseOffers !== null && supabaseOffers.length > 0) {
         cachedOffers = supabaseOffers;
         cacheExpiresAt = Date.now() + CACHE_TTL_MS;
         return supabaseOffers;

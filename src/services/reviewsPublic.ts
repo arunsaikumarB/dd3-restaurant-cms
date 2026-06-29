@@ -68,7 +68,7 @@ export async function fetchPublicReviewsData(): Promise<PublicReview[]> {
   inflightRequest = (async () => {
     try {
       const supabaseReviews = await fetchSupabasePublicReviews();
-      if (supabaseReviews !== null) {
+      if (supabaseReviews !== null && supabaseReviews.length > 0) {
         cachedReviews = supabaseReviews;
         cacheExpiresAt = Date.now() + CACHE_TTL_MS;
         return supabaseReviews;

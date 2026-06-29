@@ -71,6 +71,9 @@ Run migrations in order in the **Supabase SQL Editor** (or via Supabase CLI):
 1. `001_initial_schema.sql` — tables, indexes, triggers
 2. `002_rls_policies.sql` — Row Level Security
 3. `003_storage_buckets.sql` — storage buckets + policies
+4. `004_gallery_columns.sql` — gallery caption, featured, visible
+5. `005_reviews_featured.sql` — reviews featured column
+6. `006_production_hardening.sql` — RLS tightening and safe user provisioning
 
 ### Tables
 
