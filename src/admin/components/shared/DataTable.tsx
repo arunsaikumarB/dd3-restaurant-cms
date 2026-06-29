@@ -20,6 +20,7 @@ interface DataTableProps<T extends Record<string, unknown>> {
   emptyDescription?: string;
   onCreateClick?: () => void;
   createLabel?: string;
+  hideToolbar?: boolean;
 }
 
 export default function DataTable<T extends Record<string, unknown>>({
@@ -34,6 +35,7 @@ export default function DataTable<T extends Record<string, unknown>>({
   emptyDescription = "Try adjusting your search or filters.",
   onCreateClick,
   createLabel,
+  hideToolbar = false,
 }: DataTableProps<T>) {
   const { dark } = useAdminTheme();
   const [search, setSearch] = useState("");
@@ -76,6 +78,7 @@ export default function DataTable<T extends Record<string, unknown>>({
 
   return (
     <div className="space-y-4">
+      {!hideToolbar && (
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1 max-w-sm">
           <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${dark ? "text-white/40" : "text-admin-muted"}`} />
@@ -101,6 +104,7 @@ export default function DataTable<T extends Record<string, unknown>>({
           </div>
         )}
       </div>
+      )}
 
       {paginated.length === 0 ? (
         emptyIcon ? (
