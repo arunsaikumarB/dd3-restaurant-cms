@@ -7,6 +7,14 @@ export type ContentStatus = "active" | "inactive" | "draft";
 export type ReservationStatus = "pending" | "confirmed" | "cancelled" | "completed";
 export type UserRole = "admin" | "staff";
 
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
 export interface Timestamps {
   created_at: string;
   updated_at: string;
@@ -26,7 +34,7 @@ export interface RestaurantSettings extends Timestamps {
   email: string | null;
   address: string | null;
   google_maps: string | null;
-  opening_hours: Record<string, string> | null;
+  opening_hours: Json | null;
   facebook: string | null;
   instagram: string | null;
   youtube: string | null;
@@ -203,14 +211,20 @@ export interface Database {
         Relationships: [];
       };
     };
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
     Enums: {
       content_status: ContentStatus;
       reservation_status: ReservationStatus;
       user_role: UserRole;
     };
-    CompositeTypes: Record<string, never>;
+    CompositeTypes: {
+      [_ in never]: never;
+    };
   };
 }
 
