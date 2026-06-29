@@ -94,6 +94,9 @@ export interface GalleryImage extends Timestamps {
   image: string;
   category: string | null;
   alt_text: string | null;
+  caption: string | null;
+  featured: boolean;
+  visible: boolean;
   display_order: number;
 }
 
