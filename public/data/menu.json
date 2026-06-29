@@ -1,0 +1,3662 @@
+{
+  "generatedAt": "2026-06-29T11:16:55.490Z",
+  "source": "catalog-export-prod-DD3.xlsx",
+  "totalItems": 383,
+  "categories": [
+    {
+      "id": "biryani",
+      "name": "Biryani",
+      "rawName": "Biryani",
+      "itemCount": 25,
+      "items": [
+        {
+          "id": "chicken-biryani-boneless",
+          "name": "Chicken Biryani (Boneless)",
+          "description": "Tender boneless chicken cooked with fragrant basmati rice, aromatic spices, and a blend of flavors in our signature Chicken Biryani. A classic dish that promises a symphony of taste in every bite.",
+          "price": 17.67,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "chicken-dum-biryani",
+          "name": "Chicken Dum Biryani",
+          "description": "Tender chicken cooked with fragrant basmati rice and a blend of aromatic spices, layered and slow-cooked to perfection. Served with a side of cooling raita for a harmonious balance of flavors.",
+          "price": 16.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "chicken-fry-piece-biryani-bone-in",
+          "name": "Chicken Fry Piece Biryani (Bone-In)",
+          "description": "Tender, juicy chicken pieces marinated, fried to crispy perfection, and layered with fragrant basmati rice in our flavorful biryani blend. Served bone-in for added richness and depth of flavor.",
+          "price": 18.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "chicken-fry-piece-biryani-boneless",
+          "name": "Chicken Fry Piece Biryani (Boneless)",
+          "description": "Tender boneless chicken marinated in aromatic spices, fried to perfection, and nestled in fragrant basmati rice cooked with a blend of traditional biryani spices. Served with flavorful raita on the side.",
+          "price": 19.75,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "chicken-keema-biryani",
+          "name": "Chicken Keema Biryani",
+          "description": "Tender chicken keema cooked with fragrant basmati rice and aromatic spices, creating a flavorful and hearty biryani experience that will delight your taste buds.",
+          "price": 21.83,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "dd-special-chicken-biryani-bone-in",
+          "name": "DD Special Chicken Biryani (Bone-In)",
+          "description": "Tender, marinated bone-in chicken cooked to perfection with fragrant basmati rice and a blend of aromatic spices, creating a flavorful and satisfying DD Special Chicken Biryani.",
+          "price": 19.75,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": true
+        },
+        {
+          "id": "dd-special-chicken-biryani-boneless",
+          "name": "DD Special Chicken Biryani (Boneless)",
+          "description": "Savor the aromatic blend of spices in our DD Special Chicken Biryani, featuring tender boneless chicken and fragrant basmati rice cooked to perfection. A delightful symphony of flavors in every bite.",
+          "price": 20.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": true
+        },
+        {
+          "id": "dd-spl-nalli-gosht-biryani",
+          "name": "DD Spl Nalli Gosht Biryani",
+          "description": "Indulge in our exquisite DD Spl Nalli Gosht Biryani, a fragrant blend of succulent lamb shank and aromatic spices layered with fluffy basmati rice, promising a symphony of flavors in every bite.",
+          "price": 29.11,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "dd-spl-natu-kodi-biryani",
+          "name": "DD SPL Natu Kodi Biryani",
+          "description": "Tender, marinated chicken cooked with fragrant basmati rice, aromatic spices, and fresh herbs in our signature Natu Kodi Biryani - a deliciously indulgent dish bursting with traditional flavors.",
+          "price": 24.95,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "egg-biryani",
+          "name": "Egg Biryani",
+          "description": "A fragrant blend of basmati rice and delicate spices cooked with perfectly boiled eggs, creating a flavorful and aromatic Egg Biryani.",
+          "price": 15.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "fish-biryani",
+          "name": "Fish Biryani",
+          "description": "Tender pieces of succulent fish cooked with fragrant basmati rice, aromatic spices, and herbs in our traditional biryani style. A flavorful and enticing dish that will transport your taste buds to the shores of India.",
+          "price": 19.75,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "goat-kheema-biryani",
+          "name": "Goat Kheema Biryani",
+          "description": "Savor the rich and aromatic flavors of our Goat Kheema Biryani, a delightful fusion of tender goat meat and fragrant spices, all layered with perfectly cooked basmati rice. Experience the ultimate indulgence in every bite.",
+          "price": 23.91,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "gongura-chicken-biryani",
+          "name": "Gongura Chicken Biryani",
+          "description": "Tender chicken cooked to perfection with tangy gongura leaves, layered with aromatic basmati rice and exotic spices, creating a flavorful and satisfying biryani experience.",
+          "price": 17.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "gongura-mutton-biryani",
+          "name": "Gongura Mutton Biryani",
+          "description": "Tender mutton marinated in a tangy gongura (sorrel) sauce, layered with fragrant basmati rice and aromatic spices in our flavorful Gongura Mutton Biryani. A delectable fusion of flavors that will tantalize your taste buds.",
+          "price": 20.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "mamsam-roast-biryani-bone-in",
+          "name": "Mamsam Roast Biryani (Bone-In)",
+          "description": "Tender bone-in mutton pieces marinated in aromatic spices, layered with fragrant basmati rice, and slow-cooked to perfection. Served with a side of cooling raita. A flavorful and hearty Mamsam Roast Biryani that will delight your taste buds.",
+          "price": 20.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "mamsam-roast-biryani-boneless",
+          "name": "Mamsam Roast Biryani (Boneless)",
+          "description": "Tender boneless lamb marinated in aromatic spices, layered with fragrant basmati rice, and slow-cooked to perfection in our Mamsam Roast Biryani. Savor the rich flavors of this traditional Indian dish for a truly satisfying dining experience.",
+          "price": 21.83,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "mutton-dum-biryani",
+          "name": "Mutton Dum Biryani",
+          "description": "Tender mutton marinated in aromatic spices, layered with fragrant basmati rice, and slow-cooked to perfection, our Mutton Dum Biryani is a flavorful masterpiece that will tantalize your taste buds.",
+          "price": 19.75,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "mutton-fry-piece-biryani-bone-in",
+          "name": "Mutton Fry Piece Biryani (Bone-In)",
+          "description": "Savor the rich flavors of our Mutton Fry Piece Biryani, featuring tender bone-in mutton pieces cooked to perfection with aromatic spices and layered with fragrant basmati rice. Truly a feast for the senses at $19.99.",
+          "price": 19.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "mutton-fry-piece-biryani-boneless",
+          "name": "Mutton Fry Piece Biryani (Boneless)",
+          "description": "Tender boneless mutton pieces marinated in aromatic spices, layered with fragrant basmati rice and slow-cooked to perfection. Served with a side of cooling raita, our Mutton Fry Piece Biryani is a flavorful delight for biryani lovers.",
+          "price": 21.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "mutton-keema-biryani",
+          "name": "Mutton Keema Biryani",
+          "description": "Savor the rich flavors of our Mutton Keema Biryani, a fragrant blend of tender mutton keema and aromatic spices layered with basmati rice, creating a symphony of taste in every bite.",
+          "price": 23.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "shrimp-fry-biryani",
+          "name": "Shrimp Fry Biryani",
+          "description": "Savor the exquisite flavors of our Shrimp Fry Biryani, where succulent shrimp and aromatic spices are layered with fragrant basmati rice for a truly indulgent dining experience.",
+          "price": 19.75,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "test1",
+          "name": "Test1",
+          "description": "",
+          "price": 0.01,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "ulavacharu-chicken-dum-biryani",
+          "name": "Ulavacharu Chicken Dum Biryani",
+          "description": "Tender chicken cooked in a flavorful blend of Ulavacharu gravy, layered with fragrant basmati rice and aromatic spices, creating a delectable and satisfying Ulavacharu Chicken Dum Biryani.",
+          "price": 17.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "ulavacharu-mutton-dum-biryani",
+          "name": "Ulavacharu Mutton Dum Biryani",
+          "description": "Tender mutton cooked to perfection in a flavorful ulavacharu sauce, layered with fragrant basmati rice and slow-cooked to create a mouthwatering dum biryani.",
+          "price": 20.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        },
+        {
+          "id": "vijayawada-chicken-biryani-boneless",
+          "name": "Vijayawada Chicken Biryani (Boneless)",
+          "description": "Tender, boneless chicken marinated in aromatic spices, layered with fragrant basmati rice, and slow-cooked to perfection in traditional Vijayawada style. Served with raita and salan on the side.",
+          "price": 18.99,
+          "category": "Biryani",
+          "categorySlug": "biryani",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "breakfast",
+      "name": "Breakfast",
+      "rawName": "Breakfast",
+      "itemCount": 27,
+      "items": [
+        {
+          "id": "chapathi-with-chicken-kurma",
+          "name": "Chapathi with Chicken Kurma",
+          "description": "Tender pieces of succulent chicken simmered in a fragrant, creamy coconut curry, served alongside warm, soft chapathi bread. A comforting and flavorful breakfast option to start your day.",
+          "price": 14.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "chapathi-with-goat-kurma",
+          "name": "Chapathi with Goat Kurma",
+          "description": "Fluffy chapathi served with aromatic goat kurma, a savory breakfast delight bursting with tender meat and rich, fragrant spices.",
+          "price": 15.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "chapathi-with-veg-kurma",
+          "name": "Chapathi with Veg Kurma",
+          "description": "Soft, flaky chapathi served with a flavorful vegetable kurma, bursting with the goodness of fresh veggies and aromatic spices. A hearty and satisfying breakfast option that will delight your taste buds.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "cheese-dosa",
+          "name": "Cheese Dosa",
+          "description": "Savor the perfect fusion of South Indian flavors and creamy cheese with our Cheese Dosa. A crispy dosa filled with molten cheese, served with flavorful chutneys for a delightful breakfast experience.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "chicken-curry-dosa",
+          "name": "Chicken Curry Dosa",
+          "description": "Savor the perfect fusion of South Indian flavors with our Chicken Curry Dosa. Tender chicken simmered in aromatic spices, wrapped in a crispy dosa shell. The ultimate breakfast indulgence.",
+          "price": 15.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "cone-dosa",
+          "name": "Cone Dosa",
+          "description": "Crispy and flavorful, our Cone Dosa is a South Indian delight perfect for breakfast. Served with a medley of chutneys and sambar, this traditional dish is a delightful start to your day.",
+          "price": 11.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "egg-dosa",
+          "name": "Egg Dosa",
+          "description": "",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "ghee-karam-dosa",
+          "name": "Ghee Karam Dosa",
+          "description": "Crisp dosa smeared with rich ghee and sprinkled with spicy chutney powder, a delightful South Indian breakfast treat.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "guntur-ghee-karam-idli",
+          "name": "Guntur Ghee Karam Idli",
+          "description": "Savor the South Indian charm with our Guntur Ghee Karam Idli - fluffy steamed rice cakes drenched in aromatic ghee and a fiery chili spice blend. A perfect balance of savory and spicy to kickstart your day.",
+          "price": 11.43,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "idli-with-vada-combo",
+          "name": "Idli with Vada (Combo)",
+          "description": "Savor a traditional South Indian breakfast delight with our Idli and Vada combo. Enjoy soft, steamed rice cakes paired with crispy lentil donuts, served with a side of flavorful chutneys. The perfect balance of textures and flavors to start your day.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "masala-dosa",
+          "name": "Masala Dosa",
+          "description": "Crispy, golden dosa filled with flavorful spiced potatoes and served with tangy coconut chutney and savory sambar. A classic South Indian breakfast favorite that's sure to satisfy.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "mysore-bonda",
+          "name": "Mysore Bonda",
+          "description": "Golden-fried Mysore Bonda: A South Indian breakfast delight featuring crispy, fluffy lentil fritters bursting with savory flavors. Perfectly paired with coconut chutney for a satisfying start to your day.",
+          "price": 11.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "mysore-masala-dosa",
+          "name": "Mysore Masala Dosa",
+          "description": "Crispy South Indian crepe filled with a spicy potato masala and a fragrant blend of Mysore spices. Served with coconut chutney and sambar.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "onion-dosa",
+          "name": "Onion Dosa",
+          "description": "Crispy dosa filled with a savory blend of caramelized onions, served hot and fresh for a delightful breakfast experience.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "parota-with-chicken-kurma",
+          "name": "Parota with Chicken Kurma",
+          "description": "Flaky, buttery parota served with flavorful chicken kurma, a traditional South Indian breakfast favorite. Enjoy the perfect balance of savory spices and tender chicken in every bite.",
+          "price": 14.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "parota-with-goat-kurma",
+          "name": "Parota with Goat Kurma",
+          "description": "Flaky, buttery parota served with a fragrant and savory goat kurma, rich in spices and slow-cooked for depth of flavor. A delightful breakfast option that combines tender meat and warm, comforting layers of Indian flatbread.",
+          "price": 15.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "parota-with-veg-kurma",
+          "name": "Parota with Veg Kurma",
+          "description": "Flaky, buttery parota served with a hearty and flavorful vegetable kurma. A delicious breakfast pairing that will satisfy your morning cravings with every bite.",
+          "price": 12.47,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "plain-dosa",
+          "name": "Plain Dosa",
+          "description": "Crispy and golden-brown South Indian dosa served hot and fresh, a classic breakfast option that promises a delightful start to your day.",
+          "price": 10.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "podi-dosa",
+          "name": "Podi Dosa",
+          "description": "Savor the crispy perfection of our Podi Dosa, a South Indian classic featuring a thin, golden crepe sprinkled with flavorful podi spice blend. Enjoy the delicious fusion of textures and tastes in every bite.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "poori-with-bhaji",
+          "name": "Poori with Bhaji",
+          "description": "Crispy, golden pooris served with a flavorful and spicy potato bhaji. A classic Indian breakfast that will tantalize your taste buds with every bite.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "poori-with-chicken-curry",
+          "name": "Poori with Chicken Curry",
+          "description": "Fluffy, deep-fried poori served with a flavorful chicken curry bursting with aromatic spices. A hearty and satisfying breakfast to kickstart your day.",
+          "price": 14.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "rayalaseema-karam-dosa",
+          "name": "Rayalaseema Karam Dosa",
+          "description": "Spice up your morning with our flavorful Rayalaseema Karam Dosa, a traditional South Indian breakfast delight featuring a crispy dosa filled with a fiery chili and spice-infused potato masala. Experience a burst of authentic flavors in every bite.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "sambar-vada",
+          "name": "Sambar Vada",
+          "description": "Crispy vada soaked in aromatic sambar, a South Indian delicacy bursting with flavors of lentils, spices, and tamarind. A perfect blend of textures and tastes for a satisfying breakfast indulgence.",
+          "price": 11.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "set-dosa",
+          "name": "Set Dosa",
+          "description": "Soft, fluffy, and perfectly fermented, our Set Dosa is a South Indian delicacy that will transport you to the streets of Bangalore. Served in a set of three, these golden, savory pancakes are best enjoyed with coconut chutney and sambar for a truly authentic experience.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "uthappam-mix-veg",
+          "name": "Uthappam Mix Veg",
+          "description": "Savor the flavors of South India with our Uthappam Mix Veg, a delightful breakfast option. Enjoy a savory pancake topped with a colorful medley of fresh vegetables, bursting with vibrant flavors.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "uthappam-onion-chilli",
+          "name": "Uthappam Onion Chilli",
+          "description": "Savor the South Indian flavors with our Uthappam Onion Chilli, a delightful breakfast choice featuring a savory pancake topped with caramelized onions and spicy green chilies.",
+          "price": 13.99,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        },
+        {
+          "id": "vada",
+          "name": "Vada",
+          "description": "Crispy and savory South Indian fritters made from lentil batter, served with tangy chutneys. Perfect for a flavorful breakfast indulgence.",
+          "price": 11.43,
+          "category": "Breakfast",
+          "categorySlug": "breakfast",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "chai",
+      "name": "Chai",
+      "rawName": "Chai",
+      "itemCount": 3,
+      "items": [
+        {
+          "id": "desi-chai",
+          "name": "Desi Chai",
+          "description": "Indulge in the comforting embrace of our Desi Chai, a fragrant blend of black tea, aromatic spices, and creamy milk. Served piping hot for the perfect pick-me-up.",
+          "price": 2.07,
+          "category": "Chai",
+          "categorySlug": "chai",
+          "featured": false
+        },
+        {
+          "id": "irani-chai",
+          "name": "Irani Chai",
+          "description": "Savor the rich and aromatic flavors of our authentic Irani Chai. Made with a blend of premium tea leaves and warm spices, this traditional brew is the perfect way to indulge in a moment of pure bliss.",
+          "price": 3.11,
+          "category": "Chai",
+          "categorySlug": "chai",
+          "featured": false
+        },
+        {
+          "id": "masala-chai",
+          "name": "Masala Chai",
+          "description": "Indulge in the aromatic blend of black tea, warm spices, and creamy milk with our Masala Chai. Perfectly brewed to perfection, this traditional Indian tea will delight your senses with every sip.",
+          "price": 2.07,
+          "category": "Chai",
+          "categorySlug": "chai",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "coffee",
+      "name": "Coffee",
+      "rawName": "Coffee",
+      "itemCount": 2,
+      "items": [
+        {
+          "id": "dd-spl-filter-coffee",
+          "name": "DD SPL Filter Coffee",
+          "description": "Indulge in the rich and aromatic flavors of our DD SPL Filter Coffee, a South Indian specialty brewed to perfection. Savor the smooth blend of freshly ground coffee beans and steamed milk for a truly satisfying experience.",
+          "price": 4.99,
+          "category": "Coffee",
+          "categorySlug": "coffee",
+          "featured": false
+        },
+        {
+          "id": "instant-coffee-bru",
+          "name": "Instant Coffee (Bru)",
+          "description": "Indulge in the rich aroma and bold flavor of our Bru Instant Coffee. Perfectly brewed for a satisfying pick-me-up anytime you need it.",
+          "price": 3.11,
+          "category": "Coffee",
+          "categorySlug": "coffee",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "cooker-pulav",
+      "name": "Cooker Pulav",
+      "rawName": "Cooker Pulav",
+      "itemCount": 2,
+      "items": [
+        {
+          "id": "chicken-cooker-pulav",
+          "name": "Chicken Cooker Pulav",
+          "description": "Tender chicken cooked to perfection with fragrant basmati rice and a blend of aromatic spices, creating a flavorful and satisfying Chicken Cooker Pulav.",
+          "price": 89.99,
+          "category": "Cooker Pulav",
+          "categorySlug": "cooker-pulav",
+          "featured": false
+        },
+        {
+          "id": "mutton-cooker-pulav",
+          "name": "Mutton Cooker Pulav",
+          "description": "Tender mutton slow-cooked to perfection with aromatic spices, mixed with fragrant basmati rice, creating a flavorful and satisfying Mutton Cooker Pulav.",
+          "price": 99.99,
+          "category": "Cooker Pulav",
+          "categorySlug": "cooker-pulav",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "dd-family-packs-to-go-only",
+      "name": "DD FAMILY PACKS (TO GO ONLY)",
+      "rawName": "DD FAMILY PACKS (TO GO ONLY)",
+      "itemCount": 19,
+      "items": [
+        {
+          "id": "chicken-appetizer-family-pack",
+          "name": "Chicken appetizer Family Pack",
+          "description": "",
+          "price": 50,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "chicken-dum-biryani-family-pack",
+          "name": "CHICKEN DUM BIRYANI Family Pack",
+          "description": "Savor the aromatic flavors of our Chicken Dum Biryani, a tantalizing blend of tender chicken and fragrant spices layered with long-grain basmati rice. Perfect for sharing with the family, this dish is a true taste sensation.",
+          "price": 46.99,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "chicken-fry-piece-biryani-bone-in-family-pack",
+          "name": "CHICKEN FRY PIECE BIRYANI (BONE-IN) Family Pack",
+          "description": "Savor the indulgent flavors of our Chicken Fry Piece Biryani, featuring tender bone-in chicken marinated in aromatic spices, layered with fragrant basmati rice. A perfect family pack to-go for a delightful feast at home.",
+          "price": 47.83,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "chicken-fry-piece-biryani-boneless-family-pack",
+          "name": "CHICKEN FRY PIECE BIRYANI (BONELESS) Family Pack",
+          "description": "Tender boneless chicken marinated in aromatic spices, served atop a bed of flavorful biryani rice. Perfect for a family feast to savor in the comfort of your home.",
+          "price": 55,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "dd-spl-chicken-biryani-family-pack",
+          "name": "DD SPL CHICKEN BIRYANI Family Pack",
+          "description": "Indulge in our flavorful DD SPL Chicken Biryani, a delectable blend of fragrant basmati rice, tender marinated chicken, and aromatic spices. Perfect for sharing with the family, this dish is a true feast for the senses.",
+          "price": 51.99,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "egg-biryani-family-pack",
+          "name": "EGG BIRYANI Family Pack",
+          "description": "Indulge in our aromatic Egg Biryani, a flavorful blend of fragrant basmati rice, perfectly cooked eggs, and a medley of traditional spices. Satisfy your cravings with this savory dish that is sure to delight your taste buds and transport you to the streets of India.",
+          "price": 42.99,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "goat-appetizer-family-pack",
+          "name": "Goat appetizer Family Pack",
+          "description": "",
+          "price": 50,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "goat-dum-biryani-family-pack",
+          "name": "GOAT DUM BIRYANI Family Pack",
+          "description": "Savor the aromatic blend of tender goat meat and fragrant spices in our delectable Goat Dum Biryani, a flavorful family pack to enjoy at home. Each bite is a symphony of flavors that will transport your taste buds to the bustling streets of India.",
+          "price": 57.19,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "goat-pulav-family-pack-boneless",
+          "name": "Goat Pulav Family Pack Boneless",
+          "description": "",
+          "price": 75,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "mutton-fry-piece-biryani-bone-in-family-pack",
+          "name": "MUTTON FRY PIECE BIRYANI (BONE-IN) Family Pack",
+          "description": "Tender mutton pieces marinated in aromatic spices, nestled in flavorful biryani rice, cooked to perfection. Perfect for feeding the whole family, this bone-in mutton fry piece biryani is a delectable treat to savor at home.",
+          "price": 59.99,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "mutton-fry-piece-biryani-boneless-family-pack",
+          "name": "MUTTON FRY PIECE BIRYANI (BONELESS) Family Pack",
+          "description": "Savor the rich flavors of our Mutton Fry Piece Biryani, featuring tender boneless mutton marinated in aromatic spices, layered with fragrant basmati rice. A perfect family pack to enjoy the authentic taste of Indian cuisine at home.",
+          "price": 64.99,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "paneer-biryani-family-pack",
+          "name": "PANEER BIRYANI Family Pack",
+          "description": "Indulge in our aromatic Paneer Biryani, a flavorful blend of fragrant basmati rice, succulent paneer, and a medley of spices, perfect for sharing with the family.",
+          "price": 46.99,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "shrimp-biryani-family-pack",
+          "name": "SHRIMP BIRYANI Family Pack",
+          "description": "Indulge in our aromatic Shrimp Biryani, a flavorful blend of succulent shrimp, fragrant basmati rice, and our signature spice mix. Perfect for a family feast, this dish is a harmony of bold flavors that will transport your taste buds to the heart of India.",
+          "price": 57.19,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "ulavacharu-chicken-boneless-biryani-family-pack",
+          "name": "ULAVACHARU CHICKEN BONELESS BIRYANI Family Pack",
+          "description": "Tender boneless chicken cooked in a flavorful Ulavacharu sauce, layered with fragrant basmati rice in this indulgent family pack biryani. Enjoy a harmonious blend of spices and aromatics in every bite.",
+          "price": 51.99,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "ulavacharu-chicken-dum-biryani-family-pack",
+          "name": "ULAVACHARU CHICKEN DUM BIRYANI Family Pack",
+          "description": "Tender chicken cooked in spicy ulavacharu sauce, layered with fragrant basmati rice and slow-cooked to perfection. Our Ulavacharu Chicken Dum Biryani is a flavor-packed delight for the whole family to enjoy.",
+          "price": 51.99,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "ulavacharu-goat-dum-biryani-family-pack",
+          "name": "ULAVACHARU GOAT DUM BIRYANI Family Pack",
+          "description": "Tender goat cooked in flavorful ulavacharu sauce, layered with fragrant basmati rice and aromatic spices, creating a mouthwatering and satisfying family-sized dum biryani.",
+          "price": 59.27,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "veg-appetizer-family-pack",
+          "name": "Veg appetizer - Family Pack",
+          "description": "",
+          "price": 45,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "veg-biryan-family-pack",
+          "name": "VEG BIRYAN Family Pack",
+          "description": "A fragrant and flavorful medley of aromatic basmati rice, garden-fresh vegetables, and a blend of traditional Indian spices, our Veg Biryani is a vegetarian delight that will transport your taste buds to the streets of Mumbai. Perfect for a family feast to enjoy at home.",
+          "price": 41.59,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        },
+        {
+          "id": "vijayawada-boneless-biryani-family-pack",
+          "name": "VIJAYAWADA BONELESS BIRYANI Family Pack",
+          "description": "Tender boneless chicken cooked with fragrant basmati rice, aromatic spices, and herbs in the traditional Vijayawada style. Perfect for sharing with the family, this flavorful biryani is a delicious choice for takeout.",
+          "price": 51.99,
+          "category": "DD FAMILY PACKS (TO GO ONLY)",
+          "categorySlug": "dd-family-packs-to-go-only",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "dd-special-mandi",
+      "name": "DD SPECIAL MANDI",
+      "rawName": "DD SPECIAL MANDI",
+      "itemCount": 33,
+      "items": [
+        {
+          "id": "chicken-mandi-full",
+          "name": "CHICKEN MANDI (FULL)",
+          "description": "Tender roasted chicken infused with aromatic spices, served on a bed of fragrant basmati rice. A mouthwatering feast that will transport your taste buds to the heart of the Middle East.",
+          "price": 79.03,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "chicken-mandi-half",
+          "name": "CHICKEN MANDI (HALF)",
+          "description": "Tender half chicken marinated in aromatic spices and slow-cooked to perfection in traditional Middle Eastern style, served with fragrant basmati rice. A flavorful and satisfying choice from our DD Special Mandi selection.",
+          "price": 47.83,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "chicken-mandi-single",
+          "name": "CHICKEN MANDI (SINGLE)",
+          "description": "Tender, marinated chicken cooked to perfection over fragrant rice, our Chicken Mandi is a culinary delight that will transport your taste buds to the Middle East. Served as a single portion, this dish is a must-try for those seeking a flavorful and satisfying meal.",
+          "price": 27.03,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "dd-special-nalli-gosht-mandi-full",
+          "name": "DD SPECIAL NALLI GOSHT MANDI (FULL)",
+          "description": "Tender, succulent Nalli Gosht Mandi featuring slow-cooked lamb shank in aromatic spices, served with fragrant rice. A signature dish that promises a flavorful journey.",
+          "price": 94.99,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": true
+        },
+        {
+          "id": "dd-special-nalli-gosht-mandi-half",
+          "name": "DD SPECIAL NALLI GOSHT MANDI (HALF)",
+          "description": "Tender, succulent Nalli Gosht Mandi awaits with our DD Special half portion, a flavorful feast of slow-cooked lamb shank, fragrant spices, and aromatic rice. Experience a culinary delight that's sure to satisfy your cravings for rich, savory flavors.",
+          "price": 58.23,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": true
+        },
+        {
+          "id": "dd-special-nalli-gosht-mandi-single",
+          "name": "DD SPECIAL NALLI GOSHT MANDI (SINGLE)",
+          "description": "Tender, slow-cooked Nalli Gosht Mandi, a succulent lamb shank delicacy, expertly spiced and served with fragrant rice. A signature dish that promises an unforgettable dining experience.",
+          "price": 27.03,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": true
+        },
+        {
+          "id": "egg-mandi-full",
+          "name": "EGG MANDI (FULL)",
+          "description": "Tender, slow-cooked lamb nestled in fragrant rice, topped with a perfectly poached egg. Our Egg Mandi is a culinary delight that will transport your taste buds to a realm of savory bliss.",
+          "price": 68.99,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "egg-mandi-half",
+          "name": "EGG MANDI (HALF)",
+          "description": "Tender half chicken marinated in aromatic spices, slow-cooked to perfection, and served with fragrant basmati rice, garnished with boiled eggs. A succulent and flavorful dish that will delight your taste buds.",
+          "price": 44.83,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "egg-mandi-single",
+          "name": "EGG MANDI (SINGLE)",
+          "description": "Tender roasted lamb atop fragrant basmati rice, crowned with a perfectly cooked egg. A DD Special Mandi delight that will transport your taste buds to savory bliss.",
+          "price": 27.03,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "extra-mandi-rice",
+          "name": "EXTRA MANDI RICE",
+          "description": "Aromatic basmati rice cooked to perfection with a blend of Middle Eastern spices, tender meats, and a medley of vegetables. Satisfy your cravings with our Extra Mandi Rice, a flavorful and hearty dish from our special Mandi selection.",
+          "price": 14.99,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "fish-mandi-full",
+          "name": "FISH MANDI (FULL)",
+          "description": "Indulge in our lavish Fish Mandi, a delightful full-sized portion of tender, perfectly seasoned fish served with fragrant rice and a medley of aromatic spices. Experience a symphony of flavors in every bite with this DD Special Mandi dish.",
+          "price": 84.23,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "fish-mandi-half",
+          "name": "FISH MANDI (HALF)",
+          "description": "Tender half portion of our signature Fish Mandi, a succulent dish featuring perfectly grilled fish served with aromatic rice, Middle Eastern spices, and a side of tangy sauce. Truly a delight for seafood enthusiasts.",
+          "price": 47.83,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "fish-mandi-single",
+          "name": "FISH MANDI (SINGLE)",
+          "description": "Savor the aromatic blend of Middle Eastern flavors with our Fish Mandi - a single serving of tender fish marinated in traditional spices, cooked to perfection, and served with fragrant rice. Experience a culinary journey like no other.",
+          "price": 27.03,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "goat-mandi-full",
+          "name": "GOAT MANDI (FULL)",
+          "description": "Indulge in our exquisite Goat Mandi, a lavish feast featuring tender goat meat slow-cooked to perfection with aromatic spices and fragrant basmati rice. A dish that promises to delight your taste buds and transport you to the heart of traditional Middle Eastern flavors.",
+          "price": 84.23,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "goat-mandi-half",
+          "name": "GOAT MANDI (HALF)",
+          "description": "Tender half portion of succulent goat mandi, expertly seasoned and slow-cooked to perfection, offering a delightful blend of aromatic spices and tender meat, guaranteed to satisfy your cravings.",
+          "price": 47.83,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "goat-mandi-single",
+          "name": "GOAT MANDI (SINGLE)",
+          "description": "Tender goat meat marinated in aromatic spices and slow-cooked to perfection, served with fragrant basmati rice. Experience the rich flavors of our signature DD Special Mandi with our single portion option.",
+          "price": 27.03,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "gutti-vankaya-mandi-full",
+          "name": "GUTTI VANKAYA MANDI (FULL)",
+          "description": "Tender baby eggplants stuffed with a medley of aromatic spices and slow-cooked to perfection in a rich, flavorful gravy. Experience a symphony of traditional Indian flavors in our Gutti Vankaya Mandi, a true delight for the senses.",
+          "price": 69.67,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "gutti-vankaya-mandi-half",
+          "name": "GUTTI VANKAYA MANDI (HALF)",
+          "description": "Tender half-cut eggplant stuffed with a flavorful blend of spices, nuts, and herbs, slow-cooked to perfection. A delectable vegetarian delight that will tantalize your taste buds.",
+          "price": 44.99,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "gutti-vankaya-mandi-single",
+          "name": "GUTTI VANKAYA MANDI (SINGLE)",
+          "description": "Tender baby eggplants stuffed with a flavorful mix of spices, cooked to perfection in a rich and aromatic gravy. Enjoy the traditional flavors of Gutti Vankaya Mandi, a delightful dish from our DD Special Mandi selection.",
+          "price": 27.03,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "mixed-full-mandi-chicken-mutton",
+          "name": "MIXED FULL MANDI (CHICKEN/MUTTON)",
+          "description": "Indulge in the ultimate feast with our Mixed Full Mandi featuring tender chicken and succulent mutton, perfectly seasoned and slow-cooked to perfection. Savor a symphony of flavors in every bite.",
+          "price": 89.43,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "natukodi-mandi-full",
+          "name": "NATUKODI MANDI (FULL)",
+          "description": "Indulge in our Natukodi Mandi, a sumptuous DD Special Mandi dish. Tender marinated chicken served on a bed of fragrant basmati rice, garnished with nuts and served with flavorful broth. Experience a taste of authentic Indian flavors in every bite.",
+          "price": 84.23,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "natukodi-mandi-half",
+          "name": "NATUKODI MANDI (HALF)",
+          "description": "Tender half NATUKODI MANDI, a DD Special featuring succulent chicken marinated in aromatic spices, served with fragrant basmati rice and flavorful broth. A delectable feast for the senses.",
+          "price": 47.83,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "natukodi-mandi-single",
+          "name": "NATUKODI MANDI (SINGLE)",
+          "description": "Tender pieces of succulent Natukodi (country chicken) served over fragrant basmati rice, infused with a blend of aromatic spices. Experience the rich flavors of our DD Special Mandi with this single serving delight.",
+          "price": 27.03,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "paneer-mandi-full",
+          "name": "PANEER MANDI (FULL)",
+          "description": "Savor the indulgent flavors of our Paneer Mandi, a lavish vegetarian feast featuring tender paneer in a rich and aromatic blend of spices. The perfect choice for those seeking a delightful culinary experience.",
+          "price": 69.67,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "paneer-mandi-half",
+          "name": "PANEER MANDI (HALF)",
+          "description": "Tender cubes of paneer marinated in aromatic spices and grilled to perfection, served with fragrant rice and a medley of flavorful accompaniments in our signature Half Paneer Mandi.",
+          "price": 44.99,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "paneer-mandi-single",
+          "name": "PANEER MANDI (SINGLE)",
+          "description": "Tender chunks of marinated paneer grilled to perfection, served with aromatic rice and flavorful sauces. A delicious vegetarian twist on our signature Mandi dish.",
+          "price": 27.03,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "seafood-mandi-fish-shrimp",
+          "name": "SEAFOOD MANDI (FISH/SHRIMP)",
+          "description": "Indulge in our exquisite Seafood Mandi featuring a succulent blend of fish and shrimp, perfectly seasoned and cooked to tender perfection. Embark on a culinary journey with this flavorful dish that will tantalize your taste buds.",
+          "price": 94.99,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "shrimp-mandi-full",
+          "name": "SHRIMP MANDI (FULL)",
+          "description": "Tender shrimp marinated in aromatic spices and slow-cooked to perfection, served atop a bed of fluffy mandi rice. A flavorful feast fit for royalty.",
+          "price": 94.99,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "shrimp-mandi-half",
+          "name": "SHRIMP MANDI (HALF)",
+          "description": "Succulent half portion of our signature Shrimp Mandi, featuring tender shrimp seasoned with aromatic spices and slow-cooked to perfection. Served with fragrant long-grain basmati rice for a truly indulgent dining experience.",
+          "price": 47.83,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "shrimp-mandi-single",
+          "name": "SHRIMP MANDI (SINGLE)",
+          "description": "Tender shrimp marinated in aromatic spices and slow-cooked to perfection, served with fragrant basmati rice. A delightful seafood feast that will transport your taste buds to the Middle East.",
+          "price": 27.03,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "veg-keema-mandi-full",
+          "name": "VEG KEEMA MANDI (FULL)",
+          "description": "Savor the rich flavors of our Veg Keema Mandi, a delightful vegetarian twist on the classic mandi dish. Enjoy a full portion of fragrant rice topped with a savory blend of minced vegetables and aromatic spices, creating a truly satisfying culinary experience.",
+          "price": 69.67,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "veg-keema-mandi-half",
+          "name": "VEG KEEMA MANDI (HALF)",
+          "description": "Savor the rich flavors of our Veg Keema Mandi, a half portion of our DD Special Mandi. This aromatic dish features a medley of vegetables cooked to perfection with traditional spices, creating a delightful and fulfilling dining experience.",
+          "price": 44.99,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        },
+        {
+          "id": "veg-keema-mandi-single",
+          "name": "VEG KEEMA MANDI (SINGLE)",
+          "description": "Tender vegetarian keema served over fragrant rice, creating a flavorful and satisfying dish that is a must-try for all mandi enthusiasts.",
+          "price": 27.03,
+          "category": "DD SPECIAL MANDI",
+          "categorySlug": "dd-special-mandi",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "dd-specials",
+      "name": "DD Specials",
+      "rawName": "DD Specials",
+      "itemCount": 6,
+      "items": [
+        {
+          "id": "boti-fry",
+          "name": "Boti fry",
+          "description": "Tender cubes of marinated boti, expertly fried to perfection, offering a tantalizing blend of spices and flavors. A must-try dish from our kitchen that will leave your taste buds craving for more.",
+          "price": 17.99,
+          "category": "DD Specials",
+          "categorySlug": "dd-specials",
+          "featured": false
+        },
+        {
+          "id": "dd-chef-s-special-tawa-fish-bone-in",
+          "name": "DD Chef's Special Tawa Fish (Bone-In)",
+          "description": "Savor the succulent flavors of our Chef's Special Tawa Fish, expertly prepared with bone-in for maximum taste. Grilled to perfection with a blend of aromatic spices, this dish is a true culinary delight.",
+          "price": 20.99,
+          "category": "DD Specials",
+          "categorySlug": "dd-specials",
+          "featured": true
+        },
+        {
+          "id": "dd-chef-s-special-tawa-fish-boneless",
+          "name": "DD Chef's Special Tawa Fish (Boneless)",
+          "description": "Savor the succulent flavors of our Chef's Special Tawa Fish, boneless and expertly seasoned to perfection. Grilled on a traditional tawa, this dish boasts a harmonious blend of spices that will tantalize your taste buds.",
+          "price": 21.83,
+          "category": "DD Specials",
+          "categorySlug": "dd-specials",
+          "featured": true
+        },
+        {
+          "id": "dd-spl-potlam-biryani",
+          "name": "DD Spl Potlam Biryani",
+          "description": "Indulge in our flavorful DD Spl Potlam Biryani, a fragrant blend of aromatic spices, tender meat, and basmati rice cooked to perfection. Savor the rich flavors in every bite of this authentic Indian classic.",
+          "price": 24.95,
+          "category": "DD Specials",
+          "categorySlug": "dd-specials",
+          "featured": false
+        },
+        {
+          "id": "goat-haleem",
+          "name": "Goat Haleem",
+          "description": "A hearty blend of tender goat meat, cracked wheat, lentils, and aromatic spices slow-cooked to perfection, creating a rich and creamy texture. Experience a taste of tradition with our flavorful Goat Haleem.",
+          "price": 18.99,
+          "category": "DD Specials",
+          "categorySlug": "dd-specials",
+          "featured": false
+        },
+        {
+          "id": "nalli-gosht-roast",
+          "name": "Nalli Gosht Roast",
+          "description": "Tender lamb shank slow-roasted to perfection in a flavorful blend of aromatic spices, creating a melt-in-your-mouth Nalli Gosht Roast. A savory delicacy that will leave you craving for more.",
+          "price": 21.83,
+          "category": "DD Specials",
+          "categorySlug": "dd-specials",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "desserts",
+      "name": "Desserts",
+      "rawName": "Desserts",
+      "itemCount": 13,
+      "items": [
+        {
+          "id": "apricot-delight",
+          "name": "Apricot Delight",
+          "description": "",
+          "price": 8.59,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        },
+        {
+          "id": "beetroot-halwa",
+          "name": "Beetroot Halwa",
+          "description": "Indulge in our decadent Beetroot Halwa, a delightful Indian dessert made with grated beetroots, simmered in rich milk, ghee, and sugar, then garnished with nuts and aromatic spices. Treat yourself to a sweet and satisfying experience for $8.59.",
+          "price": 8.59,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        },
+        {
+          "id": "carrot-halwa",
+          "name": "Carrot Halwa",
+          "description": "Indulge in our rich and decadent Carrot Halwa, a traditional Indian dessert made with grated carrots, ghee, sugar, and aromatic spices. Served warm and garnished with crushed nuts, it's a delightful finale to your meal.",
+          "price": 7.99,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        },
+        {
+          "id": "dd-special-sweet",
+          "name": "DD Special Sweet",
+          "description": "Indulge in our DD Special Sweet, a decadent dessert featuring layers of moist chocolate cake, velvety ganache, and a sprinkle of toasted hazelnuts. Satisfy your sweet cravings with each delightful bite.",
+          "price": 12.47,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": true
+        },
+        {
+          "id": "double-ka-meetha",
+          "name": "Double Ka Meetha",
+          "description": "Indulge in our decadent Double Ka Meetha, a rich and aromatic Indian bread pudding soaked in saffron-infused syrup, garnished with nuts and dried fruits. A sweet treat that will transport your taste buds to a realm of pure delight.",
+          "price": 8.59,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        },
+        {
+          "id": "gulab-jamun",
+          "name": "Gulab Jamun",
+          "description": "Indulge in our decadent Gulab Jamun, soft and syrup-soaked Indian sweet dumplings, served warm for a delightful dessert experience.",
+          "price": 6.23,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        },
+        {
+          "id": "gummadikaya-halwa",
+          "name": "Gummadikaya Halwa",
+          "description": "Indulge in our luscious Gummadikaya Halwa, a traditional Indian dessert made with sweet pumpkin, ghee, sugar, and aromatic spices. Savor the rich, melt-in-your-mouth texture and warm, comforting flavors in every bite.",
+          "price": 8.59,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        },
+        {
+          "id": "ice-cream",
+          "name": "Ice Cream",
+          "description": "Creamy scoops of rich vanilla ice cream, the perfect indulgence to satisfy your sweet cravings. Made with the finest ingredients for a velvety smooth texture that melts in your mouth with every bite.",
+          "price": 6.23,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        },
+        {
+          "id": "ice-cream-gulab-jamun",
+          "name": "Ice cream Gulab Jamun",
+          "description": "Indulge in a decadent fusion of creamy ice cream and warm, syrup-soaked Gulab Jamun. This delightful dessert is a perfect balance of rich flavors and textures, creating a truly memorable sweet treat.",
+          "price": 8.99,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        },
+        {
+          "id": "kulfi",
+          "name": "Kulfi",
+          "description": "",
+          "price": 4.99,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        },
+        {
+          "id": "rasmalai",
+          "name": "Rasmalai",
+          "description": "Indulge in the rich and creamy sweetness of our Rasmalai, a traditional Indian dessert made with soft paneer cheese soaked in saffron-infused milk and garnished with chopped pistachios. Savor every bite of this luxurious treat priced at $6.23.",
+          "price": 6.23,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        },
+        {
+          "id": "sorakaya-halwa",
+          "name": "Sorakaya Halwa",
+          "description": "Indulge in the rich flavors of our Sorakaya Halwa, a decadent Indian dessert made with grated bottle gourd, milk, sugar, and infused with aromatic cardamom. Savor this sweet treat that melts in your mouth for a delightful end to your meal.",
+          "price": 8.59,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        },
+        {
+          "id": "sweet-paan",
+          "name": "Sweet Paan",
+          "description": "Indulge in our Sweet Paan, a traditional Indian dessert bursting with flavors of betel leaves, gulkand, fennel seeds, and more. A perfect ending to your meal at just $2.59.",
+          "price": 2.59,
+          "category": "Desserts",
+          "categorySlug": "desserts",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "grand-opening-buffet",
+      "name": "Grand Opening Buffet",
+      "rawName": "10.Grand Opening Buffet",
+      "itemCount": 2,
+      "items": [
+        {
+          "id": "adult-buffet",
+          "name": "Adult Buffet",
+          "description": "",
+          "price": 29.99,
+          "category": "10.Grand Opening Buffet",
+          "categorySlug": "grand-opening-buffet",
+          "featured": false
+        },
+        {
+          "id": "kids-buffet",
+          "name": "Kids Buffet",
+          "description": "",
+          "price": 17.99,
+          "category": "10.Grand Opening Buffet",
+          "categorySlug": "grand-opening-buffet",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "kebab-and-tandoori",
+      "name": "Kebab and Tandoori",
+      "rawName": "Kebab and Tandoori",
+      "itemCount": 17,
+      "items": [
+        {
+          "id": "chicken-chapli",
+          "name": "Chicken Chapli",
+          "description": "Savor the flavorful Chicken Chapli kebab, a tantalizing blend of minced chicken, aromatic spices, and fresh herbs, grilled to perfection. A succulent choice for kebab enthusiasts.",
+          "price": 17.67,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "chicken-hariyali",
+          "name": "Chicken Hariyali",
+          "description": "Tender chicken marinated in a vibrant blend of fresh mint, cilantro, and aromatic spices, grilled to juicy perfection. A flavorful and succulent kebab experience.",
+          "price": 17.67,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "chicken-seekh-kebab",
+          "name": "Chicken Seekh Kebab",
+          "description": "Tender, spiced ground chicken skewered and grilled to perfection, our Chicken Seekh Kebab is a flavorful delight. Served with a side of cooling raita, this traditional Indian dish is a must-try for kebab enthusiasts.",
+          "price": 17.67,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "chicken-tandoori",
+          "name": "Chicken Tandoori",
+          "description": "Tender marinated chicken, infused with aromatic Indian spices, grilled to perfection in our traditional tandoor oven. Served with a side of cooling raita, this dish offers a flavorful journey to tantalize your taste buds.",
+          "price": 16.99,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "chicken-tikka-kebab",
+          "name": "Chicken Tikka Kebab",
+          "description": "Tender, marinated pieces of succulent chicken grilled to perfection in our traditional tandoori oven. Served piping hot with a side of cooling raita, our Chicken Tikka Kebab is a flavorful delight for your taste buds.",
+          "price": 17.99,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "dd-spl-non-veg-kebab-platter",
+          "name": "DD SPL Non Veg Kebab Platter",
+          "description": "Indulge in our DD SPL Non Veg Kebab Platter featuring a succulent selection of grilled chicken, lamb, and prawns, bursting with flavorful spices and charred to perfection. A true feast for the senses.",
+          "price": 24.95,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "makhmali-paneer-tikka",
+          "name": "Makhmali Paneer Tikka",
+          "description": "Tender cubes of paneer marinated in a velvety blend of spices and grilled to perfection. Served sizzling hot, our Makhmali Paneer Tikka is a melt-in-your-mouth delight that will tantalize your taste buds.",
+          "price": 16.99,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "mixed-veg-kebab-gobi-mushroom-paneer-peppers",
+          "name": "Mixed Veg Kebab (Gobi/ Mushroom/ Paneer/ Peppers)",
+          "description": "Savor the medley of flavors with our Mixed Veg Kebab featuring perfectly grilled cauliflower, savory mushrooms, marinated paneer, and vibrant peppers. A delightful vegetarian delight that promises a symphony of tastes in every bite.",
+          "price": 17.67,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "murg-malai-kebab",
+          "name": "Murg Malai Kebab",
+          "description": "Tender chicken marinated in creamy yogurt, cashew paste, and aromatic spices, skewered and grilled to perfection. Savor the rich flavors of our Murg Malai Kebab, a melt-in-your-mouth tandoori delight.",
+          "price": 17.99,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "paneer-tikka-kebab",
+          "name": "Paneer Tikka Kebab",
+          "description": "Succulent cubes of marinated paneer grilled to perfection in a traditional tandoor oven, bursting with smoky flavors and aromatic spices.",
+          "price": 16.99,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "pathar-ka-gosht-goat",
+          "name": "Pathar Ka Gosht (Goat)",
+          "description": "",
+          "price": 21.83,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "reshmi-kebab-chicken",
+          "name": "Reshmi Kebab - Chicken",
+          "description": "Tender pieces of succulent chicken marinated in a blend of aromatic spices and grilled to perfection, our Reshmi Kebab is a mouthwatering delight that will tantalize your taste buds.",
+          "price": 20.99,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "seekh-kebab-chicken",
+          "name": "Seekh Kebab (Chicken)",
+          "description": "Savor the succulent flavors of our Chicken Seekh Kebab, expertly seasoned and grilled to perfection in our traditional tandoor oven. A tantalizing blend of aromatic spices and tender chicken, each bite is a culinary delight.",
+          "price": 20.99,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "tandoori-jinga",
+          "name": "Tandoori Jinga",
+          "description": "",
+          "price": 20.99,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "tandoori-pomfret",
+          "name": "Tandoori Pomfret",
+          "description": "Savor the succulent flavors of our Tandoori Pomfret, a marinated whole fish delicately grilled in a traditional tandoor oven, resulting in a tender and aromatic dish that will tantalize your taste buds.",
+          "price": 20.99,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "tangdi-kebab",
+          "name": "Tangdi Kebab",
+          "description": "Juicy chicken drumsticks marinated in a blend of aromatic spices and grilled to perfection in a traditional tandoor oven.",
+          "price": 17.99,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        },
+        {
+          "id": "tawa-fish",
+          "name": "Tawa Fish",
+          "description": "Flavorful Tawa Fish grilled to perfection with a blend of aromatic spices, served sizzling hot. A succulent seafood dish that will transport your taste buds to the streets of India.",
+          "price": 19.75,
+          "category": "Kebab and Tandoori",
+          "categorySlug": "kebab-and-tandoori",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "kids-menu",
+      "name": "Kids Menu",
+      "rawName": "Kids Menu",
+      "itemCount": 3,
+      "items": [
+        {
+          "id": "chicken-nuggets",
+          "name": "Chicken Nuggets",
+          "description": "Crispy, golden-brown chicken nuggets served with a side of savory dipping sauce. Perfectly bite-sized for little ones to enjoy.",
+          "price": 11.99,
+          "category": "Kids Menu",
+          "categorySlug": "kids-menu",
+          "featured": false
+        },
+        {
+          "id": "dd-mini-kulcha",
+          "name": "DD Mini Kulcha",
+          "description": "Miniature versions of our traditional kulcha, perfect for little ones with big appetites. Soft, fluffy bread stuffed with a savory mix of spiced potatoes, onions, and herbs, baked to golden perfection. A delightful and satisfying choice for our young guests.",
+          "price": 13.99,
+          "category": "Kids Menu",
+          "categorySlug": "kids-menu",
+          "featured": false
+        },
+        {
+          "id": "french-fries",
+          "name": "French Fries",
+          "description": "Crispy and golden French fries, perfect for little ones craving a classic side dish. Served hot and seasoned to perfection, these fries are a kid-friendly delight.",
+          "price": 9.99,
+          "category": "Kids Menu",
+          "categorySlug": "kids-menu",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "mocktails",
+      "name": "Mocktails",
+      "rawName": "Mocktails",
+      "itemCount": 4,
+      "items": [
+        {
+          "id": "banana-daiquiri",
+          "name": "Banana Daiquiri",
+          "description": "",
+          "price": 7.99,
+          "category": "Mocktails",
+          "categorySlug": "mocktails",
+          "featured": false
+        },
+        {
+          "id": "mango-margarita",
+          "name": "Mango Margarita",
+          "description": "",
+          "price": 7.99,
+          "category": "Mocktails",
+          "categorySlug": "mocktails",
+          "featured": false
+        },
+        {
+          "id": "mint-margarita",
+          "name": "Mint Margarita",
+          "description": "",
+          "price": 7.99,
+          "category": "Mocktails",
+          "categorySlug": "mocktails",
+          "featured": false
+        },
+        {
+          "id": "pinacolada",
+          "name": "Pinacolada",
+          "description": "",
+          "price": 7.99,
+          "category": "Mocktails",
+          "categorySlug": "mocktails",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "monday-offers",
+      "name": "Monday Offers",
+      "rawName": "Monday Offers",
+      "itemCount": 3,
+      "items": [
+        {
+          "id": "chicken-biryani-monday-to-go",
+          "name": "CHICKEN BIRYANI (Monday TO GO)",
+          "description": "Your favorite chicken biryani at a special Monday price — flavorful, filling, and ready to go!",
+          "price": 11,
+          "category": "Monday Offers",
+          "categorySlug": "monday-offers",
+          "featured": false
+        },
+        {
+          "id": "mutton-biryani-monday-to-go",
+          "name": "MUTTON BIRYANI (Monday TO GO)",
+          "description": "Fragrant basmati rice layered with tender mutton and authentic spices, slow-cooked to perfection.",
+          "price": 12,
+          "category": "Monday Offers",
+          "categorySlug": "monday-offers",
+          "featured": false
+        },
+        {
+          "id": "veg-biryani-monday-to-go",
+          "name": "VEG BIRYANI (Monday TO GO)",
+          "description": "Aromatic vegetarian biryani — light, flavorful, and perfect for a weekday indulgence.",
+          "price": 11,
+          "category": "Monday Offers",
+          "categorySlug": "monday-offers",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "naans",
+      "name": "Naans",
+      "rawName": "Naans",
+      "itemCount": 13,
+      "items": [
+        {
+          "id": "bread-basket",
+          "name": "Bread Basket",
+          "description": "Indulge in our delectable Bread Basket, featuring a variety of freshly baked naans served warm and perfect for sharing. Enjoy the irresistible aroma and flavors of traditional Indian breads, a delightful start to your dining experience.",
+          "price": 16.99,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "butter-naan",
+          "name": "Butter Naan",
+          "description": "Soft and fluffy Butter Naan, a classic Indian bread infused with rich buttery flavor. Perfectly baked to golden perfection, this aromatic and indulgent side pairs wonderfully with any savory dish on our menu.",
+          "price": 4.15,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "butter-roti",
+          "name": "Butter Roti",
+          "description": "Flaky and flavorful, our Butter Roti is a soft Indian flatbread brushed with rich, creamy butter. Enjoy its warm, buttery goodness alongside your favorite curry or as a delightful standalone treat.",
+          "price": 3.99,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "cheese-naan",
+          "name": "Cheese Naan",
+          "description": "Indulge in our warm and fluffy Cheese Naan, a delectable twist on a classic favorite. Made with a blend of gooey melted cheese folded into our soft, oven-baked naan bread, this savory delight is sure to satisfy your cravings.",
+          "price": 4.15,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "chilli-cheese-naan",
+          "name": "Chilli Cheese Naan",
+          "description": "Spice up your meal with our Chilli Cheese Naan, a savory twist on the traditional Indian bread. Warm, fluffy naan stuffed with gooey melted cheese and a kick of spicy chillies.",
+          "price": 4.15,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "chilli-garlic-naan",
+          "name": "Chilli Garlic Naan",
+          "description": "Our Chilli Garlic Naan is a fiery twist on a classic favorite, boasting a perfect blend of zesty garlic and spicy chilli flavors. Baked to crispy perfection in our traditional tandoor oven, this naan is a delightful accompaniment to any meal.",
+          "price": 4.15,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "garlic-naan",
+          "name": "Garlic Naan",
+          "description": "Our freshly baked Garlic Naan is a flavorful twist on traditional Indian bread, infused with aromatic garlic and herbs. Enjoy its crispy exterior and soft, fluffy interior for a delightful accompaniment to your meal.",
+          "price": 4.15,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "lachha-paratha",
+          "name": "Lachha Paratha",
+          "description": "A flaky and buttery Indian flatbread, our Lachha Paratha is a delightful accompaniment to any meal. Hand-stretched and layered to perfection, this naan is a delicious blend of crispiness and softness that will leave your taste buds wanting more.",
+          "price": 5.19,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "malabar-paratha",
+          "name": "Malabar Paratha",
+          "description": "Soft and flaky Malabar Paratha, a traditional Indian flatbread, perfectly cooked to golden perfection. Enjoy this buttery delight on its own or paired with your favorite curry for a truly satisfying meal.",
+          "price": 5.19,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "onion-kulcha",
+          "name": "Onion Kulcha",
+          "description": "Our fragrant Onion Kulcha is a soft, oven-baked naan bread infused with caramelized onions, creating a delightful blend of sweet and savory flavors. Perfectly paired with your favorite curry or enjoyed on its own, this traditional Indian flatbread is a must-try.",
+          "price": 4.15,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "peshwari-naan",
+          "name": "Peshwari Naan",
+          "description": "Indulge in our Peshwari Naan, a traditional Indian flatbread filled with a sweet and nutty blend of coconut, raisins, and almonds. Perfectly grilled to golden perfection, each bite is a delightful fusion of flavors that will transport your taste buds to the vibrant streets of India.",
+          "price": 4.15,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "plain-naan",
+          "name": "Plain Naan",
+          "description": "Soft and pillowy, our Plain Naan is the perfect accompaniment to any dish. Enjoy the warm, freshly baked bread with a hint of char from our tandoor oven.",
+          "price": 3.11,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        },
+        {
+          "id": "roti",
+          "name": "Roti",
+          "description": "Flaky and delicious, our Roti is a traditional Indian flatbread perfect for savoring with your favorite curry. Made with a delicate touch and served warm, it's the ideal accompaniment to elevate your dining experience.",
+          "price": 3.11,
+          "category": "Naans",
+          "categorySlug": "naans",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "non-vegetarian-appetizers",
+      "name": "Non Vegetarian Appetizers",
+      "rawName": "Non Vegetarian Appetizers",
+      "itemCount": 47,
+      "items": [
+        {
+          "id": "ameerpet-egg-fry",
+          "name": "Ameerpet Egg Fry",
+          "description": "Indulge in our savory Ameerpet Egg Fry, a tantalizing appetizer featuring perfectly fried eggs seasoned with aromatic spices. Served hot and bursting with flavor, this dish is a delightful way to start your meal.",
+          "price": 14.59,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "andhra-chilli-chicken",
+          "name": "Andhra Chilli Chicken",
+          "description": "Tender chicken tossed in a fiery blend of Andhra spices, sautéed with bell peppers and onions for a zesty kick.",
+          "price": 15.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "andhra-kodi-vepudu-bone-in",
+          "name": "Andhra Kodi Vepudu (Bone-In)",
+          "description": "Tender bone-in chicken cooked in a flavorful Andhra-style spice blend, creating a tantalizing aroma and a perfect balance of heat and flavor.",
+          "price": 16.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "andhra-kodi-vepudu-boneless",
+          "name": "Andhra Kodi Vepudu (Boneless)",
+          "description": "Tender boneless chicken sautéed with traditional Andhra spices for a flavorful kick in every bite.",
+          "price": 17.67,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "apollo-fish",
+          "name": "Apollo Fish",
+          "description": "Crispy and flavorful Apollo fish, marinated in a blend of exotic spices and fried to perfection. A delightful fusion of tangy and spicy flavors that will tantalize your taste buds.",
+          "price": 17.67,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "black-pepper-prawns",
+          "name": "Black Pepper Prawns",
+          "description": "Juicy prawns sautéed to perfection with a bold kick of black pepper, delivering a savory and aromatic experience in every bite.",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chicken-555",
+          "name": "Chicken 555",
+          "description": "Succulent chicken bites marinated in a blend of five flavorful spices, perfectly grilled to juicy perfection. A tantalizing appetizer that will leave taste buds craving more.",
+          "price": 16.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chicken-65-dry",
+          "name": "Chicken 65 Dry",
+          "description": "Tender chicken pieces marinated in a blend of aromatic spices and fried to perfection, creating a crispy, flavorful delight that will leave your taste buds craving more.",
+          "price": 15.59,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chicken-lollipop",
+          "name": "Chicken Lollipop",
+          "description": "Tender chicken drumettes marinated in a flavorful blend of spices and herbs, deep-fried to crispy perfection. Served with a zesty dipping sauce for a deliciously satisfying start to your meal.",
+          "price": 16.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chicken-majestic",
+          "name": "Chicken Majestic",
+          "description": "Tender chicken pieces marinated in a flavorful blend of spices, sautéed to perfection, and finished with a touch of cream and herbs. A decadent and aromatic appetizer that will delight your taste buds.",
+          "price": 15.59,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chicken-manchurian",
+          "name": "Chicken Manchurian",
+          "description": "Succulent chicken pieces tossed in a tangy and savory Manchurian sauce, creating a harmonious blend of flavors and textures. A perfect balance of sweet and spicy notes, this dish is a must-try for lovers of Asian cuisine.",
+          "price": 15.59,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chicken-pepper-fry",
+          "name": "Chicken Pepper Fry",
+          "description": "Tender chicken pieces sautéed to perfection with a medley of colorful bell peppers and aromatic spices. A zesty and flavorful appetizer that will tantalize your taste buds.",
+          "price": 15.59,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chilli-chicken",
+          "name": "Chilli Chicken",
+          "description": "Tender chunks of chicken stir-fried with vibrant bell peppers and onions in a zesty blend of spicy Asian flavors.",
+          "price": 15.59,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chilli-egg",
+          "name": "Chilli Egg",
+          "description": "Savor the perfect blend of spicy and savory with our Chilli Egg appetizer. Crispy fried eggs tossed in a zesty chili sauce, creating a flavor explosion that will tantalize your taste buds.",
+          "price": 15.59,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chilli-shrimp",
+          "name": "Chilli Shrimp",
+          "description": "",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "dd-spl-cilantro-fish",
+          "name": "DD SPL Cilantro Fish",
+          "description": "Tender pieces of fresh fish marinated in a fragrant cilantro-infused blend, grilled to perfection. Served with a zesty dipping sauce, this dish is a delightful start to your meal.",
+          "price": 17.67,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "fish-65",
+          "name": "Fish 65",
+          "description": "Crispy and flavorful Fish 65, marinated with a blend of aromatic spices and deep-fried to perfection. A tantalizing appetizer that will leave your taste buds craving for more.",
+          "price": 17.67,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "fish-amritsar",
+          "name": "Fish Amritsar",
+          "description": "Crispy and flavorful, our Fish Amritsar features tender fillets marinated in a blend of Indian spices and fried to golden perfection. Served with a zesty mango chutney for a delightful burst of flavor.",
+          "price": 20.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "fish-tikka-kebab",
+          "name": "Fish Tikka Kebab",
+          "description": "Tender chunks of marinated fish, expertly grilled to perfection with a blend of aromatic spices. A succulent and flavorful start to your meal that will leave your taste buds craving more.",
+          "price": 20.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "godavari-fish-fry",
+          "name": "Godavari Fish Fry",
+          "description": "Crispy and flavorful Godavari Fish Fry featuring marinated fish fillets delicately fried to perfection. A tantalizing blend of spices and a satisfying crunch make this dish a delightful start to your meal.",
+          "price": 21.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "gongura-mamsam-fry-bone-in",
+          "name": "Gongura Mamsam Fry (Bone-In)",
+          "description": "Tender bone-in mutton, marinated in a tangy gongura sauce and expertly fried to perfection. A flavorful and aromatic appetizer that will tantalize your taste buds with every bite.",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "gongura-mamsam-fry-boneless",
+          "name": "Gongura Mamsam Fry (Boneless)",
+          "description": "Savor the bold flavors of our Gongura Mamsam Fry, featuring tender boneless lamb marinated in tangy gongura sauce and pan-fried to perfection.",
+          "price": 20.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "gongura-royyala-vepudu",
+          "name": "Gongura Royyala Vepudu",
+          "description": "Tender shrimp sautéed with tangy gongura leaves and aromatic spices in this flavorful South Indian delicacy, Gongura Royyala Vepudu.",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "guntur-karampodi-kodi",
+          "name": "Guntur Karampodi kodi",
+          "description": "Indulge in our Guntur Karampodi Kodi, featuring succulent chicken marinated in spicy Guntur chili powder, fried to perfection. The perfect balance of heat and flavor in every bite.",
+          "price": 16.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "hell-of-chicken-drums",
+          "name": "Hell of Chicken Drums",
+          "description": "Crispy, fiery chicken drums marinated in a devilish blend of spices and served with a side of tangy dipping sauce. A devilishly delicious appetizer that will set your taste buds ablaze.",
+          "price": 17.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "hyd-chicken-65-wet",
+          "name": "Hyd Chicken 65 Wet",
+          "description": "Tender bites of spiced chicken, marinated in a flavorful blend of Indian spices, then cooked to juicy perfection in a luscious, tangy sauce. Served hot and ready to tantalize your taste buds.",
+          "price": 15.59,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "karivepaaku-kodi",
+          "name": "Karivepaaku kodi",
+          "description": "Crispy and flavorful Karivepaaku Kodi, featuring tender chicken marinated in aromatic curry leaves and spices, fried to perfection. A delightful non-vegetarian appetizer that will tantalize your taste buds.",
+          "price": 16.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "kothimeera-chicken",
+          "name": "Kothimeera Chicken",
+          "description": "",
+          "price": 16.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "loose-prawns",
+          "name": "Loose Prawns",
+          "description": "Tender prawns delicately seasoned and lightly fried to perfection, offering a tantalizing crunch with each bite. Accompanied by a zesty dipping sauce for a burst of flavor.",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mirapakaya-kodi-vepudu",
+          "name": "Mirapakaya Kodi Vepudu",
+          "description": "Spicy and flavorful Mirapakaya Kodi Vepudu featuring tender chicken sautéed with green chilies and traditional Indian spices. A mouthwatering non-vegetarian appetizer that delivers a perfect balance of heat and savory goodness.",
+          "price": 16.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mutton-ghee-roast-bone-in",
+          "name": "Mutton Ghee Roast (Bone-In)",
+          "description": "Tender mutton pieces marinated in a rich blend of spices, sautéed in fragrant ghee until perfectly roasted. Tantalize your taste buds with this succulent bone-in delight.",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mutton-ghee-roast-boneless",
+          "name": "Mutton Ghee Roast (Boneless)",
+          "description": "Tender boneless mutton cooked to perfection in aromatic ghee, boasting a rich and flavorful roast. A succulent blend of traditional spices elevates this dish to a culinary delight.",
+          "price": 20.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mutton-milagu-pirattal-bone-in",
+          "name": "Mutton Milagu Pirattal (Bone-in)",
+          "description": "Tender bone-in mutton pieces tossed in a fragrant blend of black pepper and spices, creating a flavorful and aromatic dish known as Mutton Milagu Pirattal.",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mutton-pepper-fry-bone-in",
+          "name": "Mutton Pepper Fry (Bone-In)",
+          "description": "Tender mutton pieces marinated in a flavorful blend of peppercorns and spices, then pan-fried to perfection for a crispy exterior and juicy interior. A succulent bone-in appetizer that promises bold, savory flavors in every bite.",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mutton-pepper-fry-boneless",
+          "name": "Mutton Pepper Fry (Boneless)",
+          "description": "Tender boneless mutton pieces sautéed to perfection with a fiery blend of aromatic peppercorns and spices. A tantalizing and flavorful appetizer that promises a spicy kick with every savory bite.",
+          "price": 20.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mutton-sukka-bone-in",
+          "name": "Mutton Sukka (Bone-In)",
+          "description": "Tender mutton chunks marinated in a blend of aromatic spices, sautéed to perfection with onions and curry leaves, delivering a burst of flavor in every bite. An irresistible appetizer for meat lovers seeking a taste of authentic Indian cuisine.",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mutton-sukka-boneless",
+          "name": "Mutton Sukka (Boneless)",
+          "description": "Tender boneless mutton cooked to perfection with a flavorful blend of spices, creating a succulent and aromatic dish that will tantalize your taste buds.",
+          "price": 20.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "natu-kodi-roast",
+          "name": "Natu Kodi Roast",
+          "description": "Tender chicken marinated in traditional Indian spices, slow-roasted to perfection in our clay oven. Served with a zesty mint chutney for a flavorful kick.",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "pachi-mirchi-kodi-vepudu",
+          "name": "Pachi Mirchi Kodi Vepudu",
+          "description": "Spicy and flavorful Pachi Mirchi Kodi Vepudu - a South Indian dish featuring tender chicken stir-fried with green chilies, curry leaves, and aromatic spices.",
+          "price": 15.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "palnadu-mamsam-roast-bone-in",
+          "name": "Palnadu Mamsam Roast (Bone-In)",
+          "description": "",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "palnadu-mamsam-roast-boneless",
+          "name": "Palnadu Mamsam Roast (Boneless)",
+          "description": "Tender boneless lamb cooked to perfection in a spicy Palnadu style roast, bursting with bold South Indian flavors.",
+          "price": 20.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "party-chicken-wild-wings",
+          "name": "Party Chicken Wild Wings",
+          "description": "Succulent chicken wings tossed in a zesty wild sauce, perfect for sharing or savoring solo. A party in every bite!",
+          "price": 19.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "party-chicken-wings",
+          "name": "Party Chicken Wings",
+          "description": "Crispy and flavorful chicken wings tossed in a tangy party sauce, perfect for sharing or savoring solo. A crowd-pleasing appetizer that will have your taste buds dancing.",
+          "price": 19.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "sesame-prawn-roast",
+          "name": "Sesame Prawn Roast",
+          "description": "Plump prawns glazed in a savory sesame marinade and roasted to perfection. A succulent seafood delight that's sure to tantalize your taste buds.",
+          "price": 20.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "shrimp-fry",
+          "name": "Shrimp Fry",
+          "description": "Crispy, golden shrimp fried to perfection, served with a zesty cocktail sauce for a delightful start to your meal.",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "shrimp-koli-wada-with-jalapeno-sauce",
+          "name": "Shrimp Koli Wada with Jalapeno Sauce",
+          "description": "Crispy shrimp fritters, perfectly spiced and served with a zesty jalapeno sauce for a flavorful kick. A delectable fusion of flavors that will tantalize your taste buds.",
+          "price": 20.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "shrimp-majestic",
+          "name": "Shrimp Majestic",
+          "description": "Plump shrimp marinated in a blend of exotic spices, grilled to perfection, and served with a zesty citrus aioli. A majestic start to your dining experience.",
+          "price": 18.99,
+          "category": "Non Vegetarian Appetizers",
+          "categorySlug": "non-vegetarian-appetizers",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "non-vegetarian-entrees",
+      "name": "Non Vegetarian Entrees",
+      "rawName": "Non Vegetarian Entrees",
+      "itemCount": 26,
+      "items": [
+        {
+          "id": "andhra-chicken-curry",
+          "name": "Andhra Chicken Curry",
+          "description": "Tender chicken simmered in a flavorful blend of Andhra spices, creating a rich and aromatic curry. Served with steamed rice for a satisfying and authentic Indian dish.",
+          "price": 16.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "bhimavaram-royyala-vepudu",
+          "name": "Bhimavaram Royyala Vepudu",
+          "description": "Savor the bold flavors of our Bhimavaram Royyala Vepudu, a traditional Andhra-style spicy shrimp stir-fry bursting with aromatic spices and curry leaves. A delightful seafood dish that will tantalize your taste buds.",
+          "price": 20.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "butter-chicken",
+          "name": "Butter Chicken",
+          "description": "Tender chicken simmered in a rich tomato and butter sauce, our Butter Chicken is a classic favorite bursting with aromatic spices. Served with fluffy basmati rice, this dish is a comforting delight for the senses.",
+          "price": 16.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "chepala-pulusu",
+          "name": "Chepala Pulusu",
+          "description": "Tender fish simmered in a tangy tamarind sauce, infused with aromatic spices, creating a flavorful and satisfying Chepala Pulusu.",
+          "price": 17.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "chicken-chettinad",
+          "name": "Chicken Chettinad",
+          "description": "Tender chicken cooked in a rich and aromatic blend of South Indian spices, creating a flavorful and satisfying dish known as Chicken Chettinad.",
+          "price": 16.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "chicken-karaikudi",
+          "name": "Chicken Karaikudi",
+          "description": "Tender chicken cooked in a flavorful blend of aromatic spices and coconut milk, inspired by the traditional flavors of Karaikudi. A savory and satisfying dish that will transport your taste buds to the heart of South India.",
+          "price": 16.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "chicken-mughlai",
+          "name": "Chicken Mughlai",
+          "description": "Tender chicken simmered in a rich, aromatic Mughlai sauce, combining creamy yogurt, fragrant spices, and a hint of nuttiness. Served with fluffy basmati rice for a truly indulgent experience.",
+          "price": 16.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "chicken-tikka-masala",
+          "name": "Chicken Tikka Masala",
+          "description": "Tender pieces of chicken marinated in a blend of aromatic spices, cooked to perfection in a rich and creamy tomato-based curry sauce. Served with fragrant basmati rice for a satisfyingly flavorful experience.",
+          "price": 16.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "chicken-vindaloo",
+          "name": "Chicken Vindaloo",
+          "description": "Tender chicken simmered in a fiery blend of vinegar, garlic, and spices, our Chicken Vindaloo offers a tantalizing taste of traditional Indian cuisine.",
+          "price": 16.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "dd-chef-s-special-chicken-curry-homestyle",
+          "name": "DD Chef's Special Chicken Curry (Homestyle)",
+          "description": "Savor the rich flavors of our Chef's Special Chicken Curry, a homestyle delight bursting with tender chicken, aromatic spices, and a tantalizing sauce. Perfectly balanced and full of hearty goodness.",
+          "price": 17.67,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": true
+        },
+        {
+          "id": "dd-chef-s-special-mutton-curry-homestyle",
+          "name": "DD Chef's Special Mutton Curry (Homestyle)",
+          "description": "Tender morsels of succulent mutton simmered in a rich, aromatic curry sauce, our Chef's Special Mutton Curry is a comforting homestyle delight. Served with fragrant basmati rice, this dish is a true taste of culinary craftsmanship.",
+          "price": 19.75,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": true
+        },
+        {
+          "id": "desi-chicken-curry-with-bone",
+          "name": "Desi Chicken Curry (With Bone)",
+          "description": "Tender chicken simmered in a fragrant blend of traditional Indian spices, creating a rich and flavorful curry that's perfect for spice enthusiasts. Served with bone for added depth of flavor.",
+          "price": 16.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "egg-bhurji-dry",
+          "name": "Egg Bhurji Dry",
+          "description": "Scrambled eggs cooked with aromatic spices, tomatoes, and onions, creating a flavorful and satisfying dish.",
+          "price": 13.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "egg-pulusu",
+          "name": "Egg Pulusu",
+          "description": "Tender eggs simmered in a tangy tamarind-based gravy, Egg Pulusu is a flavorful South Indian delicacy that will tantalize your taste buds.",
+          "price": 15.59,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "goan-fish-curry",
+          "name": "Goan Fish Curry",
+          "description": "Tender pieces of fresh fish simmered in a fragrant coconut and spice-infused curry sauce inspired by the flavors of Goa, India. Accompanied by steamed rice for a satisfying and aromatic dining experience.",
+          "price": 17.67,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "goat-chettinad",
+          "name": "Goat Chettinad",
+          "description": "Tender goat meat simmered in a fragrant blend of toasted spices, coconut, and curry leaves, creating a rich and flavorful Chettinad dish that will tantalize your taste buds.",
+          "price": 18.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "goat-mughalai",
+          "name": "Goat Mughalai",
+          "description": "Tender goat meat simmered in a rich and creamy Mughalai sauce, bursting with aromatic spices and flavors.",
+          "price": 18.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "goat-vindaloo",
+          "name": "Goat Vindaloo",
+          "description": "Tender goat meat marinated in a spicy blend of vinegar, ginger, and aromatic spices, slow-cooked to perfection in a fiery vindaloo curry sauce. A bold and flavorful dish that will tantalize your taste buds.",
+          "price": 18.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "hyderabadi-goat-curry",
+          "name": "Hyderabadi Goat Curry",
+          "description": "Tender goat simmered in a fragrant blend of traditional Hyderabadi spices and slow-cooked to perfection, creating a rich and flavorful curry that will transport your taste buds to India.",
+          "price": 18.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "kashmiri-goat-rogan-josh",
+          "name": "Kashmiri Goat Rogan Josh",
+          "description": "Tender goat simmered in a rich, aromatic blend of traditional Kashmiri spices, creating a flavorful and hearty Rogan Josh dish.",
+          "price": 18.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "methi-chicken",
+          "name": "Methi Chicken",
+          "description": "Tender chicken cooked with aromatic fenugreek leaves, creating a flavorful blend of spices and herbs. A savory delight for those craving a taste of traditional Indian cuisine.",
+          "price": 16.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "mutton-milagu-pirattal-boneless",
+          "name": "Mutton Milagu Pirattal (Boneless)",
+          "description": "Tender boneless mutton cooked to perfection in a fragrant blend of black pepper and spices. A savory South Indian specialty that promises a burst of flavor in every bite.",
+          "price": 20.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "natu-kodi-curry",
+          "name": "Natu Kodi Curry",
+          "description": "Tender chicken cooked in a rich and aromatic curry sauce with traditional South Indian spices, served with steamed rice.",
+          "price": 18.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "railway-chicken-curry-with-bone",
+          "name": "Railway Chicken Curry (With Bone)",
+          "description": "Tender chicken simmered in a flavorful blend of aromatic spices and tomatoes, our Railway Chicken Curry is a comforting dish that's sure to delight your taste buds. Served with bone for added richness, this classic Indian curry is a must-try for curry lovers.",
+          "price": 16.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "royyala-pulusu",
+          "name": "Royyala Pulusu",
+          "description": "Tender shrimp simmered in a tangy tamarind sauce with a medley of aromatic spices, creating a flavorful and satisfying Royyala Pulusu.",
+          "price": 18.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "royyala-vepudu",
+          "name": "Royyala Vepudu",
+          "description": "Savor the flavors of the sea with our Royyala Vepudu, a tantalizing South Indian shrimp stir-fry bursting with aromatic spices and fresh curry leaves. Treat your taste buds to this zesty and savory dish for $20.99.",
+          "price": 20.99,
+          "category": "Non Vegetarian Entrees",
+          "categorySlug": "non-vegetarian-entrees",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "pulavs",
+      "name": "Pulavs",
+      "rawName": "Pulavs",
+      "itemCount": 3,
+      "items": [
+        {
+          "id": "chicken-pulav",
+          "name": "Chicken Pulav",
+          "description": "Chicken Pulav",
+          "price": 19.75,
+          "category": "Pulavs",
+          "categorySlug": "pulavs",
+          "featured": false
+        },
+        {
+          "id": "goat-pulav",
+          "name": "Goat Pulav",
+          "description": "Goat Pulav",
+          "price": 21.99,
+          "category": "Pulavs",
+          "categorySlug": "pulavs",
+          "featured": false
+        },
+        {
+          "id": "vegitable-pulav",
+          "name": "Vegitable Pulav",
+          "description": "Vegitable Pulav",
+          "price": 16.99,
+          "category": "Pulavs",
+          "categorySlug": "pulavs",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "snacks",
+      "name": "Snacks",
+      "rawName": "Snacks",
+      "itemCount": 13,
+      "items": [
+        {
+          "id": "bandi-punugulu",
+          "name": "Bandi Punugulu",
+          "description": "Crispy on the outside, soft on the inside, our Bandi Punugulu are savory fritters bursting with flavor. Made from a blend of lentil batter and spices, these South Indian snacks are perfect for sharing or savoring solo.",
+          "price": 11.99,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "boiled-peanuts-masala",
+          "name": "Boiled Peanuts Masala",
+          "description": "Savor the bold flavors of our Boiled Peanuts Masala, a zesty twist on a classic snack. Enjoy perfectly boiled peanuts coated in a tantalizing blend of spices, creating a mouthwatering treat that's perfect for sharing or indulging solo.",
+          "price": 11.99,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "cut-mirchi",
+          "name": "Cut Mirchi",
+          "description": "Spicy green chilies stuffed with a flavorful mix of spices and herbs, then deep-fried to crispy perfection. A fiery and savory snack that packs a punch with every bite.",
+          "price": 10.99,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "egg-bonda-3pcs",
+          "name": "Egg Bonda (3Pcs)",
+          "description": "Crispy on the outside, soft on the inside, our Egg Bonda features three perfectly spiced and fried egg fritters. A delicious snack bursting with flavor that will keep you coming back for more.",
+          "price": 13.99,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "kaju-fry",
+          "name": "Kaju Fry",
+          "description": "Crispy cashews coated in a flavorful blend of spices and fried to perfection, our Kaju Fry is a delightful snack that offers a satisfying crunch with every bite.",
+          "price": 14.59,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "malai-bun",
+          "name": "Malai Bun",
+          "description": "Indulge in our delectable Malai Bun, a soft, pillowy bun filled with creamy, rich malai (clotted cream) for a decadent snack experience.",
+          "price": 5,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "mirchi-bajji",
+          "name": "Mirchi Bajji",
+          "description": "Crispy and spicy Mirchi Bajji, featuring fresh green chilies coated in a flavorful batter and deep-fried to golden perfection. A tantalizing Indian snack that packs a punch of savory heat.",
+          "price": 11.99,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "niloufer-biscuit-1-piece",
+          "name": "Niloufer Biscuit 1 Piece",
+          "description": "",
+          "price": 1,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "niloufer-biscuits-pack",
+          "name": "Niloufer Biscuits Pack",
+          "description": "",
+          "price": 14.99,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "plain-bun",
+          "name": "Plain Bun",
+          "description": "Indulge in the simplicity of our freshly baked plain bun, a light and fluffy snack perfect for any time of day. Savor the buttery aroma and soft texture with every bite.",
+          "price": 5,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "roasted-peanut-masala",
+          "name": "Roasted Peanut Masala",
+          "description": "Crunchy roasted peanuts tossed in a flavorful masala blend of spices, perfect for a satisfying snack.",
+          "price": 11.99,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "samosa",
+          "name": "Samosa",
+          "description": "Crispy golden-brown pastries stuffed with a savory blend of spiced potatoes, peas, and aromatic herbs, our Punjabi Samosas are a delightful bite-sized treat. Served with a side of tangy tamarind chutney, each morsel bursts with flavor, making them the perfect start to your meal.",
+          "price": 11.99,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        },
+        {
+          "id": "stuffed-mirchi",
+          "name": "Stuffed Mirchi",
+          "description": "Spicy green chilies stuffed with a flavorful mixture of potatoes and spices, fried to crispy perfection. A zesty and satisfying snack to tantalize your taste buds.",
+          "price": 11.99,
+          "category": "Snacks",
+          "categorySlug": "snacks",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "soft-drinks",
+      "name": "Soft Drinks",
+      "rawName": "Soft Drinks",
+      "itemCount": 29,
+      "items": [
+        {
+          "id": "butter-milk",
+          "name": "Butter Milk",
+          "description": "Creamy and refreshing, our Buttermilk is a delightful soft drink that perfectly complements any meal with its tangy flavor and smooth texture. Enjoy a cool and satisfying sip of this classic beverage for $5.99.",
+          "price": 5.99,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "can-drinks",
+          "name": "Can Drinks",
+          "description": "Quench your thirst with our selection of refreshing canned drinks, perfect for cooling down on a hot day. Enjoy a variety of flavors to complement your meal or simply sip on its own.",
+          "price": 2.07,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "canada-dry",
+          "name": "Canada Dry",
+          "description": "Enjoy the refreshing fizz of Canada Dry, a classic soft drink that perfectly complements any meal. Crisp and bubbly, it's the ideal thirst-quencher to elevate your dining experience.",
+          "price": 3.11,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "canada-dry-can",
+          "name": "Canada Dry Can",
+          "description": "Effervescent and refreshing, the Canada Dry Can offers a crisp and satisfying burst of ginger ale flavor in every sip. Enjoy the perfect balance of sweetness and carbonation in this classic soft drink option.",
+          "price": 2.07,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "coke-can",
+          "name": "Coke - Can",
+          "description": "Ice-cold Coca-Cola in a convenient can, refreshing and bubbly, perfect for quenching your thirst.",
+          "price": 2.07,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "coke-mexican-bottle-20oz",
+          "name": "Coke - Mexican Bottle (20oz)",
+          "description": "Enjoy the refreshing taste of Coca-Cola in a 20oz Mexican glass bottle. Perfectly chilled and served with a touch of nostalgia.",
+          "price": 4.15,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "diet-coke-bottle",
+          "name": "Diet Coke - Bottle",
+          "description": "Enjoy the crisp and refreshing taste of our Diet Coke served in a chilled bottle, the perfect accompaniment to your meal.",
+          "price": 4.15,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "diet-coke-can",
+          "name": "Diet Coke - Can",
+          "description": "Enjoy the crisp, refreshing taste of Diet Coke in a convenient can. Perfect for satisfying your thirst while dining in.",
+          "price": 2.07,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "fresh-lemon-soda",
+          "name": "Fresh Lemon Soda",
+          "description": "Refreshing lemon soda made with freshly squeezed lemons, perfect for a burst of citrusy delight on a warm day.",
+          "price": 6.23,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "ginger-ale-can",
+          "name": "Ginger Ale Can",
+          "description": "Refreshing and zesty, our chilled Ginger Ale Can is the perfect bubbly companion to your meal. Enjoy the invigorating blend of ginger and carbonation in every sip.",
+          "price": 2.07,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "gingerale-bottle",
+          "name": "GingerAle Bottle",
+          "description": "Refreshing and bubbly, our GingerAle Bottle is the perfect thirst-quenching companion to your meal. Made with a zesty blend of ginger and natural flavors, this fizzy drink will elevate your dining experience.",
+          "price": 4.15,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "goli-soda",
+          "name": "Goli Soda",
+          "description": "Experience the nostalgic charm of Goli Soda, a refreshing carbonated beverage bursting with fizz and flavor. Served chilled for the perfect pick-me-up.",
+          "price": 4.15,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "limca",
+          "name": "Limca",
+          "description": "Refreshing and bubbly, our Limca soda is the perfect thirst-quencher. Made with a blend of lemon and lime flavors, this citrusy drink will leave you feeling invigorated.",
+          "price": 3.99,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "limca-can",
+          "name": "Limca Can",
+          "description": "Enjoy the crisp, refreshing taste of Limca in a convenient can. This bubbly soft drink is bursting with lemon-lime flavor, perfect for quenching your thirst.",
+          "price": 2.69,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "mango-lassi",
+          "name": "Mango Lassi",
+          "description": "Indulge in the refreshing blend of ripe mangoes and creamy yogurt with our luscious Mango Lassi. Perfectly balanced sweetness in every sip.",
+          "price": 6.23,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "mexican-coke",
+          "name": "Mexican Coke",
+          "description": "Enjoy the crisp, nostalgic sweetness of Mexican Coke, made with real cane sugar for a refreshing twist on a classic soft drink.",
+          "price": 5.19,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "mexican-fanta",
+          "name": "Mexican Fanta",
+          "description": "Experience the vibrant flavors of Mexico with our refreshing Mexican Fanta. Made with real cane sugar for an authentic and satisfying taste that will transport you to the streets of Mexico City.",
+          "price": 5.19,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "mexican-sprite",
+          "name": "Mexican Sprite",
+          "description": "Refresh your taste buds with our zesty Mexican Sprite, a sparkling fusion of crisp, citrusy flavors that will tantalize your senses. Enjoy the perfect balance of sweetness and effervescence in every sip.",
+          "price": 5.19,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "poland-spring-water-bottle",
+          "name": "Poland Spring Water Bottle",
+          "description": "Stay refreshed with our Poland Spring Water Bottle, a crisp and pure hydration choice to complement your meal. Served ice-cold for the ultimate thirst-quenching experience.",
+          "price": 1.19,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "salt-lassi",
+          "name": "Salt Lassi",
+          "description": "Refreshing and tangy, our Salt Lassi is a traditional Indian yogurt drink blended with a hint of salt for a unique and satisfying flavor. Perfect for cooling down and complementing your meal.",
+          "price": 5.99,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "smart-water",
+          "name": "Smart Water",
+          "description": "Stay refreshed with our Smart Water, a crisp and pure choice for hydration. Enjoy the clean taste and electrolyte boost in every sip.",
+          "price": 4.15,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "sprite-bottle",
+          "name": "Sprite Bottle",
+          "description": "Enjoy the refreshing bubbles and crisp taste of a chilled Sprite Bottle. Perfect for quenching your thirst and adding a touch of citrusy sweetness to your meal.",
+          "price": 4.15,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "sprite-can",
+          "name": "Sprite can",
+          "description": "Refreshing and effervescent, our Sprite can is the perfect thirst-quencher. Made with a crisp, clean lemon-lime flavor, it's a bubbly delight that pairs perfectly with any meal.",
+          "price": 2.07,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "sweet-lassi",
+          "name": "Sweet Lassi",
+          "description": "Indulge in our refreshing Sweet Lassi, a traditional Indian yogurt drink blended with a hint of sweetness and a touch of cardamom. Perfectly chilled to quench your thirst and delight your taste buds.",
+          "price": 5.19,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "thums-up-can",
+          "name": "Thums Up - Can",
+          "description": "Quench your thirst with the bold and refreshing taste of Thums Up. This carbonated soft drink in a can offers a perfect balance of sweetness and fizziness, making it a delightful choice to accompany any meal.",
+          "price": 2.99,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "topo-chico",
+          "name": "Topo Chico",
+          "description": "Effervescent and refreshing, our Topo Chico sparkling water is the perfect thirst-quencher. Imported from Mexico, this bubbly soft drink is crisp and invigorating, making it a delightful choice to accompany any meal.",
+          "price": 4.15,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "topo-chico-can",
+          "name": "Topo Chico - Can",
+          "description": "Quench your thirst with the crisp effervescence of a chilled Topo Chico. This iconic mineral water from Mexico is the perfect refreshing sip to accompany your meal.",
+          "price": 3.11,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "zero-coke-bottle",
+          "name": "Zero Coke - Bottle",
+          "description": "Enjoy the crisp and refreshing taste of Zero Coke in a convenient bottle. Perfect for quenching your thirst and enhancing your dining experience.",
+          "price": 4.15,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        },
+        {
+          "id": "zero-coke-can",
+          "name": "Zero Coke - Can",
+          "description": "Enjoy the crisp, refreshing taste of Zero Coke in a convenient can. Perfectly chilled and ready to quench your thirst, this classic beverage offers the bold flavor you love with zero sugar.",
+          "price": 2.07,
+          "category": "Soft Drinks",
+          "categorySlug": "soft-drinks",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "soups",
+      "name": "Soups",
+      "rawName": "Soups",
+      "itemCount": 4,
+      "items": [
+        {
+          "id": "desi-chicken-manchow-soup",
+          "name": "Desi Chicken Manchow Soup",
+          "description": "A vibrant fusion of flavors, our Desi Chicken Manchow Soup features tender chicken simmered in a spicy, aromatic broth, enriched with crunchy vegetables and a hint of tangy soy sauce. Finished with crispy fried noodles and a sprinkle of fresh coriander, each spoonful delivers warmth and zest, making it the perfect comfort dish for any occasion.",
+          "price": 8.59,
+          "category": "Soups",
+          "categorySlug": "soups",
+          "featured": false
+        },
+        {
+          "id": "desi-veg-manchow-soup",
+          "name": "Desi Veg Manchow Soup",
+          "description": "A vibrant blend of crisp vegetables and fragrant spices, our Desi Veg Manchow Soup delivers a delightful kick with every spoonful. Crafted with a savory base of garlic, ginger, and soy sauce, it’s topped with crunchy fried noodles and fresh cilantro for an irresistible finish. Perfectly warming and packed with flavor, this soup is a comforting embrace in a bowl.",
+          "price": 8.59,
+          "category": "Soups",
+          "categorySlug": "soups",
+          "featured": false
+        },
+        {
+          "id": "goat-paya-aattukal-soup",
+          "name": "Goat Paya (Aattukal) Soup",
+          "description": "Rich and aromatic, our Goat Paya (Aattukal) Soup features tender, slow-cooked goat trotters simmered in a blend of fragrant spices and herbs. Each spoonful offers a deep, comforting broth that warms the soul, finished with a sprinkle of fresh coriander for an irresistible, authentic taste.",
+          "price": 9.35,
+          "category": "Soups",
+          "categorySlug": "soups",
+          "featured": false
+        },
+        {
+          "id": "natu-kodi-soup",
+          "name": "Natu Kodi Soup",
+          "description": "Savor the warmth of our Natu Kodi Soup, a fragrant blend of tender free-range chicken simmered to perfection with aromatic spices, fresh herbs, and a hint of tangy tamarind. Each spoonful delivers a hearty burst of flavor, creating a comforting experience that warms the soul.",
+          "price": 9.35,
+          "category": "Soups",
+          "categorySlug": "soups",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "thali",
+      "name": "Thali",
+      "rawName": "Thali",
+      "itemCount": 2,
+      "items": [
+        {
+          "id": "non-veg-thali",
+          "name": "Non Veg Thali",
+          "description": "Savor a delightful assortment of savory dishes with our Non Veg Thali. Featuring a delectable selection of tender meats, aromatic spices, and flavorful accompaniments, this traditional Indian platter is a feast for the senses.",
+          "price": 22.87,
+          "category": "Thali",
+          "categorySlug": "thali",
+          "featured": false
+        },
+        {
+          "id": "veg-thali",
+          "name": "Veg Thali",
+          "description": "Indulge in a tantalizing array of vegetarian delights with our Veg Thali. Featuring a colorful assortment of seasonal vegetables, aromatic spices, lentils, and fluffy basmati rice, this traditional Indian platter offers a symphony of flavors in every bite.",
+          "price": 20.99,
+          "category": "Thali",
+          "categorySlug": "thali",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "trays",
+      "name": "Trays",
+      "rawName": "Trays",
+      "itemCount": 5,
+      "items": [
+        {
+          "id": "chicken-biryani-small-deep-tray",
+          "name": "Chicken Biryani Small Deep Tray",
+          "description": "",
+          "price": 100,
+          "category": "Trays",
+          "categorySlug": "trays",
+          "featured": false
+        },
+        {
+          "id": "chicken-majestic-small-tray",
+          "name": "Chicken Majestic Small Tray",
+          "description": "",
+          "price": 100,
+          "category": "Trays",
+          "categorySlug": "trays",
+          "featured": false
+        },
+        {
+          "id": "chicken-pulav-deep-small-tray",
+          "name": "Chicken Pulav Deep Small Tray",
+          "description": "",
+          "price": 120,
+          "category": "Trays",
+          "categorySlug": "trays",
+          "featured": false
+        },
+        {
+          "id": "goat-pulav-small-tray",
+          "name": "Goat Pulav Small Tray",
+          "description": "",
+          "price": 110,
+          "category": "Trays",
+          "categorySlug": "trays",
+          "featured": false
+        },
+        {
+          "id": "stuffed-mirchi-small-deep-tray",
+          "name": "Stuffed Mirchi Small Deep Tray",
+          "description": "",
+          "price": 85,
+          "category": "Trays",
+          "categorySlug": "trays",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "vegetarian-appetizers",
+      "name": "Vegetarian Appetizers",
+      "rawName": "Vegetarian Appetizers",
+      "itemCount": 34,
+      "items": [
+        {
+          "id": "baby-corn-555",
+          "name": "Baby Corn 555",
+          "description": "Crispy and golden, our Baby Corn 555 features tender baby corn coated in a savory blend of spices and fried to perfection. A delightful vegetarian appetizer that will have your taste buds singing!",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "baby-corn-majestic",
+          "name": "Baby Corn Majestic",
+          "description": "Tender baby corn tossed in a flavorful blend of spices and sauces, creating a crispy and delightful appetizer that will captivate your taste buds.",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "baby-corn-manchurian",
+          "name": "Baby Corn Manchurian",
+          "description": "Crispy baby corn tossed in a tangy, spicy Manchurian sauce, this vibrant appetizer bursts with flavor. Garnished with fresh spring onions and a hint of garlic, each bite delivers a delightful crunch and a zesty kick that will leave you craving more.",
+          "price": 13.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "baby-corn-pepper-fry",
+          "name": "Baby Corn Pepper Fry",
+          "description": "Crispy baby corn is lightly tossed in a vibrant blend of bell peppers and aromatic spices, delivering a delightful crunch in every bite. This zesty appetizer is finished with a sprinkle of fresh herbs, perfect for sharing or savoring solo.",
+          "price": 13.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "cashew-pakoda",
+          "name": "Cashew Pakoda",
+          "description": "Crispy cashew pakodas are a delightful fusion of crunchy, roasted cashews and a spiced chickpea batter, deep-fried to golden perfection. Served with a tangy tamarind chutney, each bite offers a satisfying crunch followed by a burst of nutty flavor, making them an irresistible start to your meal.",
+          "price": 14.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chana-pepper-fry",
+          "name": "Chana Pepper Fry",
+          "description": "Savor the bold flavors of our Chana Pepper Fry, a delightful vegetarian appetizer featuring chickpeas sautéed with vibrant peppers and aromatic spices.",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chilli-baby-corn",
+          "name": "Chilli Baby Corn",
+          "description": "Crisp baby corn is tossed in a fiery blend of chili, garlic, and soy sauce, then lightly battered and fried to golden perfection. This vibrant appetizer is garnished with fresh cilantro and served with a tangy dipping sauce, delivering a delightful crunch and a burst of flavor in every bite.",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chilli-gobi",
+          "name": "Chilli Gobi",
+          "description": "Crispy cauliflower florets are tossed in a fiery blend of spices and tangy chili sauce, creating an irresistible crunch with every bite. Garnished with fresh cilantro and served with a cooling yogurt dip, our Chilli Gobi delivers a bold burst of flavor that’s perfect for sharing—or savoring solo!",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chilli-lotus-root",
+          "name": "Chilli Lotus Root",
+          "description": "Crispy lotus root slices are expertly stir-fried in a fiery chili sauce, delivering a perfect balance of heat and crunch. Garnished with fresh scallions and sesame seeds, this vibrant dish is a tantalizing celebration of flavors and textures that will awaken your palate.",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chilli-mushroom",
+          "name": "Chilli Mushroom",
+          "description": "Sautéed to perfection, our Chilli Mushroom features tender, juicy button mushrooms tossed in a zesty blend of garlic, ginger, and vibrant chili peppers. Finished with a sprinkle of fresh coriander, each bite delivers a delightful kick that will awaken your taste buds and leave you craving more.",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "chilli-paneer",
+          "name": "Chilli Paneer",
+          "description": "Crispy, golden cubes of paneer are tossed in a vibrant blend of spicy chili sauce, garlic, and tangy soy, delivering a perfect balance of heat and flavor. Garnished with fresh cilantro and served with a zesty dipping sauce, this irresistible vegetarian delight is sure to ignite your taste buds!",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "corn-masala-fry",
+          "name": "Corn Masala Fry",
+          "description": "Golden corn kernels are tossed in a fragrant blend of spices, sautéed to perfection, and finished with fresh cilantro and a squeeze of lime. This zesty Corn Masala Fry delivers a delightful crunch and a burst of flavor in every bite, making it the perfect start to your meal.",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "gobi-555",
+          "name": "Gobi 555",
+          "description": "Crispy cauliflower florets tossed in a tangy, spicy sauce, our Gobi 555 is a flavor-packed vegetarian delight that'll have you coming back for more.",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "gobi-65",
+          "name": "Gobi 65",
+          "description": "Crispy cauliflower florets are marinated in a blend of aromatic spices and tangy yogurt, then deep-fried to golden perfection. Served with a zesty mint chutney, Gobi 65 delivers a delightful crunch and an explosion of flavor in every bite.",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "gobi-majestic",
+          "name": "Gobi Majestic",
+          "description": "Indulge in the vibrant flavors of our Gobi Majestic, featuring crispy cauliflower florets tossed in a tangy and aromatic sauce. A delightful vegetarian appetizer that will tantalize your taste buds with every bite.",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "gobi-manchurian",
+          "name": "Gobi Manchurian",
+          "description": "Crispy, golden cauliflower florets are tossed in a tangy, spicy Manchurian sauce, blending soy, garlic, and a hint of chili for a mouthwatering kick. Garnished with fresh cilantro and served with a side of cooling yogurt dip, this irresistible vegetarian appetizer is a flavor-packed fusion delight.",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "gobi-pepper-fry",
+          "name": "Gobi Pepper Fry",
+          "description": "Crispy cauliflower florets are lightly battered and stir-fried to perfection with a medley of vibrant bell peppers, aromatic spices, and a hint of tangy tamarind. This tantalizing Gobi Pepper Fry delivers a delightful crunch and a burst of flavor, making it the perfect start to your meal.",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "hyderabad-paneer-65",
+          "name": "Hyderabad Paneer 65",
+          "description": "Crispy, marinated paneer cubes are tossed in a vibrant blend of South Indian spices and fried to golden perfection. Served with a zesty mint chutney, this tantalizing dish offers a delightful crunch and a burst of flavor in every bite.",
+          "price": 14.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "lotus-root-manchurian",
+          "name": "Lotus Root Manchurian",
+          "description": "Crispy lotus root slices are coated in a fragrant blend of soy sauce, garlic, and ginger, then tossed with vibrant bell peppers and scallions for a delightful crunch. This tantalizing Manchurian dish is finished with a sprinkle of sesame seeds, delivering an irresistible fusion of flavors that will awaken your taste buds.",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mushroom-555",
+          "name": "Mushroom 555",
+          "description": "Savor the rich umami flavors of our Mushroom 555, a tantalizing blend of sautéed mushrooms, garlic, and herbs, served on a crispy crostini. A vegetarian delight that will leave your taste buds craving more.",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mushroom-majestic",
+          "name": "Mushroom Majestic",
+          "description": "Savor the rich flavors of our Mushroom Majestic, a delectable blend of earthy mushrooms sautéed to perfection and nestled in a crispy pastry shell. A vegetarian delight that will tantalize your taste buds.",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mushroom-manchurian",
+          "name": "Mushroom Manchurian",
+          "description": "Crispy mushroom bites tossed in a tangy Manchurian sauce, a delightful blend of savory and spicy flavors. A vegetarian favorite that will leave your taste buds craving for more.",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "mushroom-pepper-fry",
+          "name": "Mushroom Pepper Fry",
+          "description": "Savor the rich umami of our Mushroom Pepper Fry, featuring tender, sautéed mushrooms tossed with a medley of vibrant bell peppers and a hint of aromatic spices. Each bite bursts with flavor, complemented by a drizzle of zesty lime, making this a delightful start to your culinary journey.",
+          "price": 13.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "onion-pakoda",
+          "name": "Onion Pakoda",
+          "description": "Crispy onion pakodas are golden-brown fritters made with thinly sliced onions, fragrant spices, and a light chickpea batter, fried to perfection. Each bite delivers a delightful crunch, complemented by a side of tangy tamarind chutney for the ultimate flavor experience.",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "paneer-555",
+          "name": "Paneer 555",
+          "description": "Savor the perfect blend of flavors with our Paneer 555, featuring succulent cubes of paneer marinated in a tantalizing mix of spices and grilled to perfection. A delightful vegetarian appetizer that promises a burst of Indian-inspired goodness in every bite.",
+          "price": 14.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "paneer-burji-dry",
+          "name": "Paneer Burji Dry",
+          "description": "Savor the aromatic blend of crumbled paneer sautéed with onions, tomatoes, and spices in our tantalizing Paneer Burji Dry. Perfect for a flavorful start to your meal.",
+          "price": 15.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "paneer-majestic",
+          "name": "Paneer Majestic",
+          "description": "Indulge in our exquisite Paneer Majestic, featuring succulent cubes of paneer marinated in a tantalizing blend of spices and pan-fried to perfection. A vegetarian delight that promises a burst of flavors in every bite.",
+          "price": 15.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "paneer-manchurian",
+          "name": "Paneer Manchurian",
+          "description": "",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "paneer-pepper-fry",
+          "name": "Paneer Pepper Fry",
+          "description": "Savor the vibrant flavors of our Paneer Pepper Fry, where tender cubes of marinated paneer are expertly tossed with an array of colorful bell peppers, aromatic spices, and a hint of tangy lime. This delightful vegetarian appetizer is pan-seared to perfection, delivering a satisfying crunch with every bite, making it a must-try for spice lovers!",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "plantain-bajji-with-coconut-dip",
+          "name": "Plantain Bajji with coconut Dip",
+          "description": "Crispy plantain bajji served with a creamy coconut dip, a delightful vegetarian starter bursting with savory flavors.",
+          "price": 14.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "punjabi-samosa",
+          "name": "Punjabi Samosa",
+          "description": "Crispy golden-brown pastries stuffed with a savory blend of spiced potatoes, peas, and aromatic herbs, our Punjabi Samosas are a delightful bite-sized treat. Served with a side of tangy tamarind chutney, each morsel bursts with flavor, making them the perfect start to your meal.",
+          "price": 9.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "spinach-pakoda",
+          "name": "Spinach Pakoda",
+          "description": "Crispy, golden-brown spinach pakodas are delicately spiced and expertly fried to perfection, offering a delightful crunch with every bite. Each morsel is a harmonious blend of fresh spinach, chickpea flour, and aromatic spices, served with a zesty tamarind chutney for the perfect dip.",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "veg-manchurian",
+          "name": "Veg Manchurian",
+          "description": "Crispy, bite-sized vegetable balls are tossed in a tangy and spicy Manchurian sauce, creating a perfect harmony of flavors. Garnished with fresh green onions and served with a zesty chili dip, this irresistible vegetarian appetizer offers a delightful crunch and a burst of umami in every bite.",
+          "price": 13.99,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        },
+        {
+          "id": "vegtable-bullets",
+          "name": "Vegtable Bullets",
+          "description": "",
+          "price": 14.59,
+          "category": "Vegetarian Appetizers",
+          "categorySlug": "vegetarian-appetizers",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "vegetarian-entrees",
+      "name": "Vegetarian Entrees",
+      "rawName": "Vegetarian Entrees",
+      "itemCount": 33,
+      "items": [
+        {
+          "id": "aloo-gobi",
+          "name": "Aloo Gobi",
+          "description": "Tender cauliflower and potatoes cooked in a fragrant blend of spices in our savory Aloo Gobi. A comforting vegetarian entree that's sure to satisfy your cravings.",
+          "price": 14.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "aloo-korma",
+          "name": "Aloo Korma",
+          "description": "Savor the rich flavors of our Aloo Korma, a delectable vegetarian delight featuring tender potatoes simmered in a creamy, aromatic sauce of spices and herbs. Truly a comforting and satisfying dish that will tantalize your taste buds.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "aloo-mutter",
+          "name": "Aloo Mutter",
+          "description": "Tender peas and potatoes simmered in a fragrant blend of spices, creating a comforting and flavorful vegetarian delight, served with fluffy basmati rice.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "aloo-palak",
+          "name": "Aloo Palak",
+          "description": "Tender spinach sautéed with aromatic spices and hearty potatoes, creating a flavorful and comforting Aloo Palak dish.",
+          "price": 14.99,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "bendi-masala",
+          "name": "Bendi Masala",
+          "description": "",
+          "price": 14.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "bendi-pulusu",
+          "name": "Bendi Pulusu",
+          "description": "Tender okra simmered in a tangy tamarind sauce with a blend of aromatic spices, creating a flavorful and comforting Bendi Pulusu. A vegetarian delight that is both satisfying and nourishing.",
+          "price": 14.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "bendi-vepudu",
+          "name": "Bendi Vepudu",
+          "description": "Tender okra sautéed with aromatic spices and onions, creating a flavorful South Indian dish that is both comforting and satisfying.",
+          "price": 14.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "chana-masala",
+          "name": "Chana Masala",
+          "description": "Aromatic and flavorful chickpea curry simmered in a rich blend of spices and tomatoes, served with fragrant basmati rice. A vegetarian delight bursting with Indian-inspired flavors.",
+          "price": 14.99,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "chana-saag",
+          "name": "Chana Saag",
+          "description": "A savory blend of tender chickpeas and fresh spinach simmered in aromatic spices, our Chana Saag is a vegetarian delight that will tantalize your taste buds. $14.59",
+          "price": 14.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "chettinad-mix-veg",
+          "name": "Chettinad Mix Veg",
+          "description": "A fragrant blend of seasonal vegetables cooked in a rich, aromatic Chettinad spice mix, offering a symphony of flavors that will delight your taste buds.",
+          "price": 14.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "chettinad-mushroom",
+          "name": "Chettinad Mushroom",
+          "description": "Savor the bold flavors of our Chettinad Mushroom dish, featuring tender mushrooms cooked in a fragrant blend of South Indian spices. A vegetarian delight that will tantalize your taste buds.",
+          "price": 14.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "chettinad-paneer",
+          "name": "Chettinad Paneer",
+          "description": "Tender cubes of paneer cheese cooked in a flavorful Chettinad spice blend, creating a rich and aromatic vegetarian delight.",
+          "price": 14.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "dal-makhani",
+          "name": "Dal Makhani",
+          "description": "Creamy black lentils slow-cooked with aromatic spices, butter, and fresh cream, creating a rich and indulgent vegetarian delight.",
+          "price": 13.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "dal-tadka",
+          "name": "Dal Tadka",
+          "description": "A fragrant blend of lentils cooked to perfection with aromatic spices and finished with a sizzling tempering of ghee, cumin, and garlic. Served with steamed basmati rice, this comforting Dal Tadka is a flavorful vegetarian delight.",
+          "price": 13.99,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "gutti-vankaya-stuffed-brinjal",
+          "name": "Gutti Vankaya (Stuffed Brinjal)",
+          "description": "Tender brinjal stuffed with a flavorful blend of spices, nuts, and herbs, creating a symphony of delicious flavors in every bite. A vegetarian delight that will tantalize your taste buds.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "kadai-bendi",
+          "name": "Kadai Bendi",
+          "description": "Tender okra cooked to perfection with a blend of aromatic spices in a traditional kadai pan, creating a flavorful and satisfying vegetarian dish.",
+          "price": 14.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "kadai-mushroom",
+          "name": "Kadai Mushroom",
+          "description": "Savor the bold flavors of our Kadai Mushroom, a fragrant blend of sautéed mushrooms, bell peppers, and onions simmered in a rich tomato-based sauce. Perfectly seasoned and served piping hot.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "kadai-paneer",
+          "name": "Kadai Paneer",
+          "description": "Tender paneer cubes sautéed in a flavorful blend of bell peppers, onions, and aromatic Indian spices, creating a rich and satisfying dish that is sure to delight your taste buds.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "kadai-veg",
+          "name": "Kadai Veg",
+          "description": "Tender mixed vegetables sautéed in a flavorful blend of aromatic spices and simmered to perfection in a traditional Indian kadai. Served piping hot, this vegetarian delight promises a symphony of flavors in every bite.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "kaju-curry",
+          "name": "Kaju Curry",
+          "description": "Creamy cashew curry featuring a rich blend of spices and tender vegetables, served with aromatic basmati rice.",
+          "price": 14.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "malai-kofta",
+          "name": "Malai Kofta",
+          "description": "Tender vegetable and paneer dumplings simmered in a rich, creamy cashew and tomato gravy, Malai Kofta is a delectable vegetarian delight that melts in your mouth. Enjoy this indulgent Indian classic bursting with aromatic spices and flavors.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "mango-dal",
+          "name": "Mango Dal",
+          "description": "Luscious mango and creamy lentils harmonize in this fragrant and flavorful vegetarian delight. Served with aromatic spices and herbs, our Mango Dal is a tantalizing blend of sweet and savory, perfect for a satisfying and wholesome meal.",
+          "price": 13.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "mushroom-korma",
+          "name": "Mushroom Korma",
+          "description": "Savor the rich flavors of our Mushroom Korma, a velvety vegetarian delight featuring tender mushrooms simmered in a creamy, aromatic blend of spices and coconut milk.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "navratan-korma",
+          "name": "Navratan Korma",
+          "description": "A royal medley of nine garden-fresh vegetables simmered in a luscious cashew cream sauce, Navratan Korma is a vegetarian delight fit for royalty. Taste the harmonious blend of flavors in every bite.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "palak-dal",
+          "name": "Palak Dal",
+          "description": "Lentils simmered with fresh spinach and aromatic spices create our flavorful Palak Dal, a hearty vegetarian dish bursting with nourishing goodness.",
+          "price": 13.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "paneer-burji-gravy",
+          "name": "Paneer Burji Gravy",
+          "description": "Savor the rich flavors of our Paneer Burji Gravy, a delightful vegetarian dish featuring crumbled paneer cooked in a luscious gravy of aromatic spices. Perfectly complemented with fluffy naan or steamed rice.",
+          "price": 14.99,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "paneer-butter-masala",
+          "name": "Paneer Butter Masala",
+          "description": "Creamy and indulgent, our Paneer Butter Masala features tender chunks of paneer simmered in a rich tomato and butter sauce with a hint of aromatic spices. A classic vegetarian favorite that promises a burst of flavors in every bite.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "paneer-korma",
+          "name": "Paneer Korma",
+          "description": "Creamy and aromatic, our Paneer Korma features succulent cubes of paneer cheese simmered in a rich, spiced cashew and yogurt sauce. Served with fragrant basmati rice, this vegetarian delight is a true taste of India.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "paneer-tikka-masala",
+          "name": "Paneer Tikka Masala",
+          "description": "Tender cubes of paneer marinated in aromatic spices, grilled to perfection, and simmered in a rich, creamy tomato-based masala sauce. Served with fluffy basmati rice for a flavorful vegetarian delight.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "punjabi-palak-paneer",
+          "name": "Punjabi Palak Paneer",
+          "description": "Creamy spinach cooked with aromatic spices and chunks of soft paneer cheese, creating a comforting and flavorful Punjabi Palak Paneer.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "shahi-paneer",
+          "name": "Shahi Paneer",
+          "description": "A regal dish fit for royalty, our Shahi Paneer features succulent cubes of paneer cheese simmered in a rich, creamy tomato and cashew sauce. Served with fragrant basmati rice, this vegetarian delight is a true taste of luxury.",
+          "price": 14.99,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "tomato-dal",
+          "name": "Tomato Dal",
+          "description": "A comforting blend of lentils and tomatoes simmered with aromatic spices, our Tomato Dal is a flavorful vegetarian entrée that delights the senses. Served with steamed rice, this wholesome dish is a true taste of Indian comfort food.",
+          "price": 13.99,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        },
+        {
+          "id": "veg-korma",
+          "name": "Veg Korma",
+          "description": "Aromatic and creamy Veg Korma featuring a medley of fresh vegetables simmered in a rich, spiced coconut and cashew sauce. Served with fragrant basmati rice, it's a delightful vegetarian delight that's sure to satisfy your taste buds.",
+          "price": 15.59,
+          "category": "Vegetarian Entrees",
+          "categorySlug": "vegetarian-entrees",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "vegetarian-rice-biryani",
+      "name": "Vegetarian Rice & Biryani",
+      "rawName": "Vegetarian Rice & Biryani",
+      "itemCount": 15,
+      "items": [
+        {
+          "id": "chilli-mushroom-biryani",
+          "name": "Chilli Mushroom Biryani",
+          "description": "Sautéed to perfection, our Chilli Mushroom features tender, juicy button mushrooms tossed in a zesty blend of garlic, ginger, and vibrant chili peppers. Finished with a sprinkle of fresh coriander, each bite delivers a delightful kick that will awaken your taste buds and leave you craving more.",
+          "price": 15.59,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "curd-rice",
+          "name": "Curd Rice",
+          "description": "Creamy and comforting curd rice, a South Indian specialty, made with perfectly cooked rice mixed with yogurt, seasoned with mustard seeds, curry leaves, and a hint of green chili. Perfect for a light and satisfying meal.",
+          "price": 13.99,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "cut-mirchi-biryani",
+          "name": "Cut Mirchi Biryani",
+          "description": "Spicy and flavorful Cut Mirchi Biryani featuring fragrant basmati rice cooked with fiery green chilies and aromatic spices. A vegetarian delight that packs a punch of taste in every bite.",
+          "price": 15.59,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "gobi-masala-biryani",
+          "name": "Gobi Masala Biryani",
+          "description": "Aromatic basmati rice cooked with fragrant spices, tender cauliflower florets, and a medley of savory masalas, creating a delightful Gobi Masala Biryani that is sure to tantalize your taste buds.",
+          "price": 15.59,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "gongura-biryani-paneer",
+          "name": "Gongura Biryani (Paneer)",
+          "description": "Savor the tangy and aromatic flavors of our Gongura Biryani with succulent paneer. Each bite is a delightful harmony of tender paneer, fragrant basmati rice, and the unique essence of gongura leaves.",
+          "price": 16.99,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "gongura-biryani-veg",
+          "name": "Gongura Biryani (Veg)",
+          "description": "Aromatic basmati rice cooked with tangy gongura leaves and a blend of exotic spices, creating a flavorful vegetarian delight.",
+          "price": 16.99,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "gutti-vankaya-biryani",
+          "name": "Gutti Vankaya Biryani",
+          "description": "Savor the rich flavors of our Gutti Vankaya Biryani, a tantalizing blend of aromatic basmati rice cooked with stuffed baby eggplants and fragrant spices. A vegetarian delight that will transport your taste buds to the heart of India.",
+          "price": 16.99,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "guttivankay-pulav",
+          "name": "GuttiVankay Pulav",
+          "description": "",
+          "price": 18,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "jeera-rice",
+          "name": "Jeera Rice",
+          "description": "Fragrant basmati rice cooked with cumin seeds and aromatic spices, our Jeera Rice is a flavorful and satisfying vegetarian option that pairs perfectly with any curry dish.",
+          "price": 13.99,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "paneer-biryani",
+          "name": "Paneer Biryani",
+          "description": "Savor the aromatic blend of fragrant basmati rice, succulent paneer, and a symphony of spices in our flavorful Paneer Biryani. A vegetarian delight that will transport your taste buds to the streets of India.",
+          "price": 16.99,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "paneer-keema-biryani",
+          "name": "Paneer Keema Biryani",
+          "description": "Savor the rich flavors of our Paneer Keema Biryani, a tantalizing blend of fragrant basmati rice, succulent paneer, and aromatic spices. Perfectly cooked to perfection, this vegetarian delight is sure to satisfy your cravings.",
+          "price": 16.99,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "ulavacharu-biryani-paneer",
+          "name": "Ulavacharu Biryani (Paneer)",
+          "description": "Indulge in our flavorful Ulavacharu Biryani featuring succulent paneer, aromatic spices, and fragrant basmati rice. A harmonious blend of South Indian and North Indian flavors.",
+          "price": 16.99,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "ulavacharu-biryani-veg",
+          "name": "Ulavacharu Biryani (Veg)",
+          "description": "Aromatic basmati rice cooked to perfection with lentils and flavorful spices, creating a delightful Ulavacharu Biryani. Enjoy the rich, vegetarian goodness in every bite.",
+          "price": 16.99,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "veg-biryani",
+          "name": "Veg Biryani",
+          "description": "Savor the aromatic blend of basmati rice cooked with fresh vegetables, fragrant spices, and herbs in our flavorful Veg Biryani. Perfectly balanced and full of deliciousness.",
+          "price": 15.59,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        },
+        {
+          "id": "veg-keema-biryani",
+          "name": "Veg Keema Biryani",
+          "description": "A flavorful blend of spiced minced vegetables and fragrant basmati rice, our Veg Keema Biryani is a vegetarian delight that will tantalize your taste buds with every bite.",
+          "price": 16.99,
+          "category": "Vegetarian Rice & Biryani",
+          "categorySlug": "vegetarian-rice-biryani",
+          "featured": false
+        }
+      ]
+    }
+  ]
+}

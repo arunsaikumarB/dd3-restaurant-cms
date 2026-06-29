@@ -1,0 +1,100 @@
+/* Official logo — height-driven sizing, width auto, never cropped. */
+
+.logo {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  image-rendering: auto;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+.logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  line-height: 0;
+}
+
+/* Navbar — fits within 72px bar without clipping the artwork */
+.logo--navbar {
+  height: 48px;
+  max-height: calc(var(--nav-height, 72px) - 16px);
+  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 640px) {
+  .logo--navbar {
+    height: 52px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .logo--navbar {
+    height: 56px;
+  }
+}
+
+/* Hero — 72 / 84 / 96px */
+.logo--hero {
+  height: 72px;
+}
+
+@media (min-width: 640px) {
+  .logo--hero {
+    height: 84px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .logo--hero {
+    height: 96px;
+  }
+}
+
+/* Footer — 56 / 64 / 72px */
+.logo--footer {
+  height: 56px;
+}
+
+@media (min-width: 640px) {
+  .logo--footer {
+    height: 64px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .logo--footer {
+    height: 72px;
+  }
+}
+
+/* Compact inline use (order card, etc.) */
+.logo--inline {
+  height: 44px;
+}
+
+@media (min-width: 640px) {
+  .logo--inline {
+    height: 52px;
+  }
+}
+
+.logo--hoverable {
+  transform-origin: center center;
+}
+
+.logo--hoverable:hover {
+  transform: scale(1.04);
+}

@@ -1,0 +1,11 @@
+node_modules
+dist
+*.local
+.env
+.env.local
+.env.*.local
+.DS_Store
+
+# Generated frame sequence (regenerate with `npm run extract`)
+public/frames
+.vercel

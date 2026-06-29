@@ -1,0 +1,45 @@
+{
+  "name": "dd3-image-sequence-scroll",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Apple/Awwwards-style scroll-driven image sequence animation built with React, Vite and GSAP ScrollTrigger.",
+  "scripts": {
+    "extract": "node scripts/extract-frames.mjs",
+    "extract:catering": "node scripts/extract-frames.mjs --input public/catering/catering-sequence.mp4 --out public/catering-frames --count 120 --width 1280 --quality 4",
+    "parse-menu": "node scripts/parse-menu.mjs",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.108.2",
+    "embla-carousel-react": "^8.6.0",
+    "embla-carousel-wheel-gestures": "^8.1.0",
+    "framer-motion": "^12.42.0",
+    "gsap": "^3.12.5",
+    "lucide-react": "^1.22.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.18.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.5.2",
+    "ffmpeg-static": "^5.2.0",
+    "ffprobe-static": "^3.1.0",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true,
+    "ffmpeg-static@5.3.0": true
+  }
+}
