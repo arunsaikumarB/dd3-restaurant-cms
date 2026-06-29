@@ -155,6 +155,30 @@ export async function fetchMenuCategories(): Promise<MenuCategoryWithCount[]> {
   }));
 }
 
+/**
+ * Public read-only fetch for the menu page (active categories only via RLS).
+ */
+export async function fetchPublicMenuCategories(): Promise<MenuCategory[] | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createClientIfConfigured();
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await categoriesTable(supabase)
+    .select("*")
+    .order("display_order", { ascending: true });
+
+  if (error) {
+    return null;
+  }
+
+  return data ?? [];
+}
+
 export async function isSlugTaken(slug: string, excludeId?: string): Promise<boolean> {
   const supabase = requireClient();
   const table = slugTable(supabase);

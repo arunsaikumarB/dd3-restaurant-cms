@@ -63,7 +63,12 @@ export function filterMenuData(
       ...cat,
       items: cat.items.filter((item) => {
         if (!normalizedQuery) return true;
-        return item.name.toLowerCase().includes(normalizedQuery);
+        return (
+          item.name.toLowerCase().includes(normalizedQuery) ||
+          item.description.toLowerCase().includes(normalizedQuery) ||
+          cat.name.toLowerCase().includes(normalizedQuery) ||
+          item.category.toLowerCase().includes(normalizedQuery)
+        );
       }),
     }))
     .filter((cat) => cat.items.length > 0);

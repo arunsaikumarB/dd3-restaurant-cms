@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { loadPublicMenuData } from "../services/menuPublic";
 import type { MenuData } from "../types/menu";
 
 export function useMenuData() {
@@ -9,23 +10,12 @@ export function useMenuData() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/data/menu.json")
-      .then((res) => {
-        if (!res.ok) throw new Error("Menu data not found");
-        return res.json();
-      })
-      .then((json: MenuData) => {
-        if (!cancelled) {
-          setData(json);
-          setLoading(false);
-        }
-      })
-      .catch((err: Error) => {
-        if (!cancelled) {
-          setError(err.message);
-          setLoading(false);
-        }
-      });
+    void loadPublicMenuData().then((result) => {
+      if (cancelled) return;
+      setData(result.data);
+      setError(result.error);
+      setLoading(false);
+    });
 
     return () => {
       cancelled = true;

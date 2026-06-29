@@ -124,17 +124,17 @@ export default function MenuPage() {
       >
         {loading && <MenuGridSkeleton />}
 
-        {error && (
+        {error && !data && (
           <div className="rounded-[24px] border border-cocoa/10 bg-white/60 p-10 text-center">
             <p className="font-serif text-2xl text-cocoa">Menu unavailable</p>
             <p className="mt-3 text-cocoa/60">
-              Run <code className="text-saffron">npm run parse-menu</code> to
-              generate menu data from the Excel catalog, then reload.
+              We couldn&apos;t load the menu right now. Please refresh the page or try again
+              later.
             </p>
           </div>
         )}
 
-        {!loading && !error && filteredCategories.length === 0 && (
+        {!loading && !error && data && filteredCategories.length === 0 && (
           <div className="rounded-[24px] border border-cocoa/10 bg-white/60 p-12 text-center">
             <p className="font-serif text-2xl text-cocoa">No dishes found</p>
             <p className="mt-3 text-cocoa/60">
@@ -143,7 +143,7 @@ export default function MenuPage() {
           </div>
         )}
 
-        {!loading && !error && (
+        {!loading && !error && data && (
           <div className="space-y-20 md:space-y-28">
             {filteredCategories.map((category, index) => (
               <CategorySection
@@ -155,7 +155,7 @@ export default function MenuPage() {
           </div>
         )}
 
-        {!loading && !error && filteredCategories.length > 0 && (
+        {!loading && !error && data && filteredCategories.length > 0 && (
           <div className="mt-20 md:mt-28">
             <CTASection
               title="Ready to Experience Desi Dhamaka?"

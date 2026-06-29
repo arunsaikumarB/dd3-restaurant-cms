@@ -167,6 +167,31 @@ export async function fetchMenuItems(): Promise<MenuItemTableRow[]> {
   return (data ?? []).map(mapJoinRow);
 }
 
+/**
+ * Public read-only fetch for the menu page (active items only via RLS).
+ */
+export async function fetchPublicMenuItems(): Promise<MenuItemTableRow[] | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createClientIfConfigured();
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await menuItemsTable(supabase)
+    .select(MENU_ITEM_SELECT)
+    .order("display_order", { ascending: true })
+    .order("name", { ascending: true });
+
+  if (error) {
+    return null;
+  }
+
+  return (data ?? []).map(mapJoinRow);
+}
+
 export async function createMenuItem(form: MenuItemForm): Promise<MenuItemTableRow> {
   const supabase = requireClient();
   const { data, error } = await menuItemsTable(supabase)

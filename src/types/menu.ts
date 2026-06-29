@@ -6,6 +6,12 @@ export interface MenuItem {
   category: string;
   categorySlug: string;
   featured: boolean;
+  image?: string | null;
+  veg?: boolean;
+  popular?: boolean;
+  chefSpecial?: boolean;
+  spiceLevel?: number | null;
+  available?: boolean;
 }
 
 export interface MenuCategory {
@@ -13,6 +19,7 @@ export interface MenuCategory {
   name: string;
   rawName: string;
   itemCount: number;
+  image?: string | null;
   items: MenuItem[];
 }
 
