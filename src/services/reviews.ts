@@ -126,6 +126,28 @@ export async function fetchReviews(): Promise<ReviewTableRow[]> {
   return sortReviewsNewest((data ?? []).map(mapReviewRow));
 }
 
+/**
+ * Public read-only fetch for testimonials (approved reviews only via RLS).
+ */
+export async function fetchPublicReviews(): Promise<Review[] | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createClientIfConfigured();
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await reviewsTable(supabase).select("*");
+
+  if (error) {
+    return null;
+  }
+
+  return data ?? [];
+}
+
 export async function createReview(form: ReviewForm): Promise<ReviewTableRow> {
   const supabase = requireClient();
   const { data, error } = await reviewsTable(supabase)

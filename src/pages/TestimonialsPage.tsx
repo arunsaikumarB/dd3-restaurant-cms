@@ -4,34 +4,12 @@ import PageHero from "../components/ui/PageHero";
 import SectionHeading from "../components/ui/SectionHeading";
 import AnimatedContainer from "../components/ui/AnimatedContainer";
 import CTASection from "../components/ui/CTASection";
+import {
+  FeaturedReviewSkeleton,
+  ReviewsGridSkeleton,
+} from "../components/testimonials/TestimonialsPageSkeleton";
+import { useReviewsData } from "../hooks/useReviewsData";
 import { EASE_POWER3, prefersReducedMotion } from "../components/showcase/motion";
-
-const TESTIMONIALS = [
-  {
-    name: "Priya Sharma",
-    text: "The biryani here is unlike anything else in the city. Aromatic, perfectly spiced and served with genuine warmth. Desi Dhamaka has become our family's favourite.",
-    rating: 5,
-    source: "Google Review",
-  },
-  {
-    name: "James Mitchell",
-    text: "We hosted our anniversary dinner in the private room — impeccable service, stunning presentation and flavours that transported us. Truly a premium experience.",
-    rating: 5,
-    source: "Google Review",
-  },
-  {
-    name: "Aisha Khan",
-    text: "From the mandi to the falooda, every dish exceeded expectations. The attention to detail and hospitality makes this a standout Indian restaurant.",
-    rating: 5,
-    source: "Google Review",
-  },
-  {
-    name: "Robert Chen",
-    text: "Catered our corporate event for 120 guests. Live tandoor counter was a hit. Professional team, on-time setup and restaurant-quality food at scale.",
-    rating: 5,
-    source: "Google Review",
-  },
-];
 
 function AnimatedRating({ value }: { value: number }) {
   const [display, setDisplay] = useState(0);
@@ -55,15 +33,24 @@ function AnimatedRating({ value }: { value: number }) {
 }
 
 export default function TestimonialsPage() {
+  const { reviews, loading } = useReviewsData();
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    if (reviews.length === 0) return;
+    setIndex((current) => (current >= reviews.length ? 0 : current));
+  }, [reviews]);
+
+  useEffect(() => {
+    if (reviews.length === 0) return;
     if (prefersReducedMotion()) return;
     const timer = window.setInterval(() => {
-      setIndex((i) => (i + 1) % TESTIMONIALS.length);
+      setIndex((i) => (i + 1) % reviews.length);
     }, 6000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [reviews.length]);
+
+  const activeReview = reviews[index];
 
   return (
     <div className="bg-ivory">
@@ -108,51 +95,57 @@ export default function TestimonialsPage() {
             aria-live="polite"
             aria-atomic="true"
           >
-            <AnimatePresence mode="wait">
-              <motion.blockquote
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5, ease: EASE_POWER3 }}
-                className="rounded-[28px] bg-[#FDFBF7] p-8 shadow-[0_24px_64px_-24px_rgba(43,29,24,0.18)] md:p-12"
-              >
-                <p className="font-serif text-[clamp(1.2rem,2.5vw,1.65rem)] leading-[1.6] text-cocoa">
-                  &ldquo;{TESTIMONIALS[index].text}&rdquo;
-                </p>
-                <footer className="mt-8 flex items-center justify-between gap-4 border-t border-cocoa/8 pt-6">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-saffron/12 font-serif text-lg font-semibold text-saffron">
-                      {TESTIMONIALS[index].name[0]}
-                    </div>
-                    <div>
-                      <cite className="not-italic block font-semibold text-cocoa">
-                        {TESTIMONIALS[index].name}
-                      </cite>
-                      <p className="text-[12px] text-cocoa/45">{TESTIMONIALS[index].source}</p>
-                    </div>
-                  </div>
-                  <span className="text-[1.1rem] tracking-wide text-saffron" aria-label={`${TESTIMONIALS[index].rating} stars`}>
-                    {"★".repeat(TESTIMONIALS[index].rating)}
-                  </span>
-                </footer>
-              </motion.blockquote>
-            </AnimatePresence>
+            {loading ? (
+              <FeaturedReviewSkeleton />
+            ) : activeReview ? (
+              <>
+                <AnimatePresence mode="wait">
+                  <motion.blockquote
+                    key={activeReview.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5, ease: EASE_POWER3 }}
+                    className="rounded-[28px] bg-[#FDFBF7] p-8 shadow-[0_24px_64px_-24px_rgba(43,29,24,0.18)] md:p-12"
+                  >
+                    <p className="font-serif text-[clamp(1.2rem,2.5vw,1.65rem)] leading-[1.6] text-cocoa">
+                      &ldquo;{activeReview.text}&rdquo;
+                    </p>
+                    <footer className="mt-8 flex items-center justify-between gap-4 border-t border-cocoa/8 pt-6">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-saffron/12 font-serif text-lg font-semibold text-saffron">
+                          {activeReview.name[0]}
+                        </div>
+                        <div>
+                          <cite className="not-italic block font-semibold text-cocoa">
+                            {activeReview.name}
+                          </cite>
+                          <p className="text-[12px] text-cocoa/45">{activeReview.source}</p>
+                        </div>
+                      </div>
+                      <span className="text-[1.1rem] tracking-wide text-saffron" aria-label={`${activeReview.rating} stars`}>
+                        {"★".repeat(activeReview.rating)}
+                      </span>
+                    </footer>
+                  </motion.blockquote>
+                </AnimatePresence>
 
-            <div className="mt-6 flex items-center gap-2.5">
-              {TESTIMONIALS.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  aria-label={`Go to review ${i + 1}`}
-                  onClick={() => setIndex(i)}
-                  className={
-                    "h-1.5 rounded-full transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron " +
-                    (i === index ? "w-10 bg-saffron" : "w-1.5 bg-cocoa/15 hover:bg-cocoa/35")
-                  }
-                />
-              ))}
-            </div>
+                <div className="mt-6 flex items-center gap-2.5">
+                  {reviews.map((review, i) => (
+                    <button
+                      key={review.id}
+                      type="button"
+                      aria-label={`Go to review ${i + 1}`}
+                      onClick={() => setIndex(i)}
+                      className={
+                        "h-1.5 rounded-full transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron " +
+                        (i === index ? "w-10 bg-saffron" : "w-1.5 bg-cocoa/15 hover:bg-cocoa/35")
+                      }
+                    />
+                  ))}
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
       </section>
@@ -165,32 +158,36 @@ export default function TestimonialsPage() {
             title="What our guests say"
             align="center"
           />
-          <div className="mt-14 grid gap-5 md:grid-cols-2">
-            {TESTIMONIALS.map((item, i) => (
-              <AnimatedContainer
-                key={item.name}
-                delay={i * 0.07}
-                className="group rounded-[24px] bg-ivory p-7 shadow-[0_8px_32px_-12px_rgba(43,29,24,0.12)] transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_24px_56px_-18px_rgba(43,29,24,0.18)]"
-              >
-                <div className="mb-5 flex items-center gap-3">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-saffron/12 font-serif text-lg font-semibold text-saffron">
-                    {item.name[0]}
+          {loading ? (
+            <ReviewsGridSkeleton />
+          ) : (
+            <div className="mt-14 grid gap-5 md:grid-cols-2">
+              {reviews.map((item, i) => (
+                <AnimatedContainer
+                  key={item.id}
+                  delay={i * 0.07}
+                  className="group rounded-[24px] bg-ivory p-7 shadow-[0_8px_32px_-12px_rgba(43,29,24,0.12)] transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_24px_56px_-18px_rgba(43,29,24,0.18)]"
+                >
+                  <div className="mb-5 flex items-center gap-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-saffron/12 font-serif text-lg font-semibold text-saffron">
+                      {item.name[0]}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-cocoa">{item.name}</p>
+                      <p className="text-[12px] text-cocoa/45">{item.source}</p>
+                    </div>
+                    <span className="ml-auto shrink-0 text-[0.95rem] text-saffron" aria-label={`${item.rating} stars`}>
+                      {"★".repeat(item.rating)}
+                    </span>
                   </div>
-                  <div>
-                    <p className="font-semibold text-cocoa">{item.name}</p>
-                    <p className="text-[12px] text-cocoa/45">{item.source}</p>
-                  </div>
-                  <span className="ml-auto shrink-0 text-[0.95rem] text-saffron" aria-label={`${item.rating} stars`}>
-                    {"★".repeat(item.rating)}
-                  </span>
-                </div>
-                <span className="mb-4 block h-px w-8 rounded-full bg-saffron/30 transition-all duration-300 group-hover:w-16 group-hover:bg-saffron/50" aria-hidden />
-                <p className="text-[14.5px] leading-[1.75] text-cocoa/62">
-                  {item.text}
-                </p>
-              </AnimatedContainer>
-            ))}
-          </div>
+                  <span className="mb-4 block h-px w-8 rounded-full bg-saffron/30 transition-all duration-300 group-hover:w-16 group-hover:bg-saffron/50" aria-hidden />
+                  <p className="text-[14.5px] leading-[1.75] text-cocoa/62">
+                    {item.text}
+                  </p>
+                </AnimatedContainer>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
