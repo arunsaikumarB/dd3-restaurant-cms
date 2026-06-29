@@ -3,10 +3,14 @@ import SectionHeading from "../components/ui/SectionHeading";
 import AnimatedContainer from "../components/ui/AnimatedContainer";
 import Button from "../components/ui/Button";
 import CTASection from "../components/ui/CTASection";
-import { SITE } from "../constants/site";
+import { useHomepageData } from "../hooks/useHomepageData";
+import { formatOpeningHoursRows } from "../services/homepagePublic";
 import { useContactForm } from "../hooks/useContactForm";
 
 export default function ContactPage() {
+  const { bundle } = useHomepageData();
+  const { settings } = bundle;
+  const hoursRows = formatOpeningHoursRows(settings.opening_hours);
   const {
     form,
     submitting,
@@ -45,17 +49,17 @@ export default function ContactPage() {
                 <h3 className="text-[12px] font-semibold uppercase tracking-label text-saffron">
                   Address
                 </h3>
-                <p className="mt-2 text-[16px] text-cocoa/70">{SITE.address}</p>
+                <p className="mt-2 text-[16px] text-cocoa/70">{settings.address}</p>
               </div>
               <div>
                 <h3 className="text-[12px] font-semibold uppercase tracking-label text-saffron">
                   Phone
                 </h3>
                 <a
-                  href={`tel:${SITE.phone.replace(/\D/g, "")}`}
+                  href={`tel:${settings.phone.replace(/\D/g, "")}`}
                   className="mt-2 block text-[16px] text-cocoa/70 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
                 >
-                  {SITE.phone}
+                  {settings.phone}
                 </a>
               </div>
               <div>
@@ -63,10 +67,10 @@ export default function ContactPage() {
                   Email
                 </h3>
                 <a
-                  href={`mailto:${SITE.email}`}
+                  href={`mailto:${settings.email}`}
                   className="mt-2 block text-[16px] text-cocoa/70 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
                 >
-                  {SITE.email}
+                  {settings.email}
                 </a>
               </div>
               <div id="reserve">
@@ -74,7 +78,7 @@ export default function ContactPage() {
                   Business Hours
                 </h3>
                 <ul className="mt-2 space-y-1">
-                  {SITE.hours.map((row) => (
+                  {hoursRows.map((row) => (
                     <li
                       key={row.days}
                       className="flex justify-between gap-4 text-[15px] text-cocoa/70"
@@ -203,7 +207,7 @@ export default function ContactPage() {
           <div className="overflow-hidden rounded-[24px] shadow-premium">
             <iframe
               title="Desi Dhamaka location on Google Maps"
-              src={SITE.mapEmbed}
+              src={settings.google_maps}
               className="aspect-[16/7] w-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"

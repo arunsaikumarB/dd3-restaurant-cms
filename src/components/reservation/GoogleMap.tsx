@@ -1,16 +1,19 @@
 import { motion } from "framer-motion";
-import { SITE } from "../../constants/site";
+import { useHomepageData } from "../../hooks/useHomepageData";
 import SectionHeading from "../ui/SectionHeading";
 import { EASE_POWER3, viewportOnce } from "../showcase/motion";
 
 export default function GoogleMap() {
+  const { bundle } = useHomepageData();
+  const { settings } = bundle;
+
   return (
     <section className="reservation-map" aria-labelledby="map-title">
       <div className="reservation-map__inner">
         <SectionHeading
           eyebrow="Find Us"
           title="Visit Desi Dhamaka"
-          subtitle={SITE.address}
+          subtitle={settings.address}
           align="center"
         />
         <h2 id="map-title" className="sr-only">
@@ -26,7 +29,7 @@ export default function GoogleMap() {
         >
           <iframe
             title="Desi Dhamaka location on Google Maps"
-            src={SITE.mapEmbed}
+            src={settings.google_maps}
             className="reservation-map__iframe"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

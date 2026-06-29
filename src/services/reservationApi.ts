@@ -1,4 +1,6 @@
 import { SITE } from "../constants/site";
+import { isSupabaseConfigured } from "../lib/supabase/env";
+import { createPublicReservation } from "./reservations";
 
 export interface ReservationPayload {
   locationId: string;
@@ -128,6 +130,25 @@ export async function submitReservation(
     return {
       success: true,
       message: "Your table has been reserved. We look forward to welcoming you.",
+    };
+  }
+
+  if (isSupabaseConfigured()) {
+    await createPublicReservation({
+      customer_name: payload.name.trim(),
+      phone: payload.phone.trim(),
+      email: payload.email.trim(),
+      date: payload.date,
+      time: payload.time,
+      guests: payload.guests,
+      special_request: payload.specialRequests?.trim(),
+    });
+
+    return {
+      success: true,
+      message: `Thank you, ${payload.name.split(" ")[0]}. Your request for ${payload.guests} guest${
+        payload.guests > 1 ? "s" : ""
+      } on ${payload.date} at ${payload.time} has been received. Our team will confirm shortly.`,
     };
   }
 

@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
 import { FOOTER_LINKS, ORDER_URL, RESERVE_URL } from "../../constants/navigation";
 import { SITE, SOCIAL_LABELS } from "../../constants/site";
+import { useHomepageData } from "../../hooks/useHomepageData";
+import {
+  buildPublicSocialLinks,
+  formatOpeningHoursRows,
+} from "../../services/homepagePublic";
 import Logo from "../ui/Logo";
 
 const SOCIAL_ICONS: Record<string, JSX.Element> = {
@@ -25,6 +30,11 @@ const SOCIAL_ICONS: Record<string, JSX.Element> = {
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { bundle } = useHomepageData();
+  const { settings } = bundle;
+  const socialLinks = buildPublicSocialLinks(settings);
+  const hoursRows = formatOpeningHoursRows(settings.opening_hours);
+  const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
 
   return (
     <footer className="border-t border-cocoa/8 bg-[#FDFBF7]">
@@ -67,13 +77,13 @@ export default function Footer() {
               className="mb-6 inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2"
               aria-label="Desi Dhamaka home"
             >
-              <Logo size="footer" background="ivory" />
+              <Logo size="footer" background="ivory" src={settings.logo} alt={logoAlt} />
             </Link>
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-saffron">
               Authentic Indian Restaurant
             </p>
             <p className="mt-1 text-[13px] text-cocoa/50">
-              Lawrenceville, New Jersey
+              {settings.address.split(",").slice(-2).join(",").trim() || settings.address}
             </p>
             <p className="mt-5 max-w-xs text-[15px] leading-[1.7] text-cocoa/60">
               Authentic Indian flavours crafted with tradition, premium ingredients
@@ -82,14 +92,14 @@ export default function Footer() {
 
             {/* Social icons */}
             <div className="mt-7 flex gap-2.5" aria-label="Social media">
-              {Object.entries(SITE.social).map(([name, url]) => (
+              {Object.entries(socialLinks).map(([name, url]) => (
                 <a
                   key={name}
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-10 w-10 items-center justify-center rounded-full border border-cocoa/10 text-cocoa/50 transition-all duration-300 hover:border-saffron/60 hover:bg-saffron/8 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
-                  aria-label={SOCIAL_LABELS[name as keyof typeof SITE.social]}
+                  aria-label={SOCIAL_LABELS[name as keyof typeof SITE.social] ?? name}
                 >
                   {SOCIAL_ICONS[name] ?? (
                     <span className="text-[11px] font-bold uppercase">{name[0]}</span>
@@ -125,7 +135,7 @@ export default function Footer() {
               Opening Hours
             </h3>
             <ul className="space-y-3">
-              {SITE.hours.map((row) => (
+              {hoursRows.map((row) => (
                 <li
                   key={row.days}
                   className="flex items-start justify-between gap-3 text-[14px] leading-snug text-cocoa/65"
@@ -143,21 +153,21 @@ export default function Footer() {
               Contact Us
             </h3>
             <address className="not-italic space-y-3 text-[14px] leading-relaxed text-cocoa/65">
-              <p>{SITE.address}</p>
+              <p>{settings.address}</p>
               <p>
                 <a
-                  href={`tel:${SITE.phone.replace(/\D/g, "")}`}
+                  href={`tel:${settings.phone.replace(/\D/g, "")}`}
                   className="transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
                 >
-                  {SITE.phone}
+                  {settings.phone}
                 </a>
               </p>
               <p>
                 <a
-                  href={`mailto:${SITE.email}`}
+                  href={`mailto:${settings.email}`}
                   className="transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
                 >
-                  {SITE.email}
+                  {settings.email}
                 </a>
               </p>
             </address>
@@ -179,10 +189,10 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-cocoa/8 pt-8 md:flex-row">
           <p className="font-serif text-[15px] tracking-wide text-cocoa/60">
-            {SITE.name}
+            {settings.restaurant_name}
           </p>
           <p className="text-[12px] uppercase tracking-[0.18em] text-cocoa/40">
-            © {year} {SITE.name}. All rights reserved.
+            © {year} {settings.restaurant_name}. All rights reserved.
           </p>
           <div className="flex gap-5">
             {[

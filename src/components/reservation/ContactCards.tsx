@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { RESERVATION_CONTACT } from "../../data/reservationPage";
+import { useHomepageData } from "../../hooks/useHomepageData";
+import { buildReservationContactCards } from "../../services/homepagePublic";
 import SectionHeading from "../ui/SectionHeading";
 import {
   containerVariants,
@@ -43,6 +44,9 @@ const contactIcons = {
 };
 
 export default function ContactCards() {
+  const { bundle } = useHomepageData();
+  const contactItems = buildReservationContactCards(bundle.settings);
+
   return (
     <section className="reservation-contact" aria-labelledby="contact-title">
       <div className="reservation-contact__inner">
@@ -63,7 +67,7 @@ export default function ContactCards() {
           whileInView="visible"
           viewport={viewportOnce}
         >
-          {RESERVATION_CONTACT.map((item) => (
+          {contactItems.map((item) => (
             <motion.div key={item.id} className="reservation-contact__card" variants={fadeUpItem}>
               <div className="reservation-contact__icon">{contactIcons[item.icon]}</div>
               <h3 className="reservation-contact__title">{item.title}</h3>

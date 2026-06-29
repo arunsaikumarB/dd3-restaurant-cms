@@ -147,6 +147,79 @@ export function formatWeekdayHoursLabel(hours: OpeningHoursForm): string {
   return `Mon – Thu · ${hours.weekday}`;
 }
 
+export function formatOpeningHoursRows(
+  hours: OpeningHoursForm,
+): { days: string; time: string }[] {
+  return [
+    { days: "Mon – Thu", time: hours.weekday },
+    { days: "Fri – Sat", time: hours.weekend },
+    { days: "Sun", time: hours.sunday },
+  ];
+}
+
+export function buildPublicSocialLinks(
+  settings: PublicRestaurantSettings,
+): Record<string, string> {
+  const links: Record<string, string> = {};
+
+  if (settings.instagram.trim()) links.instagram = settings.instagram.trim();
+  if (settings.facebook.trim()) links.facebook = settings.facebook.trim();
+  if (settings.youtube.trim()) links.youtube = settings.youtube.trim();
+
+  for (const [name, url] of Object.entries(SITE.social)) {
+    if (!links[name] && url.trim()) {
+      links[name] = url.trim();
+    }
+  }
+
+  return links;
+}
+
+export type PublicContactCard = {
+  id: string;
+  title: string;
+  value: string;
+  href?: string;
+  icon: "phone" | "email" | "location" | "clock";
+};
+
+export function buildReservationContactCards(
+  settings: PublicRestaurantSettings,
+): PublicContactCard[] {
+  const hours = formatOpeningHoursRows(settings.opening_hours)
+    .map((row) => `${row.days}: ${row.time}`)
+    .join(" · ");
+
+  return [
+    {
+      id: "phone",
+      title: "Call Us",
+      value: settings.phone,
+      href: `tel:${settings.phone.replace(/\D/g, "")}`,
+      icon: "phone",
+    },
+    {
+      id: "email",
+      title: "Email",
+      value: settings.email,
+      href: `mailto:${settings.email}`,
+      icon: "email",
+    },
+    {
+      id: "visit",
+      title: "Visit Us",
+      value: settings.address,
+      icon: "location",
+    },
+    {
+      id: "hours",
+      title: "Business Hours",
+      value: hours,
+      icon: "clock",
+    },
+  ];
+}
+
 export async function fetchHomepageBundle(): Promise<HomepageBundle> {
   const now = Date.now();
   if (cachedBundle && now < cacheExpiresAt) {

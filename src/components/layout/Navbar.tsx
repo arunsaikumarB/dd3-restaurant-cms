@@ -10,9 +10,12 @@ import {
 } from "../../constants/navigation";
 import Button from "../ui/Button";
 import Logo from "../ui/Logo";
+import { useHomepageData } from "../../hooks/useHomepageData";
 import { EASE_POWER3 } from "../showcase/motion";
 
 export default function Navbar() {
+  const { bundle } = useHomepageData();
+  const logoAlt = `${bundle.settings.restaurant_name} home`;
   const { pathname } = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -98,7 +101,14 @@ export default function Navbar() {
             className="group shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2"
             aria-label="Desi Dhamaka home"
           >
-            <Logo size="navbar" background={light ? "dark" : "ivory"} priority hoverable />
+            <Logo
+              size="navbar"
+              background={light ? "dark" : "ivory"}
+              priority
+              hoverable
+              src={bundle.settings.logo}
+              alt={logoAlt}
+            />
           </Link>
 
           <nav

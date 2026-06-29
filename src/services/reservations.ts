@@ -210,6 +210,45 @@ export async function updateReservation(id: string, form: ReservationForm): Prom
   return mapReservationRow(data);
 }
 
+export type PublicReservationPayload = {
+  customer_name: string;
+  phone: string;
+  email: string;
+  date: string;
+  time: string;
+  guests: number;
+  special_request?: string;
+};
+
+/** Anonymous booking form — RLS requires status = pending. */
+export async function createPublicReservation(payload: PublicReservationPayload): Promise<void> {
+  const supabase = createClientIfConfigured();
+  if (!supabase) {
+    throw new Error("Supabase is not configured.");
+  }
+
+  const form: ReservationForm = {
+    customer_name: payload.customer_name,
+    phone: payload.phone,
+    email: payload.email,
+    date: payload.date,
+    time: payload.time,
+    guests: payload.guests,
+    special_request: payload.special_request ?? "",
+    status: "pending",
+  };
+
+  const { error } = await (
+    supabase.from("reservations") as unknown as {
+      insert(row: ReservationInsert): Promise<{ error: SupabaseError | null }>;
+    }
+  ).insert(formToPayload(form));
+
+  if (error) {
+    throw new Error(mapSupabaseError(error, "submit reservation"));
+  }
+}
+
 export async function updateReservationStatus(
   id: string,
   status: ReservationStatus,
