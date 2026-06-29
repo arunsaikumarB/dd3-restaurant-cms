@@ -118,6 +118,7 @@ export interface Review extends Timestamps {
   rating: number;
   review: string;
   approved: boolean;
+  featured: boolean;
 }
 
 /** Insert / update helpers (omit generated fields) */
