@@ -137,6 +137,28 @@ export async function fetchGalleryImages(): Promise<GalleryCardRow[]> {
   return sortGalleryRows((data ?? []).map(mapGalleryRow));
 }
 
+/**
+ * Public read-only fetch for gallery sections.
+ */
+export async function fetchPublicGalleryImages(): Promise<GalleryImage[] | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createClientIfConfigured();
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await galleryTable(supabase).select("*");
+
+  if (error) {
+    return null;
+  }
+
+  return data ?? [];
+}
+
 export async function createGalleryImage(form: GalleryForm): Promise<GalleryCardRow> {
   const supabase = requireClient();
   const { data, error } = await galleryTable(supabase)

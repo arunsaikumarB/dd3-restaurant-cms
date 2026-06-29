@@ -1,17 +1,13 @@
 import PageHero from "../components/ui/PageHero";
 import GalleryGrid from "../components/ui/GalleryGrid";
-import { EXPERIENCE_GALLERY } from "../data/atmosphereGallery";
-
-const GALLERY_FRAMES = [
-  ...EXPERIENCE_GALLERY.map((item) => ({ src: item.image, alt: item.imageAlt })),
-  { src: "/frames/frame_0025.jpg", alt: "Restaurant lounge seating" },
-  { src: "/frames/frame_0055.jpg", alt: "Dining area detail" },
-  { src: "/frames/frame_0070.jpg", alt: "Open kitchen view" },
-  { src: "/frames/frame_0095.jpg", alt: "Evening atmosphere" },
-  { src: "/frames/frame_0110.jpg", alt: "Interior architecture" },
-];
+import { GalleryPageSkeleton } from "../components/gallery/GalleryPageSkeleton";
+import { useGalleryData } from "../hooks/useGalleryData";
+import { toGalleryGridImages } from "../services/galleryPublic";
 
 export default function GalleryPage() {
+  const { items, loading } = useGalleryData();
+  const images = toGalleryGridImages(items);
+
   return (
     <div className="bg-ivory">
       <PageHero
@@ -26,7 +22,11 @@ export default function GalleryPage() {
       />
 
       <section className="page-content-start mx-auto max-w-[1400px] px-6 pb-20 md:px-10 lg:px-16">
-        <GalleryGrid images={GALLERY_FRAMES} columns={3} />
+        {loading ? (
+          <GalleryPageSkeleton />
+        ) : (
+          <GalleryGrid images={images} columns={3} />
+        )}
       </section>
     </div>
   );

@@ -61,6 +61,12 @@ export const PAGE_SEO: Record<string, PageSeoConfig> = {
       "Explore the elegant interiors, dining spaces and atmosphere of Desi Dhamaka in Lawrenceville, New Jersey.",
     path: "/gallery",
   },
+  "/offers": {
+    title: "Special Offers — Desi Dhamaka Indian Restaurant",
+    description:
+      "View current promotions and limited-time deals at Desi Dhamaka in Lawrenceville, New Jersey.",
+    path: "/offers",
+  },
   "/reservation": {
     title: "Reserve a Table — Desi Dhamaka Indian Restaurant",
     description:

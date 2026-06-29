@@ -147,6 +147,28 @@ export async function fetchOffers(): Promise<OfferCardRow[]> {
   return sortOffers((data ?? []).map(mapOfferRow));
 }
 
+/**
+ * Public read-only fetch for offer sections (active offers only via RLS).
+ */
+export async function fetchPublicOffers(): Promise<Offer[] | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createClientIfConfigured();
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await offersTable(supabase).select("*");
+
+  if (error) {
+    return null;
+  }
+
+  return data ?? [];
+}
+
 export async function createOffer(form: OfferForm): Promise<OfferCardRow> {
   const supabase = requireClient();
   const { data, error } = await offersTable(supabase)

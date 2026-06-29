@@ -32,6 +32,7 @@ const TestimonialsPage = lazy(() => import("./pages/TestimonialsPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const OrderPage = lazy(() => import("./pages/OrderPage"));
 const GalleryPage = lazy(() => import("./pages/GalleryPage"));
+const OffersPage = lazy(() => import("./pages/OffersPage"));
 const ReservationPage = lazy(() => import("./pages/ReservationPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
@@ -110,6 +111,14 @@ function PublicRoutes() {
           element={
             <PageTransition>
               <GalleryPage />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/offers"
+          element={
+            <PageTransition>
+              <OffersPage />
             </PageTransition>
           }
         />

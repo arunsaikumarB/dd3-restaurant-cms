@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { EASE_POWER3 } from "../showcase/motion";
 
 interface GalleryGridProps {
-  images: { src: string; alt: string }[];
+  images: { id?: string; src: string; alt: string }[];
   columns?: 2 | 3;
 }
 
@@ -16,7 +16,7 @@ export default function GalleryGrid({ images, columns = 3 }: GalleryGridProps) {
     <div className={gridClass}>
       {images.map((img, i) => (
         <motion.div
-          key={img.src}
+          key={img.id ?? img.src}
           className="group overflow-hidden rounded-[24px] shadow-[0_16px_48px_-16px_rgba(43,29,24,0.22)]"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}

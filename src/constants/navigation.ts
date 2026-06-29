@@ -39,6 +39,7 @@ export const TRANSPARENT_NAV_ROUTES = [
   "/testimonials",
   "/contact",
   "/gallery",
+  "/offers",
   "/order",
   "/reservation",
 ];
