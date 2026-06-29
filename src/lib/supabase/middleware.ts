@@ -1,8 +1,14 @@
 import type { Session, User } from "@supabase/supabase-js";
 import { createClientIfConfigured } from "./client";
+import type { UserRole } from "../../types/database";
 
 export const ADMIN_LOGIN_PATH = "/admin/login";
 export const ADMIN_DASHBOARD_PATH = "/admin/dashboard";
+export const ADMIN_UNAUTHORIZED_PATH = "/admin/unauthorized";
+
+export function isAdminRole(role: UserRole | null | undefined): boolean {
+  return role === "admin";
+}
 
 /** Paths that require an authenticated Supabase session. */
 export const PROTECTED_ADMIN_PREFIX = "/admin";

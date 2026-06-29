@@ -6,7 +6,12 @@ import { AdminThemeProvider, useAdminTheme } from "../context/AdminThemeContext"
 import AdminButton from "../components/ui/Button";
 import AdminInput from "../components/ui/Input";
 import { useAuth } from "../../hooks/useAuth";
-import { signInWithEmail, ADMIN_DASHBOARD_PATH } from "../../lib/supabase/middleware";
+import {
+  signInWithEmail,
+  ADMIN_DASHBOARD_PATH,
+  ADMIN_UNAUTHORIZED_PATH,
+  isAdminRole,
+} from "../../lib/supabase/middleware";
 import { isAdminDevBypassEnabled } from "../../lib/supabase/env";
 import { SITE } from "../../constants/site";
 import "../admin.css";
@@ -46,7 +51,11 @@ function LoginForm() {
       return;
     }
 
-    await refreshSession();
+    const profile = await refreshSession();
+    if (!isAdminRole(profile?.role)) {
+      navigate(ADMIN_UNAUTHORIZED_PATH, { replace: true });
+      return;
+    }
     navigate(from, { replace: true });
   };
 

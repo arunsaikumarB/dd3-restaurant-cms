@@ -10,8 +10,10 @@ import PageSEO from "./components/seo/PageSEO";
 import AdminLayout from "./admin/components/layout/AdminLayout";
 import ProtectedRoute from "./admin/components/ProtectedRoute";
 import GuestRoute from "./admin/components/GuestRoute";
+import UnauthorizedRoute from "./admin/components/UnauthorizedRoute";
 
 const AdminLoginPage = lazy(() => import("./admin/pages/LoginPage"));
+const AdminUnauthorizedPage = lazy(() => import("./admin/pages/UnauthorizedPage"));
 const AdminDashboardPage = lazy(() => import("./admin/pages/DashboardPage"));
 const AdminHomepagePage = lazy(() => import("./admin/pages/HomepagePage"));
 const AdminMenuPage = lazy(() => import("./admin/pages/MenuPage"));
@@ -173,6 +175,14 @@ export default function App() {
             <GuestRoute>
               <AdminLoginPage />
             </GuestRoute>
+          }
+        />
+        <Route
+          path="/admin/unauthorized"
+          element={
+            <UnauthorizedRoute>
+              <AdminUnauthorizedPage />
+            </UnauthorizedRoute>
           }
         />
         <Route

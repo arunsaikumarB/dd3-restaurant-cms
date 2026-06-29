@@ -1,14 +1,18 @@
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { ADMIN_DASHBOARD_PATH } from "../../lib/supabase/middleware";
+import {
+  ADMIN_DASHBOARD_PATH,
+  ADMIN_UNAUTHORIZED_PATH,
+} from "../../lib/supabase/middleware";
 import PageLoader from "../../components/layout/PageLoader";
 
 /**
- * Redirect authenticated users away from the login page.
+ * Redirect authenticated admin users away from the login page.
+ * Non-admin authenticated users go to the unauthorized page.
  */
 export default function GuestRoute({ children }: { children: ReactNode }) {
-  const { session, loading, configured } = useAuth();
+  const { session, isAdmin, loading, configured } = useAuth();
 
   if (!configured) {
     return <>{children}</>;
@@ -19,7 +23,10 @@ export default function GuestRoute({ children }: { children: ReactNode }) {
   }
 
   if (session) {
-    return <Navigate to={ADMIN_DASHBOARD_PATH} replace />;
+    if (isAdmin) {
+      return <Navigate to={ADMIN_DASHBOARD_PATH} replace />;
+    }
+    return <Navigate to={ADMIN_UNAUTHORIZED_PATH} replace />;
   }
 
   return <>{children}</>;

@@ -9,43 +9,58 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { createClientIfConfigured } from "../lib/supabase/client";
-import { isSupabaseConfigured } from "../lib/supabase/env";
-import { signOut as authSignOut } from "../lib/supabase/middleware";
+import { isAdminDevBypassEnabled, isSupabaseConfigured } from "../lib/supabase/env";
+import { isAdminRole, signOut as authSignOut } from "../lib/supabase/middleware";
+import { fetchCurrentUserProfile } from "../services/users";
+import type { UserProfile, UserRole } from "../types/database";
 
 interface AuthContextValue {
   session: Session | null;
   user: User | null;
+  profile: UserProfile | null;
+  role: UserRole | null;
+  isAdmin: boolean;
   loading: boolean;
   configured: boolean;
   signOut: () => Promise<void>;
-  refreshSession: () => Promise<void>;
+  refreshSession: () => Promise<UserProfile | null>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const configured = isSupabaseConfigured();
+  const devBypass = isAdminDevBypassEnabled();
 
-  const refreshSession = useCallback(async () => {
+  const refreshSession = useCallback(async (): Promise<UserProfile | null> => {
     const supabase = createClientIfConfigured();
     if (!supabase) {
       setSession(null);
+      setProfile(null);
       setLoading(false);
-      return;
+      return null;
     }
+
+    setLoading(true);
 
     const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError || !userData.user) {
       setSession(null);
+      setProfile(null);
       setLoading(false);
-      return;
+      return null;
     }
 
     const { data } = await supabase.auth.getSession();
     setSession(data.session);
+
+    const nextProfile = await fetchCurrentUserProfile();
+    setProfile(nextProfile);
     setLoading(false);
+    return nextProfile;
   }, []);
 
   useEffect(() => {
@@ -55,13 +70,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    refreshSession();
+    void refreshSession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      setLoading(false);
+    } = supabase.auth.onAuthStateChange(() => {
+      void refreshSession();
     });
 
     return () => subscription.unsubscribe();
@@ -70,18 +84,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     await authSignOut();
     setSession(null);
+    setProfile(null);
   }, []);
+
+  const role = profile?.role ?? null;
+  const isAdmin = devBypass || isAdminRole(role);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       session,
       user: session?.user ?? null,
+      profile,
+      role,
+      isAdmin,
       loading,
       configured,
       signOut,
       refreshSession,
     }),
-    [session, loading, configured, signOut, refreshSession],
+    [session, profile, role, isAdmin, loading, configured, signOut, refreshSession],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
