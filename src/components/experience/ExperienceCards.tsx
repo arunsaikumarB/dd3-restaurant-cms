@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { EASE_POWER3 } from "../showcase/motion";
 import { ORDER_URL, RESERVE_URL } from "../../constants/navigation";
@@ -14,51 +14,90 @@ const TICKER_ITEMS = [
   "Authentic Dum Biryani — Slow-Cooked Daily",
 ];
 
-const CARDS = [
-  {
-    label: "The Menu",
-    headline: "Desi Dhamaka — a feast made with love",
-    subtitle: "Explore our full collection of biryanis, curries, tandoori and desserts.",
-    image: "/showcase/biryani.jpg",
-    imageAlt: "Premium biryani from Desi Dhamaka",
-    buttonText: "Explore Menu",
-    link: "/menu",
-    favourites: [
-      { src: "/showcase/biryani.jpg", alt: "Biryani" },
-      { src: "/showcase/butter-chicken.jpg", alt: "Butter chicken" },
-      { src: "/showcase/desserts-falooda.jpg", alt: "Desserts" },
-    ],
-    rotation: { rotateY: -14, rotateZ: -3, translateY: 12 },
-    scrollDelay: 200,
-  },
-  {
-    title: "Order Online",
-    label: "The Kitchen",
-    headline: "In the heart of every flavour",
-    subtitle: "Fresh, bold and delivered with the same passion as our dining room.",
-    image: "/showcase/tandoori.jpg",
-    imageAlt: "Guests enjoying Desi Dhamaka",
-    buttonText: "Order Now",
-    link: ORDER_URL,
-    rotation: { rotateY: 0, rotateZ: 0, scale: 1.1, translateY: -36 },
-    scrollDelay: 0,
-    isCenter: true,
-  },
-  {
-    label: "Reservations",
-    headline: "Of the city, every plate",
-    subtitle: "An elegant setting for unforgettable evenings.",
-    meta: `${SITE.hours[0].days} · ${SITE.hours[0].time}`,
-    image: "/frames/frame_0060.jpg",
-    imageAlt: "Desi Dhamaka restaurant interior",
-    buttonText: "Reserve a Table",
-    link: RESERVE_URL,
-    rotation: { rotateY: 14, rotateZ: 3, translateY: 12 },
-    scrollDelay: 400,
-  },
-];
+export interface ExperienceCardsProps {
+  restaurantName?: string;
+  hoursLabel?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  mapsUrl?: string;
+  orderCtaText?: string;
+  orderCtaLink?: string;
+}
 
-export default function ExperienceCards() {
+export default function ExperienceCards({
+  restaurantName = SITE.name,
+  hoursLabel = `${SITE.hours[0].days} · ${SITE.hours[0].time}`,
+  phone,
+  email,
+  address,
+  facebook,
+  instagram,
+  youtube,
+  mapsUrl,
+  orderCtaText = "Order Now",
+  orderCtaLink = ORDER_URL,
+}: ExperienceCardsProps) {
+  const cards = useMemo(() => {
+    const socialMeta = [
+      instagram ? "Instagram" : null,
+      facebook ? "Facebook" : null,
+      youtube ? "YouTube" : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const reservationMeta = [hoursLabel, phone, email, socialMeta, mapsUrl ? "Google Maps" : null]
+      .filter(Boolean)
+      .join(" · ");
+
+    return [
+      {
+        label: "The Menu",
+        headline: `${restaurantName} — a feast made with love`,
+        subtitle: "Explore our full collection of biryanis, curries, tandoori and desserts.",
+        image: "/showcase/biryani.jpg",
+        imageAlt: "Premium biryani from Desi Dhamaka",
+        buttonText: "Explore Menu",
+        link: "/menu",
+        favourites: [
+          { src: "/showcase/biryani.jpg", alt: "Biryani" },
+          { src: "/showcase/butter-chicken.jpg", alt: "Butter chicken" },
+          { src: "/showcase/desserts-falooda.jpg", alt: "Desserts" },
+        ],
+        rotation: { rotateY: -14, rotateZ: -3, translateY: 12 },
+        scrollDelay: 200,
+      },
+      {
+        title: "Order Online",
+        label: "The Kitchen",
+        headline: "In the heart of every flavour",
+        subtitle: "Fresh, bold and delivered with the same passion as our dining room.",
+        image: "/showcase/tandoori.jpg",
+        imageAlt: "Guests enjoying Desi Dhamaka",
+        buttonText: orderCtaText,
+        link: orderCtaLink,
+        rotation: { rotateY: 0, rotateZ: 0, scale: 1.1, translateY: -36 },
+        scrollDelay: 0,
+        isCenter: true,
+      },
+      {
+        label: "Reservations",
+        headline: "Of the city, every plate",
+        subtitle: address || "An elegant setting for unforgettable evenings.",
+        meta: reservationMeta,
+        image: "/frames/frame_0060.jpg",
+        imageAlt: "Desi Dhamaka restaurant interior",
+        buttonText: "Reserve a Table",
+        link: RESERVE_URL,
+        rotation: { rotateY: 14, rotateZ: 3, translateY: 12 },
+        scrollDelay: 400,
+      },
+    ];
+  }, [restaurantName, hoursLabel, phone, email, address, facebook, instagram, youtube, mapsUrl, orderCtaText, orderCtaLink]);
+
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
   const [flat, setFlat] = useState(false);
@@ -103,7 +142,7 @@ export default function ExperienceCards() {
         viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 0.8, ease: EASE_POWER3 }}
       >
-        <p className="experience-section__eyebrow">Discover Desi Dhamaka</p>
+        <p className="experience-section__eyebrow">Discover {restaurantName}</p>
         <h2 id="experience-heading" className="experience-section__title">
           Choose Your Experience
         </h2>
@@ -119,7 +158,7 @@ export default function ExperienceCards() {
           style={flat ? undefined : { perspective: "1800px" }}
         >
           <div className={`experience-stage__inner ${flat ? "experience-stage__inner--flat" : ""}`}>
-            {CARDS.map((card) => (
+            {cards.map((card) => (
               <ExperienceCard
                 key={card.title ?? card.headline}
                 label={card.label}

@@ -176,6 +176,32 @@ export async function updateHomepageContent(
   return data;
 }
 
+/**
+ * Public read-only fetch for the homepage (no insert, no auth required).
+ */
+export async function fetchHomepageContentPublic(): Promise<HomepageContent | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createClientIfConfigured();
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await homepageTable(supabase)
+    .select("*")
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    return null;
+  }
+
+  return data;
+}
+
 const LOCAL_SECTION_IDS = new Set(["testimonials", "gallery", "footer"]);
 
 export function getLocalHomepageSections(): HomepageSection[] {

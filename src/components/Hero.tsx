@@ -10,6 +10,27 @@ import Logo from "./ui/Logo";
 
 const HERO_VIDEO = "/hero/videoplayback.mp4";
 const HERO_POSTER = "/hero/hero-poster.jpg";
+const DEFAULT_TITLE = "Step inside\nthe experience";
+const DEFAULT_SUBTITLE =
+  "Scroll to walk through our doors — from the entrance to the heart of the reception, frame by cinematic frame.";
+
+export interface HeroProps {
+  title?: string;
+  subtitle?: string;
+  videoSrc?: string;
+  posterSrc?: string;
+  logoSrc?: string | null;
+  logoAlt?: string;
+}
+
+function splitTitleLines(title: string): string[] {
+  const lines = title
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return lines.length > 0 ? lines : [title];
+}
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -66,7 +87,14 @@ function prefersReducedMotion(): boolean {
   );
 }
 
-export default function Hero() {
+export default function Hero({
+  title = DEFAULT_TITLE,
+  subtitle = DEFAULT_SUBTITLE,
+  videoSrc = HERO_VIDEO,
+  posterSrc = HERO_POSTER,
+  logoSrc = null,
+  logoAlt,
+}: HeroProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [usePoster, setUsePoster] = useState(false);
@@ -116,9 +144,9 @@ export default function Hero() {
     return () => {
       video.removeEventListener("loadeddata", tryPlay);
     };
-  }, []);
+  }, [videoSrc]);
 
-  const titleLines = ["Step inside", "the experience"];
+  const titleLines = splitTitleLines(title);
 
   return (
     <section ref={sectionRef} className="hero">
@@ -126,8 +154,8 @@ export default function Hero() {
         <video
           ref={videoRef}
           className="hero__video"
-          src={HERO_VIDEO}
-          poster={HERO_POSTER}
+          src={videoSrc}
+          poster={posterSrc}
           autoPlay
           muted
           loop
@@ -138,7 +166,7 @@ export default function Hero() {
       ) : (
         <img
           className="hero__video hero__poster"
-          src={HERO_POSTER}
+          src={posterSrc}
           alt=""
           aria-hidden
           decoding="async"
@@ -160,7 +188,7 @@ export default function Hero() {
             initial="hidden"
             animate={ready ? "visible" : "hidden"}
           >
-            <Logo size="hero" background="dark" priority />
+            <Logo size="hero" background="dark" priority src={logoSrc} alt={logoAlt} />
           </motion.div>
 
           <h1 className="hero__title">
@@ -174,7 +202,7 @@ export default function Hero() {
                 animate={ready ? "visible" : "hidden"}
               >
                 {line}
-                {i === 0 && <br />}
+                {i < titleLines.length - 1 && <br />}
               </motion.span>
             ))}
           </h1>
@@ -185,8 +213,7 @@ export default function Hero() {
             initial="hidden"
             animate={ready ? "visible" : "hidden"}
           >
-            Scroll to walk through our doors — from the entrance to the heart of
-            the reception, frame by cinematic frame.
+            {subtitle}
           </motion.p>
         </div>
 

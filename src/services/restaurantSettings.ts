@@ -200,3 +200,29 @@ export async function updateRestaurantSettings(
 
   return data;
 }
+
+/**
+ * Public read-only fetch for restaurant settings (no insert, no auth required).
+ */
+export async function fetchRestaurantSettingsPublic(): Promise<RestaurantSettings | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createClientIfConfigured();
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await settingsTable(supabase)
+    .select("*")
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    return null;
+  }
+
+  return data;
+}

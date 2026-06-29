@@ -10,6 +10,9 @@ export interface LogoProps {
   className?: string;
   priority?: boolean;
   hoverable?: boolean;
+  /** Override default logo asset (e.g. from Supabase settings). */
+  src?: string | null;
+  alt?: string;
 }
 
 export default function Logo({
@@ -18,6 +21,8 @@ export default function Logo({
   className = "",
   priority = false,
   hoverable = false,
+  src,
+  alt = LOGO.alt,
 }: LogoProps) {
   const imgClasses = [
     "logo",
@@ -28,11 +33,13 @@ export default function Logo({
     .filter(Boolean)
     .join(" ");
 
+  const imageSrc = src?.trim() || logoSrcForBackground(background);
+
   return (
     <span className="logo-wrap">
       <img
-        src={logoSrcForBackground(background)}
-        alt={LOGO.alt}
+        src={imageSrc}
+        alt={alt}
         className={imgClasses}
         decoding="async"
         loading={priority ? "eager" : "lazy"}

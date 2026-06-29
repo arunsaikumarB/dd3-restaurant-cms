@@ -2,6 +2,8 @@ import { lazy, Suspense } from "react";
 import Hero from "../components/Hero";
 import LazyMount from "../components/ui/LazyMount";
 import SectionPlaceholder from "../components/ui/SectionPlaceholder";
+import { useHomepageData } from "../hooks/useHomepageData";
+import { formatWeekdayHoursLabel } from "../services/homepagePublic";
 import "../App.css";
 
 const EntranceImageSequence = lazy(
@@ -22,9 +24,20 @@ const ExperienceSection = lazy(
 );
 
 export default function HomePage() {
+  const { bundle } = useHomepageData();
+  const { content, settings } = bundle;
+  const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
+
   return (
     <div className="page">
-      <Hero />
+      <Hero
+        title={content.hero_title}
+        subtitle={content.hero_subtitle}
+        videoSrc={content.hero_video}
+        posterSrc={content.hero_image}
+        logoSrc={settings.logo}
+        logoAlt={logoAlt}
+      />
 
       <LazyMount
         dark
@@ -58,7 +71,19 @@ export default function HomePage() {
         placeholderLabel="Loading experience cards"
       >
         <Suspense fallback={<SectionPlaceholder dark minHeight="80vh" />}>
-          <ExperienceCards />
+          <ExperienceCards
+            restaurantName={settings.restaurant_name}
+            hoursLabel={formatWeekdayHoursLabel(settings.opening_hours)}
+            phone={settings.phone}
+            email={settings.email}
+            address={settings.address}
+            facebook={settings.facebook}
+            instagram={settings.instagram}
+            youtube={settings.youtube}
+            mapsUrl={settings.google_maps}
+            orderCtaText={content.cta_text}
+            orderCtaLink={content.cta_link}
+          />
         </Suspense>
       </LazyMount>
 
@@ -77,7 +102,10 @@ export default function HomePage() {
         placeholderLabel="Loading our story"
       >
         <Suspense fallback={<SectionPlaceholder minHeight="520px" />}>
-          <AboutSection />
+          <AboutSection
+            title={content.about_title}
+            description={content.about_description}
+          />
         </Suspense>
       </LazyMount>
 
@@ -104,7 +132,7 @@ export default function HomePage() {
         placeholderLabel="Loading gallery"
       >
         <Suspense fallback={<SectionPlaceholder minHeight="60vh" />}>
-          <ExperienceSection />
+          <ExperienceSection restaurantName={settings.restaurant_name} />
         </Suspense>
       </LazyMount>
     </div>

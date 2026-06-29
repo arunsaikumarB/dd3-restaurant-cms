@@ -8,7 +8,13 @@ import FeatureRow from "./FeatureRow";
 import AnnouncementRibbon from "./AnnouncementRibbon";
 import "./atmosphere.css";
 
-export default function ExperienceSection() {
+export interface ExperienceSectionProps {
+  restaurantName?: string;
+}
+
+export default function ExperienceSection({
+  restaurantName = "Desi Dhamaka",
+}: ExperienceSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -80,14 +86,14 @@ export default function ExperienceSection() {
         >
           <div className="exp-section__eyebrow-row">
             <span className="exp-section__diamond" aria-hidden />
-            <p className="exp-section__eyebrow">Desi Dhamaka Experience</p>
+            <p className="exp-section__eyebrow">{restaurantName} Experience</p>
             <span className="exp-section__diamond" aria-hidden />
           </div>
           <h2 id="exp-section-heading" className="exp-section__title">
             Experience the Ambience
           </h2>
           <p className="exp-section__subtitle">
-            Every corner of Desi Dhamaka is designed to bring together authentic Indian
+            Every corner of {restaurantName} is designed to bring together authentic Indian
             hospitality, warm interiors, and unforgettable dining moments.
           </p>
         </motion.header>
