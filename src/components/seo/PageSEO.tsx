@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { PAGE_SEO } from "../../constants/seo";
 import { SITE } from "../../constants/site";
+import { useHomepageData } from "../../hooks/useHomepageData";
+import { buildRestaurantJsonLd } from "../../services/homepagePublic";
 
 function upsertMeta(
   key: string,
@@ -27,78 +29,12 @@ function upsertLink(rel: string, href: string) {
   el.setAttribute("href", href);
 }
 
-function buildRestaurantJsonLd(path: string) {
-  const pageUrl = `${SITE.url}${path === "/" ? "" : path}`;
-  return [
-    {
-      "@context": "https://schema.org",
-      "@type": "Restaurant",
-      name: SITE.name,
-      description:
-        "Authentic Indian restaurant in Lawrenceville, NJ specializing in Andhra and Hyderabadi cuisine.",
-      url: SITE.url,
-      telephone: SITE.phone,
-      email: SITE.email,
-      image: `${SITE.url}${SITE.ogImage}`,
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: "540 Lawrence Square Blvd S",
-        addressLocality: SITE.city,
-        addressRegion: SITE.state,
-        postalCode: SITE.postalCode,
-        addressCountry: SITE.country,
-      },
-      geo: {
-        "@type": "GeoCoordinates",
-        latitude: SITE.geo.latitude,
-        longitude: SITE.geo.longitude,
-      },
-      servesCuisine: ["Indian", "Andhra", "Hyderabadi"],
-      priceRange: "$$",
-      openingHoursSpecification: [
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday"],
-          opens: "11:00",
-          closes: "22:00",
-        },
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: ["Friday", "Saturday"],
-          opens: "11:00",
-          closes: "23:00",
-        },
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: "Sunday",
-          opens: "12:00",
-          closes: "21:30",
-        },
-      ],
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      name: SITE.name,
-      url: pageUrl,
-      telephone: SITE.phone,
-      email: SITE.email,
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: "540 Lawrence Square Blvd S",
-        addressLocality: SITE.city,
-        addressRegion: SITE.state,
-        postalCode: SITE.postalCode,
-        addressCountry: SITE.country,
-      },
-    },
-  ];
-}
-
 const JSON_LD_ID = "desi-dhamaka-jsonld";
 
 export default function PageSEO() {
   const { pathname } = useLocation();
+  const { bundle } = useHomepageData();
+  const { settings } = bundle;
   const config = PAGE_SEO[pathname] ?? PAGE_SEO["/404"];
   const canonical = `${SITE.url}${config.path === "/" ? "" : config.path}`;
   const image = `${SITE.url}${config.image ?? SITE.ogImage}`;
@@ -114,7 +50,7 @@ export default function PageSEO() {
     upsertMeta("og:url", canonical, "property");
     upsertMeta("og:type", "website", "property");
     upsertMeta("og:image", image, "property");
-    upsertMeta("og:site_name", SITE.name, "property");
+    upsertMeta("og:site_name", settings.restaurant_name, "property");
 
     upsertMeta("twitter:card", "summary_large_image");
     upsertMeta("twitter:title", config.title);
@@ -128,8 +64,22 @@ export default function PageSEO() {
       script.type = "application/ld+json";
       document.head.appendChild(script);
     }
-    script.textContent = JSON.stringify(buildRestaurantJsonLd(config.path));
-  }, [config.title, config.description, config.path, canonical, image]);
+    script.textContent = JSON.stringify(buildRestaurantJsonLd(settings, config.path));
+  }, [
+    config.title,
+    config.description,
+    config.path,
+    canonical,
+    image,
+    settings.restaurant_name,
+    settings.phone,
+    settings.email,
+    settings.address,
+    settings.logo,
+    settings.opening_hours.weekday,
+    settings.opening_hours.weekend,
+    settings.opening_hours.sunday,
+  ]);
 
   return null;
 }

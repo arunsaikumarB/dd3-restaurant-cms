@@ -213,22 +213,21 @@ DevTools → `<meta name="description">` matches `PAGE_SEO` for each route.
 Share debugger or view source:
 
 - [ ] `og:title`, `og:description`, `og:url`, `og:image` present
+- [ ] JSON-LD phone/email/address match visible page content (from `restaurant_settings`)
 - [ ] Default OG image: `/showcase/biryani.jpg` (absolute URL uses `SITE.url`)
 - [ ] Test with [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) or LinkedIn post preview
 
 ### Submit sitemap to search engines
 **Current sitemap:** `https://desidhamakanj.net/lawrenceville/sitemap.xml`
 
-- [ ] Open sitemap URL in browser — valid XML, no 404
-- [ ] **Note:** sitemap currently omits `/offers` — add before submit if that page should be indexed
+- [ ] Open sitemap URL in browser — valid XML, includes `/offers`
 - [ ] [Google Search Console](https://search.google.com/search-console) → add property → submit sitemap
 - [ ] Bing Webmaster Tools → submit same sitemap
 
 ### Check robots.txt
 **URL:** `https://desidhamakanj.net/lawrenceville/robots.txt`
 
-- [ ] Returns `Allow: /` and correct `Sitemap:` line
-- [ ] Optional hardening: add `Disallow: /admin` to keep admin out of crawlers (not required for security)
+- [ ] Returns `Allow: /`, `Disallow: /admin`, and correct `Sitemap:` line
 
 ---
 

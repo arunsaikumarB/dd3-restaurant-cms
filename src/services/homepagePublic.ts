@@ -220,6 +220,128 @@ export function buildReservationContactCards(
   ];
 }
 
+function parseDisplayTimeTo24Hour(timeStr: string): string | null {
+  const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return null;
+
+  let hours = Number.parseInt(match[1], 10);
+  const minutes = match[2];
+  const period = match[3].toUpperCase();
+  if (period === "PM" && hours !== 12) hours += 12;
+  if (period === "AM" && hours === 12) hours = 0;
+  return `${hours.toString().padStart(2, "0")}:${minutes}`;
+}
+
+function parseHoursRangeToSpecification(
+  dayOfWeek: string | string[],
+  range: string,
+): Record<string, unknown> | null {
+  const [openStr, closeStr] = range.split(/[–-]/).map((part) => part.trim());
+  const opens = parseDisplayTimeTo24Hour(openStr);
+  const closes = parseDisplayTimeTo24Hour(closeStr);
+  if (!opens || !closes) return null;
+
+  return {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek,
+    opens,
+    closes,
+  };
+}
+
+function buildOpeningHoursSpecification(hours: OpeningHoursForm): Record<string, unknown>[] {
+  const specs = [
+    parseHoursRangeToSpecification(
+      ["Monday", "Tuesday", "Wednesday", "Thursday"],
+      hours.weekday,
+    ),
+    parseHoursRangeToSpecification(["Friday", "Saturday"], hours.weekend),
+    parseHoursRangeToSpecification("Sunday", hours.sunday),
+  ];
+
+  return specs.filter((spec): spec is Record<string, unknown> => spec !== null);
+}
+
+function parsePostalAddress(address: string) {
+  const parts = address.split(",").map((part) => part.trim());
+  if (parts.length >= 3) {
+    const stateZip = parts[parts.length - 1].match(/^([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$/);
+    return {
+      streetAddress: parts.slice(0, -2).join(", ") || parts[0],
+      addressLocality: parts[parts.length - 2],
+      addressRegion: stateZip?.[1] ?? SITE.state,
+      postalCode: stateZip?.[2] ?? SITE.postalCode,
+      addressCountry: SITE.country,
+    };
+  }
+
+  return {
+    streetAddress: address,
+    addressLocality: SITE.city,
+    addressRegion: SITE.state,
+    postalCode: SITE.postalCode,
+    addressCountry: SITE.country,
+  };
+}
+
+function absolutePublicUrl(pathOrUrl: string | null | undefined, fallbackPath: string): string {
+  const value = pathOrUrl?.trim() || fallbackPath;
+  if (value.startsWith("http://") || value.startsWith("https://")) {
+    return value;
+  }
+  return `${SITE.url}${value.startsWith("/") ? value : `/${value}`}`;
+}
+
+/** Schema.org JSON-LD aligned with live restaurant_settings. */
+export function buildRestaurantJsonLd(
+  settings: PublicRestaurantSettings,
+  path: string,
+) {
+  const pageUrl = `${SITE.url}${path === "/" ? "" : path}`;
+  const address = parsePostalAddress(settings.address);
+  const image = absolutePublicUrl(settings.logo, SITE.ogImage);
+  const openingHoursSpecification = buildOpeningHoursSpecification(settings.opening_hours);
+
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "Restaurant",
+      name: settings.restaurant_name,
+      description:
+        "Authentic Indian restaurant in Lawrenceville, NJ specializing in Andhra and Hyderabadi cuisine.",
+      url: SITE.url,
+      telephone: settings.phone,
+      email: settings.email,
+      image,
+      address: {
+        "@type": "PostalAddress",
+        ...address,
+      },
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: SITE.geo.latitude,
+        longitude: SITE.geo.longitude,
+      },
+      servesCuisine: ["Indian", "Andhra", "Hyderabadi"],
+      priceRange: "$$",
+      openingHoursSpecification,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      name: settings.restaurant_name,
+      url: pageUrl,
+      telephone: settings.phone,
+      email: settings.email,
+      image,
+      address: {
+        "@type": "PostalAddress",
+        ...address,
+      },
+    },
+  ];
+}
+
 export async function fetchHomepageBundle(): Promise<HomepageBundle> {
   const now = Date.now();
   if (cachedBundle && now < cacheExpiresAt) {
