@@ -33,11 +33,11 @@ const SOCIAL_ICONS: Record<string, JSX.Element> = {
 
 export default function Footer() {
   const year = new Date().getFullYear();
-  const { bundle } = useHomepageData();
+  const { bundle, locationId: bundleLocationId } = useHomepageData();
   const { navigateWithLocationGuard, selectedLocation, selectedLocationId } = useLocationSelection();
   const { settings } = bundle;
   const reservationLink = resolveReservationUrl(settings, selectedLocationId);
-  const orderLink = resolveOrderUrl(settings, selectedLocationId);
+  const orderLink = resolveOrderUrl(settings, selectedLocationId, bundleLocationId);
   const socialLinks = buildPublicSocialLinks(settings);
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;

@@ -22,7 +22,7 @@ function parseLocationId(value: string | null): LocationId | null {
 export default function OrderPage() {
   const [searchParams] = useSearchParams();
   const { selectedLocation, selectedLocationId, setLocation } = useLocationSelection();
-  const { bundle } = useHomepageData();
+  const { bundle, locationId: bundleLocationId } = useHomepageData();
   const orderSectionRef = useRef<HTMLElement>(null);
 
   const queryLocationId = parseLocationId(searchParams.get("location"));
@@ -43,7 +43,7 @@ export default function OrderPage() {
   }, [offerCategory, queryLocationId]);
 
   const orderOptions: OrderOption[] = useMemo(() => {
-    const orderBase = resolveOrderUrl(bundle.settings, selectedLocationId);
+    const orderBase = resolveOrderUrl(bundle.settings, selectedLocationId, bundleLocationId);
     const directHref =
       offerCategory
         ? buildLocationOrderMenuUrl(orderBase, offerCategory)
@@ -81,7 +81,7 @@ export default function OrderPage() {
         variant: "uber",
       },
     ];
-  }, [offerCategory, selectedLocation, selectedLocationId, bundle.settings]);
+  }, [offerCategory, selectedLocation, selectedLocationId, bundle.settings, bundleLocationId]);
 
   return (
     <div className="order-page">

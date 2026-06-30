@@ -17,9 +17,9 @@ export default function SignatureCarousel() {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [sectionVisible, setSectionVisible] = useState(false);
   const { selectedLocationId } = useLocationSelection();
-  const { bundle } = useHomepageData();
+  const { bundle, locationId: bundleLocationId } = useHomepageData();
   const { dishes } = useSignatureDishes(selectedLocationId);
-  const orderBaseUrl = resolveOrderUrl(bundle.settings, selectedLocationId);
+  const orderBaseUrl = resolveOrderUrl(bundle.settings, selectedLocationId, bundleLocationId);
 
   useEffect(() => {
     const el = sectionRef.current;

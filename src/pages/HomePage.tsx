@@ -26,10 +26,10 @@ const ExperienceSection = lazy(
 );
 
 export default function HomePage() {
-  const { bundle } = useHomepageData();
+  const { bundle, locationId: bundleLocationId } = useHomepageData();
   const { selectedLocationId } = useLocationSelection();
   const { content, settings } = bundle;
-  const orderCtaLink = resolveOrderUrl(settings, selectedLocationId);
+  const orderCtaLink = resolveOrderUrl(settings, selectedLocationId, bundleLocationId);
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
 
   return (

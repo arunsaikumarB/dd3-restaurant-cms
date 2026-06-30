@@ -21,10 +21,10 @@ import "./navbar.css";
 type NavLinkItem = { label: string; path: string };
 
 export default function Navbar() {
-  const { bundle } = useHomepageData();
+  const { bundle, locationId: bundleLocationId } = useHomepageData();
   const { navigateWithLocationGuard, selectedLocationId } = useLocationSelection();
   const reservationLink = resolveReservationUrl(bundle.settings, selectedLocationId);
-  const orderLink = resolveOrderUrl(bundle.settings, selectedLocationId);
+  const orderLink = resolveOrderUrl(bundle.settings, selectedLocationId, bundleLocationId);
   const logoAlt = `${bundle.settings.restaurant_name} home`;
   const logoSrc = bundle.settings.logo?.trim() || logoSrcForBackground("dark");
   const { pathname } = useLocation();
