@@ -43,10 +43,14 @@ export interface RestaurantSettings extends Timestamps {
   favicon: string | null;
   reservation_url: string | null;
   order_url: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+  seo_keywords: string | null;
 }
 
 export interface HomepageContent extends Timestamps {
   id: string;
+  location_id: RestaurantLocationId;
   hero_title: string | null;
   hero_subtitle: string | null;
   hero_image: string | null;

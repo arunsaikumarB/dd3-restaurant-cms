@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { PAGE_SEO } from "../../constants/seo";
 import { SITE } from "../../constants/site";
@@ -20,6 +20,11 @@ function upsertMeta(
   el.setAttribute("content", content);
 }
 
+function removeMeta(key: string, attr: "name" | "property" = "name") {
+  const el = document.querySelector(`meta[${attr}="${key}"]`);
+  el?.remove();
+}
+
 function upsertLink(rel: string, href: string) {
   let el = document.querySelector(`link[rel="${rel}"]`);
   if (!el) {
@@ -36,16 +41,37 @@ export default function PageSEO() {
   const { pathname } = useLocation();
   const { bundle } = useHomepageData();
   const { settings } = bundle;
-  const config = PAGE_SEO[pathname] ?? PAGE_SEO["/404"];
+  const baseConfig = PAGE_SEO[pathname] ?? PAGE_SEO["/404"];
+  const isHome = pathname === "/";
+
+  const config = useMemo(() => {
+    if (!isHome) {
+      return baseConfig;
+    }
+
+    return {
+      ...baseConfig,
+      title: settings.seo_title.trim() || baseConfig.title,
+      description: settings.seo_description.trim() || baseConfig.description,
+    };
+  }, [baseConfig, isHome, settings.seo_description, settings.seo_title]);
+
   const siteUrl = getSiteUrl();
   const canonical = `${siteUrl}${config.path === "/" ? "" : config.path}`;
   const image = `${siteUrl}${config.image ?? SITE.ogImage}`;
+  const keywords = isHome ? settings.seo_keywords.trim() : "";
 
   useEffect(() => {
     document.title = config.title;
 
     upsertMeta("description", config.description);
     upsertLink("canonical", canonical);
+
+    if (keywords) {
+      upsertMeta("keywords", keywords);
+    } else {
+      removeMeta("keywords");
+    }
 
     upsertMeta("og:title", config.title, "property");
     upsertMeta("og:description", config.description, "property");
@@ -73,6 +99,7 @@ export default function PageSEO() {
     config.path,
     canonical,
     image,
+    keywords,
     siteUrl,
     settings.restaurant_name,
     settings.phone,

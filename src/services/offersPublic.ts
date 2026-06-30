@@ -1,6 +1,6 @@
 import { getOffersForLocation } from "../data/offers";
 import type { LocationOffer } from "../data/offers";
-import type { LocationId } from "../config/locations";
+import { LOCATION_IDS, type LocationId } from "../config/locations";
 import type { Offer } from "../types/database";
 import { formatOfferDate, getOfferScheduleStatus } from "../utils/offers/schedule";
 import { slugify } from "../utils/slug";
@@ -17,9 +17,13 @@ export function getPublicOffersFallback(locationId: LocationId = "lawrenceville"
   return getPublicOffersForLocation(locationId);
 }
 
+export function buildCmsOfferSlug(row: Pick<Offer, "id" | "title">): string {
+  return `${slugify(row.title)}-${row.id.slice(0, 8)}`;
+}
+
 function mapDbOfferToLocationOffer(row: Offer): LocationOffer {
   const endDate = formatOfferDate(row.end_date);
-  const slug = `${slugify(row.title)}-${row.id.slice(0, 8)}`;
+  const slug = buildCmsOfferSlug(row);
 
   return {
     id: `cms-${row.id}`,
@@ -83,4 +87,31 @@ export async function loadPublicOffersData(locationId: LocationId): Promise<Publ
       error: err instanceof Error ? err.message : "Failed to load offers.",
     };
   }
+}
+
+export function getRelatedOffersFromList(
+  offers: LocationOffer[],
+  slug: string,
+  limit = 3,
+): LocationOffer[] {
+  return offers.filter((offer) => offer.slug !== slug).slice(0, limit);
+}
+
+export async function resolveOfferDetail(
+  slug: string,
+  preferredLocationId?: LocationId,
+): Promise<{ locationId: LocationId; offer: LocationOffer; offers: LocationOffer[] } | null> {
+  const orderedLocationIds = preferredLocationId
+    ? [preferredLocationId, ...LOCATION_IDS.filter((id) => id !== preferredLocationId)]
+    : [...LOCATION_IDS];
+
+  for (const locationId of orderedLocationIds) {
+    const offers = await fetchPublicOffersData(locationId);
+    const offer = offers.find((entry) => entry.slug === slug);
+    if (offer) {
+      return { locationId, offer, offers };
+    }
+  }
+
+  return null;
 }

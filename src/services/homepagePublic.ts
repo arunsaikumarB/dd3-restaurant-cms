@@ -35,6 +35,9 @@ export type PublicRestaurantSettings = {
   logo: string | null;
   reservation_url: string;
   order_url: string;
+  seo_title: string;
+  seo_description: string;
+  seo_keywords: string;
 };
 
 export type HomepageBundle = {
@@ -89,6 +92,9 @@ export function getHomepageFallbacks(locationId: LocationId = "lawrenceville"): 
       logo: defaults.logo,
       reservation_url: defaults.reservation_url ?? "",
       order_url: defaults.order_url ?? ORDER_DIRECT_URL,
+      seo_title: "",
+      seo_description: "",
+      seo_keywords: "",
     },
   };
 }
@@ -145,6 +151,9 @@ function mapRestaurantSettings(
     logo: row?.logo?.trim() || fallbacks.logo,
     reservation_url: row?.reservation_url?.trim() || fallbacks.reservation_url,
     order_url: row?.order_url?.trim() || fallbacks.order_url,
+    seo_title: row?.seo_title?.trim() || fallbacks.seo_title,
+    seo_description: row?.seo_description?.trim() || fallbacks.seo_description,
+    seo_keywords: row?.seo_keywords?.trim() || fallbacks.seo_keywords,
   };
 }
 
@@ -375,7 +384,7 @@ export async function fetchHomepageBundle(
   const request = (async () => {
     try {
       const [homepageRow, settingsRow] = await Promise.all([
-        fetchHomepageContentPublic(),
+        fetchHomepageContentPublic(locationId),
         fetchRestaurantSettingsPublic(locationId),
       ]);
 

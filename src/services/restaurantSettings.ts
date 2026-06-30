@@ -24,6 +24,9 @@ export type RestaurantSettingsForm = {
   favicon: string | null;
   reservation_url: string;
   order_url: string;
+  seo_title: string;
+  seo_description: string;
+  seo_keywords: string;
 };
 
 export function buildDefaultRestaurantSettings(
@@ -49,6 +52,9 @@ export function buildDefaultRestaurantSettings(
     favicon: null,
     reservation_url: location.reservationLink,
     order_url: location.orderDirectLink,
+    seo_title: "",
+    seo_description: "",
+    seo_keywords: "",
   };
 }
 
@@ -75,6 +81,9 @@ export function rowToForm(row: RestaurantSettings): RestaurantSettingsForm {
     favicon: row.favicon,
     reservation_url: row.reservation_url ?? "",
     order_url: row.order_url ?? "",
+    seo_title: row.seo_title ?? "",
+    seo_description: row.seo_description ?? "",
+    seo_keywords: row.seo_keywords ?? "",
   };
 }
 
@@ -97,6 +106,9 @@ export function formToUpdatePayload(form: RestaurantSettingsForm) {
     favicon: form.favicon?.trim() || null,
     reservation_url: form.reservation_url.trim() || null,
     order_url: form.order_url.trim() || null,
+    seo_title: form.seo_title.trim() || null,
+    seo_description: form.seo_description.trim() || null,
+    seo_keywords: form.seo_keywords.trim() || null,
   };
 }
 

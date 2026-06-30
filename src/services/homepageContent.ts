@@ -1,6 +1,7 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
 import { ORDER_DIRECT_URL } from "../constants/ordering";
+import type { LocationId } from "../config/locations";
 import { HOMEPAGE_SECTIONS } from "../admin/data/mock";
 import type { HomepageSection } from "../admin/types";
 import type { HomepageContent, HomepageContentInsert } from "../types/database";
@@ -21,11 +22,11 @@ function fieldValue(sectionId: string, key: string, fallback = ""): string {
   return section?.fields.find((f) => f.key === key)?.value ?? fallback;
 }
 
-export function buildDefaultHomepageContent(): Omit<
-  HomepageContent,
-  "id" | "created_at" | "updated_at"
-> {
+export function buildDefaultHomepageContent(
+  locationId: LocationId = "lawrenceville",
+): Omit<HomepageContent, "id" | "created_at" | "updated_at"> {
   return {
+    location_id: locationId,
     hero_title: fieldValue("hero", "title", "Authentic Indian Cuisine"),
     hero_subtitle: fieldValue(
       "hero",
@@ -85,6 +86,9 @@ type SupabaseError = { message: string; code?: string };
 
 type HomepageQuery = {
   select(columns: string): {
+    eq(column: string, value: string): {
+      maybeSingle(): Promise<{ data: HomepageContent | null; error: SupabaseError | null }>;
+    };
     order(column: string, options: { ascending: boolean }): {
       limit(count: number): {
         maybeSingle(): Promise<{ data: HomepageContent | null; error: SupabaseError | null }>;
@@ -109,7 +113,9 @@ function homepageTable(supabase: NonNullable<ReturnType<typeof createClientIfCon
   return supabase.from("homepage_content") as unknown as HomepageQuery;
 }
 
-export async function getOrCreateHomepageContent(): Promise<HomepageContent> {
+export async function getOrCreateHomepageContent(
+  locationId: LocationId,
+): Promise<HomepageContent> {
   if (!isSupabaseConfigured()) {
     throw new Error("Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
   }
@@ -123,8 +129,7 @@ export async function getOrCreateHomepageContent(): Promise<HomepageContent> {
 
   const { data: existing, error: fetchError } = await table
     .select("*")
-    .order("created_at", { ascending: true })
-    .limit(1)
+    .eq("location_id", locationId)
     .maybeSingle();
 
   if (fetchError) {
@@ -136,7 +141,7 @@ export async function getOrCreateHomepageContent(): Promise<HomepageContent> {
   }
 
   const { data: created, error: insertError } = await table
-    .insert(buildDefaultHomepageContent() as HomepageContentInsert)
+    .insert(buildDefaultHomepageContent(locationId) as HomepageContentInsert)
     .select("*")
     .single();
 
@@ -148,7 +153,7 @@ export async function getOrCreateHomepageContent(): Promise<HomepageContent> {
 }
 
 export async function updateHomepageContent(
-  id: string,
+  locationId: LocationId,
   form: HomepageContentForm,
 ): Promise<HomepageContent> {
   if (!isSupabaseConfigured()) {
@@ -165,7 +170,7 @@ export async function updateHomepageContent(
 
   const { data, error } = await table
     .update(payload as Partial<HomepageContentInsert>)
-    .eq("id", id)
+    .eq("location_id", locationId)
     .select("*")
     .single();
 
@@ -179,7 +184,9 @@ export async function updateHomepageContent(
 /**
  * Public read-only fetch for the homepage (no insert, no auth required).
  */
-export async function fetchHomepageContentPublic(): Promise<HomepageContent | null> {
+export async function fetchHomepageContentPublic(
+  locationId: LocationId,
+): Promise<HomepageContent | null> {
   if (!isSupabaseConfigured()) {
     return null;
   }
@@ -191,8 +198,7 @@ export async function fetchHomepageContentPublic(): Promise<HomepageContent | nu
 
   const { data, error } = await homepageTable(supabase)
     .select("*")
-    .order("created_at", { ascending: true })
-    .limit(1)
+    .eq("location_id", locationId)
     .maybeSingle();
 
   if (error) {

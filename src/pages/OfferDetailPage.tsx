@@ -1,55 +1,93 @@
-import { useEffect, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import OffersGrid from "../components/offers/OffersGrid";
 import Button from "../components/ui/Button";
+import SectionPlaceholder from "../components/ui/SectionPlaceholder";
 import type { LocationId } from "../config/locations";
 import { getLocationConfig } from "../config/locations";
 import { useLocationSelection } from "../context/LocationContext";
 import {
-  findOfferAcrossLocations,
-  getOfferBySlug,
   getOfferOrderPath,
-  getRelatedOffers,
   isInternalOfferOrderPath,
 } from "../data/offers";
+import {
+  getRelatedOffersFromList,
+  resolveOfferDetail,
+  type PublicOffer,
+} from "../services/offersPublic";
 import "../components/offers/offer-detail.css";
 
 type OfferDetailPageProps = {
   forcedLocationId?: LocationId;
 };
 
+type ResolvedOffer = {
+  locationId: LocationId;
+  offer: PublicOffer;
+  offers: PublicOffer[];
+};
+
 export default function OfferDetailPage({ forcedLocationId }: OfferDetailPageProps) {
   const { slug } = useParams<{ slug: string }>();
   const { selectedLocationId, setLocation, navigateWithLocationGuard } = useLocationSelection();
+  const [resolved, setResolved] = useState<ResolvedOffer | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  const activeLocationId = forcedLocationId ?? selectedLocationId;
-
-  const resolved =
-    slug && activeLocationId ? getOfferBySlug(activeLocationId, slug) : undefined;
-
-  const fallback =
-    slug && !resolved ? findOfferAcrossLocations(slug, forcedLocationId) : null;
+  const preferredLocationId = forcedLocationId ?? selectedLocationId ?? undefined;
 
   useEffect(() => {
-    const nextLocationId = forcedLocationId ?? fallback?.locationId;
-    if (nextLocationId && nextLocationId !== selectedLocationId) {
+    if (!slug) {
+      setLoading(false);
+      setNotFound(true);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setNotFound(false);
+    setResolved(null);
+
+    void resolveOfferDetail(slug, preferredLocationId).then((result) => {
+      if (cancelled) return;
+      if (!result) {
+        setNotFound(true);
+        setResolved(null);
+      } else {
+        setResolved(result);
+        setNotFound(false);
+      }
+      setLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, preferredLocationId]);
+
+  useEffect(() => {
+    if (!resolved) return;
+    const nextLocationId = forcedLocationId ?? resolved.locationId;
+    if (nextLocationId !== selectedLocationId) {
       setLocation(nextLocationId);
     }
-  }, [fallback, forcedLocationId, selectedLocationId, setLocation]);
+  }, [forcedLocationId, resolved, selectedLocationId, setLocation]);
 
   if (!slug) {
     return <Navigate to="/offers" replace />;
   }
 
-  const offer = resolved ?? fallback?.offer;
-  const locationId = forcedLocationId ?? (resolved ? activeLocationId : fallback?.locationId);
+  if (loading) {
+    return <SectionPlaceholder minHeight="60vh" label="Loading offer details" />;
+  }
 
-  if (!offer || !locationId) {
+  if (notFound || !resolved) {
     return <Navigate to="/offers" replace />;
   }
 
+  const { locationId, offer, offers } = resolved;
   const location = getLocationConfig(locationId);
-  const related = getRelatedOffers(locationId, offer.slug);
+  const related = getRelatedOffersFromList(offers, offer.slug);
   const heroImage = offer.gallery[0] ?? offer.image;
   const orderPath = getOfferOrderPath(locationId, offer);
   const orderIsInternal = isInternalOfferOrderPath(orderPath);

@@ -10,6 +10,7 @@ import AdminToast from "../components/ui/Toast";
 import MediaUploadField from "../components/settings/MediaUploadField";
 import HomepagePageSkeleton from "../components/settings/HomepagePageSkeleton";
 import { useAdminTheme } from "../context/AdminThemeContext";
+import { useLocation } from "../hooks/useLocation";
 import { HOMEPAGE_SECTIONS } from "../data/mock";
 import type { HomepageSection } from "../types";
 import {
@@ -42,7 +43,7 @@ function fieldError(
 
 export default function HomepageManagementPage() {
   const { dark } = useAdminTheme();
-  const [contentId, setContentId] = useState<string | null>(null);
+  const { locationId, isAllLocations, scope } = useLocation();
   const [form, setForm] = useState<HomepageContentForm | null>(null);
   const [localSections, setLocalSections] = useState<HomepageSection[]>(getLocalHomepageSections);
   const [activeId, setActiveId] = useState(HOMEPAGE_SECTIONS[0]?.id ?? "");
@@ -71,12 +72,18 @@ export default function HomepageManagementPage() {
   const active = sections.find((section) => section.id === activeId);
 
   const loadContent = useCallback(async () => {
+    if (isAllLocations) {
+      setLoading(false);
+      setLoadError(null);
+      setForm(null);
+      return;
+    }
+
     setLoading(true);
     setLoadError(null);
     try {
-      const row = await getOrCreateHomepageContent();
+      const row = await getOrCreateHomepageContent(locationId);
       const nextForm = rowToForm(row);
-      setContentId(row.id);
       setForm(nextForm);
       savedFormRef.current = nextForm;
       setFieldErrors({});
@@ -85,11 +92,11 @@ export default function HomepageManagementPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAllLocations, locationId]);
 
   useEffect(() => {
     void loadContent();
-  }, [loadContent]);
+  }, [loadContent, scope]);
 
   const updateField = (sectionId: string, key: string, value: string) => {
     if (sectionId === "hero" || sectionId === "featured") {
@@ -124,7 +131,7 @@ export default function HomepageManagementPage() {
   };
 
   const handleSave = async () => {
-    if (!form || !contentId || saving) return;
+    if (!form || saving || isAllLocations) return;
 
     const errors = validateHomepageContent(form);
     setFieldErrors(errors);
@@ -135,7 +142,7 @@ export default function HomepageManagementPage() {
 
     setSaving(true);
     try {
-      const updated = await updateHomepageContent(contentId, form);
+      const updated = await updateHomepageContent(locationId, form);
       const nextForm = rowToForm(updated);
       setForm(nextForm);
       savedFormRef.current = nextForm;
@@ -176,6 +183,25 @@ export default function HomepageManagementPage() {
           description="Edit hero, featured sections, and footer content."
         />
         <HomepagePageSkeleton />
+      </div>
+    );
+  }
+
+  if (isAllLocations) {
+    return (
+      <div>
+        <AdminBreadcrumbs
+          items={[{ label: "Admin", path: "/admin/dashboard" }, { label: "Homepage" }]}
+        />
+        <PageHeader
+          title="Homepage Management"
+          description="Edit hero, featured sections, and footer content."
+        />
+        <AdminCard>
+          <p className="text-sm text-admin-muted">
+            Select a single location in the header to edit homepage content for that branch.
+          </p>
+        </AdminCard>
       </div>
     );
   }

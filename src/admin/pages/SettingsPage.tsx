@@ -9,7 +9,6 @@ import AdminToast from "../components/ui/Toast";
 import ImageUploadField from "../components/settings/ImageUploadField";
 import SettingsPageSkeleton from "../components/settings/SettingsPageSkeleton";
 import { useLocation } from "../hooks/useLocation";
-import { RESTAURANT_SETTINGS } from "../data/mock";
 import {
   getOrCreateRestaurantSettings,
   rowToForm,
@@ -23,19 +22,10 @@ import {
   type RestaurantSettingsErrors,
 } from "../../utils/validation/restaurantSettings";
 
-type SeoForm = {
-  title: string;
-  description: string;
-  keywords: string;
-};
-
-const DEFAULT_SEO: SeoForm = RESTAURANT_SETTINGS.seo;
-
 export default function SettingsPage() {
   const { locationId, isAllLocations, scope } = useLocation();
   const [settingsId, setSettingsId] = useState<string | null>(null);
   const [form, setForm] = useState<RestaurantSettingsForm | null>(null);
-  const [seo, setSeo] = useState<SeoForm>(DEFAULT_SEO);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -47,7 +37,6 @@ export default function SettingsPage() {
   });
 
   const savedFormRef = useRef<RestaurantSettingsForm | null>(null);
-  const savedSeoRef = useRef<SeoForm>(DEFAULT_SEO);
 
   const showToast = useCallback((message: string, variant: "success" | "error" = "success") => {
     setToast({ open: true, message, variant });
@@ -133,7 +122,6 @@ export default function SettingsPage() {
     if (savedFormRef.current) {
       setForm({ ...savedFormRef.current });
     }
-    setSeo({ ...savedSeoRef.current });
     setFieldErrors({});
   };
 
@@ -327,18 +315,18 @@ export default function SettingsPage() {
         <div className="space-y-4">
           <AdminInput
             label="Page Title"
-            value={seo.title}
-            onChange={(e) => setSeo({ ...seo, title: e.target.value })}
+            value={form.seo_title}
+            onChange={(e) => patchForm({ seo_title: e.target.value })}
           />
           <AdminTextarea
             label="Meta Description"
-            value={seo.description}
-            onChange={(e) => setSeo({ ...seo, description: e.target.value })}
+            value={form.seo_description}
+            onChange={(e) => patchForm({ seo_description: e.target.value })}
           />
           <AdminInput
             label="Keywords"
-            value={seo.keywords}
-            onChange={(e) => setSeo({ ...seo, keywords: e.target.value })}
+            value={form.seo_keywords}
+            onChange={(e) => patchForm({ seo_keywords: e.target.value })}
           />
         </div>
       ),
