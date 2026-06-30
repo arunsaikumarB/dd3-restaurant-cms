@@ -1,21 +1,29 @@
 import { useEffect, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import {
-  NAV_LINKS,
   NAV_BAR_HEIGHT,
+  NAV_LINKS,
   ORDER_URL,
   RESERVE_URL,
   TRANSPARENT_NAV_ROUTES,
 } from "../../constants/navigation";
-import Button from "../ui/Button";
-import Logo from "../ui/Logo";
+import { LOGO, logoSrcForBackground } from "../../constants/logo";
 import { useHomepageData } from "../../hooks/useHomepageData";
 import { EASE_POWER3 } from "../showcase/motion";
+import LocationSwitcher from "../location/LocationSwitcher";
+import { useLocationSelection } from "../../context/LocationContext";
+import "./navbar.css";
+
+type NavLinkItem = { label: string; path: string };
 
 export default function Navbar() {
   const { bundle } = useHomepageData();
+  const { navigateWithLocationGuard, selectedLocation } = useLocationSelection();
   const logoAlt = `${bundle.settings.restaurant_name} home`;
+  const logoSrc = bundle.settings.logo?.trim() || logoSrcForBackground("dark");
   const { pathname } = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -24,10 +32,10 @@ export default function Navbar() {
 
   const canBeTransparent = TRANSPARENT_NAV_ROUTES.includes(pathname);
   const isTransparent = canBeTransparent && !scrolled;
-  const light = isTransparent;
+  const headerTone: "light" | "dark" = isTransparent || scrolled ? "light" : "dark";
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 48);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -81,112 +89,111 @@ export default function Navbar() {
   const isActive = (path: string) =>
     path === "/" ? pathname === "/" : pathname.startsWith(path);
 
+  const handleMaybeGuardedNav = (event: MouseEvent<HTMLElement>, path: string) => {
+    if (path === RESERVE_URL && selectedLocation?.reservationLink?.startsWith("http")) {
+      event.preventDefault();
+      window.open(selectedLocation.reservationLink, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (path === "/menu" || path === ORDER_URL || path === RESERVE_URL) {
+      event.preventDefault();
+      navigateWithLocationGuard(path);
+    }
+  };
+
+  const headerClass =
+    "site-header " +
+    (isTransparent ? "site-header--transparent " : "site-header--solid ") +
+    (scrolled ? "site-header--scrolled" : "");
+
+  const navLinkClass = (active: boolean) =>
+    "site-header__nav-link text-[12px] font-semibold whitespace-nowrap px-0.5 uppercase tracking-wide text-white/80 hover:text-white 2xl:text-sm 2xl:tracking-wider" +
+    (active ? " site-header__nav-link--active" : "");
+
+  const renderNavLink = (link: NavLinkItem) => {
+    const active = isActive(link.path);
+    return (
+      <Link
+        key={link.path}
+        to={link.path}
+        onClick={(event) => handleMaybeGuardedNav(event, link.path)}
+        className={navLinkClass(active)}
+      >
+        {link.label}
+      </Link>
+    );
+  };
+
   return (
     <>
       <header
-        className={
-          "fixed left-0 right-0 top-0 z-50 transition-[background,border-color] duration-300 " +
-          (isTransparent
-            ? "border-transparent bg-transparent"
-            : "border-b border-cocoa/10 bg-ivory")
-        }
+        className={headerClass}
         style={{ ["--nav-height" as string]: `${NAV_BAR_HEIGHT}px` }}
       >
-        <div
-          className="mx-auto flex max-w-[1400px] items-center justify-between px-6 md:px-10 lg:px-16"
-          style={{ height: NAV_BAR_HEIGHT }}
-        >
-          <Link
-            to="/"
-            className="group shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2"
-            aria-label="Desi Dhamaka home"
-          >
-            <Logo
-              size="navbar"
-              background={light ? "dark" : "ivory"}
-              priority
-              hoverable
-              src={bundle.settings.logo}
-              alt={logoAlt}
-            />
-          </Link>
-
-          <nav
-            className="hidden flex-1 items-center justify-center gap-5 md:flex lg:gap-7 xl:gap-9"
-            aria-label="Primary"
-          >
-            {NAV_LINKS.map((link) => {
-              const active = isActive(link.path);
-              return (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={
-                    "relative pb-0.5 text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 " +
-                    (active
-                      ? "text-saffron"
-                      : light
-                        ? "text-white/80 hover:text-white"
-                        : "text-cocoa/65 hover:text-cocoa")
-                  }
-                >
-                  {link.label}
-                  <span
-                    className={
-                      "absolute -bottom-1 left-0 h-px bg-saffron transition-all duration-400 " +
-                      (active ? "w-full" : "w-0 group-hover:w-full")
-                    }
-                  />
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="hidden items-center gap-3 lg:flex">
-            <Button to={ORDER_URL} variant="primary" className="!h-[40px] !px-5 !text-[10.5px]">
-              Order Now
-            </Button>
-            <Button to={RESERVE_URL} variant="outline" light={light} className="!h-[40px] !px-5 !text-[10.5px]">
-              Reserve a Table
-            </Button>
+        <div className="site-header__bar mx-auto grid h-20 w-full max-w-[1600px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 px-4 sm:px-8 lg:px-12 2xl:gap-x-5">
+          {/* Logo */}
+          <div className="flex flex-shrink-0 items-center">
+            <Link to="/" className="leading-none" aria-label={LOGO.alt}>
+              <img
+                src={logoSrc}
+                alt={logoAlt}
+                className="h-11 w-auto object-contain"
+                decoding="async"
+                loading="eager"
+                fetchPriority="high"
+                draggable={false}
+              />
+            </Link>
           </div>
 
-          <button
-            ref={menuButtonRef}
-            type="button"
-            className={
-              "relative z-50 flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron md:hidden " +
-              (light
-                ? "border-white/40 text-white hover:border-white"
-                : "border-cocoa/15 text-cocoa hover:border-cocoa/30")
-            }
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-nav-drawer"
-            onClick={() => setMobileOpen((v) => !v)}
+          {/* Desktop nav — all links in one row, xl+ */}
+          <nav
+            className="site-header__nav hidden min-w-0 items-center justify-center gap-2.5 xl:flex 2xl:gap-4"
+            aria-label="Primary"
           >
-            <span className="sr-only">Menu</span>
-            <div className="flex w-5 flex-col gap-1.5">
-              <span
-                className={
-                  "block h-0.5 w-full transition-transform duration-300 " +
-                  (mobileOpen ? "translate-y-2 rotate-45 bg-cocoa" : light ? "bg-white" : "bg-cocoa")
-                }
-              />
-              <span
-                className={
-                  "block h-0.5 w-full transition-opacity duration-300 " +
-                  (mobileOpen ? "opacity-0" : light ? "bg-white" : "bg-cocoa")
-                }
-              />
-              <span
-                className={
-                  "block h-0.5 w-full transition-transform duration-300 " +
-                  (mobileOpen ? "-translate-y-2 -rotate-45 bg-cocoa" : light ? "bg-white" : "bg-cocoa")
-                }
-              />
-            </div>
-          </button>
+            {NAV_LINKS.map(renderNavLink)}
+          </nav>
+
+          {/* Desktop actions — xl+ */}
+          <div className="hidden flex-shrink-0 items-center gap-2 xl:flex 2xl:gap-3">
+            <Link
+              to={ORDER_URL}
+              onClick={(event) => handleMaybeGuardedNav(event, ORDER_URL)}
+              className="whitespace-nowrap rounded-full bg-brand-primary px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#d43415] 2xl:px-5 2xl:py-2.5 2xl:text-xs"
+            >
+              Order Now
+            </Link>
+            <Link
+              to={RESERVE_URL}
+              onClick={(event) => handleMaybeGuardedNav(event, RESERVE_URL)}
+              className="whitespace-nowrap rounded-full border border-white px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-cocoa 2xl:px-5 2xl:py-2.5 2xl:text-xs"
+            >
+              Reserve a Table
+            </Link>
+            <LocationSwitcher variant="header" tone={headerTone} />
+          </div>
+
+          {/* Tablet / mobile */}
+          <div className="flex flex-shrink-0 items-center justify-end gap-2 xl:hidden">
+            <Link
+              to={ORDER_URL}
+              onClick={(event) => handleMaybeGuardedNav(event, ORDER_URL)}
+              className="whitespace-nowrap rounded-full bg-brand-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#d43415]"
+            >
+              Order Now
+            </Link>
+            <button
+              ref={menuButtonRef}
+              type="button"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/40 text-white transition-colors hover:border-white"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav-drawer"
+              onClick={() => setMobileOpen((value) => !value)}
+            >
+              {mobileOpen ? <X size={22} aria-hidden /> : <Menu size={22} aria-hidden />}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -195,30 +202,38 @@ export default function Navbar() {
           <motion.div
             ref={drawerRef}
             id="mobile-nav-drawer"
-            className="fixed inset-0 z-40 bg-ivory md:hidden"
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ duration: 0.45, ease: EASE_POWER3 }}
+            className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-6 bg-black px-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: EASE_POWER3 }}
           >
-            <nav
-              className="flex h-full flex-col justify-center px-10 pt-20"
-              aria-label="Mobile"
+            <button
+              type="button"
+              className="absolute right-6 top-6 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/30 text-white"
+              aria-label="Close menu"
+              onClick={() => setMobileOpen(false)}
             >
-              {NAV_LINKS.map((link, i) => {
+              <X size={22} aria-hidden />
+            </button>
+
+            <nav className="flex w-full max-w-sm flex-col items-center gap-2" aria-label="Mobile">
+              {NAV_LINKS.map((link, index) => {
                 const active = isActive(link.path);
                 return (
                   <motion.div
                     key={link.path}
-                    initial={{ opacity: 0, x: 24 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.05 + i * 0.05, ease: EASE_POWER3 }}
+                    className="w-full text-center"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.04 + index * 0.03, ease: EASE_POWER3 }}
                   >
                     <Link
                       to={link.path}
+                      onClick={(event) => handleMaybeGuardedNav(event, link.path)}
                       className={
-                        "block py-4 text-2xl font-serif transition-colors " +
-                        (active ? "text-saffron" : "text-cocoa hover:text-saffron")
+                        "block py-2 text-2xl font-semibold transition-colors" +
+                        (active ? " text-brand-secondary" : " text-white hover:text-brand-secondary")
                       }
                     >
                       {link.label}
@@ -226,15 +241,25 @@ export default function Navbar() {
                   </motion.div>
                 );
               })}
-              <div className="mt-10 flex flex-col gap-3">
-                <Button to={ORDER_URL} variant="primary">
-                  Order Now
-                </Button>
-                <Button to={RESERVE_URL} variant="outline">
-                  Reserve a Table
-                </Button>
-              </div>
             </nav>
+
+            <div className="mt-4 flex w-full max-w-sm flex-col items-stretch gap-3">
+              <Link
+                to={ORDER_URL}
+                onClick={(event) => handleMaybeGuardedNav(event, ORDER_URL)}
+                className="rounded-full bg-brand-primary px-5 py-3 text-center text-sm font-bold uppercase tracking-wider text-white"
+              >
+                Order Now
+              </Link>
+              <Link
+                to={RESERVE_URL}
+                onClick={(event) => handleMaybeGuardedNav(event, RESERVE_URL)}
+                className="rounded-full border border-white px-5 py-3 text-center text-sm font-bold uppercase tracking-wider text-white"
+              >
+                Reserve a Table
+              </Link>
+              <LocationSwitcher variant="full" />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

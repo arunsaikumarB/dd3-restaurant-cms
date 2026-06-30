@@ -1,5 +1,7 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
+import type { LocationId } from "../config/locations";
+import { getLocationConfig, LOCATION_IDS } from "../config/locations";
 import type { Offer, OfferInsert } from "../types/database";
 import {
   formatOfferDate,
@@ -33,6 +35,8 @@ export type OfferCardRow = {
   status: "active" | "inactive";
   scheduleStatus: OfferScheduleStatus;
   created_at: string;
+  location_id?: LocationId;
+  locationName?: string;
 };
 
 export const EMPTY_OFFER_FORM: OfferForm = {
@@ -57,7 +61,20 @@ export function rowToForm(row: OfferCardRow): OfferForm {
   };
 }
 
-export function formToPayload(form: OfferForm): OfferInsert {
+export function formToPayload(form: OfferForm, locationId: LocationId): OfferInsert {
+  return {
+    location_id: locationId,
+    title: form.title.trim(),
+    description: form.description.trim() || null,
+    banner: form.banner?.trim() || null,
+    discount: form.discount.trim(),
+    start_date: form.start_date,
+    end_date: form.end_date,
+    active: form.active,
+  };
+}
+
+function formToUpdatePayload(form: OfferForm) {
   return {
     title: form.title.trim(),
     description: form.description.trim() || null,
@@ -103,13 +120,15 @@ function sortOffers(rows: OfferCardRow[]): OfferCardRow[] {
 type SupabaseError = { message: string; code?: string };
 
 type OffersQuery = {
-  select(columns: string): Promise<{ data: Offer[] | null; error: SupabaseError | null }>;
+  select(columns: string): {
+    eq(column: string, value: string): Promise<{ data: Offer[] | null; error: SupabaseError | null }>;
+  };
   insert(row: OfferInsert): {
     select(columns: string): {
       single(): Promise<{ data: Offer | null; error: SupabaseError | null }>;
     };
   };
-  update(row: Partial<OfferInsert>): {
+  update(row: ReturnType<typeof formToUpdatePayload> | { active: boolean }): {
     eq(column: string, value: string): {
       select(columns: string): {
         single(): Promise<{ data: Offer | null; error: SupabaseError | null }>;
@@ -136,9 +155,9 @@ function requireClient() {
   return supabase;
 }
 
-export async function fetchOffers(): Promise<OfferCardRow[]> {
+export async function fetchOffers(locationId: LocationId): Promise<OfferCardRow[]> {
   const supabase = requireClient();
-  const { data, error } = await offersTable(supabase).select("*");
+  const { data, error } = await offersTable(supabase).select("*").eq("location_id", locationId);
 
   if (error) {
     throw new Error(mapSupabaseError(error, "load offers"));
@@ -147,10 +166,21 @@ export async function fetchOffers(): Promise<OfferCardRow[]> {
   return sortOffers((data ?? []).map(mapOfferRow));
 }
 
+export async function fetchAllOffers(): Promise<OfferCardRow[]> {
+  const results = await Promise.all(
+    LOCATION_IDS.map(async (locationId) => {
+      const rows = await fetchOffers(locationId);
+      const locationName = getLocationConfig(locationId).shortName;
+      return rows.map((row) => ({ ...row, location_id: locationId, locationName }));
+    }),
+  );
+  return results.flat();
+}
+
 /**
  * Public read-only fetch for offer sections (active offers only via RLS).
  */
-export async function fetchPublicOffers(): Promise<Offer[] | null> {
+export async function fetchPublicOffers(locationId: LocationId): Promise<Offer[] | null> {
   if (!isSupabaseConfigured()) {
     return null;
   }
@@ -160,7 +190,7 @@ export async function fetchPublicOffers(): Promise<Offer[] | null> {
     return null;
   }
 
-  const { data, error } = await offersTable(supabase).select("*");
+  const { data, error } = await offersTable(supabase).select("*").eq("location_id", locationId);
 
   if (error) {
     return null;
@@ -169,10 +199,10 @@ export async function fetchPublicOffers(): Promise<Offer[] | null> {
   return data ?? [];
 }
 
-export async function createOffer(form: OfferForm): Promise<OfferCardRow> {
+export async function createOffer(form: OfferForm, locationId: LocationId): Promise<OfferCardRow> {
   const supabase = requireClient();
   const { data, error } = await offersTable(supabase)
-    .insert(formToPayload(form))
+    .insert(formToPayload(form, locationId))
     .select("*")
     .single();
 
@@ -186,7 +216,7 @@ export async function createOffer(form: OfferForm): Promise<OfferCardRow> {
 export async function updateOffer(id: string, form: OfferForm): Promise<OfferCardRow> {
   const supabase = requireClient();
   const { data, error } = await offersTable(supabase)
-    .update(formToPayload(form))
+    .update(formToUpdatePayload(form))
     .eq("id", id)
     .select("*")
     .single();

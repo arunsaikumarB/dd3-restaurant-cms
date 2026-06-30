@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 
 type Variant = "primary" | "outline" | "ghost";
 
@@ -7,7 +7,7 @@ export interface ButtonProps {
   children: ReactNode;
   href?: string;
   to?: string;
-  onClick?: () => void;
+  onClick?: (event: MouseEvent<HTMLElement>) => void;
   variant?: Variant;
   className?: string;
   type?: "button" | "submit";
@@ -47,7 +47,7 @@ export default function Button({
 
   if (to) {
     return (
-      <Link to={to} className={classes}>
+      <Link to={to} className={classes} onClick={onClick}>
         {children}
       </Link>
     );
@@ -55,7 +55,12 @@ export default function Button({
 
   if (href) {
     return (
-      <a href={href} className={classes} {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+      <a
+        href={href}
+        className={classes}
+        onClick={onClick}
+        {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      >
         {children}
       </a>
     );

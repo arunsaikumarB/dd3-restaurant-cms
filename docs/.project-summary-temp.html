@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Desi Dhamaka — Project Summary</title>
+  <style>
+    @page { margin: 18mm 16mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", Calibri, Arial, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.45;
+      color: #1a1a1a;
+      max-width: 100%;
+    }
+    h1 {
+      font-size: 22pt;
+      color: #b91c1c;
+      margin: 0 0 4px;
+      border-bottom: 3px solid #b91c1c;
+      padding-bottom: 8px;
+    }
+    .subtitle { color: #555; font-size: 11pt; margin-bottom: 20px; }
+    h2 {
+      font-size: 13pt;
+      color: #991b1b;
+      margin: 22px 0 8px;
+      page-break-after: avoid;
+    }
+    h3 { font-size: 11pt; margin: 14px 0 6px; page-break-after: avoid; }
+    p { margin: 0 0 8px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 14px;
+      font-size: 9.5pt;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #d4d4d4;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #fef2f2; font-weight: 600; }
+    tr:nth-child(even) td { background: #fafafa; }
+    ul { margin: 4px 0 10px; padding-left: 20px; }
+    li { margin-bottom: 4px; }
+    .exec-box {
+      background: #fef2f2;
+      border-left: 4px solid #b91c1c;
+      padding: 12px 14px;
+      margin: 12px 0 18px;
+      page-break-inside: avoid;
+    }
+    .oneliner {
+      background: #f5f5f5;
+      border: 1px solid #e5e5e5;
+      padding: 12px 14px;
+      font-style: italic;
+      margin: 12px 0;
+      page-break-inside: avoid;
+    }
+    .status-ok { color: #15803d; font-weight: 600; }
+    .status-pending { color: #a16207; font-weight: 600; }
+    .flow {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 12px;
+      font-family: Consolas, monospace;
+      font-size: 9pt;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      page-break-inside: avoid;
+    }
+    .footer {
+      margin-top: 24px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+      font-size: 8.5pt;
+      color: #666;
+    }
+    .page-break { page-break-before: always; }
+  </style>
+</head>
+<body>
+
+<h1>Desi Dhamaka Website &amp; Admin CMS</h1>
+<p class="subtitle">Project summary for leadership review &mdash; June 30, 2026</p>
+
+<h2>Executive summary</h2>
+<div class="exec-box">
+  <p>We built and deployed a <strong>full restaurant website with a content management system (CMS)</strong> for Desi Dhamaka. The public site lets customers browse the menu, view offers, make reservations, and read reviews. The <strong>admin dashboard</strong> lets staff update content without touching code.</p>
+  <p>The system is <strong>live on a demo URL</strong> today, connected to a real database and authentication backend. It is ready for content entry and stakeholder review before pointing at the production domain (<code>desidhamakanj.net</code>).</p>
+</div>
+
+<h2>What was built</h2>
+<table>
+  <tr><th>Part</th><th>Purpose</th><th>Who uses it</th></tr>
+  <tr><td><strong>Public website</strong></td><td>Marketing, menu, gallery, offers, reservations, contact</td><td>Customers</td></tr>
+  <tr><td><strong>Admin dashboard</strong></td><td>Manage all site content from one place</td><td>Restaurant staff / managers</td></tr>
+</table>
+
+<h3>Technology stack</h3>
+<table>
+  <tr><th>Layer</th><th>Technology</th></tr>
+  <tr><td>Frontend</td><td>React 18 + TypeScript + Vite</td></tr>
+  <tr><td>Hosting</td><td>Netlify (HTTPS, global CDN)</td></tr>
+  <tr><td>Backend</td><td>Supabase (PostgreSQL, Auth, Storage)</td></tr>
+  <tr><td>Source code</td><td>GitHub: dd3-restaurant-cms</td></tr>
+</table>
+
+<h2>How it works (end-to-end flow)</h2>
+<div class="flow">Customer visits public site
+    &rarr; Pages served from Netlify
+    &rarr; Content loaded from Supabase database
+
+Staff opens Admin Dashboard (/admin/login)
+    &rarr; Supabase Authentication (email + password)
+    &rarr; Role check: Admin = full access | Staff = access denied
+    &rarr; Admin edits menu, homepage, settings, etc.
+    &rarr; Changes saved to Supabase
+    &rarr; Public website reflects updates within ~60 seconds</div>
+
+<h2>Work completed — phase by phase</h2>
+<table>
+  <tr><th>Phase</th><th>Deliverable</th></tr>
+  <tr><td>Foundation</td><td>Public pages (Home, Menu, About, Gallery, Offers, Reservations, Contact, etc.) and full admin UI wired to Supabase</td></tr>
+  <tr><td>Phase 15 — Production hardening</td><td>Row Level Security (RLS), hardened auth, safe user provisioning (new users default to staff)</td></tr>
+  <tr><td>Phase 16 — Role-based access</td><td>Admin-only dashboard; staff see access denied; protected /admin/* routes</td></tr>
+  <tr><td>Phase 17 — Pre-deploy wiring</td><td>Footer, contact, reservations, logo from Settings; smoke test documentation</td></tr>
+  <tr><td>Phase 18 — Launch checklist</td><td>Infrastructure, Supabase, SEO, performance, and security checklist</td></tr>
+  <tr><td>Phase 19 — SEO</td><td>Dynamic meta tags, JSON-LD structured data, sitemap.xml, robots.txt (admin blocked from indexing)</td></tr>
+  <tr><td>Phase 20 — Demo deployment</td><td>Environment config, Netlify deploy, build-time SEO generation</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<h2>Deployment &amp; go-live steps completed</h2>
+
+<h3>A. Code &amp; repository</h3>
+<ul>
+  <li>Project repository: <strong>arunsaikumarB/dd3-restaurant-cms</strong></li>
+  <li>Latest milestone: <strong>Phase 20 — Demo Deployment Configuration</strong></li>
+</ul>
+
+<h3>B. Netlify (hosting)</h3>
+<ul>
+  <li>Site name: <strong>desi-dhamaka-admin</strong></li>
+  <li>Live URL: <strong>https://desi-dhamaka-admin.netlify.app</strong></li>
+  <li>Admin login: <strong>https://desi-dhamaka-admin.netlify.app/admin/login</strong></li>
+  <li>Environment variables configured: VITE_SITE_URL, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY</li>
+</ul>
+
+<h3>C. Supabase (backend)</h3>
+<ul>
+  <li>Supabase project configured and connected to the live site</li>
+  <li>All <strong>6 database migrations</strong> applied (tables, security policies, storage buckets)</li>
+  <li>Admin user created in Authentication and promoted to <strong>admin</strong> role</li>
+</ul>
+
+<h3>D. Issues resolved during setup</h3>
+<table>
+  <tr><th>Issue</th><th>Cause</th><th>Resolution</th></tr>
+  <tr><td>Invalid login credentials</td><td>Wrong API key type (publishable vs anon)</td><td>Switched to legacy anon JWT key; redeployed</td></tr>
+  <tr><td>Access denied</td><td>User lacked admin role</td><td>SQL update to set role = admin</td></tr>
+  <tr><td>public.users does not exist</td><td>Database migrations not yet run</td><td>Ran migrations 001–006; created admin profile</td></tr>
+</table>
+
+<h2>What the admin can manage today</h2>
+<table>
+  <tr><th>Area</th><th>Capabilities</th></tr>
+  <tr><td>Homepage</td><td>Hero title/subtitle, images, about section, CTAs</td></tr>
+  <tr><td>Menu</td><td>Categories, items, prices, images, dietary flags, active/inactive</td></tr>
+  <tr><td>Gallery</td><td>Upload images, captions, featured/visible toggles</td></tr>
+  <tr><td>Offers</td><td>Promotions, banners, date ranges</td></tr>
+  <tr><td>Reviews</td><td>Approve/reject customer reviews</td></tr>
+  <tr><td>Reservations</td><td>View and manage booking requests</td></tr>
+  <tr><td>Settings</td><td>Restaurant name, phone, email, address, hours, social links, logo</td></tr>
+</table>
+
+<h2>Security posture</h2>
+<ul>
+  <li>Admin routes require email + password authentication</li>
+  <li>Only users with <strong>admin</strong> role can access the dashboard</li>
+  <li>Database Row Level Security limits public vs. staff access</li>
+  <li>Service-role keys are not exposed in frontend or public environment variables</li>
+  <li>Admin area excluded from search engine indexing</li>
+</ul>
+
+<h2>Current status</h2>
+<table>
+  <tr><th>Item</th><th>Status</th></tr>
+  <tr><td>Demo site live</td><td class="status-ok">Complete</td></tr>
+  <tr><td>Admin CMS working</td><td class="status-ok">Complete</td></tr>
+  <tr><td>Database &amp; storage</td><td class="status-ok">Complete</td></tr>
+  <tr><td>SEO basics</td><td class="status-ok">Complete</td></tr>
+  <tr><td>Production domain (desidhamakanj.net)</td><td class="status-pending">Not yet connected — demo only</td></tr>
+</table>
+
+<h2>Recommended next steps</h2>
+<ol>
+  <li><strong>Content</strong> — Populate menu, homepage, settings, and gallery via the admin dashboard</li>
+  <li><strong>Stakeholder review</strong> — Walk leadership through the public site and admin on the demo URL</li>
+  <li><strong>Production cutover</strong> — Point desidhamakanj.net/lawrenceville to Netlify; update VITE_SITE_URL; redeploy</li>
+  <li><strong>Staff accounts</strong> — Create additional users in Supabase; assign staff or admin roles as needed</li>
+  <li><strong>Final QA</strong> — Run smoke test and launch checklist on the production URL</li>
+</ol>
+
+<h2>One-liner for leadership</h2>
+<div class="oneliner">
+  &ldquo;We delivered a modern restaurant website with a secure admin CMS, deployed it to a live demo environment, connected it to a cloud database, and resolved authentication and database setup so the team can manage menu, homepage, and bookings without developers — ready for content fill and production domain switch when approved.&rdquo;
+</div>
+
+<div class="footer">
+  Desi Dhamaka — Website &amp; Admin CMS Project Summary<br />
+  Demo: https://desi-dhamaka-admin.netlify.app | Admin: /admin/login
+</div>
+
+</body>
+</html>

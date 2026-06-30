@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { loadPublicMenuData } from "../services/menuPublic";
 import type { MenuData } from "../types/menu";
+import type { LocationId } from "../config/locations";
 
-export function useMenuData() {
+export function useMenuData(locationId: LocationId | null) {
   const [data, setData] = useState<MenuData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
 
-    void loadPublicMenuData().then((result) => {
+    void loadPublicMenuData(locationId ?? "lawrenceville").then((result) => {
       if (cancelled) return;
       setData(result.data);
       setError(result.error);
@@ -20,7 +22,7 @@ export function useMenuData() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [locationId]);
 
   return { data, loading, error };
 }

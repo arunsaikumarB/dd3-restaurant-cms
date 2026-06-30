@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   UtensilsCrossed,
@@ -12,8 +13,10 @@ import AdminCard from "../components/ui/Card";
 import AdminChart, { AreaChart } from "../components/ui/Chart";
 import AdminButton from "../components/ui/Button";
 import { useAdminTheme } from "../context/AdminThemeContext";
+import { useLocation } from "../hooks/useLocation";
+import { fetchDashboardStats } from "../services/dashboardStats";
+import type { AdminStat } from "../types";
 import {
-  DASHBOARD_STATS,
   VISITOR_CHART_DATA,
   RESERVATION_CHART_DATA,
   RECENT_ACTIVITIES,
@@ -37,6 +40,21 @@ const quickActions = [
 
 export default function AdminDashboardPage() {
   const { dark } = useAdminTheme();
+  const { scope, currentLocation } = useLocation();
+  const [stats, setStats] = useState<AdminStat[]>([]);
+  const [locationLabel, setLocationLabel] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchDashboardStats(scope).then((result) => {
+      if (cancelled) return;
+      setStats(result.stats);
+      setLocationLabel(result.locationLabel);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [scope]);
 
   return (
     <div>
@@ -44,12 +62,15 @@ export default function AdminDashboardPage() {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
         <p className={`mt-1 text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>
-          Welcome back. Here&apos;s what&apos;s happening at Desi Dhamaka today.
+          {locationLabel
+            ? `Overview for ${locationLabel}.`
+            : "Welcome back. Here's what's happening at Desi Dhamaka today."}
+          {currentLocation ? ` ${currentLocation.address}` : ""}
         </p>
       </motion.div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {DASHBOARD_STATS.map((stat, i) => (
+        {stats.map((stat, i) => (
           <motion.div
             key={stat.id}
             initial={{ opacity: 0, y: 16 }}
@@ -106,7 +127,7 @@ export default function AdminDashboardPage() {
           <div className={`mt-6 rounded-xl p-4 ${dark ? "bg-admin-primary/10" : "bg-admin-ivory"}`}>
             <p className="text-xs font-medium text-admin-primary">Tip</p>
             <p className={`mt-1 text-xs ${dark ? "text-white/50" : "text-admin-muted"}`}>
-              Connect your backend to sync live reservation and review data.
+              Use the location selector in the header to switch between restaurant branches.
             </p>
           </div>
         </AdminCard>

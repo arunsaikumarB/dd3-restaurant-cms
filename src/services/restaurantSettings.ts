@@ -1,6 +1,6 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
-import { SITE } from "../constants/site";
+import { getLocationConfig, type LocationId } from "../config/locations";
 import type { RestaurantSettings, RestaurantSettingsInsert } from "../types/database";
 
 export type OpeningHoursForm = {
@@ -23,23 +23,24 @@ export type RestaurantSettingsForm = {
   favicon: string | null;
 };
 
-export function buildDefaultRestaurantSettings(): Omit<
-  RestaurantSettings,
-  "id" | "created_at" | "updated_at"
-> {
+export function buildDefaultRestaurantSettings(
+  locationId: LocationId,
+): Omit<RestaurantSettings, "id" | "created_at" | "updated_at"> {
+  const location = getLocationConfig(locationId);
   return {
-    restaurant_name: SITE.name,
-    phone: SITE.phone,
-    email: SITE.email,
-    address: SITE.address,
-    google_maps: SITE.mapEmbed,
+    location_id: locationId,
+    restaurant_name: `Desi Dhamaka — ${location.shortName}`,
+    phone: location.phone,
+    email: location.email,
+    address: location.address,
+    google_maps: location.googleMapsEmbed,
     opening_hours: {
-      weekday: "11:00 AM – 10:00 PM",
-      weekend: "11:00 AM – 11:00 PM",
-      sunday: "12:00 PM – 9:30 PM",
+      weekday: location.openingHours.weekday,
+      weekend: location.openingHours.weekend,
+      sunday: location.openingHours.sunday,
     },
-    facebook: SITE.social.facebook,
-    instagram: SITE.social.instagram,
+    facebook: "",
+    instagram: "",
     youtube: "",
     logo: null,
     favicon: null,
@@ -104,18 +105,20 @@ type SupabaseError = { message: string; code?: string };
 
 type SettingsQuery = {
   select(columns: string): {
-    order(column: string, options: { ascending: boolean }): {
-      limit(count: number): {
-        maybeSingle(): Promise<{ data: RestaurantSettings | null; error: SupabaseError | null }>;
-      };
+    eq(column: string, value: string): {
+      maybeSingle(): Promise<{ data: RestaurantSettings | null; error: SupabaseError | null }>;
     };
+    order(column: string, options: { ascending: boolean }): Promise<{
+      data: RestaurantSettings[] | null;
+      error: SupabaseError | null;
+    }>;
   };
   insert(row: RestaurantSettingsInsert): {
     select(columns: string): {
       single(): Promise<{ data: RestaurantSettings | null; error: SupabaseError | null }>;
     };
   };
-  update(row: Partial<RestaurantSettingsInsert>): {
+  update(row: ReturnType<typeof formToUpdatePayload>): {
     eq(column: string, value: string): {
       select(columns: string): {
         single(): Promise<{ data: RestaurantSettings | null; error: SupabaseError | null }>;
@@ -128,10 +131,9 @@ function settingsTable(supabase: NonNullable<ReturnType<typeof createClientIfCon
   return supabase.from("restaurant_settings") as unknown as SettingsQuery;
 }
 
-/**
- * Fetch the singleton restaurant_settings row, creating defaults if missing.
- */
-export async function getOrCreateRestaurantSettings(): Promise<RestaurantSettings> {
+export async function getOrCreateRestaurantSettings(
+  locationId: LocationId,
+): Promise<RestaurantSettings> {
   if (!isSupabaseConfigured()) {
     throw new Error("Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
   }
@@ -145,8 +147,7 @@ export async function getOrCreateRestaurantSettings(): Promise<RestaurantSetting
 
   const { data: existing, error: fetchError } = await table
     .select("*")
-    .order("created_at", { ascending: true })
-    .limit(1)
+    .eq("location_id", locationId)
     .maybeSingle();
 
   if (fetchError) {
@@ -158,7 +159,7 @@ export async function getOrCreateRestaurantSettings(): Promise<RestaurantSetting
   }
 
   const { data: created, error: insertError } = await table
-    .insert(buildDefaultRestaurantSettings() as RestaurantSettingsInsert)
+    .insert(buildDefaultRestaurantSettings(locationId) as RestaurantSettingsInsert)
     .select("*")
     .single();
 
@@ -169,9 +170,27 @@ export async function getOrCreateRestaurantSettings(): Promise<RestaurantSetting
   return created;
 }
 
-/**
- * Update restaurant settings by id.
- */
+export async function fetchAllRestaurantSettings(): Promise<RestaurantSettings[]> {
+  if (!isSupabaseConfigured()) {
+    throw new Error("Supabase is not configured.");
+  }
+
+  const supabase = createClientIfConfigured();
+  if (!supabase) {
+    throw new Error("Supabase client could not be initialized.");
+  }
+
+  const { data, error } = await settingsTable(supabase)
+    .select("*")
+    .order("location_id", { ascending: true });
+
+  if (error) {
+    throw new Error(mapSupabaseError(error));
+  }
+
+  return data ?? [];
+}
+
 export async function updateRestaurantSettings(
   id: string,
   form: RestaurantSettingsForm,
@@ -185,11 +204,10 @@ export async function updateRestaurantSettings(
     throw new Error("Supabase client could not be initialized.");
   }
 
-  const payload = formToUpdatePayload(form);
   const table = settingsTable(supabase);
 
   const { data, error } = await table
-    .update(payload as Partial<RestaurantSettingsInsert>)
+    .update(formToUpdatePayload(form))
     .eq("id", id)
     .select("*")
     .single();
@@ -201,10 +219,9 @@ export async function updateRestaurantSettings(
   return data;
 }
 
-/**
- * Public read-only fetch for restaurant settings (no insert, no auth required).
- */
-export async function fetchRestaurantSettingsPublic(): Promise<RestaurantSettings | null> {
+export async function fetchRestaurantSettingsPublic(
+  locationId: LocationId,
+): Promise<RestaurantSettings | null> {
   if (!isSupabaseConfigured()) {
     return null;
   }
@@ -216,8 +233,7 @@ export async function fetchRestaurantSettingsPublic(): Promise<RestaurantSetting
 
   const { data, error } = await settingsTable(supabase)
     .select("*")
-    .order("created_at", { ascending: true })
-    .limit(1)
+    .eq("location_id", locationId)
     .maybeSingle();
 
   if (error) {

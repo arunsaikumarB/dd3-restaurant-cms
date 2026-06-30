@@ -1,109 +1,85 @@
-import { PUBLIC_OFFERS_FALLBACK, type PublicOffer } from "../data/publicOffers";
+import { getOffersForLocation } from "../data/offers";
+import type { LocationOffer } from "../data/offers";
+import type { LocationId } from "../config/locations";
 import type { Offer } from "../types/database";
 import { formatOfferDate, getOfferScheduleStatus } from "../utils/offers/schedule";
+import { slugify } from "../utils/slug";
 import { fetchPublicOffers } from "./offers";
 
-export type { PublicOffer };
+export type { LocationOffer as PublicOffer };
 
-const CACHE_TTL_MS = 60_000;
-const FALLBACK_BANNER = "/showcase/biryani.jpg";
+export function getPublicOffersForLocation(locationId: LocationId): LocationOffer[] {
+  return getOffersForLocation(locationId);
+}
 
-let cachedOffers: PublicOffer[] | null = null;
-let cacheExpiresAt = 0;
-let inflightRequest: Promise<PublicOffer[]> | null = null;
+/** @deprecated Use getPublicOffersForLocation */
+export function getPublicOffersFallback(locationId: LocationId = "lawrenceville"): LocationOffer[] {
+  return getPublicOffersForLocation(locationId);
+}
 
-function mapPublicOffer(row: Offer): PublicOffer {
+function mapDbOfferToLocationOffer(row: Offer): LocationOffer {
+  const endDate = formatOfferDate(row.end_date);
+  const slug = `${slugify(row.title)}-${row.id.slice(0, 8)}`;
+
   return {
-    id: row.id,
+    id: `cms-${row.id}`,
+    slug,
     title: row.title,
-    description: row.description?.trim() ?? "",
-    banner: row.banner?.trim() || FALLBACK_BANNER,
-    discount: row.discount?.trim() ?? "",
-    start_date: formatOfferDate(row.start_date),
-    end_date: formatOfferDate(row.end_date),
-    created_at: row.created_at,
+    description: row.description ?? "",
+    content: [
+      {
+        heading: row.title,
+        paragraphs: row.description ? [row.description] : [],
+      },
+    ],
+    image: row.banner ?? "/showcase/biryani.jpg",
+    gallery: row.banner ? [row.banner] : [],
+    badge: row.discount || null,
+    price: null,
+    validUntil: endDate || null,
+    terms: [],
+    orderCategory: null,
+    featured: row.active,
+    category: row.discount || null,
   };
 }
 
-function isCurrentPublicOffer(offer: PublicOffer, now = new Date()): boolean {
-  return getOfferScheduleStatus(offer.start_date, offer.end_date, now) === "current";
+function isVisibleCmsOffer(row: Offer): boolean {
+  if (!row.active) return false;
+  const startDate = formatOfferDate(row.start_date);
+  const endDate = formatOfferDate(row.end_date);
+  return getOfferScheduleStatus(startDate, endDate) !== "expired";
 }
 
-function sortPublicOffers(rows: PublicOffer[]): PublicOffer[] {
-  return [...rows].sort((a, b) => {
-    const startDiff = b.start_date.localeCompare(a.start_date);
-    if (startDiff !== 0) return startDiff;
-    return b.created_at.localeCompare(a.created_at);
-  });
+function mergeLocationOffers(staticOffers: LocationOffer[], cmsOffers: LocationOffer[]): LocationOffer[] {
+  if (cmsOffers.length === 0) return staticOffers;
+  return [...staticOffers, ...cmsOffers];
 }
 
-function filterPublicOffers(rows: PublicOffer[]): PublicOffer[] {
-  return sortPublicOffers(rows.filter((offer) => isCurrentPublicOffer(offer)));
-}
+export async function fetchPublicOffersData(locationId: LocationId): Promise<LocationOffer[]> {
+  const staticOffers = getOffersForLocation(locationId);
+  const dbOffers = await fetchPublicOffers(locationId);
 
-export function getPublicOffersFallback(): PublicOffer[] {
-  return sortPublicOffers(PUBLIC_OFFERS_FALLBACK);
-}
-
-async function fetchSupabasePublicOffers(): Promise<PublicOffer[] | null> {
-  const rows = await fetchPublicOffers();
-  if (!rows) {
-    return null;
+  if (!dbOffers || dbOffers.length === 0) {
+    return staticOffers;
   }
 
-  const mapped = rows.map(mapPublicOffer);
-  const current = filterPublicOffers(mapped);
-  return current;
-}
-
-export async function fetchPublicOffersData(): Promise<PublicOffer[]> {
-  const now = Date.now();
-  if (cachedOffers && now < cacheExpiresAt) {
-    return cachedOffers;
-  }
-
-  if (inflightRequest) {
-    return inflightRequest;
-  }
-
-  inflightRequest = (async () => {
-    try {
-      const supabaseOffers = await fetchSupabasePublicOffers();
-      if (supabaseOffers !== null && supabaseOffers.length > 0) {
-        cachedOffers = supabaseOffers;
-        cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-        return supabaseOffers;
-      }
-
-      const fallback = getPublicOffersFallback();
-      cachedOffers = fallback;
-      cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-      return fallback;
-    } catch {
-      const fallback = getPublicOffersFallback();
-      cachedOffers = fallback;
-      cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-      return fallback;
-    } finally {
-      inflightRequest = null;
-    }
-  })();
-
-  return inflightRequest;
+  const cmsOffers = dbOffers.filter(isVisibleCmsOffer).map(mapDbOfferToLocationOffer);
+  return mergeLocationOffers(staticOffers, cmsOffers);
 }
 
 export type PublicOffersResult = {
-  offers: PublicOffer[];
+  offers: LocationOffer[];
   error: string | null;
 };
 
-export async function loadPublicOffersData(): Promise<PublicOffersResult> {
+export async function loadPublicOffersData(locationId: LocationId): Promise<PublicOffersResult> {
   try {
-    const offers = await fetchPublicOffersData();
+    const offers = await fetchPublicOffersData(locationId);
     return { offers, error: null };
   } catch (err) {
     return {
-      offers: getPublicOffersFallback(),
+      offers: getOffersForLocation(locationId),
       error: err instanceof Error ? err.message : "Failed to load offers.",
     };
   }

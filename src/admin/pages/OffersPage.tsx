@@ -17,10 +17,12 @@ import AdminToast from "../components/ui/Toast";
 import ImageUploadField from "../components/settings/ImageUploadField";
 import OffersPageSkeleton from "../components/settings/OffersPageSkeleton";
 import { useAdminTheme } from "../context/AdminThemeContext";
+import { useLocation } from "../hooks/useLocation";
 import {
   createOffer,
   deleteOffer,
   EMPTY_OFFER_FORM,
+  fetchAllOffers,
   fetchOffers,
   rowToForm,
   scheduleStatusLabel,
@@ -62,6 +64,7 @@ const FILTER_OPTIONS = [
 
 export default function OffersPage() {
   const { dark } = useAdminTheme();
+  const { locationId, isAllLocations, scope } = useLocation();
   const [offers, setOffers] = useState<OfferCardRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -91,18 +94,27 @@ export default function OffersPage() {
     setLoading(true);
     setLoadError(null);
     try {
-      const rows = await fetchOffers();
+      const rows = isAllLocations ? await fetchAllOffers() : await fetchOffers(locationId);
       setOffers(rows);
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : "Failed to load offers.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAllLocations, locationId]);
 
   useEffect(() => {
     void loadOffers();
   }, [loadOffers]);
+
+  useEffect(() => {
+    setSearch("");
+    setFilterBy("all");
+    setModalOpen(false);
+    setDeleteOpen(false);
+    setEditingId(null);
+    setDeletingOffer(null);
+  }, [scope]);
 
   const filteredOffers = useMemo(() => {
     let result = [...offers];
@@ -144,6 +156,10 @@ export default function OffersPage() {
   }, [offers, search, sortBy, filterBy]);
 
   const openCreateModal = () => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to create offers.", "error");
+      return;
+    }
     setEditingId(null);
     setForm({ ...EMPTY_OFFER_FORM });
     setFieldErrors({});
@@ -192,7 +208,7 @@ export default function OffersPage() {
         await updateOffer(editingId, form);
         showToast("Offer updated successfully.");
       } else {
-        await createOffer(form);
+        await createOffer(form, locationId);
         showToast("Offer created successfully.");
       }
       setModalOpen(false);
@@ -342,6 +358,9 @@ export default function OffersPage() {
                     {offer.discount}
                   </span>
                   <h3 className="mt-2 text-xl font-semibold text-white">{offer.name}</h3>
+                  {isAllLocations && offer.locationName ? (
+                    <p className="mt-1 text-xs text-white/70">{offer.locationName}</p>
+                  ) : null}
                 </div>
                 <div className="absolute right-3 top-3">
                   <ActionMenu

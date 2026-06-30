@@ -8,6 +8,7 @@ import AdminButton from "../components/ui/Button";
 import AdminToast from "../components/ui/Toast";
 import ImageUploadField from "../components/settings/ImageUploadField";
 import SettingsPageSkeleton from "../components/settings/SettingsPageSkeleton";
+import { useLocation } from "../hooks/useLocation";
 import { RESTAURANT_SETTINGS } from "../data/mock";
 import {
   getOrCreateRestaurantSettings,
@@ -31,6 +32,7 @@ type SeoForm = {
 const DEFAULT_SEO: SeoForm = RESTAURANT_SETTINGS.seo;
 
 export default function SettingsPage() {
+  const { locationId, isAllLocations, scope } = useLocation();
   const [settingsId, setSettingsId] = useState<string | null>(null);
   const [form, setForm] = useState<RestaurantSettingsForm | null>(null);
   const [seo, setSeo] = useState<SeoForm>(DEFAULT_SEO);
@@ -52,10 +54,18 @@ export default function SettingsPage() {
   }, []);
 
   const loadSettings = useCallback(async () => {
+    if (isAllLocations) {
+      setLoading(false);
+      setLoadError(null);
+      setForm(null);
+      setSettingsId(null);
+      return;
+    }
+
     setLoading(true);
     setLoadError(null);
     try {
-      const row = await getOrCreateRestaurantSettings();
+      const row = await getOrCreateRestaurantSettings(locationId);
       const nextForm = rowToForm(row);
       setSettingsId(row.id);
       setForm(nextForm);
@@ -66,11 +76,11 @@ export default function SettingsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAllLocations, locationId]);
 
   useEffect(() => {
     void loadSettings();
-  }, [loadSettings]);
+  }, [loadSettings, scope]);
 
   const uploadAsset = async (file: File, folder: "logo" | "favicon") => {
     const ext = file.name.split(".").pop() ?? "bin";
@@ -136,6 +146,23 @@ export default function SettingsPage() {
           description="Configure your restaurant details, hours, and SEO."
         />
         <SettingsPageSkeleton />
+      </div>
+    );
+  }
+
+  if (isAllLocations) {
+    return (
+      <div>
+        <AdminBreadcrumbs items={[{ label: "Admin", path: "/admin/dashboard" }, { label: "Settings" }]} />
+        <PageHeader
+          title="Restaurant Settings"
+          description="Configure your restaurant details, hours, and SEO."
+        />
+        <AdminCard>
+          <p className="text-sm text-admin-muted">
+            Select a single location in the header to edit restaurant settings for that branch.
+          </p>
+        </AdminCard>
       </div>
     );
   }

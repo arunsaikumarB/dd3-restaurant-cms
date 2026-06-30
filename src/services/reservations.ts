@@ -1,5 +1,6 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
+import { getLocationConfig, type LocationId } from "../config/locations";
 import type { Reservation, ReservationInsert, ReservationStatus } from "../types/database";
 import { mapSupabaseError } from "../utils/supabase/errors";
 
@@ -28,6 +29,8 @@ export type ReservationTableRow = {
   special_request: string;
   status: ReservationStatus;
   created_at: string;
+  location_id?: LocationId;
+  locationName?: string;
 };
 
 export const EMPTY_RESERVATION_FORM: ReservationForm = {
@@ -76,7 +79,21 @@ export function rowToForm(row: ReservationTableRow): ReservationForm {
   };
 }
 
-export function formToPayload(form: ReservationForm): ReservationInsert {
+export function formToPayload(form: ReservationForm, locationId: LocationId): ReservationInsert {
+  return {
+    location_id: locationId,
+    customer_name: form.customer_name.trim(),
+    phone: form.phone.trim(),
+    email: form.email.trim() || null,
+    date: form.date.trim(),
+    time: formatTimeForDb(form.time.trim()),
+    guests: Math.round(form.guests),
+    special_request: form.special_request.trim() || null,
+    status: form.status,
+  };
+}
+
+function formToUpdatePayload(form: ReservationForm) {
   return {
     customer_name: form.customer_name.trim(),
     phone: form.phone.trim(),
@@ -112,6 +129,7 @@ export function formatTimeForDisplay(time: string): string {
 
 function mapReservationRow(row: Reservation): ReservationTableRow {
   const specialRequest = row.special_request ?? "";
+  const locationName = getLocationConfig(row.location_id).shortName;
 
   return {
     id: row.id,
@@ -127,6 +145,8 @@ function mapReservationRow(row: Reservation): ReservationTableRow {
     special_request: specialRequest,
     status: row.status,
     created_at: row.created_at,
+    location_id: row.location_id,
+    locationName,
   };
 }
 
@@ -137,7 +157,13 @@ function sortReservationsNewest(rows: ReservationTableRow[]): ReservationTableRo
 type SupabaseError = { message: string; code?: string };
 
 type ReservationsQuery = {
-  select(columns: string): Promise<{ data: Reservation[] | null; error: SupabaseError | null }>;
+  select(columns: string): {
+    eq(column: string, value: string): Promise<{ data: Reservation[] | null; error: SupabaseError | null }>;
+    order(
+      column: string,
+      options: { ascending: boolean },
+    ): Promise<{ data: Reservation[] | null; error: SupabaseError | null }>;
+  };
   insert(row: ReservationInsert): {
     select(columns: string): {
       single(): Promise<{ data: Reservation | null; error: SupabaseError | null }>;
@@ -170,9 +196,11 @@ function requireClient() {
   return supabase;
 }
 
-export async function fetchReservations(): Promise<ReservationTableRow[]> {
+export async function fetchReservations(locationId: LocationId): Promise<ReservationTableRow[]> {
   const supabase = requireClient();
-  const { data, error } = await reservationsTable(supabase).select("*");
+  const { data, error } = await reservationsTable(supabase)
+    .select("*")
+    .eq("location_id", locationId);
 
   if (error) {
     throw new Error(mapSupabaseError(error, "load reservations"));
@@ -181,10 +209,26 @@ export async function fetchReservations(): Promise<ReservationTableRow[]> {
   return sortReservationsNewest((data ?? []).map(mapReservationRow));
 }
 
-export async function createReservation(form: ReservationForm): Promise<ReservationTableRow> {
+export async function fetchAllReservations(): Promise<ReservationTableRow[]> {
+  const supabase = requireClient();
+  const { data, error } = await reservationsTable(supabase).select("*").order("created_at", {
+    ascending: false,
+  });
+
+  if (error) {
+    throw new Error(mapSupabaseError(error, "load reservations"));
+  }
+
+  return sortReservationsNewest((data ?? []).map(mapReservationRow));
+}
+
+export async function createReservation(
+  form: ReservationForm,
+  locationId: LocationId,
+): Promise<ReservationTableRow> {
   const supabase = requireClient();
   const { data, error } = await reservationsTable(supabase)
-    .insert(formToPayload(form))
+    .insert(formToPayload(form, locationId))
     .select("*")
     .single();
 
@@ -198,7 +242,7 @@ export async function createReservation(form: ReservationForm): Promise<Reservat
 export async function updateReservation(id: string, form: ReservationForm): Promise<ReservationTableRow> {
   const supabase = requireClient();
   const { data, error } = await reservationsTable(supabase)
-    .update(formToPayload(form))
+    .update(formToUpdatePayload(form))
     .eq("id", id)
     .select("*")
     .single();
@@ -211,6 +255,7 @@ export async function updateReservation(id: string, form: ReservationForm): Prom
 }
 
 export type PublicReservationPayload = {
+  location_id: LocationId;
   customer_name: string;
   phone: string;
   email: string;
@@ -242,7 +287,7 @@ export async function createPublicReservation(payload: PublicReservationPayload)
     supabase.from("reservations") as unknown as {
       insert(row: ReservationInsert): Promise<{ error: SupabaseError | null }>;
     }
-  ).insert(formToPayload(form));
+  ).insert(formToPayload(form, payload.location_id));
 
   if (error) {
     throw new Error(mapSupabaseError(error, "submit reservation"));

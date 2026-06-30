@@ -14,11 +14,13 @@ import AdminToast from "../components/ui/Toast";
 import ImageUploadField from "../components/settings/ImageUploadField";
 import CategoriesPageSkeleton from "../components/settings/CategoriesPageSkeleton";
 import { useAdminTheme } from "../context/AdminThemeContext";
+import { useLocation } from "../hooks/useLocation";
 import {
   CategoryDeleteBlockedError,
   createMenuCategory,
   deleteMenuCategory,
   EMPTY_MENU_CATEGORY_FORM,
+  fetchAllMenuCategories,
   fetchMenuCategories,
   isSlugTaken,
   rowToForm,
@@ -55,6 +57,7 @@ const STATUS_OPTIONS = [
 
 export default function CategoryManagementPage() {
   const { dark } = useAdminTheme();
+  const { locationId, isAllLocations, scope } = useLocation();
   const [categories, setCategories] = useState<MenuCategoryWithCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -85,18 +88,28 @@ export default function CategoryManagementPage() {
     setLoading(true);
     setLoadError(null);
     try {
-      const rows = await fetchMenuCategories();
+      const rows = isAllLocations
+        ? await fetchAllMenuCategories()
+        : await fetchMenuCategories(locationId);
       setCategories(rows);
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : "Failed to load categories.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAllLocations, locationId]);
 
   useEffect(() => {
     void loadCategories();
   }, [loadCategories]);
+
+  useEffect(() => {
+    setSearch("");
+    setModalOpen(false);
+    setDeleteOpen(false);
+    setEditingId(null);
+    setDeletingCategory(null);
+  }, [scope]);
 
   const filteredCategories = useMemo(() => {
     let result = [...categories];
@@ -124,6 +137,10 @@ export default function CategoryManagementPage() {
   }, [categories, search, sortBy]);
 
   const openCreateModal = () => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to add categories.", "error");
+      return;
+    }
     setEditingId(null);
     setForm({ ...EMPTY_MENU_CATEGORY_FORM, display_order: categories.length });
     setFieldErrors({});
@@ -180,7 +197,7 @@ export default function CategoryManagementPage() {
 
     let slugTaken = false;
     try {
-      slugTaken = await isSlugTaken(slug, editingId ?? undefined);
+      slugTaken = await isSlugTaken(slug, locationId, editingId ?? undefined);
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to validate slug.", "error");
       return;
@@ -199,7 +216,7 @@ export default function CategoryManagementPage() {
         await updateMenuCategory(editingId, normalizedForm);
         showToast("Category updated successfully.");
       } else {
-        await createMenuCategory(normalizedForm);
+        await createMenuCategory(normalizedForm, locationId);
         showToast("Category created successfully.");
       }
       setModalOpen(false);
@@ -354,6 +371,7 @@ export default function CategoryManagementPage() {
                 <div className="flex items-center justify-between">
                   <span className={`text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>
                     {cat.itemCount} items
+                    {isAllLocations && cat.locationName ? ` · ${cat.locationName}` : ""}
                   </span>
                   <div className="flex gap-1">
                     <AdminButton

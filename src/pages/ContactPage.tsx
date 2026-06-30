@@ -6,9 +6,11 @@ import CTASection from "../components/ui/CTASection";
 import { useHomepageData } from "../hooks/useHomepageData";
 import { formatOpeningHoursRows } from "../services/homepagePublic";
 import { useContactForm } from "../hooks/useContactForm";
+import { useLocationSelection } from "../context/LocationContext";
 
 export default function ContactPage() {
   const { bundle } = useHomepageData();
+  const { selectedLocation } = useLocationSelection();
   const { settings } = bundle;
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
   const {
@@ -27,7 +29,7 @@ export default function ContactPage() {
       <PageHero
         label="Get in Touch"
         title="Contact"
-        subtitle="We'd love to hear from you — reservations, catering enquiries or simply a hello."
+        subtitle={`We'd love to hear from you${selectedLocation ? ` in ${selectedLocation.shortName}` : ""} — reservations, catering enquiries or simply a hello.`}
         backgroundImage="/showcase/mandi.jpg"
         breadcrumbItems={[
           { label: "Home", to: "/" },
@@ -224,8 +226,9 @@ export default function ContactPage() {
         <CTASection
           title="Ready to Experience Desi Dhamaka?"
           subtitle="Reserve Your Table Today"
-          buttonLabel="Reserve Now"
-          buttonTo="/reservation"
+          buttonLabel={selectedLocation?.reservationLink?.startsWith("http") ? "Reserve Online" : "Reserve Now"}
+          buttonTo={selectedLocation?.reservationLink?.startsWith("http") ? undefined : "/reservation"}
+          buttonHref={selectedLocation?.reservationLink?.startsWith("http") ? selectedLocation.reservationLink : undefined}
         />
       </section>
     </div>

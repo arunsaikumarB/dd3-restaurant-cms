@@ -55,7 +55,7 @@ let cacheExpiresAt = 0;
 let inflightRequest: Promise<HomepageBundle> | null = null;
 
 export function getHomepageFallbacks(): HomepageBundle {
-  const defaults = buildDefaultRestaurantSettings();
+  const defaults = buildDefaultRestaurantSettings("lawrenceville");
   const defaultHours = defaults.opening_hours as OpeningHoursForm;
 
   return {
@@ -358,7 +358,7 @@ export async function fetchHomepageBundle(): Promise<HomepageBundle> {
     try {
       const [homepageRow, settingsRow] = await Promise.all([
         fetchHomepageContentPublic(),
-        fetchRestaurantSettingsPublic(),
+        fetchRestaurantSettingsPublic("lawrenceville"),
       ]);
 
       const bundle: HomepageBundle = {

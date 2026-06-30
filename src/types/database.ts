@@ -29,6 +29,7 @@ export interface UserProfile extends Timestamps {
 
 export interface RestaurantSettings extends Timestamps {
   id: string;
+  location_id: RestaurantLocationId;
   restaurant_name: string;
   phone: string | null;
   email: string | null;
@@ -54,8 +55,11 @@ export interface HomepageContent extends Timestamps {
   about_description: string | null;
 }
 
+export type RestaurantLocationId = "south-plainfield" | "oak-tree" | "lawrenceville";
+
 export interface MenuCategory extends Timestamps {
   id: string;
+  location_id: RestaurantLocationId;
   name: string;
   slug: string;
   image: string | null;
@@ -65,6 +69,7 @@ export interface MenuCategory extends Timestamps {
 
 export interface MenuItem extends Timestamps {
   id: string;
+  location_id: RestaurantLocationId;
   category_id: string;
   name: string;
   description: string | null;
@@ -80,6 +85,7 @@ export interface MenuItem extends Timestamps {
 
 export interface Offer extends Timestamps {
   id: string;
+  location_id: RestaurantLocationId;
   title: string;
   description: string | null;
   banner: string | null;
@@ -102,6 +108,7 @@ export interface GalleryImage extends Timestamps {
 
 export interface Reservation extends Timestamps {
   id: string;
+  location_id: RestaurantLocationId;
   customer_name: string;
   phone: string;
   email: string | null;

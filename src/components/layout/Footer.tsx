@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { FOOTER_LINKS, ORDER_URL, RESERVE_URL } from "../../constants/navigation";
 import { SITE, SOCIAL_LABELS } from "../../constants/site";
 import { useHomepageData } from "../../hooks/useHomepageData";
+import { useLocationSelection } from "../../context/LocationContext";
 import {
   buildPublicSocialLinks,
   formatOpeningHoursRows,
@@ -31,6 +32,7 @@ const SOCIAL_ICONS: Record<string, JSX.Element> = {
 export default function Footer() {
   const year = new Date().getFullYear();
   const { bundle } = useHomepageData();
+  const { navigateWithLocationGuard, selectedLocation } = useLocationSelection();
   const { settings } = bundle;
   const socialLinks = buildPublicSocialLinks(settings);
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
@@ -52,12 +54,24 @@ export default function Footer() {
           <div className="flex flex-wrap gap-3">
             <Link
               to={ORDER_URL}
+              onClick={(event) => {
+                event.preventDefault();
+                navigateWithLocationGuard(ORDER_URL);
+              }}
               className="inline-flex h-[42px] items-center justify-center gap-2 rounded-full bg-brand-primary px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ivory shadow-[0_4px_16px_-4px_rgba(237,60,24,0.5)] transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:shadow-[0_8px_24px_-6px_rgba(237,60,24,0.55)] focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-cocoa"
             >
               Order Now
             </Link>
             <Link
               to={RESERVE_URL}
+              onClick={(event) => {
+                event.preventDefault();
+                if (selectedLocation?.reservationLink?.startsWith("http")) {
+                  window.open(selectedLocation.reservationLink, "_blank", "noopener,noreferrer");
+                  return;
+                }
+                navigateWithLocationGuard(RESERVE_URL);
+              }}
               className="inline-flex h-[42px] items-center justify-center gap-2 rounded-full border-2 border-ivory/30 px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ivory transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-ivory/60 hover:bg-ivory/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-cocoa"
             >
               Reserve a Table
@@ -82,6 +96,11 @@ export default function Footer() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-saffron">
               Authentic Indian Restaurant
             </p>
+            {selectedLocation && (
+              <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-cocoa/55">
+                {selectedLocation.name}
+              </p>
+            )}
             <p className="mt-1 text-[13px] text-cocoa/50">
               {settings.address.split(",").slice(-2).join(",").trim() || settings.address}
             </p>
@@ -119,6 +138,12 @@ export default function Footer() {
                 <li key={link.path}>
                   <Link
                     to={link.path}
+                    onClick={(event) => {
+                      if (link.path === "/menu") {
+                        event.preventDefault();
+                        navigateWithLocationGuard("/menu");
+                      }
+                    }}
                     className="group flex items-center gap-2 text-[14px] text-cocoa/65 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
                   >
                     <span className="block h-px w-3 bg-cocoa/25 transition-all duration-300 group-hover:w-5 group-hover:bg-saffron" />

@@ -13,9 +13,11 @@ import SearchBar from "../components/menu/SearchBar";
 import { NAV_BAR_HEIGHT } from "../constants/navigation";
 import { useMenuData } from "../hooks/useMenuData";
 import { filterMenuData, flattenItems } from "../utils/menu";
+import { useLocationSelection } from "../context/LocationContext";
 
 export default function MenuPage() {
-  const { data, loading, error } = useMenuData();
+  const { selectedLocationId, selectedLocation } = useLocationSelection();
+  const { data, loading, error } = useMenuData(selectedLocationId);
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -72,7 +74,7 @@ export default function MenuPage() {
       <PageHero
         label="The Menu"
         title="Menu"
-        subtitle="Discover authentic Indian flavours crafted with tradition, premium ingredients and unforgettable taste."
+        subtitle={`Discover authentic Indian flavours crafted with tradition, premium ingredients and unforgettable taste${selectedLocation ? ` at ${selectedLocation.shortName}` : ""}.`}
         backgroundImage="/showcase/biryani.jpg"
         breadcrumbItems={[
           { label: "Home", to: "/" },

@@ -4,16 +4,21 @@ import {
   loadPublicOffersData,
   type PublicOffer,
 } from "../services/offersPublic";
+import type { LocationId } from "../config/locations";
 
-export function useOffersData() {
-  const [offers, setOffers] = useState<PublicOffer[]>(() => getPublicOffersFallback());
+export function useOffersData(locationId: LocationId | null) {
+  const [offers, setOffers] = useState<PublicOffer[]>(() =>
+    getPublicOffersFallback(locationId ?? "lawrenceville"),
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    const resolvedLocation = locationId ?? "lawrenceville";
+    setLoading(true);
 
-    void loadPublicOffersData().then((result) => {
+    void loadPublicOffersData(resolvedLocation).then((result) => {
       if (cancelled) return;
       setOffers(result.offers);
       setError(result.error);
@@ -23,7 +28,7 @@ export function useOffersData() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [locationId]);
 
   return { offers, loading, error };
 }

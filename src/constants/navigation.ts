@@ -2,6 +2,7 @@ export const NAV_LINKS = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about" },
   { label: "Menu", path: "/menu" },
+  { label: "Offers", path: "/offers" },
   { label: "Catering", path: "/catering" },
   { label: "Parties", path: "/parties" },
   { label: "Testimonials", path: "/testimonials" },
@@ -12,6 +13,7 @@ export const FOOTER_LINKS = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about" },
   { label: "Menu", path: "/menu" },
+  { label: "Offers", path: "/offers" },
   { label: "Catering", path: "/catering" },
   { label: "Parties", path: "/parties" },
   { label: "Testimonials", path: "/testimonials" },
@@ -23,8 +25,8 @@ export const FOOTER_LINKS = [
 export const ORDER_URL = "/order";
 export const RESERVE_URL = "/reservation";
 
-/** Fixed header height — keep sticky offsets in sync. */
-export const NAV_BAR_HEIGHT = 72;
+/** Fixed header height — keep sticky offsets in sync (matches h-20). */
+export const NAV_BAR_HEIGHT = 80;
 
 /** Menu category anchor offset (nav + sticky toolbar). */
 export const MENU_SCROLL_MARGIN = NAV_BAR_HEIGHT + 168;

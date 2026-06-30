@@ -1,5 +1,7 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
+import type { LocationId } from "../config/locations";
+import { getLocationConfig, LOCATION_IDS } from "../config/locations";
 import type { ContentStatus, MenuCategory, MenuCategoryInsert } from "../types/database";
 import { mapSupabaseError } from "../utils/supabase/errors";
 import { resolveCategorySlug } from "../utils/validation/menuCategories";
@@ -14,6 +16,7 @@ export type MenuCategoryForm = {
 
 export type MenuCategoryWithCount = MenuCategory & {
   itemCount: number;
+  locationName?: string;
 };
 
 export const EMPTY_MENU_CATEGORY_FORM: MenuCategoryForm = {
@@ -34,7 +37,18 @@ export function rowToForm(row: MenuCategory): MenuCategoryForm {
   };
 }
 
-export function formToPayload(form: MenuCategoryForm): MenuCategoryInsert {
+export function formToPayload(form: MenuCategoryForm, locationId: LocationId): MenuCategoryInsert {
+  return {
+    location_id: locationId,
+    name: form.name.trim(),
+    slug: resolveCategorySlug(form.name, form.slug),
+    image: form.image?.trim() || null,
+    display_order: Math.round(form.display_order),
+    status: form.status,
+  };
+}
+
+function formToUpdatePayload(form: MenuCategoryForm) {
   return {
     name: form.name.trim(),
     slug: resolveCategorySlug(form.name, form.slug),
@@ -55,17 +69,19 @@ type SupabaseError = { message: string; code?: string };
 
 type CategoriesQuery = {
   select(columns: string): {
-    order(column: string, options: { ascending: boolean }): Promise<{
-      data: MenuCategory[] | null;
-      error: SupabaseError | null;
-    }>;
+    eq(column: string, value: string): {
+      order(column: string, options: { ascending: boolean }): Promise<{
+        data: MenuCategory[] | null;
+        error: SupabaseError | null;
+      }>;
+    };
   };
   insert(row: MenuCategoryInsert): {
     select(columns: string): {
       single(): Promise<{ data: MenuCategory | null; error: SupabaseError | null }>;
     };
   };
-  update(row: Partial<MenuCategoryInsert>): {
+  update(row: ReturnType<typeof formToUpdatePayload> | { status: ContentStatus }): {
     eq(column: string, value: string): {
       select(columns: string): {
         single(): Promise<{ data: MenuCategory | null; error: SupabaseError | null }>;
@@ -78,7 +94,12 @@ type CategoriesQuery = {
 };
 
 type MenuItemsQuery = {
-  select(columns: string): Promise<{ data: { category_id: string }[] | null; error: SupabaseError | null }>;
+  select(columns: string): {
+    eq(column: string, value: string): Promise<{
+      data: { category_id: string }[] | null;
+      error: SupabaseError | null;
+    }>;
+  };
   select(
     columns: string,
     options: { count: "exact"; head: true },
@@ -90,10 +111,12 @@ type MenuItemsQuery = {
 type SlugQuery = {
   select(columns: string): {
     eq(column: string, value: string): {
-      neq(column: string, value: string): {
+      eq(column: string, value: string): {
+        neq(column: string, value: string): {
+          maybeSingle(): Promise<{ data: { id: string } | null; error: SupabaseError | null }>;
+        };
         maybeSingle(): Promise<{ data: { id: string } | null; error: SupabaseError | null }>;
       };
-      maybeSingle(): Promise<{ data: { id: string } | null; error: SupabaseError | null }>;
     };
   };
 };
@@ -129,15 +152,15 @@ function aggregateItemCounts(rows: { category_id: string }[]): Map<string, numbe
   return counts;
 }
 
-export async function fetchMenuCategories(): Promise<MenuCategoryWithCount[]> {
+export async function fetchMenuCategories(locationId: LocationId): Promise<MenuCategoryWithCount[]> {
   const supabase = requireClient();
   const categories = categoriesTable(supabase);
   const items = menuItemsTable(supabase);
 
   const [{ data: categoryRows, error: categoryError }, { data: itemRows, error: itemError }] =
     await Promise.all([
-      categories.select("*").order("display_order", { ascending: true }),
-      items.select("category_id"),
+      categories.select("*").eq("location_id", locationId).order("display_order", { ascending: true }),
+      items.select("category_id").eq("location_id", locationId),
     ]);
 
   if (categoryError) {
@@ -155,10 +178,23 @@ export async function fetchMenuCategories(): Promise<MenuCategoryWithCount[]> {
   }));
 }
 
+export async function fetchAllMenuCategories(): Promise<MenuCategoryWithCount[]> {
+  const results = await Promise.all(
+    LOCATION_IDS.map(async (locationId) => {
+      const rows = await fetchMenuCategories(locationId);
+      const locationName = getLocationConfig(locationId).shortName;
+      return rows.map((row) => ({ ...row, locationName }));
+    }),
+  );
+  return results.flat();
+}
+
 /**
  * Public read-only fetch for the menu page (active categories only via RLS).
  */
-export async function fetchPublicMenuCategories(): Promise<MenuCategory[] | null> {
+export async function fetchPublicMenuCategories(
+  locationId: LocationId,
+): Promise<MenuCategory[] | null> {
   if (!isSupabaseConfigured()) {
     return null;
   }
@@ -170,6 +206,7 @@ export async function fetchPublicMenuCategories(): Promise<MenuCategory[] | null
 
   const { data, error } = await categoriesTable(supabase)
     .select("*")
+    .eq("location_id", locationId)
     .order("display_order", { ascending: true });
 
   if (error) {
@@ -179,12 +216,16 @@ export async function fetchPublicMenuCategories(): Promise<MenuCategory[] | null
   return data ?? [];
 }
 
-export async function isSlugTaken(slug: string, excludeId?: string): Promise<boolean> {
+export async function isSlugTaken(
+  slug: string,
+  locationId: LocationId,
+  excludeId?: string,
+): Promise<boolean> {
   const supabase = requireClient();
   const table = slugTable(supabase);
   const normalized = slug.trim();
 
-  const query = table.select("id").eq("slug", normalized);
+  const query = table.select("id").eq("slug", normalized).eq("location_id", locationId);
   const { data, error } = excludeId
     ? await query.neq("id", excludeId).maybeSingle()
     : await query.maybeSingle();
@@ -196,9 +237,12 @@ export async function isSlugTaken(slug: string, excludeId?: string): Promise<boo
   return Boolean(data);
 }
 
-export async function createMenuCategory(form: MenuCategoryForm): Promise<MenuCategory> {
+export async function createMenuCategory(
+  form: MenuCategoryForm,
+  locationId: LocationId,
+): Promise<MenuCategory> {
   const supabase = requireClient();
-  const payload = formToPayload(form);
+  const payload = formToPayload(form, locationId);
 
   const { data, error } = await categoriesTable(supabase)
     .insert(payload)
@@ -214,10 +258,9 @@ export async function createMenuCategory(form: MenuCategoryForm): Promise<MenuCa
 
 export async function updateMenuCategory(id: string, form: MenuCategoryForm): Promise<MenuCategory> {
   const supabase = requireClient();
-  const payload = formToPayload(form);
 
   const { data, error } = await categoriesTable(supabase)
-    .update(payload)
+    .update(formToUpdatePayload(form))
     .eq("id", id)
     .select("*")
     .single();

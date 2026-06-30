@@ -1,5 +1,6 @@
 import Button from "./Button";
 import AnimatedContainer from "./AnimatedContainer";
+import { useLocationSelection } from "../../context/LocationContext";
 
 interface CTASectionProps {
   title: string;
@@ -18,6 +19,7 @@ export default function CTASection({
   buttonHref,
   dark = true,
 }: CTASectionProps) {
+  const { navigateWithLocationGuard } = useLocationSelection();
   return (
     <AnimatedContainer>
       <section
@@ -72,6 +74,12 @@ export default function CTASection({
             <Button
               to={buttonTo}
               href={buttonHref}
+              onClick={(event) => {
+                if (buttonTo === "/menu" || buttonTo === "/order" || buttonTo === "/reservation") {
+                  event.preventDefault();
+                  navigateWithLocationGuard(buttonTo);
+                }
+              }}
               variant={dark ? "outline" : "primary"}
               className={dark ? "!border-ivory/40 !text-ivory hover:!bg-ivory/10 hover:!border-ivory/70" : ""}
             >

@@ -1,5 +1,6 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
+import { getLocationConfig, LOCATION_IDS, type LocationId } from "../config/locations";
 import type { ContentStatus, MenuItem, MenuItemInsert } from "../types/database";
 import { mapSupabaseError } from "../utils/supabase/errors";
 
@@ -33,6 +34,8 @@ export type MenuItemTableRow = {
   status: ContentStatus;
   display_order: number;
   created_at: string;
+  location_id?: LocationId;
+  locationName?: string;
 };
 
 type MenuItemJoinRow = MenuItem & {
@@ -69,7 +72,7 @@ export function rowToForm(row: MenuItemTableRow): MenuItemForm {
   };
 }
 
-export function formToPayload(form: MenuItemForm): MenuItemInsert {
+function formToUpdatePayload(form: MenuItemForm) {
   return {
     category_id: form.category_id,
     name: form.name.trim(),
@@ -85,7 +88,14 @@ export function formToPayload(form: MenuItemForm): MenuItemInsert {
   };
 }
 
-function mapJoinRow(row: MenuItemJoinRow): MenuItemTableRow {
+export function formToPayload(form: MenuItemForm, locationId: LocationId): MenuItemInsert {
+  return {
+    location_id: locationId,
+    ...formToUpdatePayload(form),
+  };
+}
+
+function mapJoinRow(row: MenuItemJoinRow, locationId?: LocationId): MenuItemTableRow {
   return {
     id: row.id,
     category_id: row.category_id,
@@ -102,6 +112,8 @@ function mapJoinRow(row: MenuItemJoinRow): MenuItemTableRow {
     status: row.status,
     display_order: row.display_order,
     created_at: row.created_at,
+    location_id: locationId ?? row.location_id,
+    locationName: locationId ? getLocationConfig(locationId).shortName : undefined,
   };
 }
 
@@ -109,14 +121,16 @@ type SupabaseError = { message: string; code?: string };
 
 type MenuItemsQuery = {
   select(columns: string): {
-    order(
-      column: string,
-      options: { ascending: boolean },
-    ): {
+    eq(column: string, value: string): {
       order(
         column: string,
         options: { ascending: boolean },
-      ): Promise<{ data: MenuItemJoinRow[] | null; error: SupabaseError | null }>;
+      ): {
+        order(
+          column: string,
+          options: { ascending: boolean },
+        ): Promise<{ data: MenuItemJoinRow[] | null; error: SupabaseError | null }>;
+      };
     };
   };
   insert(row: MenuItemInsert): {
@@ -124,7 +138,7 @@ type MenuItemsQuery = {
       single(): Promise<{ data: MenuItemJoinRow | null; error: SupabaseError | null }>;
     };
   };
-  update(row: Partial<MenuItemInsert>): {
+  update(row: ReturnType<typeof formToUpdatePayload> | { status: ContentStatus }): {
     eq(column: string, value: string): {
       select(columns: string): {
         single(): Promise<{ data: MenuItemJoinRow | null; error: SupabaseError | null }>;
@@ -153,10 +167,11 @@ function requireClient() {
   return supabase;
 }
 
-export async function fetchMenuItems(): Promise<MenuItemTableRow[]> {
+export async function fetchMenuItems(locationId: LocationId): Promise<MenuItemTableRow[]> {
   const supabase = requireClient();
   const { data, error } = await menuItemsTable(supabase)
     .select(MENU_ITEM_SELECT)
+    .eq("location_id", locationId)
     .order("display_order", { ascending: true })
     .order("name", { ascending: true });
 
@@ -164,13 +179,29 @@ export async function fetchMenuItems(): Promise<MenuItemTableRow[]> {
     throw new Error(mapSupabaseError(error, "load menu items"));
   }
 
-  return (data ?? []).map(mapJoinRow);
+  return (data ?? []).map((row) => mapJoinRow(row, locationId));
+}
+
+export async function fetchAllMenuItems(): Promise<MenuItemTableRow[]> {
+  const results = await Promise.all(
+    LOCATION_IDS.map(async (locationId) => {
+      const rows = await fetchMenuItems(locationId);
+      return rows.map((row) => ({
+        ...row,
+        location_id: locationId,
+        locationName: getLocationConfig(locationId).shortName,
+      }));
+    }),
+  );
+  return results.flat();
 }
 
 /**
  * Public read-only fetch for the menu page (active items only via RLS).
  */
-export async function fetchPublicMenuItems(): Promise<MenuItemTableRow[] | null> {
+export async function fetchPublicMenuItems(
+  locationId: LocationId,
+): Promise<MenuItemTableRow[] | null> {
   if (!isSupabaseConfigured()) {
     return null;
   }
@@ -182,6 +213,7 @@ export async function fetchPublicMenuItems(): Promise<MenuItemTableRow[] | null>
 
   const { data, error } = await menuItemsTable(supabase)
     .select(MENU_ITEM_SELECT)
+    .eq("location_id", locationId)
     .order("display_order", { ascending: true })
     .order("name", { ascending: true });
 
@@ -189,13 +221,16 @@ export async function fetchPublicMenuItems(): Promise<MenuItemTableRow[] | null>
     return null;
   }
 
-  return (data ?? []).map(mapJoinRow);
+  return (data ?? []).map((row) => mapJoinRow(row, locationId));
 }
 
-export async function createMenuItem(form: MenuItemForm): Promise<MenuItemTableRow> {
+export async function createMenuItem(
+  form: MenuItemForm,
+  locationId: LocationId,
+): Promise<MenuItemTableRow> {
   const supabase = requireClient();
   const { data, error } = await menuItemsTable(supabase)
-    .insert(formToPayload(form))
+    .insert(formToPayload(form, locationId))
     .select(MENU_ITEM_SELECT)
     .single();
 
@@ -208,8 +243,9 @@ export async function createMenuItem(form: MenuItemForm): Promise<MenuItemTableR
 
 export async function updateMenuItem(id: string, form: MenuItemForm): Promise<MenuItemTableRow> {
   const supabase = requireClient();
+
   const { data, error } = await menuItemsTable(supabase)
-    .update(formToPayload(form))
+    .update(formToUpdatePayload(form))
     .eq("id", id)
     .select(MENU_ITEM_SELECT)
     .single();

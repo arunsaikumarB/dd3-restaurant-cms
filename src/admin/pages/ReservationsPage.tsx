@@ -11,11 +11,13 @@ import AdminInput from "../components/ui/Input";
 import AdminTextarea from "../components/ui/Textarea";
 import AdminToast from "../components/ui/Toast";
 import ReservationsPageSkeleton from "../components/settings/ReservationsPageSkeleton";
+import { useLocation } from "../hooks/useLocation";
 import { useAdminTheme } from "../context/AdminThemeContext";
 import {
   createReservation,
   deleteReservation,
   EMPTY_RESERVATION_FORM,
+  fetchAllReservations,
   fetchReservations,
   GUESTS_FILTER_OPTIONS,
   rowToForm,
@@ -47,6 +49,7 @@ const SORT_OPTIONS = [
 
 export default function ReservationsPage() {
   const { dark } = useAdminTheme();
+  const { locationId, isAllLocations, scope } = useLocation();
   const [reservations, setReservations] = useState<ReservationTableRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -78,18 +81,31 @@ export default function ReservationsPage() {
     setLoading(true);
     setLoadError(null);
     try {
-      const rows = await fetchReservations();
+      const rows = isAllLocations
+        ? await fetchAllReservations()
+        : await fetchReservations(locationId);
       setReservations(rows);
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : "Failed to load reservations.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAllLocations, locationId]);
 
   useEffect(() => {
     void loadReservations();
   }, [loadReservations]);
+
+  useEffect(() => {
+    setSearch("");
+    setStatusFilter("all");
+    setDateFilter("");
+    setGuestsFilter("all");
+    setModalOpen(false);
+    setDeleteOpen(false);
+    setEditingId(null);
+    setDeletingReservation(null);
+  }, [scope]);
 
   const filteredReservations = useMemo(() => {
     let result = [...reservations];
@@ -141,6 +157,10 @@ export default function ReservationsPage() {
   }, [reservations, search, statusFilter, dateFilter, guestsFilter, sortBy]);
 
   const openCreateModal = () => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to create reservations.", "error");
+      return;
+    }
     setEditingId(null);
     setForm({ ...EMPTY_RESERVATION_FORM });
     setFieldErrors({});
@@ -177,7 +197,7 @@ export default function ReservationsPage() {
         await updateReservation(editingId, form);
         showToast("Reservation updated successfully.");
       } else {
-        await createReservation(form);
+        await createReservation(form, locationId);
         showToast("Reservation created successfully.");
       }
       setModalOpen(false);
@@ -228,9 +248,11 @@ export default function ReservationsPage() {
     }
   };
 
-  const columns = [
-    { key: "name", label: "Guest", sortable: true },
-    { key: "date", label: "Date", sortable: true },
+  const columns = useMemo(
+    () => [
+      { key: "name", label: "Guest", sortable: true },
+      ...(isAllLocations ? [{ key: "locationName", label: "Location", sortable: true }] : []),
+      { key: "date", label: "Date", sortable: true },
     { key: "time", label: "Time", sortable: true },
     { key: "guests", label: "Guests", sortable: true },
     { key: "phone", label: "Phone" },
@@ -264,7 +286,9 @@ export default function ReservationsPage() {
         />
       ),
     },
-  ];
+    ],
+    [isAllLocations],
+  );
 
   if (loading) {
     return (

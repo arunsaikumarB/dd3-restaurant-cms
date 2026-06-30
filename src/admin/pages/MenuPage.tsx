@@ -15,12 +15,14 @@ import AdminToggle from "../components/ui/Toggle";
 import AdminToast from "../components/ui/Toast";
 import ImageUploadField from "../components/settings/ImageUploadField";
 import { useAdminTheme } from "../context/AdminThemeContext";
+import { useLocation } from "../hooks/useLocation";
 import { fetchMenuCategories } from "../../services/menuCategories";
 import {
   availabilityLabel,
   createMenuItem,
   deleteMenuItem,
   EMPTY_MENU_ITEM_FORM,
+  fetchAllMenuItems,
   fetchMenuItems,
   isMenuItemAvailable,
   rowToForm,
@@ -69,6 +71,7 @@ const VEG_OPTIONS = [
 
 export default function MenuManagementPage() {
   const { dark } = useAdminTheme();
+  const { locationId, isAllLocations, scope } = useLocation();
   const [items, setItems] = useState<MenuItemTableRow[]>([]);
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,22 +107,51 @@ export default function MenuManagementPage() {
     setLoading(true);
     setLoadError(null);
     try {
-      const [menuRows, categoryRows] = await Promise.all([
-        fetchMenuItems(),
-        fetchMenuCategories(),
-      ]);
-      setItems(menuRows);
-      setCategories(categoryRows.map((row) => ({ id: row.id, name: row.name })));
+      if (isAllLocations) {
+        const menuRows = await fetchAllMenuItems();
+        setItems(menuRows);
+        const categoryMap = new Map<string, { id: string; name: string }>();
+        for (const row of menuRows) {
+          if (!categoryMap.has(row.category_id)) {
+            categoryMap.set(row.category_id, {
+              id: row.category_id,
+              name: `${row.category}${row.locationName ? ` (${row.locationName})` : ""}`,
+            });
+          }
+        }
+        setCategories([...categoryMap.values()]);
+      } else {
+        const [menuRows, categoryRows] = await Promise.all([
+          fetchMenuItems(locationId),
+          fetchMenuCategories(locationId),
+        ]);
+        setItems(menuRows);
+        setCategories(categoryRows.map((row) => ({ id: row.id, name: row.name })));
+      }
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : "Failed to load menu items.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAllLocations, locationId]);
 
   useEffect(() => {
     void loadMenu();
   }, [loadMenu]);
+
+  useEffect(() => {
+    setSearch("");
+    setCategoryFilter("all");
+    setTypeFilter("all");
+    setPopularFilter("all");
+    setChefFilter("all");
+    setStatusFilter("all");
+    setAddOpen(false);
+    setEditOpen(false);
+    setDeleteOpen(false);
+    setEditItem(null);
+    setDeletingItem(null);
+  }, [scope]);
 
   const categoryOptions = useMemo(
     () => [{ value: "all", label: "All Categories" }, ...categories.map((c) => ({ value: c.id, label: c.name }))],
@@ -194,6 +226,10 @@ export default function MenuManagementPage() {
   }, [items, search, sortBy, categoryFilter, typeFilter, popularFilter, chefFilter, statusFilter]);
 
   const openAddModal = () => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to add menu items.", "error");
+      return;
+    }
     setForm({
       ...EMPTY_MENU_ITEM_FORM,
       display_order: items.length,
@@ -253,7 +289,7 @@ export default function MenuManagementPage() {
         setEditOpen(false);
         setEditItem(null);
       } else {
-        await createMenuItem(form);
+        await createMenuItem(form, locationId);
         showToast("Menu item created successfully.");
         setAddOpen(false);
       }
@@ -308,20 +344,24 @@ export default function MenuManagementPage() {
     }
   };
 
-  const columns = [
-    {
-      key: "image",
-      label: "Image",
-      render: (row: MenuItemTableRow) => (
-        <img
-          src={row.image ?? FALLBACK_IMAGE}
-          alt=""
-          className="h-10 w-10 rounded-lg object-cover"
-        />
-      ),
-    },
-    { key: "name", label: "Name" },
-    { key: "category", label: "Category" },
+  const columns = useMemo(() => {
+    const base = [
+      {
+        key: "image",
+        label: "Image",
+        render: (row: MenuItemTableRow) => (
+          <img
+            src={row.image ?? FALLBACK_IMAGE}
+            alt=""
+            className="h-10 w-10 rounded-lg object-cover"
+          />
+        ),
+      },
+      { key: "name", label: "Name" },
+      ...(isAllLocations
+        ? [{ key: "locationName", label: "Location" }]
+        : []),
+      { key: "category", label: "Category" },
     {
       key: "price",
       label: "Price",
@@ -376,7 +416,9 @@ export default function MenuManagementPage() {
         />
       ),
     },
-  ];
+    ];
+    return base;
+  }, [isAllLocations, togglingId, dark]);
 
   if (loadError) {
     return (

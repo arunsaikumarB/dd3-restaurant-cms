@@ -11,6 +11,7 @@ import AdminLayout from "./admin/components/layout/AdminLayout";
 import ProtectedRoute from "./admin/components/ProtectedRoute";
 import GuestRoute from "./admin/components/GuestRoute";
 import UnauthorizedRoute from "./admin/components/UnauthorizedRoute";
+import { LocationProvider } from "./context/LocationContext";
 
 const AdminLoginPage = lazy(() => import("./admin/pages/LoginPage"));
 const AdminUnauthorizedPage = lazy(() => import("./admin/pages/UnauthorizedPage"));
@@ -35,6 +36,7 @@ const ContactPage = lazy(() => import("./pages/ContactPage"));
 const OrderPage = lazy(() => import("./pages/OrderPage"));
 const GalleryPage = lazy(() => import("./pages/GalleryPage"));
 const OffersPage = lazy(() => import("./pages/OffersPage"));
+const OfferDetailPage = lazy(() => import("./pages/OfferDetailPage"));
 const ReservationPage = lazy(() => import("./pages/ReservationPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
@@ -125,6 +127,22 @@ function PublicRoutes() {
           }
         />
         <Route
+          path="/offers/oak-tree/:slug"
+          element={
+            <PageTransition>
+              <OfferDetailPage forcedLocationId="oak-tree" />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/offers/:slug"
+          element={
+            <PageTransition>
+              <OfferDetailPage />
+            </PageTransition>
+          }
+        />
+        <Route
           path="/reservation"
           element={
             <PageTransition>
@@ -147,7 +165,7 @@ function PublicRoutes() {
 
 function PublicSiteShell() {
   return (
-    <>
+    <LocationProvider>
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-saffron focus:px-4 focus:py-2 focus:text-cocoa"
@@ -161,7 +179,7 @@ function PublicSiteShell() {
         <PublicRoutes />
       </main>
       <Footer />
-    </>
+    </LocationProvider>
   );
 }
 

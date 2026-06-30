@@ -1,5 +1,6 @@
 import { SITE } from "../constants/site";
 import { isSupabaseConfigured } from "../lib/supabase/env";
+import { isLocationId } from "../config/locations";
 import { createPublicReservation } from "./reservations";
 
 export interface ReservationPayload {
@@ -134,7 +135,9 @@ export async function submitReservation(
   }
 
   if (isSupabaseConfigured()) {
+    const locationId = isLocationId(payload.locationId) ? payload.locationId : "lawrenceville";
     await createPublicReservation({
+      location_id: locationId,
       customer_name: payload.name.trim(),
       phone: payload.phone.trim(),
       email: payload.email.trim(),

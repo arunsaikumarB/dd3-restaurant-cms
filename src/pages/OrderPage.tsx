@@ -1,20 +1,90 @@
-import { lazy, Suspense } from "react";
-import { ORDER_OPTIONS } from "../data/orderPage";
+import { lazy, Suspense, useEffect, useMemo, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
+import { type OrderOption } from "../data/orderPage";
 import PageHero from "../components/ui/PageHero";
 import OrderOptionCard from "../components/order/OrderOptionCard";
 import FeatureGrid from "../components/order/FeatureGrid";
 import SectionPlaceholder from "../components/ui/SectionPlaceholder";
+import { LOCATION_OPTIONS, type LocationId } from "../config/locations";
+import { buildLocationOrderMenuUrl } from "../constants/ordering";
+import { useLocationSelection } from "../context/LocationContext";
 import "../components/order/order.css";
 
 const ReservationCTA = lazy(() => import("../components/order/ReservationCTA"));
 
+function parseLocationId(value: string | null): LocationId | null {
+  if (!value) return null;
+  return LOCATION_OPTIONS.some((option) => option.id === value) ? (value as LocationId) : null;
+}
+
 export default function OrderPage() {
+  const [searchParams] = useSearchParams();
+  const { selectedLocation, selectedLocationId, setLocation } = useLocationSelection();
+  const orderSectionRef = useRef<HTMLElement>(null);
+
+  const queryLocationId = parseLocationId(searchParams.get("location"));
+  const offerCategory = searchParams.get("category")?.trim() ?? "";
+
+  useEffect(() => {
+    if (queryLocationId && queryLocationId !== selectedLocationId) {
+      setLocation(queryLocationId);
+    }
+  }, [queryLocationId, selectedLocationId, setLocation]);
+
+  useEffect(() => {
+    if (!queryLocationId && !offerCategory) return;
+    const timer = window.setTimeout(() => {
+      orderSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [offerCategory, queryLocationId]);
+
+  const orderOptions: OrderOption[] = useMemo(() => {
+    const directHref =
+      selectedLocation && offerCategory
+        ? buildLocationOrderMenuUrl(selectedLocation.orderDirectLink, offerCategory)
+        : (selectedLocation?.orderDirectLink ?? "/order");
+
+    return [
+      {
+        id: "direct",
+        brand: "Desi Dhamaka",
+        title: "Order Direct",
+        badge: offerCategory ? offerCategory : "Pickup Only",
+        description: offerCategory
+          ? `Continue to order ${offerCategory} from Desi Dhamaka${selectedLocation ? ` ${selectedLocation.shortName}` : ""}.`
+          : "Order directly from us for the freshest experience and the best service.",
+        image: "/showcase/biryani.jpg",
+        imageAlt: "Fresh biryani from Desi Dhamaka",
+        pills: ["Fresh Daily", "Best Value", "Personal Service"],
+        buttonText: `Order Direct${selectedLocation ? ` - ${selectedLocation.shortName}` : ""}`,
+        buttonHref: directHref,
+        buttonColor: "#ED3C18",
+        variant: "desi",
+      },
+      {
+        id: "uber",
+        brand: "Uber Eats",
+        title: "Delivery & Pickup",
+        badge: "Available Now",
+        description: "Enjoy fast delivery or pickup through Uber Eats.",
+        image: "/showcase/tandoori.jpg",
+        imageAlt: "Tandoori platter available on Uber Eats",
+        pills: ["Fast Delivery", "Live Tracking", "Easy Pickup"],
+        buttonText: "Order with Uber Eats",
+        buttonHref: selectedLocation?.uberEatsLink ?? "/order",
+        buttonColor: "#FA9040",
+        variant: "uber",
+      },
+    ];
+  }, [offerCategory, selectedLocation]);
+
   return (
     <div className="order-page">
       <PageHero
         label="Order Online"
         title="Order Online"
-        subtitle="Order authentic Indian food from Desi Dhamaka. Choose pickup or delivery — freshly prepared, delivered your way."
+        subtitle={`Order authentic Indian food from Desi Dhamaka${selectedLocation ? ` ${selectedLocation.shortName}` : ""}. Choose pickup or delivery — freshly prepared, delivered your way.`}
         backgroundImage="/showcase/biryani.jpg"
         backgroundVideo="/hero/videoplayback.mp4"
         breadcrumbItems={[
@@ -23,8 +93,18 @@ export default function OrderPage() {
         ]}
       />
 
+      {offerCategory ? (
+        <div className="order-page__offer-banner page-content-start">
+          <p className="order-page__offer-banner-text">
+            Ready to order: <strong>{offerCategory}</strong>
+            {selectedLocation ? ` at ${selectedLocation.name}` : ""}
+          </p>
+        </div>
+      ) : null}
+
       <section
-        className="order-options page-content-start"
+        ref={orderSectionRef}
+        className={`order-options${offerCategory ? "" : " page-content-start"}`}
         aria-labelledby="order-options-heading"
       >
         <div className="order-page__texture" aria-hidden />
@@ -33,7 +113,7 @@ export default function OrderPage() {
             Choose your ordering method
           </h2>
           <div className="order-options__grid">
-            {ORDER_OPTIONS.map((option, index) => (
+            {orderOptions.map((option, index) => (
               <OrderOptionCard key={option.id} option={option} index={index} />
             ))}
           </div>

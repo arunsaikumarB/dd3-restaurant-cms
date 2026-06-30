@@ -4,6 +4,7 @@ import { Bell, Moon, Search, Sun } from "lucide-react";
 import { useAdminTheme } from "../../context/AdminThemeContext";
 import { SITE } from "../../../constants/site";
 import AdminBadge from "../ui/Badge";
+import HeaderLocationSelector from "./HeaderLocationSelector";
 
 export default function AdminHeader() {
   const { dark, toggleDark } = useAdminTheme();
@@ -16,7 +17,9 @@ export default function AdminHeader() {
         dark ? "border-admin-border-dark bg-admin-surface-dark/80 backdrop-blur-xl" : "border-admin-border bg-white/80 backdrop-blur-xl admin-glass",
       ].join(" ")}
     >
-      <div className="relative hidden max-w-md flex-1 md:block">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <HeaderLocationSelector />
+        <div className="relative hidden max-w-md flex-1 lg:block">
         <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${dark ? "text-white/40" : "text-admin-muted"}`} />
         <input
           type="search"
@@ -29,6 +32,7 @@ export default function AdminHeader() {
             dark ? "border-admin-border-dark bg-white/5 text-white placeholder:text-white/40" : "border-admin-border bg-admin-ivory/50 placeholder:text-admin-muted/60",
           ].join(" ")}
         />
+        </div>
       </div>
 
       <p className={`text-sm font-medium md:hidden ${dark ? "text-white/80" : "text-admin-text"}`}>

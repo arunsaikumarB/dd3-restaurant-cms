@@ -5,10 +5,16 @@ import ImageGallery from "../components/reservation/ImageGallery";
 import ContactCards from "../components/reservation/ContactCards";
 import GoogleMap from "../components/reservation/GoogleMap";
 import PageHero from "../components/ui/PageHero";
+import { useLocationSelection } from "../context/LocationContext";
 import "../components/reservation/reservation.css";
 
 export default function ReservationPage() {
+  const { selectedLocation } = useLocationSelection();
   const scrollToBooking = () => {
+    if (selectedLocation?.reservationLink?.startsWith("http")) {
+      window.open(selectedLocation.reservationLink, "_blank", "noopener,noreferrer");
+      return;
+    }
     document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -20,7 +26,7 @@ export default function ReservationPage() {
       <PageHero
         label="Reservations"
         title="Reserve Your Table"
-        subtitle="Experience authentic Indian hospitality, unforgettable flavours, and elegant dining."
+        subtitle={`Experience authentic Indian hospitality, unforgettable flavours, and elegant dining${selectedLocation ? ` at ${selectedLocation.shortName}` : ""}.`}
         backgroundImage="/reservation/interior/interior-01.png"
         breadcrumbItems={[
           { label: "Home", to: "/" },
@@ -53,7 +59,9 @@ export default function ReservationPage() {
           className="reservation-sticky__btn"
           onClick={scrollToBooking}
         >
-          Reserve My Table
+          {selectedLocation?.reservationLink?.startsWith("http")
+            ? "Reserve Online"
+            : "Reserve My Table"}
         </button>
       </div>
     </div>

@@ -53,6 +53,26 @@ export function buildChefGaaMenuUrl(
   return url.toString();
 }
 
+/** Builds a location-specific ChefGaa order URL, optionally deep-linking to a category. */
+export function buildLocationOrderMenuUrl(
+  orderMenuBase: string,
+  categoryName?: string | null,
+  itemName?: string,
+): string {
+  const url = new URL(orderMenuBase);
+  const category = categoryName?.trim() ?? "";
+  const item = itemName?.trim() ?? "";
+
+  if (category) {
+    url.searchParams.set(CHEFGAA_DEEP_LINK_PARAMS.category, category);
+  }
+  if (item) {
+    url.searchParams.set(CHEFGAA_DEEP_LINK_PARAMS.item, item);
+  }
+
+  return url.toString();
+}
+
 /**
  * Opens the ChefGaa menu in a new tab, deep-linking to the given category
  * and item when the platform supports those query parameters.

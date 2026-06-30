@@ -2,10 +2,12 @@ import type { MenuCategory as DbMenuCategory } from "../types/database";
 import type { MenuCategory, MenuData, MenuItem } from "../types/menu";
 import { fetchPublicMenuCategories } from "./menuCategories";
 import { fetchPublicMenuItems, type MenuItemTableRow } from "./menuItems";
+import { applyLocationToMenu, type LocationId } from "../config/locations";
+import { getStaticMenuForLocation } from "../data/menu";
 
 const CACHE_TTL_MS = 60_000;
 
-let cachedMenu: MenuData | null = null;
+let cachedByLocation: Partial<Record<LocationId, MenuData>> = {};
 let cacheExpiresAt = 0;
 let inflightRequest: Promise<MenuData> | null = null;
 let inflightFallback: Promise<MenuData> | null = null;
@@ -100,10 +102,10 @@ async function fetchFallbackMenuData(): Promise<MenuData> {
   }
 }
 
-async function fetchSupabaseMenuData(): Promise<MenuData | null> {
+async function fetchSupabaseMenuData(locationId: LocationId): Promise<MenuData | null> {
   const [categories, items] = await Promise.all([
-    fetchPublicMenuCategories(),
-    fetchPublicMenuItems(),
+    fetchPublicMenuCategories(locationId),
+    fetchPublicMenuItems(locationId),
   ]);
 
   if (!categories || !items) {
@@ -113,10 +115,11 @@ async function fetchSupabaseMenuData(): Promise<MenuData | null> {
   return buildMenuData(categories, items);
 }
 
-export async function fetchPublicMenuData(): Promise<MenuData> {
+export async function fetchPublicMenuData(locationId: LocationId): Promise<MenuData> {
   const now = Date.now();
-  if (cachedMenu && now < cacheExpiresAt) {
-    return cachedMenu;
+  const cachedLocation = cachedByLocation[locationId];
+  if (cachedLocation && now < cacheExpiresAt) {
+    return cachedLocation;
   }
 
   if (inflightRequest) {
@@ -125,22 +128,36 @@ export async function fetchPublicMenuData(): Promise<MenuData> {
 
   inflightRequest = (async () => {
     try {
-      const supabaseData = await fetchSupabaseMenuData();
-      if (supabaseData && supabaseData.categories.length > 0) {
-        cachedMenu = supabaseData;
+      const staticMenu = getStaticMenuForLocation(locationId);
+      if (staticMenu) {
+        cachedByLocation = {};
         cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-        return supabaseData;
+        cachedByLocation[locationId] = staticMenu;
+        return staticMenu;
+      }
+
+      const supabaseData = await fetchSupabaseMenuData(locationId);
+      if (supabaseData && supabaseData.categories.length > 0) {
+        cachedByLocation = {};
+        cacheExpiresAt = Date.now() + CACHE_TTL_MS;
+        const locationMenu = applyLocationToMenu(supabaseData, locationId);
+        cachedByLocation[locationId] = locationMenu;
+        return locationMenu;
       }
 
       const fallback = await fetchFallbackMenuData();
-      cachedMenu = fallback;
+      cachedByLocation = {};
       cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-      return fallback;
+      const locationMenu = applyLocationToMenu(fallback, locationId);
+      cachedByLocation[locationId] = locationMenu;
+      return locationMenu;
     } catch {
       const fallback = await fetchFallbackMenuData();
-      cachedMenu = fallback;
+      cachedByLocation = {};
       cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-      return fallback;
+      const locationMenu = applyLocationToMenu(fallback, locationId);
+      cachedByLocation[locationId] = locationMenu;
+      return locationMenu;
     } finally {
       inflightRequest = null;
     }
@@ -154,9 +171,9 @@ export type PublicMenuDataResult = {
   error: string | null;
 };
 
-export async function loadPublicMenuData(): Promise<PublicMenuDataResult> {
+export async function loadPublicMenuData(locationId: LocationId): Promise<PublicMenuDataResult> {
   try {
-    const data = await fetchPublicMenuData();
+    const data = await fetchPublicMenuData(locationId);
     return { data, error: null };
   } catch (err) {
     return {

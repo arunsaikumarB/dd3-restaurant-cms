@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { motion } from "framer-motion";
 import { AdminThemeProvider, useAdminTheme } from "../../context/AdminThemeContext";
+import { AdminLocationProvider } from "../../context/AdminLocationContext";
 import AdminSidebar from "./Sidebar";
 import AdminHeader from "./Header";
 import "../../admin.css";
@@ -28,7 +29,9 @@ function AdminLayoutInner() {
 export default function AdminLayout() {
   return (
     <AdminThemeProvider>
-      <AdminLayoutInner />
+      <AdminLocationProvider>
+        <AdminLayoutInner />
+      </AdminLocationProvider>
     </AdminThemeProvider>
   );
 }

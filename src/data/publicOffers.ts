@@ -7,6 +7,10 @@ export type PublicOffer = {
   start_date: string;
   end_date: string;
   created_at: string;
+  originalPrice?: string;
+  offerPrice?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
 };
 
 const FALLBACK_BANNER = "/showcase/biryani.jpg";

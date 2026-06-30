@@ -56,6 +56,27 @@
   color: rgba(43, 29, 24, 0.58);
 }
 
+.order-page__offer-banner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 3vw, 2rem) 1.25rem;
+}
+
+.order-page__offer-banner-text {
+  padding: 0.85rem 1.15rem;
+  border-radius: 16px;
+  border: 1px solid rgba(237, 60, 24, 0.15);
+  background: rgba(237, 60, 24, 0.06);
+  font-size: 14px;
+  color: rgba(43, 29, 24, 0.72);
+  text-align: center;
+}
+
+.order-page__offer-banner-text strong {
+  color: #ed3c18;
+  font-weight: 700;
+}
+
 /* Order options */
 .order-options {
   position: relative;
