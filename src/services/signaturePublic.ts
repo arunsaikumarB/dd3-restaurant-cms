@@ -1,9 +1,13 @@
 import type { LocationId } from "../config/locations";
 import type { SignatureDish } from "../data/signatureDishes";
+import {
+  resolveChefGaaCategory,
+  resolveChefGaaItem,
+} from "../data/chefgaaNameMap";
 import { fetchPublicMenuItems } from "./menuItems";
 
 /** Max chef's-special dishes shown in the homepage carousel. */
-const MAX_SIGNATURE_DISHES = 12;
+const MAX_SIGNATURE_DISHES = 28;
 
 /** Showcase images used when a menu item has no uploaded image yet. */
 const SHOWCASE_FALLBACKS: { match: string; image: string }[] = [
@@ -49,8 +53,8 @@ export async function fetchPublicSignatureDishes(
         id: row.id,
         name: row.name,
         category,
-        category_name: category,
-        item_name: row.name,
+        category_name: resolveChefGaaCategory(category),
+        item_name: resolveChefGaaItem(row.name),
         price: row.price,
         image: pickImage(row.image, category, row.name),
         badge: "Chef's Special",
