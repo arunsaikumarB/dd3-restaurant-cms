@@ -1,16 +1,22 @@
 -- Per-location restaurant settings and reservations.
+-- Idempotent: safe to re-run after a partial/previous apply.
 
 ALTER TABLE public.restaurant_settings
-  ADD COLUMN location_id TEXT NOT NULL DEFAULT 'lawrenceville';
+  ADD COLUMN IF NOT EXISTS location_id TEXT NOT NULL DEFAULT 'lawrenceville';
 
+ALTER TABLE public.restaurant_settings
+  DROP CONSTRAINT IF EXISTS restaurant_settings_location_id_check;
 ALTER TABLE public.restaurant_settings
   ADD CONSTRAINT restaurant_settings_location_id_check
   CHECK (location_id IN ('south-plainfield', 'oak-tree', 'lawrenceville'));
 
 ALTER TABLE public.restaurant_settings
+  DROP CONSTRAINT IF EXISTS restaurant_settings_location_id_key;
+ALTER TABLE public.restaurant_settings
   ADD CONSTRAINT restaurant_settings_location_id_key UNIQUE (location_id);
 
-CREATE INDEX restaurant_settings_location_id_idx ON public.restaurant_settings (location_id);
+CREATE INDEX IF NOT EXISTS restaurant_settings_location_id_idx
+  ON public.restaurant_settings (location_id);
 
 INSERT INTO public.restaurant_settings (
   location_id,
@@ -65,11 +71,15 @@ WHERE rs.location_id = 'lawrenceville'
   );
 
 ALTER TABLE public.reservations
-  ADD COLUMN location_id TEXT NOT NULL DEFAULT 'lawrenceville';
+  ADD COLUMN IF NOT EXISTS location_id TEXT NOT NULL DEFAULT 'lawrenceville';
 
+ALTER TABLE public.reservations
+  DROP CONSTRAINT IF EXISTS reservations_location_id_check;
 ALTER TABLE public.reservations
   ADD CONSTRAINT reservations_location_id_check
   CHECK (location_id IN ('south-plainfield', 'oak-tree', 'lawrenceville'));
 
-CREATE INDEX reservations_location_id_idx ON public.reservations (location_id);
-CREATE INDEX reservations_location_date_idx ON public.reservations (location_id, date);
+CREATE INDEX IF NOT EXISTS reservations_location_id_idx
+  ON public.reservations (location_id);
+CREATE INDEX IF NOT EXISTS reservations_location_date_idx
+  ON public.reservations (location_id, date);

@@ -1,31 +1,40 @@
 -- Multi-location menu: categories and items scoped by restaurant location.
+-- Idempotent: safe to re-run after a partial/previous apply.
 
 ALTER TABLE public.menu_categories
-  ADD COLUMN location_id TEXT NOT NULL DEFAULT 'lawrenceville';
+  ADD COLUMN IF NOT EXISTS location_id TEXT NOT NULL DEFAULT 'lawrenceville';
 
 ALTER TABLE public.menu_categories
-  DROP CONSTRAINT menu_categories_slug_key;
+  DROP CONSTRAINT IF EXISTS menu_categories_slug_key;
 
+ALTER TABLE public.menu_categories
+  DROP CONSTRAINT IF EXISTS menu_categories_location_slug_key;
 ALTER TABLE public.menu_categories
   ADD CONSTRAINT menu_categories_location_slug_key UNIQUE (location_id, slug);
 
 ALTER TABLE public.menu_categories
+  DROP CONSTRAINT IF EXISTS menu_categories_location_id_check;
+ALTER TABLE public.menu_categories
   ADD CONSTRAINT menu_categories_location_id_check
   CHECK (location_id IN ('south-plainfield', 'oak-tree', 'lawrenceville'));
 
-CREATE INDEX menu_categories_location_id_idx ON public.menu_categories (location_id);
-CREATE INDEX menu_categories_location_display_order_idx
+CREATE INDEX IF NOT EXISTS menu_categories_location_id_idx
+  ON public.menu_categories (location_id);
+CREATE INDEX IF NOT EXISTS menu_categories_location_display_order_idx
   ON public.menu_categories (location_id, display_order);
 
 ALTER TABLE public.menu_items
-  ADD COLUMN location_id TEXT NOT NULL DEFAULT 'lawrenceville';
+  ADD COLUMN IF NOT EXISTS location_id TEXT NOT NULL DEFAULT 'lawrenceville';
 
+ALTER TABLE public.menu_items
+  DROP CONSTRAINT IF EXISTS menu_items_location_id_check;
 ALTER TABLE public.menu_items
   ADD CONSTRAINT menu_items_location_id_check
   CHECK (location_id IN ('south-plainfield', 'oak-tree', 'lawrenceville'));
 
-CREATE INDEX menu_items_location_id_idx ON public.menu_items (location_id);
-CREATE INDEX menu_items_location_display_order_idx
+CREATE INDEX IF NOT EXISTS menu_items_location_id_idx
+  ON public.menu_items (location_id);
+CREATE INDEX IF NOT EXISTS menu_items_location_display_order_idx
   ON public.menu_items (location_id, display_order);
 
 -- Align existing items with their category location after backfill.
@@ -50,6 +59,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS menu_items_sync_location ON public.menu_items;
 CREATE TRIGGER menu_items_sync_location
   BEFORE INSERT OR UPDATE OF category_id ON public.menu_items
   FOR EACH ROW EXECUTE FUNCTION public.sync_menu_item_location_id();
