@@ -11,6 +11,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   LOCATION_STORAGE_KEY,
   LOCATION_OPTIONS,
+  readStoredLocationId,
   type LocationId,
   getLocationConfig,
   isLocationRequiredPath,
@@ -31,16 +32,22 @@ const LocationContext = createContext<LocationContextValue | null>(null);
 export function LocationProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [selectedLocationId, setSelectedLocationId] = useState<LocationId | null>(null);
+  const [selectedLocationId, setSelectedLocationId] = useState<LocationId | null>(
+    readStoredLocationId,
+  );
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [pendingPath, setPendingPath] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(LOCATION_STORAGE_KEY) as LocationId | null;
-    if (!stored) return;
-    if (LOCATION_OPTIONS.some((option) => option.id === stored)) {
-      setSelectedLocationId(stored);
-    }
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== LOCATION_STORAGE_KEY) return;
+      const next = event.newValue;
+      if (next && LOCATION_OPTIONS.some((option) => option.id === next)) {
+        setSelectedLocationId(next as LocationId);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   const setLocation = useCallback((locationId: LocationId) => {

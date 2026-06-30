@@ -4,10 +4,16 @@ import {
   resolveChefGaaCategory,
   resolveChefGaaItem,
 } from "../data/chefgaaNameMap";
-import { fetchPublicMenuItems } from "./menuItems";
+import { createClientIfConfigured } from "../lib/supabase/client";
+import { isSupabaseConfigured } from "../lib/supabase/env";
+import type { MenuItem } from "../types/database";
 
 /** Max chef's-special dishes shown in the homepage carousel. */
 const MAX_SIGNATURE_DISHES = 28;
+
+type MenuItemJoinRow = MenuItem & {
+  menu_categories: { name: string } | null;
+};
 
 /** Showcase images used when a menu item has no uploaded image yet. */
 const SHOWCASE_FALLBACKS: { match: string; image: string }[] = [
@@ -31,6 +37,20 @@ function pickImage(image: string | null, category: string, name: string): string
   return found?.image ?? DEFAULT_SHOWCASE_IMAGE;
 }
 
+function mapRowToSignatureDish(row: MenuItemJoinRow): SignatureDish {
+  const category = row.menu_categories?.name ?? "Chef's Special";
+  return {
+    id: row.id,
+    name: row.name,
+    category,
+    category_name: resolveChefGaaCategory(category),
+    item_name: resolveChefGaaItem(row.name),
+    price: Number(row.price),
+    image: pickImage(row.image, category, row.name),
+    badge: "Chef's Special",
+  };
+}
+
 /**
  * Loads chef's-special dishes for a location from the database, mapped to the
  * SignatureDish shape used by the homepage carousel. Returns null when Supabase
@@ -39,25 +59,27 @@ function pickImage(image: string | null, category: string, name: string): string
 export async function fetchPublicSignatureDishes(
   locationId: LocationId,
 ): Promise<SignatureDish[] | null> {
-  const rows = await fetchPublicMenuItems(locationId);
-  if (!rows) {
+  if (!isSupabaseConfigured()) {
     return null;
   }
 
-  return rows
-    .filter((row) => row.chefSpecial && row.status === "active")
-    .slice(0, MAX_SIGNATURE_DISHES)
-    .map((row) => {
-      const category = row.category || "Chef's Special";
-      return {
-        id: row.id,
-        name: row.name,
-        category,
-        category_name: resolveChefGaaCategory(category),
-        item_name: resolveChefGaaItem(row.name),
-        price: row.price,
-        image: pickImage(row.image, category, row.name),
-        badge: "Chef's Special",
-      };
-    });
+  const supabase = createClientIfConfigured();
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("menu_items")
+    .select("*, menu_categories ( name )")
+    .eq("location_id", locationId)
+    .eq("chef_special", true)
+    .eq("status", "active")
+    .order("display_order", { ascending: true })
+    .limit(MAX_SIGNATURE_DISHES);
+
+  if (error) {
+    return null;
+  }
+
+  return (data as MenuItemJoinRow[]).map(mapRowToSignatureDish);
 }

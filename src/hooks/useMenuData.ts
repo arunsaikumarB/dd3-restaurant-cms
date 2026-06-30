@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { loadPublicMenuData } from "../services/menuPublic";
 import type { MenuData } from "../types/menu";
-import type { LocationId } from "../config/locations";
+import { resolvePublicLocationId, type LocationId } from "../config/locations";
 
 export function useMenuData(locationId: LocationId | null) {
   const [data, setData] = useState<MenuData | null>(null);
@@ -11,8 +11,9 @@ export function useMenuData(locationId: LocationId | null) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    const resolvedLocationId = resolvePublicLocationId(locationId);
 
-    void loadPublicMenuData(locationId ?? "lawrenceville").then((result) => {
+    void loadPublicMenuData(resolvedLocationId).then((result) => {
       if (cancelled) return;
       setData(result.data);
       setError(result.error);

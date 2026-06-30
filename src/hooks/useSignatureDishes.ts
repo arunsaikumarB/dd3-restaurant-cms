@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import type { LocationId } from "../config/locations";
+import { useEffect, useMemo, useState } from "react";
+import { resolvePublicLocationId, type LocationId } from "../config/locations";
 import { SIGNATURE_DISHES, type SignatureDish } from "../data/signatureDishes";
 import { fetchPublicSignatureDishes } from "../services/signaturePublic";
 
@@ -9,20 +9,33 @@ import { fetchPublicSignatureDishes } from "../services/signaturePublic";
  * when the database is empty or unavailable.
  */
 export function useSignatureDishes(locationId: LocationId | null) {
-  const [dishes, setDishes] = useState<SignatureDish[]>(SIGNATURE_DISHES);
+  const resolvedLocationId = useMemo(
+    () => resolvePublicLocationId(locationId),
+    [locationId],
+  );
+  const [dishes, setDishes] = useState<SignatureDish[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setError(null);
 
-    void fetchPublicSignatureDishes(locationId ?? "lawrenceville")
+    void fetchPublicSignatureDishes(resolvedLocationId)
       .then((result) => {
         if (cancelled) return;
-        setDishes(result && result.length > 0 ? result : SIGNATURE_DISHES);
+        if (result === null) {
+          setDishes(SIGNATURE_DISHES);
+          setError("Unable to load signature dishes from the database.");
+          return;
+        }
+        setDishes(result.length > 0 ? result : SIGNATURE_DISHES);
       })
       .catch(() => {
-        if (!cancelled) setDishes(SIGNATURE_DISHES);
+        if (cancelled) return;
+        setDishes(SIGNATURE_DISHES);
+        setError("Unable to load signature dishes from the database.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -31,7 +44,7 @@ export function useSignatureDishes(locationId: LocationId | null) {
     return () => {
       cancelled = true;
     };
-  }, [locationId]);
+  }, [resolvedLocationId]);
 
-  return { dishes, loading };
+  return { dishes, loading, error, locationId: resolvedLocationId };
 }

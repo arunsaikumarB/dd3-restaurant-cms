@@ -28,6 +28,8 @@ export type LocationConfig = {
 };
 
 export const LOCATION_STORAGE_KEY = "dd3.selectedLocation";
+/** Default public-site location when none is selected yet (homepage, etc.). */
+export const DEFAULT_PUBLIC_LOCATION_ID: LocationId = "south-plainfield";
 /** Shared admin CMS location preference (menu, categories, offers). */
 export const ADMIN_LOCATION_STORAGE_KEY = "dd3.admin.selectedLocation";
 /** @deprecated Use ADMIN_LOCATION_STORAGE_KEY */
@@ -127,6 +129,26 @@ export function getLocationConfig(locationId: LocationId): LocationConfig {
 
 export function getLocationSlug(locationId: LocationId): string {
   return locationId;
+}
+
+/** Resolve the active public location from context, localStorage, or default. */
+export function resolvePublicLocationId(
+  locationId: LocationId | null | undefined,
+): LocationId {
+  if (locationId) return locationId;
+  if (typeof window !== "undefined") {
+    const stored = window.localStorage.getItem(LOCATION_STORAGE_KEY);
+    if (stored && isLocationId(stored)) return stored;
+  }
+  return DEFAULT_PUBLIC_LOCATION_ID;
+}
+
+/** Read persisted location from localStorage (browser only). */
+export function readStoredLocationId(): LocationId | null {
+  if (typeof window === "undefined") return null;
+  const stored = window.localStorage.getItem(LOCATION_STORAGE_KEY);
+  if (stored && isLocationId(stored)) return stored;
+  return null;
 }
 
 export function applyLocationToMenu(menu: MenuData, locationId: LocationId): MenuData {
