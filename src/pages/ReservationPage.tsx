@@ -4,13 +4,14 @@ import FeatureCards from "../components/reservation/FeatureCards";
 import ImageGallery from "../components/reservation/ImageGallery";
 import ContactCards from "../components/reservation/ContactCards";
 import GoogleMap from "../components/reservation/GoogleMap";
+import PageHero from "../components/ui/PageHero";
 import { useLocationSelection } from "../context/LocationContext";
 import { useHomepageData } from "../hooks/useHomepageData";
 import { isExternalUrl, resolveReservationUrl } from "../utils/locationLinks";
 import "../components/reservation/reservation.css";
 
 export default function ReservationPage() {
-  const { selectedLocationId } = useLocationSelection();
+  const { selectedLocation, selectedLocationId } = useLocationSelection();
   const { bundle } = useHomepageData();
   const reservationLink = resolveReservationUrl(bundle.settings, selectedLocationId);
   const scrollToBooking = () => {
@@ -25,6 +26,17 @@ export default function ReservationPage() {
     <div className="reservation-page">
       <div className="reservation-page__texture" aria-hidden />
       <div className="reservation-page__pattern" aria-hidden />
+
+      <PageHero
+        label="Reservations"
+        title="Reserve Your Table"
+        subtitle={`Experience authentic Indian hospitality, unforgettable flavours, and elegant dining${selectedLocation ? ` at ${selectedLocation.shortName}` : ""}.`}
+        backgroundImage="/reservation/interior/interior-01.png"
+        breadcrumbItems={[
+          { label: "Home", to: "/" },
+          { label: "Reservation" },
+        ]}
+      />
 
       <section
         id="booking"
