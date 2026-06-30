@@ -74,7 +74,7 @@ lines.push(
   "INSERT INTO public.menu_items (category_id, name, description, price, image, veg, popular, chef_special, spice_level, status, display_order, location_id)",
 );
 lines.push(
-  "SELECT c.id, v.name, v.description, v.price, v.image, v.veg, v.popular, v.chef_special, v.spice_level, v.status, v.display_order, v.location_id",
+  "SELECT c.id, v.name, v.description, v.price, v.image, v.veg, v.popular, v.chef_special, v.spice_level, v.status::public.content_status, v.display_order, v.location_id",
 );
 lines.push("FROM (VALUES");
 

@@ -37,7 +37,7 @@ WITH cat AS (
   SELECT id, slug FROM public.menu_categories WHERE location_id = 'south-plainfield'
 )
 INSERT INTO public.menu_items (category_id, name, description, price, image, veg, popular, chef_special, spice_level, status, display_order, location_id)
-SELECT c.id, v.name, v.description, v.price, v.image, v.veg, v.popular, v.chef_special, v.spice_level, v.status, v.display_order, v.location_id
+SELECT c.id, v.name, v.description, v.price, v.image, v.veg, v.popular, v.chef_special, v.spice_level, v.status::public.content_status, v.display_order, v.location_id
 FROM (VALUES
   ('soups', 'Veg Sweet Corn Soup', 'A comforting blend of sweet corn, fresh vegetables, and rich broth — creamy, mildly seasoned, and soul-soothing in every spoonful.', 8.31, NULL, TRUE, FALSE, FALSE, NULL, 'active', 0, 'south-plainfield'),
   ('soups', 'Chicken Sweet Corn Soup', 'Tender chicken and golden corn kernels simmered in a smooth, savory broth — the perfect balance of comfort and flavor.', 8.31, NULL, FALSE, FALSE, FALSE, NULL, 'active', 1, 'south-plainfield'),
