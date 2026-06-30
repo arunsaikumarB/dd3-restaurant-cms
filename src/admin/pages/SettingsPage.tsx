@@ -267,7 +267,7 @@ export default function SettingsPage() {
             value={form.order_url}
             error={fieldErrors.order_url}
             onChange={(e) => patchForm({ order_url: e.target.value })}
-            placeholder="https://orders.chefgaa.com/..."
+            placeholder="https://order.chefgaa.com/... or https://orders.chefgaa.com/..."
           />
         </div>
       ),

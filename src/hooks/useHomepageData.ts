@@ -5,11 +5,11 @@ import {
   type HomepageBundle,
 } from "../services/homepagePublic";
 import { useLocationSelection } from "../context/LocationContext";
-import type { LocationId } from "../config/locations";
+import { resolvePublicLocationId, type LocationId } from "../config/locations";
 
 export function useHomepageData() {
   const { selectedLocationId } = useLocationSelection();
-  const resolvedLocationId: LocationId = selectedLocationId ?? "lawrenceville";
+  const resolvedLocationId: LocationId = resolvePublicLocationId(selectedLocationId);
   const [bundle, setBundle] = useState<HomepageBundle>(() =>
     getHomepageFallbacks(resolvedLocationId),
   );

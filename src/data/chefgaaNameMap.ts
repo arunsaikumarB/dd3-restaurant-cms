@@ -11,6 +11,25 @@
  * back to the raw DB value automatically.
  */
 
+import type { LocationId } from "../config/locations";
+import { DEFAULT_PUBLIC_LOCATION_ID } from "../config/locations";
+
+/** Per-location ChefGaa store URLs for online ordering. */
+export const ORDER_URLS: Record<LocationId, string> = {
+  "south-plainfield":
+    "https://order.chefgaa.com/store/desi-dhamaka?order_type=106",
+  "oak-tree": "https://order.chefgaa.com/store/desi-dhamaka?order_type=108",
+  lawrenceville: "https://orders.chefgaa.com/store/desi-dhamaka/menu",
+};
+
+/** Resolves the ChefGaa order URL for a location (falls back to South Plainfield). */
+export function getOrderUrl(locationId: LocationId | string | null | undefined): string {
+  if (locationId && locationId in ORDER_URLS) {
+    return ORDER_URLS[locationId as LocationId];
+  }
+  return ORDER_URLS[DEFAULT_PUBLIC_LOCATION_ID];
+}
+
 /** Category slug (menu_categories.slug) -> ChefGaa category name. */
 export const CHEFGAA_CATEGORY_MAP: Record<string, string> = {
   soups: "Soups",

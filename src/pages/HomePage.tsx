@@ -4,6 +4,8 @@ import LazyMount from "../components/ui/LazyMount";
 import SectionPlaceholder from "../components/ui/SectionPlaceholder";
 import { useHomepageData } from "../hooks/useHomepageData";
 import { formatWeekdayHoursLabel } from "../services/homepagePublic";
+import { useLocationSelection } from "../context/LocationContext";
+import { resolveOrderUrl } from "../utils/locationLinks";
 import "../App.css";
 
 const EntranceImageSequence = lazy(
@@ -25,7 +27,9 @@ const ExperienceSection = lazy(
 
 export default function HomePage() {
   const { bundle } = useHomepageData();
+  const { selectedLocationId } = useLocationSelection();
   const { content, settings } = bundle;
+  const orderCtaLink = resolveOrderUrl(settings, selectedLocationId);
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
 
   return (
@@ -82,7 +86,7 @@ export default function HomePage() {
             youtube={settings.youtube}
             mapsUrl={settings.google_maps}
             orderCtaText={content.cta_text}
-            orderCtaLink={content.cta_link}
+            orderCtaLink={orderCtaLink}
           />
         </Suspense>
       </LazyMount>

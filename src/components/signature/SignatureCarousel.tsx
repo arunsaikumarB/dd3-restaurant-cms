@@ -5,7 +5,9 @@ import SignatureCard from "./SignatureCard";
 import NavigationArrows from "./NavigationArrows";
 import FeatureRow from "./FeatureRow";
 import { useLocationSelection } from "../../context/LocationContext";
+import { useHomepageData } from "../../hooks/useHomepageData";
 import { useSignatureDishes } from "../../hooks/useSignatureDishes";
+import { resolveOrderUrl } from "../../utils/locationLinks";
 import "./signature.css";
 
 const SCROLL_STEP = 300;
@@ -15,7 +17,9 @@ export default function SignatureCarousel() {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [sectionVisible, setSectionVisible] = useState(false);
   const { selectedLocationId } = useLocationSelection();
+  const { bundle } = useHomepageData();
   const { dishes } = useSignatureDishes(selectedLocationId);
+  const orderBaseUrl = resolveOrderUrl(bundle.settings, selectedLocationId);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -95,6 +99,7 @@ export default function SignatureCarousel() {
               <div className="signature-carousel__slide" key={dish.id}>
                 <SignatureCard
                   dish={dish}
+                  orderBaseUrl={orderBaseUrl}
                   entranceVisible={sectionVisible}
                   entranceDelay={index * 0.08}
                 />

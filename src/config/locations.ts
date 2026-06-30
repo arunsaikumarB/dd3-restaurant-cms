@@ -46,7 +46,7 @@ export const LOCATIONS: Record<LocationId, LocationConfig> = {
     googleMapsEmbed:
       "https://www.google.com/maps?q=4941+Stelton+Rd+South+Plainfield+NJ+07080&output=embed",
     reservationLink: "https://www.opentable.com/r/desi-dhamaka-south-plainfield",
-    orderDirectLink: "https://orders.chefgaa.com/store/desi-dhamaka-south-plainfield/menu",
+    orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka?order_type=106",
     uberEatsLink: "https://www.ubereats.com/store/desi-dhamaka-south-plainfield/placeholder",
     openingHours: {
       weekday: "11:00 AM - 10:00 PM",
@@ -68,7 +68,7 @@ export const LOCATIONS: Record<LocationId, LocationConfig> = {
     googleMapsEmbed:
       "https://www.google.com/maps?q=1676+Oak+Tree+Rd+Edison+NJ+08820&output=embed",
     reservationLink: "https://www.opentable.com/r/desi-dhamaka-oak-tree",
-    orderDirectLink: "https://orders.chefgaa.com/store/desi-dhamaka-oak-tree/menu",
+    orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka?order_type=108",
     uberEatsLink: "https://www.ubereats.com/store/desi-dhamaka-oak-tree/placeholder",
     openingHours: {
       weekday: "11:30 AM - 10:00 PM",

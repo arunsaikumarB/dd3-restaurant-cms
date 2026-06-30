@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { FOOTER_LINKS, ORDER_URL, RESERVE_URL } from "../../constants/navigation";
+import { FOOTER_LINKS, RESERVE_URL } from "../../constants/navigation";
+import { EXTERNAL_ORDER_LINK_PROPS } from "../../constants/ordering";
 import { SITE, SOCIAL_LABELS } from "../../constants/site";
 import { useHomepageData } from "../../hooks/useHomepageData";
 import { useLocationSelection } from "../../context/LocationContext";
-import { isExternalUrl, resolveReservationUrl } from "../../utils/locationLinks";
+import { isExternalUrl, resolveOrderUrl, resolveReservationUrl } from "../../utils/locationLinks";
 import {
   buildPublicSocialLinks,
   formatOpeningHoursRows,
@@ -36,6 +37,7 @@ export default function Footer() {
   const { navigateWithLocationGuard, selectedLocation, selectedLocationId } = useLocationSelection();
   const { settings } = bundle;
   const reservationLink = resolveReservationUrl(settings, selectedLocationId);
+  const orderLink = resolveOrderUrl(settings, selectedLocationId);
   const socialLinks = buildPublicSocialLinks(settings);
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
@@ -54,16 +56,13 @@ export default function Footer() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link
-              to={ORDER_URL}
-              onClick={(event) => {
-                event.preventDefault();
-                navigateWithLocationGuard(ORDER_URL);
-              }}
+            <a
+              href={orderLink}
               className="inline-flex h-[42px] items-center justify-center gap-2 rounded-full bg-brand-primary px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ivory shadow-[0_4px_16px_-4px_rgba(237,60,24,0.5)] transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:shadow-[0_8px_24px_-6px_rgba(237,60,24,0.55)] focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-cocoa"
+              {...EXTERNAL_ORDER_LINK_PROPS}
             >
               Order Now
-            </Link>
+            </a>
             <Link
               to={RESERVE_URL}
               onClick={(event) => {

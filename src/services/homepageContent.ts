@@ -1,7 +1,7 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
-import { ORDER_DIRECT_URL } from "../constants/ordering";
 import type { LocationId } from "../config/locations";
+import { getOrderUrl } from "../data/chefgaaNameMap";
 import { HOMEPAGE_SECTIONS } from "../admin/data/mock";
 import type { HomepageSection } from "../admin/types";
 import type { HomepageContent, HomepageContentInsert } from "../types/database";
@@ -36,7 +36,7 @@ export function buildDefaultHomepageContent(
     hero_image: "/hero/hero-poster.jpg",
     hero_video: "/hero/videoplayback.mp4",
     cta_text: fieldValue("hero", "cta1", "Order Now"),
-    cta_link: ORDER_DIRECT_URL,
+    cta_link: getOrderUrl(locationId),
     about_title: fieldValue("featured", "heading", "Signature Special Dishes"),
     about_description: fieldValue(
       "featured",

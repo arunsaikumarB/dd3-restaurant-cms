@@ -1,9 +1,11 @@
-/** ChefGaa online ordering base URL for Desi Dhamaka Lawrenceville. */
-export const ORDER_MENU_BASE =
-  "https://orders.chefgaa.com/store/desi-dhamaka/menu";
+import { DEFAULT_PUBLIC_LOCATION_ID } from "../config/locations";
+import { getOrderUrl } from "../data/chefgaaNameMap";
 
-/** Generic menu link (order page "Order Direct" button). */
-export const ORDER_DIRECT_URL = ORDER_MENU_BASE;
+/** Default ChefGaa online ordering base URL (Lawrenceville). */
+export const ORDER_MENU_BASE = getOrderUrl("lawrenceville");
+
+/** Generic menu link fallback (South Plainfield default location). */
+export const ORDER_DIRECT_URL = getOrderUrl(DEFAULT_PUBLIC_LOCATION_ID);
 
 /**
  * ChefGaa URL query parameter names for deep linking.
@@ -19,6 +21,8 @@ export const CHEFGAA_DEEP_LINK_PARAMS = {
 export interface ChefGaaDeepLinkOptions {
   /** Optional catalog UUID for item-level deep linking when supported. */
   itemId?: string;
+  /** Override the store base URL (e.g. per-location order URL from CMS). */
+  baseUrl?: string;
 }
 
 /** Target for featured homepage dishes that link to ChefGaa. */
@@ -36,7 +40,7 @@ export function buildChefGaaMenuUrl(
   itemName: string,
   options?: ChefGaaDeepLinkOptions,
 ): string {
-  const url = new URL(ORDER_MENU_BASE);
+  const url = new URL(options?.baseUrl ?? ORDER_MENU_BASE);
   const category = categoryName.trim();
   const item = itemName.trim();
 

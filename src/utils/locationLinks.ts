@@ -1,5 +1,9 @@
-import { getLocationConfig, type LocationId } from "../config/locations";
-import { ORDER_DIRECT_URL } from "../constants/ordering";
+import {
+  getLocationConfig,
+  resolvePublicLocationId,
+  type LocationId,
+} from "../config/locations";
+import { getOrderUrl } from "../data/chefgaaNameMap";
 
 type LinkSettings = {
   reservation_url?: string | null;
@@ -12,8 +16,8 @@ export function resolveReservationUrl(
 ): string {
   const fromCms = settings?.reservation_url?.trim();
   if (fromCms) return fromCms;
-  if (locationId) return getLocationConfig(locationId).reservationLink;
-  return "/reservation";
+  const resolved = resolvePublicLocationId(locationId);
+  return getLocationConfig(resolved).reservationLink;
 }
 
 export function resolveOrderUrl(
@@ -22,8 +26,7 @@ export function resolveOrderUrl(
 ): string {
   const fromCms = settings?.order_url?.trim();
   if (fromCms) return fromCms;
-  if (locationId) return getLocationConfig(locationId).orderDirectLink;
-  return ORDER_DIRECT_URL;
+  return getOrderUrl(resolvePublicLocationId(locationId));
 }
 
 export function isExternalUrl(url: string): boolean {

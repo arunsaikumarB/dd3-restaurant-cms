@@ -6,16 +6,16 @@ import { Menu, X } from "lucide-react";
 import {
   NAV_BAR_HEIGHT,
   NAV_LINKS,
-  ORDER_URL,
   RESERVE_URL,
   TRANSPARENT_NAV_ROUTES,
 } from "../../constants/navigation";
+import { EXTERNAL_ORDER_LINK_PROPS } from "../../constants/ordering";
 import { LOGO, logoSrcForBackground } from "../../constants/logo";
 import { useHomepageData } from "../../hooks/useHomepageData";
 import { EASE_POWER3 } from "../showcase/motion";
 import LocationSwitcher from "../location/LocationSwitcher";
 import { useLocationSelection } from "../../context/LocationContext";
-import { isExternalUrl, resolveReservationUrl } from "../../utils/locationLinks";
+import { isExternalUrl, resolveOrderUrl, resolveReservationUrl } from "../../utils/locationLinks";
 import "./navbar.css";
 
 type NavLinkItem = { label: string; path: string };
@@ -24,6 +24,7 @@ export default function Navbar() {
   const { bundle } = useHomepageData();
   const { navigateWithLocationGuard, selectedLocationId } = useLocationSelection();
   const reservationLink = resolveReservationUrl(bundle.settings, selectedLocationId);
+  const orderLink = resolveOrderUrl(bundle.settings, selectedLocationId);
   const logoAlt = `${bundle.settings.restaurant_name} home`;
   const logoSrc = bundle.settings.logo?.trim() || logoSrcForBackground("dark");
   const { pathname } = useLocation();
@@ -97,7 +98,7 @@ export default function Navbar() {
       window.open(reservationLink, "_blank", "noopener,noreferrer");
       return;
     }
-    if (path === "/menu" || path === ORDER_URL || path === RESERVE_URL) {
+    if (path === "/menu" || path === RESERVE_URL) {
       event.preventDefault();
       navigateWithLocationGuard(path);
     }
@@ -158,13 +159,13 @@ export default function Navbar() {
 
           {/* Desktop actions — xl+ */}
           <div className="hidden flex-shrink-0 items-center gap-2 xl:flex 2xl:gap-3">
-            <Link
-              to={ORDER_URL}
-              onClick={(event) => handleMaybeGuardedNav(event, ORDER_URL)}
+            <a
+              href={orderLink}
               className="whitespace-nowrap rounded-full bg-brand-primary px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#d43415] 2xl:px-5 2xl:py-2.5 2xl:text-xs"
+              {...EXTERNAL_ORDER_LINK_PROPS}
             >
               Order Now
-            </Link>
+            </a>
             <Link
               to={RESERVE_URL}
               onClick={(event) => handleMaybeGuardedNav(event, RESERVE_URL)}
@@ -177,13 +178,13 @@ export default function Navbar() {
 
           {/* Tablet / mobile */}
           <div className="flex flex-shrink-0 items-center justify-end gap-2 xl:hidden">
-            <Link
-              to={ORDER_URL}
-              onClick={(event) => handleMaybeGuardedNav(event, ORDER_URL)}
+            <a
+              href={orderLink}
               className="whitespace-nowrap rounded-full bg-brand-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#d43415]"
+              {...EXTERNAL_ORDER_LINK_PROPS}
             >
               Order Now
-            </Link>
+            </a>
             <button
               ref={menuButtonRef}
               type="button"
@@ -246,13 +247,13 @@ export default function Navbar() {
             </nav>
 
             <div className="mt-4 flex w-full max-w-sm flex-col items-stretch gap-3">
-              <Link
-                to={ORDER_URL}
-                onClick={(event) => handleMaybeGuardedNav(event, ORDER_URL)}
+              <a
+                href={orderLink}
                 className="rounded-full bg-brand-primary px-5 py-3 text-center text-sm font-bold uppercase tracking-wider text-white"
+                {...EXTERNAL_ORDER_LINK_PROPS}
               >
                 Order Now
-              </Link>
+              </a>
               <Link
                 to={RESERVE_URL}
                 onClick={(event) => handleMaybeGuardedNav(event, RESERVE_URL)}

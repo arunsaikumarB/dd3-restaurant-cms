@@ -7,6 +7,7 @@ import {
 
 export interface SignatureCardProps {
   dish: SignatureDish;
+  orderBaseUrl: string;
   entranceDelay?: number;
   entranceVisible?: boolean;
 }
@@ -59,10 +60,13 @@ function DishIcon({ category }: { category: string }) {
 
 export default function SignatureCard({
   dish,
+  orderBaseUrl,
   entranceDelay = 0,
   entranceVisible = true,
 }: SignatureCardProps) {
-  const orderUrl = buildChefGaaMenuUrl(dish.category_name, dish.item_name);
+  const orderUrl = buildChefGaaMenuUrl(dish.category_name, dish.item_name, {
+    baseUrl: orderBaseUrl,
+  });
 
   return (
     <motion.div

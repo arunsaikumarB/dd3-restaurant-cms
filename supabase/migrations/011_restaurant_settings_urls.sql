@@ -13,12 +13,12 @@ FROM (
     (
       'south-plainfield',
       'https://www.opentable.com/r/desi-dhamaka-south-plainfield',
-      'https://orders.chefgaa.com/store/desi-dhamaka-south-plainfield/menu'
+      'https://order.chefgaa.com/store/desi-dhamaka?order_type=106'
     ),
     (
       'oak-tree',
       'https://www.opentable.com/r/desi-dhamaka-oak-tree',
-      'https://orders.chefgaa.com/store/desi-dhamaka-oak-tree/menu'
+      'https://order.chefgaa.com/store/desi-dhamaka?order_type=108'
     ),
     (
       'lawrenceville',

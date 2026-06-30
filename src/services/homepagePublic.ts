@@ -1,4 +1,4 @@
-import { ORDER_DIRECT_URL } from "../constants/ordering";
+import { getOrderUrl } from "../data/chefgaaNameMap";
 import { SITE } from "../constants/site";
 import { getSiteUrl } from "../config/env";
 import type { LocationId } from "../config/locations";
@@ -60,7 +60,7 @@ let cachedBundleByLocation: Partial<Record<LocationId, HomepageBundle>> = {};
 let cacheExpiresAtByLocation: Partial<Record<LocationId, number>> = {};
 const inflightByLocation: Partial<Record<LocationId, Promise<HomepageBundle>>> = {};
 
-export function getHomepageFallbacks(locationId: LocationId = "lawrenceville"): HomepageBundle {
+export function getHomepageFallbacks(locationId: LocationId = "south-plainfield"): HomepageBundle {
   const defaults = buildDefaultRestaurantSettings(locationId);
   const defaultHours = defaults.opening_hours as OpeningHoursForm;
 
@@ -71,7 +71,7 @@ export function getHomepageFallbacks(locationId: LocationId = "lawrenceville"): 
       hero_image: HERO_IMAGE_FALLBACK,
       hero_video: HERO_VIDEO_FALLBACK,
       cta_text: "Order Now",
-      cta_link: defaults.order_url || ORDER_DIRECT_URL,
+      cta_link: defaults.order_url || getOrderUrl(locationId),
       about_title: ABOUT_TITLE_FALLBACK,
       about_description: ABOUT_DESCRIPTION_FALLBACK,
     },
@@ -91,7 +91,7 @@ export function getHomepageFallbacks(locationId: LocationId = "lawrenceville"): 
       youtube: defaults.youtube ?? "",
       logo: defaults.logo,
       reservation_url: defaults.reservation_url ?? "",
-      order_url: defaults.order_url ?? ORDER_DIRECT_URL,
+      order_url: defaults.order_url ?? getOrderUrl(locationId),
       seo_title: "",
       seo_description: "",
       seo_keywords: "",
