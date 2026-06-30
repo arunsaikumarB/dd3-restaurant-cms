@@ -173,14 +173,15 @@ export default function Hero({
         />
       )}
 
-      <motion.div className="hero__stage" style={{ opacity: stageOpacity }}>
-        <motion.div
-          className="hero__overlay"
-          variants={overlayVariants}
-          initial="hidden"
-          animate={ready ? "visible" : "hidden"}
-        />
+      <motion.div
+        className="hero__overlay"
+        variants={overlayVariants}
+        initial="hidden"
+        animate={ready ? "visible" : "hidden"}
+        aria-hidden
+      />
 
+      <motion.div className="hero__stage" style={{ opacity: stageOpacity }}>
         <div className="hero__content">
           <motion.div
             className="hero__logo-wrap"
