@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { PAGE_SEO } from "../../constants/seo";
 import { SITE } from "../../constants/site";
+import { getSiteUrl } from "../../config/env";
 import { useHomepageData } from "../../hooks/useHomepageData";
 import { buildRestaurantJsonLd } from "../../services/homepagePublic";
 
@@ -36,8 +37,9 @@ export default function PageSEO() {
   const { bundle } = useHomepageData();
   const { settings } = bundle;
   const config = PAGE_SEO[pathname] ?? PAGE_SEO["/404"];
-  const canonical = `${SITE.url}${config.path === "/" ? "" : config.path}`;
-  const image = `${SITE.url}${config.image ?? SITE.ogImage}`;
+  const siteUrl = getSiteUrl();
+  const canonical = `${siteUrl}${config.path === "/" ? "" : config.path}`;
+  const image = `${siteUrl}${config.image ?? SITE.ogImage}`;
 
   useEffect(() => {
     document.title = config.title;
@@ -71,6 +73,7 @@ export default function PageSEO() {
     config.path,
     canonical,
     image,
+    siteUrl,
     settings.restaurant_name,
     settings.phone,
     settings.email,

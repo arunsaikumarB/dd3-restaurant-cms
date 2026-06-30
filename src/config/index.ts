@@ -1,8 +1,9 @@
-export { createClient, createClientIfConfigured } from "./client";
 export {
+  PRODUCTION_SITE_URL_FALLBACK,
   getSiteUrl,
   getSupabaseUrl,
   getSupabaseAnonKey,
+  getSupabaseServiceRoleKey,
   isSupabaseConfigured,
   isAdminDevBypassEnabled,
 } from "./env";

@@ -1,5 +1,6 @@
 import { ORDER_DIRECT_URL } from "../constants/ordering";
 import { SITE } from "../constants/site";
+import { getSiteUrl } from "../config/env";
 import type { HomepageContent } from "../types/database";
 import { fetchHomepageContentPublic } from "./homepageContent";
 import {
@@ -289,7 +290,7 @@ function absolutePublicUrl(pathOrUrl: string | null | undefined, fallbackPath: s
   if (value.startsWith("http://") || value.startsWith("https://")) {
     return value;
   }
-  return `${SITE.url}${value.startsWith("/") ? value : `/${value}`}`;
+  return `${getSiteUrl()}${value.startsWith("/") ? value : `/${value}`}`;
 }
 
 /** Schema.org JSON-LD aligned with live restaurant_settings. */
@@ -297,7 +298,8 @@ export function buildRestaurantJsonLd(
   settings: PublicRestaurantSettings,
   path: string,
 ) {
-  const pageUrl = `${SITE.url}${path === "/" ? "" : path}`;
+  const siteUrl = getSiteUrl();
+  const pageUrl = `${siteUrl}${path === "/" ? "" : path}`;
   const address = parsePostalAddress(settings.address);
   const image = absolutePublicUrl(settings.logo, SITE.ogImage);
   const openingHoursSpecification = buildOpeningHoursSpecification(settings.opening_hours);
@@ -309,7 +311,7 @@ export function buildRestaurantJsonLd(
       name: settings.restaurant_name,
       description:
         "Authentic Indian restaurant in Lawrenceville, NJ specializing in Andhra and Hyderabadi cuisine.",
-      url: SITE.url,
+      url: siteUrl,
       telephone: settings.phone,
       email: settings.email,
       image,

@@ -9,7 +9,7 @@
     "extract:catering": "node scripts/extract-frames.mjs --input public/catering/catering-sequence.mp4 --out public/catering-frames --count 120 --width 1280 --quality 4",
     "parse-menu": "node scripts/parse-menu.mjs",
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/generate-seo-files.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

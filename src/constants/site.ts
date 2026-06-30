@@ -1,8 +1,6 @@
 export const SITE = {
   name: "Desi Dhamaka",
   tagline: "Indian Restaurant",
-  /** Production site URL — update when deploying to final domain. */
-  url: "https://desidhamakanj.net/lawrenceville",
   phone: "(609) 890-9272",
   email: "desidhamaka3marketing@gmail.com",
   address: "540 Lawrence Square Blvd S, Lawrenceville, NJ 08648",
