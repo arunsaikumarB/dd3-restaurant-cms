@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { SIGNATURE_DISHES } from "../../data/signatureDishes";
 import SignatureCard from "./SignatureCard";
 import NavigationArrows from "./NavigationArrows";
 import FeatureRow from "./FeatureRow";
+import { useLocationSelection } from "../../context/LocationContext";
+import { useSignatureDishes } from "../../hooks/useSignatureDishes";
 import "./signature.css";
 
 const SCROLL_STEP = 300;
@@ -13,6 +14,8 @@ export default function SignatureCarousel() {
   const sectionRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const [sectionVisible, setSectionVisible] = useState(false);
+  const { selectedLocationId } = useLocationSelection();
+  const { dishes } = useSignatureDishes(selectedLocationId);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -88,7 +91,7 @@ export default function SignatureCarousel() {
           aria-label="Signature dishes carousel"
         >
           <div className="signature-carousel__track">
-            {SIGNATURE_DISHES.map((dish, index) => (
+            {dishes.map((dish, index) => (
               <div className="signature-carousel__slide" key={dish.id}>
                 <SignatureCard
                   dish={dish}
