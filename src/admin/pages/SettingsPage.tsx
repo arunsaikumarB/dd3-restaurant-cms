@@ -10,11 +10,13 @@ import ImageUploadField from "../components/settings/ImageUploadField";
 import SettingsPageSkeleton from "../components/settings/SettingsPageSkeleton";
 import { useLocation } from "../hooks/useLocation";
 import {
+  getCanonicalOrderUrl,
   getOrCreateRestaurantSettings,
   rowToForm,
   updateRestaurantSettings,
   type RestaurantSettingsForm,
 } from "../../services/restaurantSettings";
+import { getLocationConfig } from "../../config/locations";
 import { uploadFile } from "../../services/storage/upload";
 import {
   hasValidationErrors,
@@ -175,6 +177,9 @@ export default function SettingsPage() {
     );
   }
 
+  const canonicalOrderUrl = getCanonicalOrderUrl(locationId);
+  const locationLabel = getLocationConfig(locationId).shortName;
+
   const sections = [
     {
       title: "Restaurant Info",
@@ -262,13 +267,28 @@ export default function SettingsPage() {
             onChange={(e) => patchForm({ reservation_url: e.target.value })}
             placeholder="/reservation or https://..."
           />
-          <AdminInput
-            label="Order URL"
-            value={form.order_url}
-            error={fieldErrors.order_url}
-            onChange={(e) => patchForm({ order_url: e.target.value })}
-            placeholder="https://order.chefgaa.com/... or https://orders.chefgaa.com/..."
-          />
+          <div className="space-y-2">
+            <AdminInput
+              label="Order URL"
+              value={form.order_url}
+              error={fieldErrors.order_url}
+              onChange={(e) => patchForm({ order_url: e.target.value })}
+              placeholder="https://order.chefgaa.com/... or https://orders.chefgaa.com/..."
+            />
+            <p className="text-xs text-admin-muted">
+              Default for {locationLabel}:{" "}
+              <span className="break-all font-mono text-[11px]">{canonicalOrderUrl}</span>
+            </p>
+            {form.order_url.trim() !== canonicalOrderUrl ? (
+              <AdminButton
+                type="button"
+                variant="outline"
+                onClick={() => patchForm({ order_url: canonicalOrderUrl })}
+              >
+                Use default order URL
+              </AdminButton>
+            ) : null}
+          </div>
         </div>
       ),
     },

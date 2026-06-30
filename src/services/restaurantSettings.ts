@@ -1,8 +1,14 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
 import { getLocationConfig, type LocationId } from "../config/locations";
+import { getOrderUrl } from "../data/chefgaaNameMap";
 import type { RestaurantSettings, RestaurantSettingsInsert } from "../types/database";
 import { LocationScopeError } from "../utils/supabase/locationScope";
+import { isOrderUrlForLocation } from "../utils/locationLinks";
+
+export function getCanonicalOrderUrl(locationId: LocationId): string {
+  return getOrderUrl(locationId);
+}
 
 export type OpeningHoursForm = {
   weekday: string;
@@ -51,7 +57,7 @@ export function buildDefaultRestaurantSettings(
     logo: null,
     favicon: null,
     reservation_url: location.reservationLink,
-    order_url: location.orderDirectLink,
+    order_url: getOrderUrl(locationId),
     seo_title: "",
     seo_description: "",
     seo_keywords: "",
@@ -80,7 +86,7 @@ export function rowToForm(row: RestaurantSettings): RestaurantSettingsForm {
     logo: row.logo,
     favicon: row.favicon,
     reservation_url: row.reservation_url ?? "",
-    order_url: row.order_url ?? "",
+    order_url: row.order_url?.trim() || getOrderUrl(row.location_id),
     seo_title: row.seo_title ?? "",
     seo_description: row.seo_description ?? "",
     seo_keywords: row.seo_keywords ?? "",
@@ -139,7 +145,7 @@ type SettingsQuery = {
       single(): Promise<{ data: RestaurantSettings | null; error: SupabaseError | null }>;
     };
   };
-  update(row: ReturnType<typeof formToUpdatePayload>): {
+  update(row: ReturnType<typeof formToUpdatePayload> | { order_url: string }): {
     eq(column: string, value: string): {
       select(columns: string): {
         single(): Promise<{ data: RestaurantSettings | null; error: SupabaseError | null }>;
@@ -150,6 +156,31 @@ type SettingsQuery = {
 
 function settingsTable(supabase: NonNullable<ReturnType<typeof createClientIfConfigured>>) {
   return supabase.from("restaurant_settings") as unknown as SettingsQuery;
+}
+
+/** Persists the canonical ChefGaa order URL when CMS value is missing or wrong. */
+async function repairOrderUrlIfNeeded(
+  table: SettingsQuery,
+  locationId: LocationId,
+  row: RestaurantSettings,
+): Promise<RestaurantSettings> {
+  const canonical = getOrderUrl(locationId);
+  const current = row.order_url?.trim();
+  if (current && isOrderUrlForLocation(current, locationId)) {
+    return row;
+  }
+
+  const { data, error } = await table
+    .update({ order_url: canonical })
+    .eq("location_id", locationId)
+    .select("*")
+    .single();
+
+  if (error || !data) {
+    return { ...row, order_url: canonical };
+  }
+
+  return data;
 }
 
 export async function getOrCreateRestaurantSettings(
@@ -176,7 +207,7 @@ export async function getOrCreateRestaurantSettings(
   }
 
   if (existing) {
-    return existing;
+    return repairOrderUrlIfNeeded(table, locationId, existing);
   }
 
   const { data: created, error: insertError } = await table

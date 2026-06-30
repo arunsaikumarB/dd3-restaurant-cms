@@ -11,7 +11,7 @@ type LinkSettings = {
 };
 
 /** True when a CMS order URL targets the same ChefGaa store as the location default. */
-function isOrderUrlForLocation(url: string, locationId: LocationId): boolean {
+export function isOrderUrlForLocation(url: string, locationId: LocationId): boolean {
   const expected = getOrderUrl(locationId);
   if (url === expected) return true;
 
