@@ -1,4 +1,5 @@
 import { createClientIfConfigured } from "../../lib/supabase/client";
+import { validateUploadFileSize } from "../../constants/storage";
 import type { StorageBucket } from "../../types/database";
 
 export interface UploadOptions {
@@ -33,6 +34,11 @@ export async function uploadFile({
   const supabase = createClientIfConfigured();
   if (!supabase) {
     throw new Error("Supabase is not configured.");
+  }
+
+  const sizeError = validateUploadFileSize(bucket, file);
+  if (sizeError) {
+    throw new Error(sizeError);
   }
 
   const objectPath = buildObjectPath(file, path);

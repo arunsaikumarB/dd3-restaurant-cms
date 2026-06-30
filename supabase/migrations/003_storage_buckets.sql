@@ -4,11 +4,11 @@
 
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES
-  ('menu-images', 'menu-images', TRUE, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp']),
+  ('menu-images', 'menu-images', TRUE, 10485760, ARRAY['image/jpeg', 'image/png', 'image/webp']),
   ('gallery-images', 'gallery-images', TRUE, 10485760, ARRAY['image/jpeg', 'image/png', 'image/webp']),
-  ('offer-images', 'offer-images', TRUE, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp']),
-  ('homepage-images', 'homepage-images', TRUE, 10485760, ARRAY['image/jpeg', 'image/png', 'image/webp', 'video/mp4']),
-  ('restaurant-assets', 'restaurant-assets', TRUE, 2097152, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/x-icon', 'image/vnd.microsoft.icon'])
+  ('offer-images', 'offer-images', TRUE, 10485760, ARRAY['image/jpeg', 'image/png', 'image/webp']),
+  ('homepage-images', 'homepage-images', TRUE, 104857600, ARRAY['image/jpeg', 'image/png', 'image/webp', 'video/mp4']),
+  ('restaurant-assets', 'restaurant-assets', TRUE, 10485760, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/x-icon', 'image/vnd.microsoft.icon'])
 ON CONFLICT (id) DO NOTHING;
 
 -- Public read for all buckets
