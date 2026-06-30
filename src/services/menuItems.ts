@@ -2,6 +2,7 @@ import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
 import { getLocationConfig, LOCATION_IDS, type LocationId } from "../config/locations";
 import type { ContentStatus, MenuItem, MenuItemInsert } from "../types/database";
+import { LocationScopeError } from "../utils/supabase/locationScope";
 import { mapSupabaseError } from "../utils/supabase/errors";
 
 export type MenuItemForm = {
@@ -112,7 +113,7 @@ function mapJoinRow(row: MenuItemJoinRow, locationId?: LocationId): MenuItemTabl
     status: row.status,
     display_order: row.display_order,
     created_at: row.created_at,
-    location_id: locationId ?? row.location_id,
+    location_id: row.location_id ?? locationId,
     locationName: locationId ? getLocationConfig(locationId).shortName : undefined,
   };
 }
@@ -140,13 +141,17 @@ type MenuItemsQuery = {
   };
   update(row: ReturnType<typeof formToUpdatePayload> | { status: ContentStatus }): {
     eq(column: string, value: string): {
-      select(columns: string): {
-        single(): Promise<{ data: MenuItemJoinRow | null; error: SupabaseError | null }>;
+      eq(column: string, value: string): {
+        select(columns: string): {
+          single(): Promise<{ data: MenuItemJoinRow | null; error: SupabaseError | null }>;
+        };
       };
     };
   };
   delete(): {
-    eq(column: string, value: string): Promise<{ error: SupabaseError | null }>;
+    eq(column: string, value: string): {
+      eq(column: string, value: string): Promise<{ error: SupabaseError | null }>;
+    };
   };
 };
 
@@ -224,11 +229,42 @@ export async function fetchPublicMenuItems(
   return (data ?? []).map((row) => mapJoinRow(row, locationId));
 }
 
+async function assertCategoryInLocation(
+  supabase: NonNullable<ReturnType<typeof createClientIfConfigured>>,
+  categoryId: string,
+  locationId: LocationId,
+): Promise<void> {
+  const { data, error } = await (
+    supabase.from("menu_categories") as unknown as {
+      select(columns: string): {
+        eq(column: string, value: string): {
+          eq(column: string, value: string): {
+            maybeSingle(): Promise<{ data: { id: string } | null; error: SupabaseError | null }>;
+          };
+        };
+      };
+    }
+  )
+    .select("id")
+    .eq("id", categoryId)
+    .eq("location_id", locationId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(mapSupabaseError(error, "validate category"));
+  }
+  if (!data) {
+    throw new LocationScopeError("Category does not belong to the selected location.");
+  }
+}
+
 export async function createMenuItem(
   form: MenuItemForm,
   locationId: LocationId,
 ): Promise<MenuItemTableRow> {
   const supabase = requireClient();
+  await assertCategoryInLocation(supabase, form.category_id, locationId);
+
   const { data, error } = await menuItemsTable(supabase)
     .insert(formToPayload(form, locationId))
     .select(MENU_ITEM_SELECT)
@@ -238,46 +274,60 @@ export async function createMenuItem(
     throw new Error(mapSupabaseError(error ?? { message: "Create failed." }, "create menu item"));
   }
 
-  return mapJoinRow(data);
+  return mapJoinRow(data, locationId);
 }
 
-export async function updateMenuItem(id: string, form: MenuItemForm): Promise<MenuItemTableRow> {
+export async function updateMenuItem(
+  id: string,
+  form: MenuItemForm,
+  locationId: LocationId,
+): Promise<MenuItemTableRow> {
   const supabase = requireClient();
+  await assertCategoryInLocation(supabase, form.category_id, locationId);
 
   const { data, error } = await menuItemsTable(supabase)
     .update(formToUpdatePayload(form))
     .eq("id", id)
+    .eq("location_id", locationId)
     .select(MENU_ITEM_SELECT)
     .single();
 
+  if (error?.code === "PGRST116" || (!error && !data)) {
+    throw new LocationScopeError();
+  }
   if (error || !data) {
     throw new Error(mapSupabaseError(error ?? { message: "Update failed." }, "update menu item"));
   }
 
-  return mapJoinRow(data);
+  return mapJoinRow(data, locationId);
 }
 
 export async function updateMenuItemStatus(
   id: string,
   status: ContentStatus,
+  locationId: LocationId,
 ): Promise<MenuItemTableRow> {
   const supabase = requireClient();
   const { data, error } = await menuItemsTable(supabase)
     .update({ status })
     .eq("id", id)
+    .eq("location_id", locationId)
     .select(MENU_ITEM_SELECT)
     .single();
 
+  if (error?.code === "PGRST116" || (!error && !data)) {
+    throw new LocationScopeError();
+  }
   if (error || !data) {
     throw new Error(mapSupabaseError(error ?? { message: "Update failed." }, "update menu item status"));
   }
 
-  return mapJoinRow(data);
+  return mapJoinRow(data, locationId);
 }
 
-export async function deleteMenuItem(id: string): Promise<void> {
+export async function deleteMenuItem(id: string, locationId: LocationId): Promise<void> {
   const supabase = requireClient();
-  const { error } = await menuItemsTable(supabase).delete().eq("id", id);
+  const { error } = await menuItemsTable(supabase).delete().eq("id", id).eq("location_id", locationId);
 
   if (error) {
     throw new Error(mapSupabaseError(error, "delete menu item"));

@@ -8,6 +8,7 @@ import {
   getOfferScheduleStatus,
   type OfferScheduleStatus,
 } from "../utils/offers/schedule";
+import { LocationScopeError } from "../utils/supabase/locationScope";
 import { mapSupabaseError } from "../utils/supabase/errors";
 
 export type OfferForm = {
@@ -105,6 +106,7 @@ function mapOfferRow(row: Offer): OfferCardRow {
     status: row.active ? "active" : "inactive",
     scheduleStatus: getOfferScheduleStatus(startDate, endDate),
     created_at: row.created_at,
+    location_id: row.location_id,
   };
 }
 
@@ -130,13 +132,17 @@ type OffersQuery = {
   };
   update(row: ReturnType<typeof formToUpdatePayload> | { active: boolean }): {
     eq(column: string, value: string): {
-      select(columns: string): {
-        single(): Promise<{ data: Offer | null; error: SupabaseError | null }>;
+      eq(column: string, value: string): {
+        select(columns: string): {
+          single(): Promise<{ data: Offer | null; error: SupabaseError | null }>;
+        };
       };
     };
   };
   delete(): {
-    eq(column: string, value: string): Promise<{ error: SupabaseError | null }>;
+    eq(column: string, value: string): {
+      eq(column: string, value: string): Promise<{ error: SupabaseError | null }>;
+    };
   };
 };
 
@@ -213,14 +219,22 @@ export async function createOffer(form: OfferForm, locationId: LocationId): Prom
   return mapOfferRow(data);
 }
 
-export async function updateOffer(id: string, form: OfferForm): Promise<OfferCardRow> {
+export async function updateOffer(
+  id: string,
+  form: OfferForm,
+  locationId: LocationId,
+): Promise<OfferCardRow> {
   const supabase = requireClient();
   const { data, error } = await offersTable(supabase)
     .update(formToUpdatePayload(form))
     .eq("id", id)
+    .eq("location_id", locationId)
     .select("*")
     .single();
 
+  if (error?.code === "PGRST116" || (!error && !data)) {
+    throw new LocationScopeError();
+  }
   if (error || !data) {
     throw new Error(mapSupabaseError(error ?? { message: "Update failed." }, "update offer"));
   }
@@ -228,14 +242,22 @@ export async function updateOffer(id: string, form: OfferForm): Promise<OfferCar
   return mapOfferRow(data);
 }
 
-export async function updateOfferActive(id: string, active: boolean): Promise<OfferCardRow> {
+export async function updateOfferActive(
+  id: string,
+  active: boolean,
+  locationId: LocationId,
+): Promise<OfferCardRow> {
   const supabase = requireClient();
   const { data, error } = await offersTable(supabase)
     .update({ active })
     .eq("id", id)
+    .eq("location_id", locationId)
     .select("*")
     .single();
 
+  if (error?.code === "PGRST116" || (!error && !data)) {
+    throw new LocationScopeError();
+  }
   if (error || !data) {
     throw new Error(mapSupabaseError(error ?? { message: "Update failed." }, "update offer status"));
   }
@@ -243,9 +265,9 @@ export async function updateOfferActive(id: string, active: boolean): Promise<Of
   return mapOfferRow(data);
 }
 
-export async function deleteOffer(id: string): Promise<void> {
+export async function deleteOffer(id: string, locationId: LocationId): Promise<void> {
   const supabase = requireClient();
-  const { error } = await offersTable(supabase).delete().eq("id", id);
+  const { error } = await offersTable(supabase).delete().eq("id", id).eq("location_id", locationId);
 
   if (error) {
     throw new Error(mapSupabaseError(error, "delete offer"));

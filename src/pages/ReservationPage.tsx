@@ -6,13 +6,17 @@ import ContactCards from "../components/reservation/ContactCards";
 import GoogleMap from "../components/reservation/GoogleMap";
 import PageHero from "../components/ui/PageHero";
 import { useLocationSelection } from "../context/LocationContext";
+import { useHomepageData } from "../hooks/useHomepageData";
+import { isExternalUrl, resolveReservationUrl } from "../utils/locationLinks";
 import "../components/reservation/reservation.css";
 
 export default function ReservationPage() {
-  const { selectedLocation } = useLocationSelection();
+  const { selectedLocation, selectedLocationId } = useLocationSelection();
+  const { bundle } = useHomepageData();
+  const reservationLink = resolveReservationUrl(bundle.settings, selectedLocationId);
   const scrollToBooking = () => {
-    if (selectedLocation?.reservationLink?.startsWith("http")) {
-      window.open(selectedLocation.reservationLink, "_blank", "noopener,noreferrer");
+    if (isExternalUrl(reservationLink)) {
+      window.open(reservationLink, "_blank", "noopener,noreferrer");
       return;
     }
     document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" });
@@ -59,7 +63,7 @@ export default function ReservationPage() {
           className="reservation-sticky__btn"
           onClick={scrollToBooking}
         >
-          {selectedLocation?.reservationLink?.startsWith("http")
+          {isExternalUrl(reservationLink)
             ? "Reserve Online"
             : "Reserve My Table"}
         </button>

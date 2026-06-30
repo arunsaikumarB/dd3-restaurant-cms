@@ -2,6 +2,7 @@ import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
 import { getLocationConfig, type LocationId } from "../config/locations";
 import type { Reservation, ReservationInsert, ReservationStatus } from "../types/database";
+import { LocationScopeError } from "../utils/supabase/locationScope";
 import { mapSupabaseError } from "../utils/supabase/errors";
 
 export type ReservationForm = {
@@ -171,13 +172,17 @@ type ReservationsQuery = {
   };
   update(row: Partial<ReservationInsert>): {
     eq(column: string, value: string): {
-      select(columns: string): {
-        single(): Promise<{ data: Reservation | null; error: SupabaseError | null }>;
+      eq(column: string, value: string): {
+        select(columns: string): {
+          single(): Promise<{ data: Reservation | null; error: SupabaseError | null }>;
+        };
       };
     };
   };
   delete(): {
-    eq(column: string, value: string): Promise<{ error: SupabaseError | null }>;
+    eq(column: string, value: string): {
+      eq(column: string, value: string): Promise<{ error: SupabaseError | null }>;
+    };
   };
 };
 
@@ -239,14 +244,22 @@ export async function createReservation(
   return mapReservationRow(data);
 }
 
-export async function updateReservation(id: string, form: ReservationForm): Promise<ReservationTableRow> {
+export async function updateReservation(
+  id: string,
+  form: ReservationForm,
+  locationId: LocationId,
+): Promise<ReservationTableRow> {
   const supabase = requireClient();
   const { data, error } = await reservationsTable(supabase)
     .update(formToUpdatePayload(form))
     .eq("id", id)
+    .eq("location_id", locationId)
     .select("*")
     .single();
 
+  if (error?.code === "PGRST116" || (!error && !data)) {
+    throw new LocationScopeError();
+  }
   if (error || !data) {
     throw new Error(mapSupabaseError(error ?? { message: "Update failed." }, "update reservation"));
   }
@@ -297,14 +310,19 @@ export async function createPublicReservation(payload: PublicReservationPayload)
 export async function updateReservationStatus(
   id: string,
   status: ReservationStatus,
+  locationId: LocationId,
 ): Promise<ReservationTableRow> {
   const supabase = requireClient();
   const { data, error } = await reservationsTable(supabase)
     .update({ status })
     .eq("id", id)
+    .eq("location_id", locationId)
     .select("*")
     .single();
 
+  if (error?.code === "PGRST116" || (!error && !data)) {
+    throw new LocationScopeError();
+  }
   if (error || !data) {
     throw new Error(mapSupabaseError(error ?? { message: "Update failed." }, "update reservation status"));
   }
@@ -312,9 +330,9 @@ export async function updateReservationStatus(
   return mapReservationRow(data);
 }
 
-export async function deleteReservation(id: string): Promise<void> {
+export async function deleteReservation(id: string, locationId: LocationId): Promise<void> {
   const supabase = requireClient();
-  const { error } = await reservationsTable(supabase).delete().eq("id", id);
+  const { error } = await reservationsTable(supabase).delete().eq("id", id).eq("location_id", locationId);
 
   if (error) {
     throw new Error(mapSupabaseError(error, "delete reservation"));

@@ -8,6 +8,8 @@ import SectionPlaceholder from "../components/ui/SectionPlaceholder";
 import { LOCATION_OPTIONS, type LocationId } from "../config/locations";
 import { buildLocationOrderMenuUrl } from "../constants/ordering";
 import { useLocationSelection } from "../context/LocationContext";
+import { useHomepageData } from "../hooks/useHomepageData";
+import { resolveOrderUrl } from "../utils/locationLinks";
 import "../components/order/order.css";
 
 const ReservationCTA = lazy(() => import("../components/order/ReservationCTA"));
@@ -20,6 +22,7 @@ function parseLocationId(value: string | null): LocationId | null {
 export default function OrderPage() {
   const [searchParams] = useSearchParams();
   const { selectedLocation, selectedLocationId, setLocation } = useLocationSelection();
+  const { bundle } = useHomepageData();
   const orderSectionRef = useRef<HTMLElement>(null);
 
   const queryLocationId = parseLocationId(searchParams.get("location"));
@@ -40,10 +43,11 @@ export default function OrderPage() {
   }, [offerCategory, queryLocationId]);
 
   const orderOptions: OrderOption[] = useMemo(() => {
+    const orderBase = resolveOrderUrl(bundle.settings, selectedLocationId);
     const directHref =
-      selectedLocation && offerCategory
-        ? buildLocationOrderMenuUrl(selectedLocation.orderDirectLink, offerCategory)
-        : (selectedLocation?.orderDirectLink ?? "/order");
+      offerCategory
+        ? buildLocationOrderMenuUrl(orderBase, offerCategory)
+        : orderBase;
 
     return [
       {
@@ -77,7 +81,7 @@ export default function OrderPage() {
         variant: "uber",
       },
     ];
-  }, [offerCategory, selectedLocation]);
+  }, [offerCategory, selectedLocation, selectedLocationId, bundle.settings]);
 
   return (
     <div className="order-page">

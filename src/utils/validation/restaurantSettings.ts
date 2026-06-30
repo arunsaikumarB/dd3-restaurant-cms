@@ -62,6 +62,16 @@ export function validateRestaurantSettings(
     errors.youtube = "Enter a valid YouTube URL.";
   }
 
+  const reservationUrl = form.reservation_url.trim();
+  if (reservationUrl && !reservationUrl.startsWith("/") && !isValidUrl(reservationUrl)) {
+    errors.reservation_url = "Enter a valid URL or path (e.g. /reservation).";
+  }
+
+  const orderUrl = form.order_url.trim();
+  if (orderUrl && !orderUrl.startsWith("/") && !isValidUrl(orderUrl)) {
+    errors.order_url = "Enter a valid order URL.";
+  }
+
   return errors;
 }
 

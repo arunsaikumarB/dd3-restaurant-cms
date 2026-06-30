@@ -12,6 +12,7 @@ import AdminTextarea from "../components/ui/Textarea";
 import AdminToast from "../components/ui/Toast";
 import ReservationsPageSkeleton from "../components/settings/ReservationsPageSkeleton";
 import { useLocation } from "../hooks/useLocation";
+import { resolveMutationLocationId } from "../utils/resolveMutationLocation";
 import { useAdminTheme } from "../context/AdminThemeContext";
 import {
   createReservation,
@@ -168,6 +169,10 @@ export default function ReservationsPage() {
   };
 
   const openEditModal = (row: ReservationTableRow) => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to edit reservations.", "error");
+      return;
+    }
     setEditingId(row.id);
     setForm(rowToForm(row));
     setFieldErrors({});
@@ -183,6 +188,10 @@ export default function ReservationsPage() {
 
   const handleSave = async () => {
     if (submitting) return;
+    if (isAllLocations) {
+      showToast("Select a single location in the header to save reservations.", "error");
+      return;
+    }
 
     const errors = validateReservationForm(form);
     setFieldErrors(errors);
@@ -194,7 +203,17 @@ export default function ReservationsPage() {
     setSubmitting(true);
     try {
       if (editingId) {
-        await updateReservation(editingId, form);
+        const editingRow = reservations.find((row) => row.id === editingId);
+        const mutationLocationId = resolveMutationLocationId(
+          scope,
+          locationId,
+          editingRow?.location_id,
+        );
+        if (!mutationLocationId) {
+          showToast("Select a single location in the header to edit reservations.", "error");
+          return;
+        }
+        await updateReservation(editingId, form, mutationLocationId);
         showToast("Reservation updated successfully.");
       } else {
         await createReservation(form, locationId);
@@ -212,6 +231,10 @@ export default function ReservationsPage() {
   };
 
   const openDeleteModal = (row: ReservationTableRow) => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to delete reservations.", "error");
+      return;
+    }
     setDeletingReservation(row);
     setDeleteOpen(true);
   };
@@ -221,7 +244,16 @@ export default function ReservationsPage() {
 
     setDeleting(true);
     try {
-      await deleteReservation(deletingReservation.id);
+      const mutationLocationId = resolveMutationLocationId(
+        scope,
+        locationId,
+        deletingReservation.location_id,
+      );
+      if (!mutationLocationId) {
+        showToast("Select a single location in the header to delete reservations.", "error");
+        return;
+      }
+      await deleteReservation(deletingReservation.id, mutationLocationId);
       showToast("Reservation deleted successfully.");
       setDeleteOpen(false);
       setDeletingReservation(null);
@@ -235,10 +267,15 @@ export default function ReservationsPage() {
 
   const handleStatusChange = async (row: ReservationTableRow, status: ReservationStatus) => {
     if (updatingStatusId || row.status === status) return;
+    const mutationLocationId = resolveMutationLocationId(scope, locationId, row.location_id);
+    if (!mutationLocationId) {
+      showToast("Select a single location in the header to update reservations.", "error");
+      return;
+    }
 
     setUpdatingStatusId(row.id);
     try {
-      const updated = await updateReservationStatus(row.id, status);
+      const updated = await updateReservationStatus(row.id, status, mutationLocationId);
       setReservations((prev) => prev.map((item) => (item.id === row.id ? updated : item)));
       showToast(`Reservation marked as ${status}.`);
     } catch (err) {

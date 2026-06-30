@@ -41,6 +41,8 @@ export interface RestaurantSettings extends Timestamps {
   youtube: string | null;
   logo: string | null;
   favicon: string | null;
+  reservation_url: string | null;
+  order_url: string | null;
 }
 
 export interface HomepageContent extends Timestamps {

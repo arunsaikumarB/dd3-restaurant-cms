@@ -3,6 +3,7 @@ import { FOOTER_LINKS, ORDER_URL, RESERVE_URL } from "../../constants/navigation
 import { SITE, SOCIAL_LABELS } from "../../constants/site";
 import { useHomepageData } from "../../hooks/useHomepageData";
 import { useLocationSelection } from "../../context/LocationContext";
+import { isExternalUrl, resolveReservationUrl } from "../../utils/locationLinks";
 import {
   buildPublicSocialLinks,
   formatOpeningHoursRows,
@@ -32,8 +33,9 @@ const SOCIAL_ICONS: Record<string, JSX.Element> = {
 export default function Footer() {
   const year = new Date().getFullYear();
   const { bundle } = useHomepageData();
-  const { navigateWithLocationGuard, selectedLocation } = useLocationSelection();
+  const { navigateWithLocationGuard, selectedLocation, selectedLocationId } = useLocationSelection();
   const { settings } = bundle;
+  const reservationLink = resolveReservationUrl(settings, selectedLocationId);
   const socialLinks = buildPublicSocialLinks(settings);
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
@@ -66,8 +68,8 @@ export default function Footer() {
               to={RESERVE_URL}
               onClick={(event) => {
                 event.preventDefault();
-                if (selectedLocation?.reservationLink?.startsWith("http")) {
-                  window.open(selectedLocation.reservationLink, "_blank", "noopener,noreferrer");
+                if (isExternalUrl(reservationLink)) {
+                  window.open(reservationLink, "_blank", "noopener,noreferrer");
                   return;
                 }
                 navigateWithLocationGuard(RESERVE_URL);

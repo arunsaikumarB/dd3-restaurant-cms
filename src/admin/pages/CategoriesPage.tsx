@@ -15,6 +15,7 @@ import ImageUploadField from "../components/settings/ImageUploadField";
 import CategoriesPageSkeleton from "../components/settings/CategoriesPageSkeleton";
 import { useAdminTheme } from "../context/AdminThemeContext";
 import { useLocation } from "../hooks/useLocation";
+import { resolveMutationLocationId } from "../utils/resolveMutationLocation";
 import {
   CategoryDeleteBlockedError,
   createMenuCategory,
@@ -149,6 +150,10 @@ export default function CategoryManagementPage() {
   };
 
   const openEditModal = (category: MenuCategoryWithCount) => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to edit categories.", "error");
+      return;
+    }
     setEditingId(category.id);
     setForm(rowToForm(category));
     setFieldErrors({});
@@ -191,6 +196,10 @@ export default function CategoryManagementPage() {
 
   const handleSave = async () => {
     if (submitting) return;
+    if (isAllLocations) {
+      showToast("Select a single location in the header to save categories.", "error");
+      return;
+    }
 
     const slug = resolveCategorySlug(form.name, form.slug);
     const normalizedForm = { ...form, slug };
@@ -213,7 +222,7 @@ export default function CategoryManagementPage() {
     setSubmitting(true);
     try {
       if (editingId) {
-        await updateMenuCategory(editingId, normalizedForm);
+        await updateMenuCategory(editingId, normalizedForm, locationId);
         showToast("Category updated successfully.");
       } else {
         await createMenuCategory(normalizedForm, locationId);
@@ -230,6 +239,10 @@ export default function CategoryManagementPage() {
   };
 
   const openDeleteModal = (category: MenuCategoryWithCount) => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to delete categories.", "error");
+      return;
+    }
     setDeletingCategory(category);
     setDeleteOpen(true);
   };
@@ -239,7 +252,16 @@ export default function CategoryManagementPage() {
 
     setDeleting(true);
     try {
-      await deleteMenuCategory(deletingCategory.id);
+      const mutationLocationId = resolveMutationLocationId(
+        scope,
+        locationId,
+        deletingCategory.location_id,
+      );
+      if (!mutationLocationId) {
+        showToast("Select a single location in the header to delete categories.", "error");
+        return;
+      }
+      await deleteMenuCategory(deletingCategory.id, mutationLocationId);
       showToast("Category deleted successfully.");
       setDeleteOpen(false);
       setDeletingCategory(null);
@@ -257,11 +279,20 @@ export default function CategoryManagementPage() {
 
   const handleToggleStatus = async (category: MenuCategoryWithCount) => {
     if (togglingId) return;
+    const mutationLocationId = resolveMutationLocationId(
+      scope,
+      locationId,
+      category.location_id,
+    );
+    if (!mutationLocationId) {
+      showToast("Select a single location in the header to update categories.", "error");
+      return;
+    }
 
     const nextStatus: ContentStatus = category.status === "active" ? "inactive" : "active";
     setTogglingId(category.id);
     try {
-      const updated = await updateMenuCategoryStatus(category.id, nextStatus);
+      const updated = await updateMenuCategoryStatus(category.id, nextStatus, mutationLocationId);
       setCategories((prev) =>
         prev.map((row) =>
           row.id === category.id ? { ...row, status: updated.status } : row,

@@ -3,6 +3,7 @@ import { isSupabaseConfigured } from "../lib/supabase/env";
 import type { LocationId } from "../config/locations";
 import { getLocationConfig, LOCATION_IDS } from "../config/locations";
 import type { ContentStatus, MenuCategory, MenuCategoryInsert } from "../types/database";
+import { LocationScopeError } from "../utils/supabase/locationScope";
 import { mapSupabaseError } from "../utils/supabase/errors";
 import { resolveCategorySlug } from "../utils/validation/menuCategories";
 
@@ -83,13 +84,17 @@ type CategoriesQuery = {
   };
   update(row: ReturnType<typeof formToUpdatePayload> | { status: ContentStatus }): {
     eq(column: string, value: string): {
-      select(columns: string): {
-        single(): Promise<{ data: MenuCategory | null; error: SupabaseError | null }>;
+      eq(column: string, value: string): {
+        select(columns: string): {
+          single(): Promise<{ data: MenuCategory | null; error: SupabaseError | null }>;
+        };
       };
     };
   };
   delete(): {
-    eq(column: string, value: string): Promise<{ error: SupabaseError | null }>;
+    eq(column: string, value: string): {
+      eq(column: string, value: string): Promise<{ error: SupabaseError | null }>;
+    };
   };
 };
 
@@ -104,7 +109,9 @@ type MenuItemsQuery = {
     columns: string,
     options: { count: "exact"; head: true },
   ): {
-    eq(column: string, value: string): Promise<{ count: number | null; error: SupabaseError | null }>;
+    eq(column: string, value: string): {
+      eq(column: string, value: string): Promise<{ count: number | null; error: SupabaseError | null }>;
+    };
   };
 };
 
@@ -256,15 +263,23 @@ export async function createMenuCategory(
   return data;
 }
 
-export async function updateMenuCategory(id: string, form: MenuCategoryForm): Promise<MenuCategory> {
+export async function updateMenuCategory(
+  id: string,
+  form: MenuCategoryForm,
+  locationId: LocationId,
+): Promise<MenuCategory> {
   const supabase = requireClient();
 
   const { data, error } = await categoriesTable(supabase)
     .update(formToUpdatePayload(form))
     .eq("id", id)
+    .eq("location_id", locationId)
     .select("*")
     .single();
 
+  if (error?.code === "PGRST116" || (!error && !data)) {
+    throw new LocationScopeError();
+  }
   if (error || !data) {
     throw new Error(mapSupabaseError(error ?? { message: "Update failed." }, "update category"));
   }
@@ -275,15 +290,20 @@ export async function updateMenuCategory(id: string, form: MenuCategoryForm): Pr
 export async function updateMenuCategoryStatus(
   id: string,
   status: ContentStatus,
+  locationId: LocationId,
 ): Promise<MenuCategory> {
   const supabase = requireClient();
 
   const { data, error } = await categoriesTable(supabase)
     .update({ status })
     .eq("id", id)
+    .eq("location_id", locationId)
     .select("*")
     .single();
 
+  if (error?.code === "PGRST116" || (!error && !data)) {
+    throw new LocationScopeError();
+  }
   if (error || !data) {
     throw new Error(mapSupabaseError(error ?? { message: "Update failed." }, "update category status"));
   }
@@ -291,12 +311,13 @@ export async function updateMenuCategoryStatus(
   return data;
 }
 
-export async function deleteMenuCategory(id: string): Promise<void> {
+export async function deleteMenuCategory(id: string, locationId: LocationId): Promise<void> {
   const supabase = requireClient();
 
   const { count, error: countError } = await menuItemsTable(supabase)
     .select("*", { count: "exact", head: true })
-    .eq("category_id", id);
+    .eq("category_id", id)
+    .eq("location_id", locationId);
 
   if (countError) {
     throw new Error(mapSupabaseError(countError, "delete category"));
@@ -306,7 +327,7 @@ export async function deleteMenuCategory(id: string): Promise<void> {
     throw new CategoryDeleteBlockedError();
   }
 
-  const { error } = await categoriesTable(supabase).delete().eq("id", id);
+  const { error } = await categoriesTable(supabase).delete().eq("id", id).eq("location_id", locationId);
   if (error) {
     throw new Error(mapSupabaseError(error, "delete category"));
   }

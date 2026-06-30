@@ -7,11 +7,13 @@ import { useHomepageData } from "../hooks/useHomepageData";
 import { formatOpeningHoursRows } from "../services/homepagePublic";
 import { useContactForm } from "../hooks/useContactForm";
 import { useLocationSelection } from "../context/LocationContext";
+import { isExternalUrl, resolveReservationUrl } from "../utils/locationLinks";
 
 export default function ContactPage() {
   const { bundle } = useHomepageData();
-  const { selectedLocation } = useLocationSelection();
+  const { selectedLocation, selectedLocationId } = useLocationSelection();
   const { settings } = bundle;
+  const reservationLink = resolveReservationUrl(settings, selectedLocationId);
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
   const {
     form,
@@ -226,9 +228,9 @@ export default function ContactPage() {
         <CTASection
           title="Ready to Experience Desi Dhamaka?"
           subtitle="Reserve Your Table Today"
-          buttonLabel={selectedLocation?.reservationLink?.startsWith("http") ? "Reserve Online" : "Reserve Now"}
-          buttonTo={selectedLocation?.reservationLink?.startsWith("http") ? undefined : "/reservation"}
-          buttonHref={selectedLocation?.reservationLink?.startsWith("http") ? selectedLocation.reservationLink : undefined}
+          buttonLabel={isExternalUrl(reservationLink) ? "Reserve Online" : "Reserve Now"}
+          buttonTo={isExternalUrl(reservationLink) ? undefined : "/reservation"}
+          buttonHref={isExternalUrl(reservationLink) ? reservationLink : undefined}
         />
       </section>
     </div>

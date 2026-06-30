@@ -16,6 +16,7 @@ import AdminToast from "../components/ui/Toast";
 import ImageUploadField from "../components/settings/ImageUploadField";
 import { useAdminTheme } from "../context/AdminThemeContext";
 import { useLocation } from "../hooks/useLocation";
+import { resolveMutationLocationId } from "../utils/resolveMutationLocation";
 import { fetchMenuCategories } from "../../services/menuCategories";
 import {
   availabilityLabel,
@@ -240,6 +241,10 @@ export default function MenuManagementPage() {
   };
 
   const openEditDrawer = (item: MenuItemTableRow) => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to edit menu items.", "error");
+      return;
+    }
     setEditItem(item);
     setForm(rowToForm(item));
     setFieldErrors({});
@@ -273,6 +278,10 @@ export default function MenuManagementPage() {
 
   const handleSave = async (mode: "add" | "edit") => {
     if (submitting) return;
+    if (isAllLocations) {
+      showToast("Select a single location in the header to save menu items.", "error");
+      return;
+    }
 
     const errors = validateMenuItemForm(form);
     setFieldErrors(errors);
@@ -284,7 +293,12 @@ export default function MenuManagementPage() {
     setSubmitting(true);
     try {
       if (mode === "edit" && editItem) {
-        await updateMenuItem(editItem.id, form);
+        const mutationLocationId = resolveMutationLocationId(scope, locationId, editItem.location_id);
+        if (!mutationLocationId) {
+          showToast("Select a single location in the header to edit menu items.", "error");
+          return;
+        }
+        await updateMenuItem(editItem.id, form, mutationLocationId);
         showToast("Menu item updated successfully.");
         setEditOpen(false);
         setEditItem(null);
@@ -303,6 +317,10 @@ export default function MenuManagementPage() {
   };
 
   const openDeleteModal = (item: MenuItemTableRow) => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to delete menu items.", "error");
+      return;
+    }
     setDeletingItem(item);
     setDeleteOpen(true);
   };
@@ -312,7 +330,16 @@ export default function MenuManagementPage() {
 
     setDeleting(true);
     try {
-      await deleteMenuItem(deletingItem.id);
+      const mutationLocationId = resolveMutationLocationId(
+        scope,
+        locationId,
+        deletingItem.location_id,
+      );
+      if (!mutationLocationId) {
+        showToast("Select a single location in the header to delete menu items.", "error");
+        return;
+      }
+      await deleteMenuItem(deletingItem.id, mutationLocationId);
       showToast("Menu item deleted successfully.");
       setDeleteOpen(false);
       setDeletingItem(null);
@@ -326,11 +353,16 @@ export default function MenuManagementPage() {
 
   const handleToggleAvailability = async (item: MenuItemTableRow) => {
     if (togglingId) return;
+    const mutationLocationId = resolveMutationLocationId(scope, locationId, item.location_id);
+    if (!mutationLocationId) {
+      showToast("Select a single location in the header to update menu items.", "error");
+      return;
+    }
 
     const nextStatus = toggleAvailabilityStatus(item.status);
     setTogglingId(item.id);
     try {
-      const updated = await updateMenuItemStatus(item.id, nextStatus);
+      const updated = await updateMenuItemStatus(item.id, nextStatus, mutationLocationId);
       setItems((prev) =>
         prev.map((row) =>
           row.id === item.id ? { ...row, status: updated.status } : row,

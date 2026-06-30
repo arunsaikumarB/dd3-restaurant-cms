@@ -1,6 +1,7 @@
 import { ORDER_DIRECT_URL } from "../constants/ordering";
 import { SITE } from "../constants/site";
 import { getSiteUrl } from "../config/env";
+import type { LocationId } from "../config/locations";
 import type { HomepageContent } from "../types/database";
 import { fetchHomepageContentPublic } from "./homepageContent";
 import {
@@ -32,6 +33,8 @@ export type PublicRestaurantSettings = {
   instagram: string;
   youtube: string;
   logo: string | null;
+  reservation_url: string;
+  order_url: string;
 };
 
 export type HomepageBundle = {
@@ -50,12 +53,12 @@ const ABOUT_DESCRIPTION_FALLBACK =
 
 const CACHE_TTL_MS = 60_000;
 
-let cachedBundle: HomepageBundle | null = null;
-let cacheExpiresAt = 0;
-let inflightRequest: Promise<HomepageBundle> | null = null;
+let cachedBundleByLocation: Partial<Record<LocationId, HomepageBundle>> = {};
+let cacheExpiresAtByLocation: Partial<Record<LocationId, number>> = {};
+const inflightByLocation: Partial<Record<LocationId, Promise<HomepageBundle>>> = {};
 
-export function getHomepageFallbacks(): HomepageBundle {
-  const defaults = buildDefaultRestaurantSettings("lawrenceville");
+export function getHomepageFallbacks(locationId: LocationId = "lawrenceville"): HomepageBundle {
+  const defaults = buildDefaultRestaurantSettings(locationId);
   const defaultHours = defaults.opening_hours as OpeningHoursForm;
 
   return {
@@ -65,7 +68,7 @@ export function getHomepageFallbacks(): HomepageBundle {
       hero_image: HERO_IMAGE_FALLBACK,
       hero_video: HERO_VIDEO_FALLBACK,
       cta_text: "Order Now",
-      cta_link: ORDER_DIRECT_URL,
+      cta_link: defaults.order_url || ORDER_DIRECT_URL,
       about_title: ABOUT_TITLE_FALLBACK,
       about_description: ABOUT_DESCRIPTION_FALLBACK,
     },
@@ -84,12 +87,17 @@ export function getHomepageFallbacks(): HomepageBundle {
       instagram: defaults.instagram ?? SITE.social.instagram,
       youtube: defaults.youtube ?? "",
       logo: defaults.logo,
+      reservation_url: defaults.reservation_url ?? "",
+      order_url: defaults.order_url ?? ORDER_DIRECT_URL,
     },
   };
 }
 
-function parseOpeningHours(value: RestaurantSettings["opening_hours"]): OpeningHoursForm {
-  const fallbacks = getHomepageFallbacks().settings.opening_hours;
+function parseOpeningHours(
+  value: RestaurantSettings["opening_hours"],
+  locationId: LocationId,
+): OpeningHoursForm {
+  const fallbacks = getHomepageFallbacks(locationId).settings.opening_hours;
 
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return fallbacks;
@@ -118,8 +126,11 @@ function mapHomepageContent(row: HomepageContent | null): PublicHomepageContent 
   };
 }
 
-function mapRestaurantSettings(row: RestaurantSettings | null): PublicRestaurantSettings {
-  const fallbacks = getHomepageFallbacks().settings;
+function mapRestaurantSettings(
+  row: RestaurantSettings | null,
+  locationId: LocationId,
+): PublicRestaurantSettings {
+  const fallbacks = getHomepageFallbacks(locationId).settings;
 
   return {
     restaurant_name: row?.restaurant_name?.trim() || fallbacks.restaurant_name,
@@ -127,11 +138,13 @@ function mapRestaurantSettings(row: RestaurantSettings | null): PublicRestaurant
     email: row?.email?.trim() || fallbacks.email,
     address: row?.address?.trim() || fallbacks.address,
     google_maps: row?.google_maps?.trim() || fallbacks.google_maps,
-    opening_hours: parseOpeningHours(row?.opening_hours ?? null),
+    opening_hours: parseOpeningHours(row?.opening_hours ?? null, locationId),
     facebook: row?.facebook?.trim() || fallbacks.facebook,
     instagram: row?.instagram?.trim() || fallbacks.instagram,
     youtube: row?.youtube?.trim() || fallbacks.youtube,
     logo: row?.logo?.trim() || fallbacks.logo,
+    reservation_url: row?.reservation_url?.trim() || fallbacks.reservation_url,
+    order_url: row?.order_url?.trim() || fallbacks.order_url,
   };
 }
 
@@ -344,40 +357,46 @@ export function buildRestaurantJsonLd(
   ];
 }
 
-export async function fetchHomepageBundle(): Promise<HomepageBundle> {
+export async function fetchHomepageBundle(
+  locationId: LocationId = "lawrenceville",
+): Promise<HomepageBundle> {
   const now = Date.now();
-  if (cachedBundle && now < cacheExpiresAt) {
-    return cachedBundle;
+  const cached = cachedBundleByLocation[locationId];
+  const cacheExpiresAt = cacheExpiresAtByLocation[locationId] ?? 0;
+  if (cached && now < cacheExpiresAt) {
+    return cached;
   }
 
-  if (inflightRequest) {
-    return inflightRequest;
+  const inflight = inflightByLocation[locationId];
+  if (inflight) {
+    return inflight;
   }
 
-  inflightRequest = (async () => {
+  const request = (async () => {
     try {
       const [homepageRow, settingsRow] = await Promise.all([
         fetchHomepageContentPublic(),
-        fetchRestaurantSettingsPublic("lawrenceville"),
+        fetchRestaurantSettingsPublic(locationId),
       ]);
 
       const bundle: HomepageBundle = {
         content: mapHomepageContent(homepageRow),
-        settings: mapRestaurantSettings(settingsRow),
+        settings: mapRestaurantSettings(settingsRow, locationId),
       };
 
-      cachedBundle = bundle;
-      cacheExpiresAt = Date.now() + CACHE_TTL_MS;
+      cachedBundleByLocation[locationId] = bundle;
+      cacheExpiresAtByLocation[locationId] = Date.now() + CACHE_TTL_MS;
       return bundle;
     } catch {
-      const fallback = getHomepageFallbacks();
-      cachedBundle = fallback;
-      cacheExpiresAt = Date.now() + CACHE_TTL_MS;
+      const fallback = getHomepageFallbacks(locationId);
+      cachedBundleByLocation[locationId] = fallback;
+      cacheExpiresAtByLocation[locationId] = Date.now() + CACHE_TTL_MS;
       return fallback;
     } finally {
-      inflightRequest = null;
+      delete inflightByLocation[locationId];
     }
   })();
 
-  return inflightRequest;
+  inflightByLocation[locationId] = request;
+  return request;
 }

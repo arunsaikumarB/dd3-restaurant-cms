@@ -116,7 +116,7 @@ export default function SettingsPage() {
 
     setSaving(true);
     try {
-      const updated = await updateRestaurantSettings(settingsId, form);
+      const updated = await updateRestaurantSettings(locationId, form);
       const nextForm = rowToForm(updated);
       setForm(nextForm);
       savedFormRef.current = nextForm;
@@ -259,6 +259,27 @@ export default function SettingsPage() {
             label="Sunday"
             value={form.opening_hours.sunday}
             onChange={(e) => patchHours("sunday", e.target.value)}
+          />
+        </div>
+      ),
+    },
+    {
+      title: "Order & Reservation Links",
+      fields: (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <AdminInput
+            label="Reservation URL"
+            value={form.reservation_url}
+            error={fieldErrors.reservation_url}
+            onChange={(e) => patchForm({ reservation_url: e.target.value })}
+            placeholder="/reservation or https://..."
+          />
+          <AdminInput
+            label="Order URL"
+            value={form.order_url}
+            error={fieldErrors.order_url}
+            onChange={(e) => patchForm({ order_url: e.target.value })}
+            placeholder="https://orders.chefgaa.com/..."
           />
         </div>
       ),

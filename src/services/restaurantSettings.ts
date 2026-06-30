@@ -2,6 +2,7 @@ import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
 import { getLocationConfig, type LocationId } from "../config/locations";
 import type { RestaurantSettings, RestaurantSettingsInsert } from "../types/database";
+import { LocationScopeError } from "../utils/supabase/locationScope";
 
 export type OpeningHoursForm = {
   weekday: string;
@@ -21,6 +22,8 @@ export type RestaurantSettingsForm = {
   youtube: string;
   logo: string | null;
   favicon: string | null;
+  reservation_url: string;
+  order_url: string;
 };
 
 export function buildDefaultRestaurantSettings(
@@ -44,6 +47,8 @@ export function buildDefaultRestaurantSettings(
     youtube: "",
     logo: null,
     favicon: null,
+    reservation_url: location.reservationLink,
+    order_url: location.orderDirectLink,
   };
 }
 
@@ -68,6 +73,8 @@ export function rowToForm(row: RestaurantSettings): RestaurantSettingsForm {
     youtube: row.youtube ?? "",
     logo: row.logo,
     favicon: row.favicon,
+    reservation_url: row.reservation_url ?? "",
+    order_url: row.order_url ?? "",
   };
 }
 
@@ -88,6 +95,8 @@ export function formToUpdatePayload(form: RestaurantSettingsForm) {
     youtube: form.youtube.trim() || null,
     logo: form.logo?.trim() || null,
     favicon: form.favicon?.trim() || null,
+    reservation_url: form.reservation_url.trim() || null,
+    order_url: form.order_url.trim() || null,
   };
 }
 
@@ -192,7 +201,7 @@ export async function fetchAllRestaurantSettings(): Promise<RestaurantSettings[]
 }
 
 export async function updateRestaurantSettings(
-  id: string,
+  locationId: LocationId,
   form: RestaurantSettingsForm,
 ): Promise<RestaurantSettings> {
   if (!isSupabaseConfigured()) {
@@ -208,10 +217,13 @@ export async function updateRestaurantSettings(
 
   const { data, error } = await table
     .update(formToUpdatePayload(form))
-    .eq("id", id)
+    .eq("location_id", locationId)
     .select("*")
     .single();
 
+  if (error?.code === "PGRST116" || (!error && !data)) {
+    throw new LocationScopeError();
+  }
   if (error || !data) {
     throw new Error(mapSupabaseError(error ?? { message: "Update failed." }));
   }

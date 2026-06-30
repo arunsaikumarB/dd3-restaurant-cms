@@ -18,6 +18,7 @@ import ImageUploadField from "../components/settings/ImageUploadField";
 import OffersPageSkeleton from "../components/settings/OffersPageSkeleton";
 import { useAdminTheme } from "../context/AdminThemeContext";
 import { useLocation } from "../hooks/useLocation";
+import { resolveMutationLocationId } from "../utils/resolveMutationLocation";
 import {
   createOffer,
   deleteOffer,
@@ -167,6 +168,10 @@ export default function OffersPage() {
   };
 
   const openEditModal = (offer: OfferCardRow) => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to edit offers.", "error");
+      return;
+    }
     setEditingId(offer.id);
     setForm(rowToForm(offer));
     setFieldErrors({});
@@ -194,6 +199,10 @@ export default function OffersPage() {
 
   const handleSave = async () => {
     if (submitting) return;
+    if (isAllLocations) {
+      showToast("Select a single location in the header to save offers.", "error");
+      return;
+    }
 
     const errors = validateOfferForm(form);
     setFieldErrors(errors);
@@ -205,7 +214,17 @@ export default function OffersPage() {
     setSubmitting(true);
     try {
       if (editingId) {
-        await updateOffer(editingId, form);
+        const editingOffer = offers.find((row) => row.id === editingId);
+        const mutationLocationId = resolveMutationLocationId(
+          scope,
+          locationId,
+          editingOffer?.location_id,
+        );
+        if (!mutationLocationId) {
+          showToast("Select a single location in the header to edit offers.", "error");
+          return;
+        }
+        await updateOffer(editingId, form, mutationLocationId);
         showToast("Offer updated successfully.");
       } else {
         await createOffer(form, locationId);
@@ -223,6 +242,10 @@ export default function OffersPage() {
   };
 
   const openDeleteModal = (offer: OfferCardRow) => {
+    if (isAllLocations) {
+      showToast("Select a single location in the header to delete offers.", "error");
+      return;
+    }
     setDeletingOffer(offer);
     setDeleteOpen(true);
   };
@@ -232,7 +255,16 @@ export default function OffersPage() {
 
     setDeleting(true);
     try {
-      await deleteOffer(deletingOffer.id);
+      const mutationLocationId = resolveMutationLocationId(
+        scope,
+        locationId,
+        deletingOffer.location_id,
+      );
+      if (!mutationLocationId) {
+        showToast("Select a single location in the header to delete offers.", "error");
+        return;
+      }
+      await deleteOffer(deletingOffer.id, mutationLocationId);
       showToast("Offer deleted successfully.");
       setDeleteOpen(false);
       setDeletingOffer(null);
@@ -246,11 +278,16 @@ export default function OffersPage() {
 
   const handleToggleActive = async (offer: OfferCardRow) => {
     if (togglingId) return;
+    const mutationLocationId = resolveMutationLocationId(scope, locationId, offer.location_id);
+    if (!mutationLocationId) {
+      showToast("Select a single location in the header to update offers.", "error");
+      return;
+    }
 
     const nextActive = !offer.active;
     setTogglingId(offer.id);
     try {
-      const updated = await updateOfferActive(offer.id, nextActive);
+      const updated = await updateOfferActive(offer.id, nextActive, mutationLocationId);
       setOffers((prev) =>
         prev.map((row) => (row.id === offer.id ? updated : row)),
       );

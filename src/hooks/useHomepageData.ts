@@ -5,11 +5,15 @@ import {
   type HomepageBundle,
 } from "../services/homepagePublic";
 import { useLocationSelection } from "../context/LocationContext";
+import type { LocationId } from "../config/locations";
 
 export function useHomepageData() {
-  const [bundle, setBundle] = useState<HomepageBundle>(() => getHomepageFallbacks());
+  const { selectedLocationId } = useLocationSelection();
+  const resolvedLocationId: LocationId = selectedLocationId ?? "lawrenceville";
+  const [bundle, setBundle] = useState<HomepageBundle>(() =>
+    getHomepageFallbacks(resolvedLocationId),
+  );
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { selectedLocation } = useLocationSelection();
 
   useEffect(() => {
     let cancelled = false;
@@ -17,7 +21,7 @@ export function useHomepageData() {
     const load = async () => {
       setIsRefreshing(true);
       try {
-        const data = await fetchHomepageBundle();
+        const data = await fetchHomepageBundle(resolvedLocationId);
         if (!cancelled) {
           setBundle(data);
         }
@@ -33,21 +37,7 @@ export function useHomepageData() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [resolvedLocationId]);
 
-  const locationAwareBundle: HomepageBundle = selectedLocation
-    ? {
-        ...bundle,
-        settings: {
-          ...bundle.settings,
-          phone: selectedLocation.phone,
-          email: selectedLocation.email,
-          address: selectedLocation.address,
-          google_maps: selectedLocation.googleMapsEmbed,
-          opening_hours: selectedLocation.openingHours,
-        },
-      }
-    : bundle;
-
-  return { bundle: locationAwareBundle, isRefreshing };
+  return { bundle, isRefreshing, locationId: resolvedLocationId };
 }

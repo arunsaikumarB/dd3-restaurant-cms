@@ -15,13 +15,15 @@ import { useHomepageData } from "../../hooks/useHomepageData";
 import { EASE_POWER3 } from "../showcase/motion";
 import LocationSwitcher from "../location/LocationSwitcher";
 import { useLocationSelection } from "../../context/LocationContext";
+import { isExternalUrl, resolveReservationUrl } from "../../utils/locationLinks";
 import "./navbar.css";
 
 type NavLinkItem = { label: string; path: string };
 
 export default function Navbar() {
   const { bundle } = useHomepageData();
-  const { navigateWithLocationGuard, selectedLocation } = useLocationSelection();
+  const { navigateWithLocationGuard, selectedLocationId } = useLocationSelection();
+  const reservationLink = resolveReservationUrl(bundle.settings, selectedLocationId);
   const logoAlt = `${bundle.settings.restaurant_name} home`;
   const logoSrc = bundle.settings.logo?.trim() || logoSrcForBackground("dark");
   const { pathname } = useLocation();
@@ -90,9 +92,9 @@ export default function Navbar() {
     path === "/" ? pathname === "/" : pathname.startsWith(path);
 
   const handleMaybeGuardedNav = (event: MouseEvent<HTMLElement>, path: string) => {
-    if (path === RESERVE_URL && selectedLocation?.reservationLink?.startsWith("http")) {
+    if (path === RESERVE_URL && isExternalUrl(reservationLink)) {
       event.preventDefault();
-      window.open(selectedLocation.reservationLink, "_blank", "noopener,noreferrer");
+      window.open(reservationLink, "_blank", "noopener,noreferrer");
       return;
     }
     if (path === "/menu" || path === ORDER_URL || path === RESERVE_URL) {

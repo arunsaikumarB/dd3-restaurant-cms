@@ -8,8 +8,64 @@ import { getStaticMenuForLocation } from "../data/menu";
 const CACHE_TTL_MS = 60_000;
 
 let cachedByLocation: Partial<Record<LocationId, MenuData>> = {};
-let cacheExpiresAt = 0;
-let inflightRequest: Promise<MenuData> | null = null;
+let cacheExpiresAtByLocation: Partial<Record<LocationId, number>> = {};
+const inflightByLocation: Partial<Record<LocationId, Promise<MenuData>>> = {};
+
+async function resolveMenuData(locationId: LocationId): Promise<MenuData> {
+  const supabaseData = await fetchSupabaseMenuData(locationId);
+  if (supabaseData && supabaseData.categories.length > 0) {
+    return applyLocationToMenu(supabaseData, locationId);
+  }
+
+  const staticMenu = getStaticMenuForLocation(locationId);
+  if (staticMenu) {
+    return staticMenu;
+  }
+
+  const fallback = await fetchFallbackMenuData();
+  return applyLocationToMenu(fallback, locationId);
+}
+
+export async function fetchPublicMenuData(locationId: LocationId): Promise<MenuData> {
+  const now = Date.now();
+  const cachedLocation = cachedByLocation[locationId];
+  const cacheExpiresAt = cacheExpiresAtByLocation[locationId] ?? 0;
+  if (cachedLocation && now < cacheExpiresAt) {
+    return cachedLocation;
+  }
+
+  const inflight = inflightByLocation[locationId];
+  if (inflight) {
+    return inflight;
+  }
+
+  const request = (async () => {
+    try {
+      const menu = await resolveMenuData(locationId);
+      cachedByLocation[locationId] = menu;
+      cacheExpiresAtByLocation[locationId] = Date.now() + CACHE_TTL_MS;
+      return menu;
+    } catch {
+      const staticMenu = getStaticMenuForLocation(locationId);
+      if (staticMenu) {
+        cachedByLocation[locationId] = staticMenu;
+        cacheExpiresAtByLocation[locationId] = Date.now() + CACHE_TTL_MS;
+        return staticMenu;
+      }
+
+      const fallback = await fetchFallbackMenuData();
+      const menu = applyLocationToMenu(fallback, locationId);
+      cachedByLocation[locationId] = menu;
+      cacheExpiresAtByLocation[locationId] = Date.now() + CACHE_TTL_MS;
+      return menu;
+    } finally {
+      delete inflightByLocation[locationId];
+    }
+  })();
+
+  inflightByLocation[locationId] = request;
+  return request;
+}
 let inflightFallback: Promise<MenuData> | null = null;
 
 function mapMenuItem(row: MenuItemTableRow, category: DbMenuCategory): MenuItem {
@@ -115,56 +171,6 @@ async function fetchSupabaseMenuData(locationId: LocationId): Promise<MenuData |
   return buildMenuData(categories, items);
 }
 
-export async function fetchPublicMenuData(locationId: LocationId): Promise<MenuData> {
-  const now = Date.now();
-  const cachedLocation = cachedByLocation[locationId];
-  if (cachedLocation && now < cacheExpiresAt) {
-    return cachedLocation;
-  }
-
-  if (inflightRequest) {
-    return inflightRequest;
-  }
-
-  inflightRequest = (async () => {
-    try {
-      const staticMenu = getStaticMenuForLocation(locationId);
-      if (staticMenu) {
-        cachedByLocation = {};
-        cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-        cachedByLocation[locationId] = staticMenu;
-        return staticMenu;
-      }
-
-      const supabaseData = await fetchSupabaseMenuData(locationId);
-      if (supabaseData && supabaseData.categories.length > 0) {
-        cachedByLocation = {};
-        cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-        const locationMenu = applyLocationToMenu(supabaseData, locationId);
-        cachedByLocation[locationId] = locationMenu;
-        return locationMenu;
-      }
-
-      const fallback = await fetchFallbackMenuData();
-      cachedByLocation = {};
-      cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-      const locationMenu = applyLocationToMenu(fallback, locationId);
-      cachedByLocation[locationId] = locationMenu;
-      return locationMenu;
-    } catch {
-      const fallback = await fetchFallbackMenuData();
-      cachedByLocation = {};
-      cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-      const locationMenu = applyLocationToMenu(fallback, locationId);
-      cachedByLocation[locationId] = locationMenu;
-      return locationMenu;
-    } finally {
-      inflightRequest = null;
-    }
-  })();
-
-  return inflightRequest;
-}
 
 export type PublicMenuDataResult = {
   data: MenuData | null;
