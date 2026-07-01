@@ -11,8 +11,10 @@ export type HomepageContentForm = {
   hero_subtitle: string;
   hero_image: string | null;
   hero_video: string | null;
-  cta_text: string;
-  cta_link: string;
+  primary_cta_label: string;
+  primary_cta_url: string;
+  secondary_cta_label: string;
+  secondary_cta_url: string;
   about_title: string;
   about_description: string;
 };
@@ -35,8 +37,10 @@ export function buildDefaultHomepageContent(
     ),
     hero_image: "/hero/hero-poster.jpg",
     hero_video: "/hero/videoplayback.mp4",
-    cta_text: fieldValue("hero", "cta1", "Order Now"),
-    cta_link: getOrderUrl(locationId),
+    primary_cta_label: "Order Now",
+    primary_cta_url: getOrderUrl(locationId),
+    secondary_cta_label: "View Menu",
+    secondary_cta_url: "/menu",
     about_title: fieldValue("featured", "heading", "Signature Special Dishes"),
     about_description: fieldValue(
       "featured",
@@ -52,8 +56,10 @@ export function rowToForm(row: HomepageContent): HomepageContentForm {
     hero_subtitle: row.hero_subtitle ?? "",
     hero_image: row.hero_image,
     hero_video: row.hero_video,
-    cta_text: row.cta_text ?? "",
-    cta_link: row.cta_link ?? "",
+    primary_cta_label: row.primary_cta_label ?? "",
+    primary_cta_url: row.primary_cta_url ?? "",
+    secondary_cta_label: row.secondary_cta_label ?? "",
+    secondary_cta_url: row.secondary_cta_url ?? "",
     about_title: row.about_title ?? "",
     about_description: row.about_description ?? "",
   };
@@ -65,8 +71,10 @@ export function formToUpdatePayload(form: HomepageContentForm) {
     hero_subtitle: form.hero_subtitle.trim() || null,
     hero_image: form.hero_image?.trim() || null,
     hero_video: form.hero_video?.trim() || null,
-    cta_text: form.cta_text.trim(),
-    cta_link: form.cta_link.trim(),
+    primary_cta_label: form.primary_cta_label.trim(),
+    primary_cta_url: form.primary_cta_url.trim(),
+    secondary_cta_label: form.secondary_cta_label.trim(),
+    secondary_cta_url: form.secondary_cta_url.trim(),
     about_title: form.about_title.trim(),
     about_description: form.about_description.trim() || null,
   };
@@ -232,8 +240,6 @@ export function buildSectionsFromForm(form: HomepageContentForm): HomepageSectio
     fields: heroTemplate.fields.map((field) => {
       if (field.key === "title") return { ...field, value: form.hero_title };
       if (field.key === "subtitle") return { ...field, value: form.hero_subtitle };
-      if (field.key === "cta1") return { ...field, value: form.cta_text };
-      if (field.key === "cta2") return { ...field, value: form.cta_link };
       return { ...field };
     }),
   };
@@ -259,8 +265,6 @@ export function patchFormFromField(
   if (sectionId === "hero") {
     if (key === "title") return { ...form, hero_title: value };
     if (key === "subtitle") return { ...form, hero_subtitle: value };
-    if (key === "cta1") return { ...form, cta_text: value };
-    if (key === "cta2") return { ...form, cta_link: value };
   }
 
   if (sectionId === "featured") {

@@ -7,8 +7,6 @@ import { useHomepageData } from "../hooks/useHomepageData";
 import { usePageContent } from "../context/PageContentContext";
 import { useGallerySection } from "../hooks/useGallerySection";
 import { formatWeekdayHoursLabel } from "../services/homepagePublic";
-import { useLocationSelection } from "../context/LocationContext";
-import { resolveOrderUrl } from "../utils/locationLinks";
 import "../App.css";
 
 const EntranceImageSequence = lazy(
@@ -29,12 +27,10 @@ const ExperienceSection = lazy(
 );
 
 export default function HomePage() {
-  const { bundle, locationId: bundleLocationId } = useHomepageData();
+  const { bundle } = useHomepageData();
   const { fetchSection } = usePageContent();
-  const { selectedLocationId } = useLocationSelection();
   const { content, settings } = bundle;
   const heroUi = fetchSection("home", "hero_ui", { scrollHint: "Scroll" });
-  const orderCtaLink = resolveOrderUrl(settings, selectedLocationId, bundleLocationId);
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
 
   const heroPosterFallback = useMemo<PublicGalleryItem[]>(
@@ -67,6 +63,8 @@ export default function HomePage() {
         logoSrc={settings.logo}
         logoAlt={logoAlt}
         scrollHint={heroUi.scrollHint}
+        primaryCta={content.primary_cta}
+        secondaryCta={content.secondary_cta}
       />
 
       <LazyMount
@@ -111,8 +109,8 @@ export default function HomePage() {
             instagram={settings.instagram}
             youtube={settings.youtube}
             mapsUrl={settings.google_maps}
-            orderCtaText={content.cta_text}
-            orderCtaLink={orderCtaLink}
+            orderCtaText={content.primary_cta.label}
+            orderCtaLink={content.primary_cta.url}
           />
         </Suspense>
       </LazyMount>

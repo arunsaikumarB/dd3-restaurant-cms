@@ -11,13 +11,18 @@ import {
 } from "./restaurantSettings";
 import type { RestaurantSettings } from "../types/database";
 
+export type PublicHomepageCta = {
+  label: string;
+  url: string;
+};
+
 export type PublicHomepageContent = {
   hero_title: string;
   hero_subtitle: string;
   hero_image: string;
   hero_video: string;
-  cta_text: string;
-  cta_link: string;
+  primary_cta: PublicHomepageCta;
+  secondary_cta: PublicHomepageCta;
   about_title: string;
   about_description: string;
 };
@@ -70,8 +75,8 @@ export function getHomepageFallbacks(locationId: LocationId = "south-plainfield"
       hero_subtitle: HERO_SUBTITLE_FALLBACK,
       hero_image: HERO_IMAGE_FALLBACK,
       hero_video: HERO_VIDEO_FALLBACK,
-      cta_text: "Order Now",
-      cta_link: defaults.order_url || getOrderUrl(locationId),
+      primary_cta: { label: "Order Now", url: defaults.order_url || getOrderUrl(locationId) },
+      secondary_cta: { label: "View Menu", url: "/menu" },
       about_title: ABOUT_TITLE_FALLBACK,
       about_description: ABOUT_DESCRIPTION_FALLBACK,
     },
@@ -117,16 +122,31 @@ function parseOpeningHours(
   };
 }
 
-function mapHomepageContent(row: HomepageContent | null): PublicHomepageContent {
-  const fallbacks = getHomepageFallbacks().content;
+function mapCta(
+  label: string | null | undefined,
+  url: string | null | undefined,
+  fallback: PublicHomepageCta,
+): PublicHomepageCta {
+  return {
+    label: label?.trim() || fallback.label,
+    url: url?.trim() || fallback.url,
+  };
+}
+
+function mapHomepageContent(row: HomepageContent | null, locationId: LocationId): PublicHomepageContent {
+  const fallbacks = getHomepageFallbacks(locationId).content;
 
   return {
     hero_title: row?.hero_title?.trim() || fallbacks.hero_title,
     hero_subtitle: row?.hero_subtitle?.trim() || fallbacks.hero_subtitle,
     hero_image: row?.hero_image?.trim() || fallbacks.hero_image,
     hero_video: row?.hero_video?.trim() || fallbacks.hero_video,
-    cta_text: row?.cta_text?.trim() || fallbacks.cta_text,
-    cta_link: row?.cta_link?.trim() || fallbacks.cta_link,
+    primary_cta: mapCta(row?.primary_cta_label, row?.primary_cta_url, fallbacks.primary_cta),
+    secondary_cta: mapCta(
+      row?.secondary_cta_label,
+      row?.secondary_cta_url,
+      fallbacks.secondary_cta,
+    ),
     about_title: row?.about_title?.trim() || fallbacks.about_title,
     about_description: row?.about_description?.trim() || fallbacks.about_description,
   };
@@ -389,7 +409,7 @@ export async function fetchHomepageBundle(
       ]);
 
       const bundle: HomepageBundle = {
-        content: mapHomepageContent(homepageRow),
+        content: mapHomepageContent(homepageRow, locationId),
         settings: mapRestaurantSettings(settingsRow, locationId),
       };
 

@@ -49,10 +49,69 @@ function fieldError(
   errors: HomepageContentErrors,
 ): string | undefined {
   if (sectionId === "hero" && key === "title") return errors.hero_title;
-  if (sectionId === "hero" && key === "cta1") return errors.cta_text;
-  if (sectionId === "hero" && key === "cta2") return errors.cta_link;
+  if (sectionId === "hero" && key === "primary_cta_label") return errors.primary_cta_label;
+  if (sectionId === "hero" && key === "primary_cta_url") return errors.primary_cta_url;
+  if (sectionId === "hero" && key === "secondary_cta_label") return errors.secondary_cta_label;
+  if (sectionId === "hero" && key === "secondary_cta_url") return errors.secondary_cta_url;
   if (sectionId === "featured" && key === "heading") return errors.about_title;
   return undefined;
+}
+
+function renderHeroCtaFields(
+  form: HomepageContentForm,
+  disabled: boolean,
+  dark: boolean,
+  errors: HomepageContentErrors,
+  onChange: (patch: Partial<HomepageContentForm>) => void,
+) {
+  const borderClass = dark ? "border-white/10" : "border-admin-border/60";
+
+  return (
+    <>
+      <div className={`rounded-xl border ${borderClass} p-4`}>
+        <p className={`mb-3 text-sm font-medium ${dark ? "text-white/80" : "text-admin-text"}`}>
+          Primary CTA
+        </p>
+        <div className="space-y-3">
+          <AdminInput
+            label="Label"
+            value={form.primary_cta_label}
+            disabled={disabled}
+            error={fieldError("hero", "primary_cta_label", errors)}
+            onChange={(event) => onChange({ primary_cta_label: event.target.value })}
+          />
+          <AdminInput
+            label="URL"
+            value={form.primary_cta_url}
+            disabled={disabled}
+            error={fieldError("hero", "primary_cta_url", errors)}
+            onChange={(event) => onChange({ primary_cta_url: event.target.value })}
+          />
+        </div>
+      </div>
+      <div className={`rounded-xl border ${borderClass} p-4`}>
+        <p className={`mb-3 text-sm font-medium ${dark ? "text-white/80" : "text-admin-text"}`}>
+          Secondary CTA
+        </p>
+        <div className="space-y-3">
+          <AdminInput
+            label="Label"
+            value={form.secondary_cta_label}
+            disabled={disabled}
+            error={fieldError("hero", "secondary_cta_label", errors)}
+            onChange={(event) => onChange({ secondary_cta_label: event.target.value })}
+          />
+          <AdminInput
+            label="URL"
+            value={form.secondary_cta_url}
+            disabled={disabled}
+            error={fieldError("hero", "secondary_cta_url", errors)}
+            onChange={(event) => onChange({ secondary_cta_url: event.target.value })}
+          />
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default function HomepageManagementPage() {
@@ -336,6 +395,11 @@ export default function HomepageManagementPage() {
                       />
                     ),
                   )}
+                  {activeLegacy.id === "hero" && form
+                    ? renderHeroCtaFields(form, saving, dark, fieldErrors, (patch) =>
+                        setForm((prev) => (prev ? { ...prev, ...patch } : prev)),
+                      )
+                    : null}
                   {activeLegacy.id === "hero" && (
                     <div className="grid gap-6 sm:grid-cols-2">
                       <MediaUploadField

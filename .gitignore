@@ -9,3 +9,6 @@ dist
 # Generated frame sequence (regenerate with `npm run extract`)
 public/frames
 .vercel
+
+# Local Netlify folder
+.netlify

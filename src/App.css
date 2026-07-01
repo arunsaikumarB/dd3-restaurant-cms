@@ -96,6 +96,14 @@
   color: var(--muted);
 }
 
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
 .scroll-hint {
   position: absolute;
   bottom: 40px;
@@ -276,6 +284,16 @@
 .btn:hover {
   transform: translateY(-2px);
   opacity: 0.9;
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.btn--outline:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .footer {

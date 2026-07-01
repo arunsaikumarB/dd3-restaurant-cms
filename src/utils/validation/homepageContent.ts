@@ -18,6 +18,26 @@ function isValidCtaLink(value: string): boolean {
   }
 }
 
+function validateCtaPair(
+  label: string,
+  url: string,
+  labelKey: keyof HomepageContentForm,
+  urlKey: keyof HomepageContentForm,
+  labelFallback: string,
+  errors: HomepageContentErrors,
+) {
+  if (!label.trim()) {
+    errors[labelKey] = `${labelFallback} label is required.`;
+  }
+
+  const trimmedUrl = url.trim();
+  if (!trimmedUrl) {
+    errors[urlKey] = `${labelFallback} URL is required.`;
+  } else if (!isValidCtaLink(trimmedUrl)) {
+    errors[urlKey] = "Enter a valid URL (https://...) or internal route (/path).";
+  }
+}
+
 export function validateHomepageContent(form: HomepageContentForm): HomepageContentErrors {
   const errors: HomepageContentErrors = {};
 
@@ -25,16 +45,23 @@ export function validateHomepageContent(form: HomepageContentForm): HomepageCont
     errors.hero_title = "Hero title is required.";
   }
 
-  if (!form.cta_text.trim()) {
-    errors.cta_text = "CTA text is required.";
-  }
+  validateCtaPair(
+    form.primary_cta_label,
+    form.primary_cta_url,
+    "primary_cta_label",
+    "primary_cta_url",
+    "Primary CTA",
+    errors,
+  );
 
-  const ctaLink = form.cta_link.trim();
-  if (!ctaLink) {
-    errors.cta_link = "CTA link is required.";
-  } else if (!isValidCtaLink(ctaLink)) {
-    errors.cta_link = "Enter a valid URL (https://...) or internal route (/path).";
-  }
+  validateCtaPair(
+    form.secondary_cta_label,
+    form.secondary_cta_url,
+    "secondary_cta_label",
+    "secondary_cta_url",
+    "Secondary CTA",
+    errors,
+  );
 
   if (!form.about_title.trim()) {
     errors.about_title = "About title is required.";

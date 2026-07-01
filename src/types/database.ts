@@ -55,8 +55,10 @@ export interface HomepageContent extends Timestamps {
   hero_subtitle: string | null;
   hero_image: string | null;
   hero_video: string | null;
-  cta_text: string | null;
-  cta_link: string | null;
+  primary_cta_label: string | null;
+  primary_cta_url: string | null;
+  secondary_cta_label: string | null;
+  secondary_cta_url: string | null;
   about_title: string | null;
   about_description: string | null;
 }

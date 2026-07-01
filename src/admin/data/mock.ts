@@ -113,8 +113,6 @@ export const HOMEPAGE_SECTIONS: HomepageSection[] = [
     fields: [
       { key: "title", label: "Hero Title", value: "Authentic Indian Cuisine", type: "text" },
       { key: "subtitle", label: "Hero Subtitle", value: "Experience the rich flavors of India in Lawrenceville, NJ", type: "textarea" },
-      { key: "cta1", label: "Primary CTA", value: "Order Now", type: "text" },
-      { key: "cta2", label: "Secondary CTA", value: "Reserve a Table", type: "text" },
     ],
   },
   {

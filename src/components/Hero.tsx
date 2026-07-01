@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   motion,
   useScroll,
@@ -13,6 +14,13 @@ const HERO_POSTER = "/hero/hero-poster.jpg";
 const DEFAULT_TITLE = "Step inside\nthe experience";
 const DEFAULT_SUBTITLE =
   "Scroll to walk through our doors — from the entrance to the heart of the reception, frame by cinematic frame.";
+const DEFAULT_PRIMARY_CTA = { label: "Order Now", url: "/order" };
+const DEFAULT_SECONDARY_CTA = { label: "View Menu", url: "/menu" };
+
+export type HeroCta = {
+  label: string;
+  url: string;
+};
 
 export interface HeroProps {
   title?: string;
@@ -22,6 +30,42 @@ export interface HeroProps {
   logoSrc?: string | null;
   logoAlt?: string;
   scrollHint?: string;
+  primaryCta?: HeroCta;
+  secondaryCta?: HeroCta;
+}
+
+function isExternalUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url.trim());
+}
+
+function HeroCtaButton({
+  cta,
+  variant = "solid",
+}: {
+  cta: HeroCta;
+  variant?: "solid" | "outline";
+}) {
+  const className = variant === "outline" ? "btn btn--outline" : "btn";
+  const label = cta.label.trim() || (variant === "outline" ? "View Menu" : "Order Now");
+  const href = cta.url.trim();
+
+  if (!href) {
+    return null;
+  }
+
+  if (isExternalUrl(href)) {
+    return (
+      <a className={className} href={href} target="_blank" rel="noopener noreferrer">
+        {label}
+      </a>
+    );
+  }
+
+  return (
+    <Link className={className} to={href}>
+      {label}
+    </Link>
+  );
 }
 
 function splitTitleLines(title: string): string[] {
@@ -72,6 +116,15 @@ const subVariants: Variants = {
   },
 };
 
+const ctaVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.9, ease: EASE_POWER3, delay: 0.75 },
+  },
+};
+
 const scrollHintVariants: Variants = {
   hidden: { opacity: 0, y: 12 },
   visible: {
@@ -96,6 +149,8 @@ export default function Hero({
   logoSrc = null,
   logoAlt,
   scrollHint = "Scroll",
+  primaryCta = DEFAULT_PRIMARY_CTA,
+  secondaryCta = DEFAULT_SECONDARY_CTA,
 }: HeroProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -218,6 +273,16 @@ export default function Hero({
           >
             {subtitle}
           </motion.p>
+
+          <motion.div
+            className="hero__actions"
+            variants={ctaVariants}
+            initial="hidden"
+            animate={ready ? "visible" : "hidden"}
+          >
+            <HeroCtaButton cta={primaryCta} />
+            <HeroCtaButton cta={secondaryCta} variant="outline" />
+          </motion.div>
         </div>
 
         <motion.div
