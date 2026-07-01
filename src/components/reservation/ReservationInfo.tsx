@@ -1,9 +1,25 @@
 import { motion } from "framer-motion";
 import { RESERVATION_STATS } from "../../data/reservationPage";
+import { usePageContent } from "../../context/PageContentContext";
 import { EASE_POWER3, viewportOnce } from "../showcase/motion";
 import InteriorSlideshow from "./InteriorSlideshow";
 
 export default function ReservationInfo() {
+  const { fetchSection } = usePageContent();
+  const statsContent = fetchSection("reservation", "stats", {
+    items: RESERVATION_STATS.map(({ label, value }) => ({ label, value })),
+  });
+
+  const stats = statsContent.items.map((item, index) => {
+    const fallback = RESERVATION_STATS[index];
+    return {
+      id: fallback?.id ?? `stat-${index}`,
+      label: item.label,
+      value: item.value,
+      accent: fallback && "accent" in fallback ? fallback.accent : undefined,
+    };
+  });
+
   return (
     <motion.div
       className="reservation-info"
@@ -16,7 +32,7 @@ export default function ReservationInfo() {
       <div className="reservation-info__gradient" aria-hidden />
 
       <div className="reservation-info__cards">
-        {RESERVATION_STATS.map((stat, index) => (
+        {stats.map((stat, index) => (
           <motion.div
             key={stat.id}
             className="reservation-info__card"
@@ -32,9 +48,7 @@ export default function ReservationInfo() {
             <p
               className={
                 "reservation-info__card-value" +
-                ("accent" in stat && stat.accent
-                  ? " reservation-info__card-value--accent"
-                  : "")
+                (stat.accent ? " reservation-info__card-value--accent" : "")
               }
             >
               {stat.value}

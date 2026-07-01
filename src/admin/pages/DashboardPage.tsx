@@ -8,8 +8,6 @@ import {
   Star,
   Settings,
   RefreshCw,
-  CheckCircle2,
-  AlertTriangle,
   ChevronDown,
 } from "lucide-react";
 import AdminBreadcrumbs from "../components/shared/Breadcrumbs";
@@ -48,13 +46,6 @@ const healthEmoji: Record<ChefGaaSyncHealthStatus, string> = {
   failed: "🔴",
   never_synced: "⚪",
 };
-
-const quickActions = [
-  { label: "New Offer", path: "/admin/offers", icon: Tag },
-  { label: "Upload Image", path: "/admin/gallery", icon: Image },
-  { label: "ChefGaa Integration", path: "/admin/integrations/chefgaa", icon: PlugZap },
-  { label: "Restaurant Settings", path: "/admin/settings", icon: Settings },
-];
 
 const CONTENT_STAT_ORDER = ["offers", "gallery", "reviews"] as const;
 const OPERATIONS_STAT_ORDER = [
@@ -134,6 +125,7 @@ export default function AdminDashboardPage() {
   const { dark } = useAdminTheme();
   const { scope, currentLocation } = useLocation();
   const [stats, setStats] = useState<AdminStat[]>([]);
+  const [insightStats, setInsightStats] = useState<AdminStat[]>([]);
   const [locationLabel, setLocationLabel] = useState("");
   const [chefGaa, setChefGaa] = useState<ChefGaaDashboardSummary | null>(null);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
@@ -165,6 +157,7 @@ export default function AdminDashboardPage() {
     try {
       const result = await fetchDashboardStats(scope);
       setStats(result.stats);
+      setInsightStats(result.insightStats);
       setLocationLabel(result.locationLabel);
       setChefGaa(result.chefGaa);
       setRecentActivity(result.recentActivity);
@@ -209,6 +202,13 @@ export default function AdminDashboardPage() {
           gridClassName="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
         />
       </div>
+
+      <section className="mt-8" aria-label="Website insights">
+        <h2 className="text-sm font-semibold">Website Insights</h2>
+        <div className="mt-4">
+          <StatGrid stats={insightStats} gridClassName="grid gap-4 sm:grid-cols-2 xl:grid-cols-5" />
+        </div>
+      </section>
 
       <section className="mt-8" aria-label="Operations and system status">
         <button
@@ -318,77 +318,50 @@ export default function AdminDashboardPage() {
                 </div>
               </AdminCard>
             ) : null}
+
+            <AdminCard>
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold">Recent Activity</h3>
+                <span className={`text-xs ${dark ? "text-white/40" : "text-admin-muted"}`}>
+                  ChefGaa sync runs
+                </span>
+              </div>
+              {recentActivity.length === 0 ? (
+                <p className={`py-8 text-center text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>
+                  No sync activity yet. Run a ChefGaa sync to populate this feed.
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {recentActivity.map((item) => {
+                    const Icon = activityIcons[item.type] ?? Tag;
+                    return (
+                      <li
+                        key={item.id}
+                        className={`flex items-center gap-3 rounded-xl p-3 ${dark ? "hover:bg-white/5" : "hover:bg-admin-ivory/50"}`}
+                      >
+                        <div
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${dark ? "bg-white/10 text-admin-gold" : "bg-admin-primary/10 text-admin-primary"}`}
+                        >
+                          <Icon size={16} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium">{item.action}</p>
+                          <p className={`truncate text-xs ${dark ? "text-white/40" : "text-admin-muted"}`}>
+                            {item.target}
+                          </p>
+                        </div>
+                        <span className={`shrink-0 text-xs ${dark ? "text-white/30" : "text-admin-muted/70"}`}>
+                          {item.time}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </AdminCard>
           </div>
         ) : null}
       </section>
-
-      <div className="mt-8 grid gap-6 lg:grid-cols-3">
-        <AdminCard className="lg:col-span-2">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <h3 className="text-sm font-semibold">Recent Activity</h3>
-            <span className={`text-xs ${dark ? "text-white/40" : "text-admin-muted"}`}>
-              ChefGaa sync runs
-            </span>
-          </div>
-          {recentActivity.length === 0 ? (
-            <p className={`py-8 text-center text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>
-              No sync activity yet. Run a ChefGaa sync to populate this feed.
-            </p>
-          ) : (
-            <ul className="space-y-3">
-              {recentActivity.map((item) => {
-                const Icon = activityIcons[item.type] ?? Tag;
-                return (
-                  <li
-                    key={item.id}
-                    className={`flex items-center gap-3 rounded-xl p-3 ${dark ? "hover:bg-white/5" : "hover:bg-admin-ivory/50"}`}
-                  >
-                    <div
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${dark ? "bg-white/10 text-admin-gold" : "bg-admin-primary/10 text-admin-primary"}`}
-                    >
-                      <Icon size={16} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium">{item.action}</p>
-                      <p className={`truncate text-xs ${dark ? "text-white/40" : "text-admin-muted"}`}>
-                        {item.target}
-                      </p>
-                    </div>
-                    <span className={`shrink-0 text-xs ${dark ? "text-white/30" : "text-admin-muted/70"}`}>
-                      {item.time}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </AdminCard>
-
-        <AdminCard>
-          <h3 className="mb-4 text-sm font-semibold">Quick Actions</h3>
-          <div className="space-y-2">
-            {quickActions.map((action) => (
-              <Link key={action.path} to={action.path}>
-                <AdminButton variant="outline" className="w-full justify-start">
-                  <action.icon size={16} />
-                  {action.label}
-                </AdminButton>
-              </Link>
-            ))}
-          </div>
-          <div className={`mt-6 rounded-xl p-4 ${dark ? "bg-admin-primary/10" : "bg-admin-ivory"}`}>
-            <p className="text-xs font-medium text-admin-primary">Sync monitoring</p>
-            <p className={`mt-1 flex items-start gap-2 text-xs ${dark ? "text-white/50" : "text-admin-muted"}`}>
-              {chefGaa?.failedLocations ? (
-                <AlertTriangle size={14} className="mt-0.5 shrink-0 text-admin-warning" />
-              ) : (
-                <CheckCircle2 size={14} className="mt-0.5 shrink-0 text-admin-success" />
-              )}
-              Dashboard metrics refresh automatically every 60 seconds. Use Refresh to reload without syncing.
-            </p>
-          </div>
-        </AdminCard>
-      </div>
     </div>
   );
 }

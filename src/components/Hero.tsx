@@ -21,6 +21,7 @@ export interface HeroProps {
   posterSrc?: string;
   logoSrc?: string | null;
   logoAlt?: string;
+  scrollHint?: string;
 }
 
 function splitTitleLines(title: string): string[] {
@@ -94,6 +95,7 @@ export default function Hero({
   posterSrc = HERO_POSTER,
   logoSrc = null,
   logoAlt,
+  scrollHint = "Scroll",
 }: HeroProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -226,7 +228,7 @@ export default function Hero({
           aria-label="Scroll down to explore"
         >
           <span className="scroll-hint__mouse" aria-hidden />
-          Scroll
+          {scrollHint}
         </motion.div>
       </motion.div>
     </section>

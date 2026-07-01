@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { usePageContent } from "../../context/PageContentContext";
 import { useHomepageData } from "../../hooks/useHomepageData";
 import { buildReservationContactCards } from "../../services/homepagePublic";
 import SectionHeading from "../ui/SectionHeading";
@@ -43,17 +44,40 @@ const contactIcons = {
   ),
 };
 
+const CONTACT_TITLE_KEYS = {
+  phone: "phoneTitle",
+  email: "emailTitle",
+  visit: "visitTitle",
+  hours: "hoursTitle",
+} as const;
+
 export default function ContactCards() {
+  const { fetchSection } = usePageContent();
   const { bundle } = useHomepageData();
-  const contactItems = buildReservationContactCards(bundle.settings);
+  const section = fetchSection("reservation", "contact_section", {
+    eyebrow: "Restaurant Information",
+    title: "We're Here for You",
+    subtitle: "Reach out directly or visit us — our team is ready to welcome you.",
+    phoneTitle: "Call Us",
+    emailTitle: "Email",
+    visitTitle: "Visit Us",
+    hoursTitle: "Business Hours",
+  });
+  const contactItems = buildReservationContactCards(bundle.settings).map((item) => {
+    const titleKey = CONTACT_TITLE_KEYS[item.id as keyof typeof CONTACT_TITLE_KEYS];
+    return {
+      ...item,
+      title: titleKey ? section[titleKey] : item.title,
+    };
+  });
 
   return (
     <section className="reservation-contact" aria-labelledby="contact-title">
       <div className="reservation-contact__inner">
         <SectionHeading
-          eyebrow="Restaurant Information"
-          title="We&apos;re Here for You"
-          subtitle="Reach out directly or visit us — our team is ready to welcome you."
+          eyebrow={section.eyebrow}
+          title={section.title}
+          subtitle={section.subtitle}
           align="center"
         />
         <h2 id="contact-title" className="sr-only">

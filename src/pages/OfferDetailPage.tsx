@@ -1,5 +1,5 @@
 import { useEffect, useState, type MouseEvent } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import OffersGrid from "../components/offers/OffersGrid";
 import Button from "../components/ui/Button";
 import SectionPlaceholder from "../components/ui/SectionPlaceholder";
@@ -15,6 +15,7 @@ import {
   resolveOfferDetail,
   type PublicOffer,
 } from "../services/offersPublic";
+import { trackOfferClick } from "../services/analytics";
 import "../components/offers/offer-detail.css";
 
 type OfferDetailPageProps = {
@@ -29,6 +30,7 @@ type ResolvedOffer = {
 
 export default function OfferDetailPage({ forcedLocationId }: OfferDetailPageProps) {
   const { slug } = useParams<{ slug: string }>();
+  const { pathname } = useLocation();
   const { selectedLocationId, setLocation, navigateWithLocationGuard } = useLocationSelection();
   const [resolved, setResolved] = useState<ResolvedOffer | null>(null);
   const [loading, setLoading] = useState(true);
@@ -93,10 +95,18 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
   const orderIsInternal = isInternalOfferOrderPath(orderPath);
 
   const handleOrderClick = (event: MouseEvent<HTMLElement>) => {
+    trackOfferClick(offer.id, offer.title, locationId, pathname);
     if (!orderIsInternal) return;
     event.preventDefault();
     setLocation(locationId);
     navigateWithLocationGuard(orderPath);
+  };
+
+  const handleReserveClick = (event: MouseEvent<HTMLElement>) => {
+    trackOfferClick(offer.id, offer.title, locationId, pathname);
+    event.preventDefault();
+    setLocation(locationId);
+    navigateWithLocationGuard("/reservation");
   };
 
   return (
@@ -197,11 +207,7 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
         <section className="offer-detail-actions" aria-label="Offer actions">
           <Button
             to="/reservation"
-            onClick={(event) => {
-              event.preventDefault();
-              setLocation(locationId);
-              navigateWithLocationGuard("/reservation");
-            }}
+            onClick={handleReserveClick}
           >
             Reserve Table
           </Button>
@@ -210,7 +216,7 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
               Order Now
             </Button>
           ) : (
-            <Button variant="outline" href={orderPath}>
+            <Button variant="outline" href={orderPath} onClick={() => trackOfferClick(offer.id, offer.title, locationId, pathname)}>
               Order Now
             </Button>
           )}

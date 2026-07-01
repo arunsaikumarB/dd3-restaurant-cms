@@ -1,7 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion } from "framer-motion";
-import { EXPERIENCE_GALLERY } from "../../data/atmosphereGallery";
+import { EXPERIENCE_GALLERY, EXPERIENCE_FEATURES, RIBBON_ANNOUNCEMENTS, type ExperienceGalleryItem } from "../../data/atmosphereGallery";
+import type { PublicGalleryItem } from "../../data/publicGallery";
+import { usePageContent } from "../../context/PageContentContext";
+import { useGallerySection } from "../../hooks/useGallerySection";
 import { EASE_POWER3 } from "../showcase/motion";
 import ExperienceCard from "./ExperienceCard";
 import FeatureRow from "./FeatureRow";
@@ -12,12 +15,41 @@ export interface ExperienceSectionProps {
   restaurantName?: string;
 }
 
+function mapAmbienceItems(items: PublicGalleryItem[]): ExperienceGalleryItem[] {
+  return items.map((item, index) => {
+    const fallback = EXPERIENCE_GALLERY[index];
+    return {
+      id: item.id,
+      title: item.title || item.caption || fallback?.title || "Gallery",
+      subtitle: item.caption || fallback?.subtitle || "",
+      image: item.image,
+      imageAlt: item.alt_text || item.title || fallback?.imageAlt || "Restaurant ambience",
+    };
+  });
+}
+
+const AMBIENCE_FALLBACK = {
+  eyebrowTemplate: "{name} Experience",
+  title: "Experience the Ambience",
+  subtitleTemplate:
+    "Every corner of {name} is designed to bring together authentic Indian hospitality, warm interiors, and unforgettable dining moments.",
+  features: EXPERIENCE_FEATURES.map(({ title, description }) => ({ title, description })),
+  ribbonItems: RIBBON_ANNOUNCEMENTS.map((text) => ({ text })),
+};
+
 export default function ExperienceSection({
   restaurantName = "Desi Dhamaka",
 }: ExperienceSectionProps) {
+  const { fetchSection, interpolate } = usePageContent();
+  const ambience = fetchSection("home", "ambience", AMBIENCE_FALLBACK);
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const ambienceImages = useGallerySection("ambience");
+  const galleryItems = useMemo(
+    () => mapAmbienceItems(ambienceImages),
+    [ambienceImages],
+  );
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
@@ -59,7 +91,7 @@ export default function ExperienceSection({
   }, [emblaApi]);
 
   const renderCard = useCallback(
-    (item: (typeof EXPERIENCE_GALLERY)[number], index: number) => (
+    (item: ExperienceGalleryItem, index: number) => (
       <ExperienceCard
         key={item.id}
         title={item.title}
@@ -86,21 +118,22 @@ export default function ExperienceSection({
         >
           <div className="exp-section__eyebrow-row">
             <span className="exp-section__diamond" aria-hidden />
-            <p className="exp-section__eyebrow">{restaurantName} Experience</p>
+            <p className="exp-section__eyebrow">
+              {interpolate(ambience.eyebrowTemplate, { name: restaurantName })}
+            </p>
             <span className="exp-section__diamond" aria-hidden />
           </div>
           <h2 id="exp-section-heading" className="exp-section__title">
-            Experience the Ambience
+            {ambience.title}
           </h2>
           <p className="exp-section__subtitle">
-            Every corner of {restaurantName} is designed to bring together authentic Indian
-            hospitality, warm interiors, and unforgettable dining moments.
+            {interpolate(ambience.subtitleTemplate, { name: restaurantName })}
           </p>
         </motion.header>
 
         {/* Desktop — 5 equal squares, always fits container width */}
         <div className="exp-section__row" role="list">
-          {EXPERIENCE_GALLERY.map((item, index) => (
+          {galleryItems.map((item, index) => (
             <div className="exp-section__slot" role="listitem" key={item.id}>
               {renderCard(item, index)}
             </div>
@@ -114,7 +147,7 @@ export default function ExperienceSection({
             ref={emblaRef}
           >
             <div className="exp-section__track">
-              {EXPERIENCE_GALLERY.map((item, index) => (
+              {galleryItems.map((item, index) => (
                 <div className="exp-section__slide" key={item.id}>
                   {renderCard(item, index)}
                 </div>
@@ -124,8 +157,8 @@ export default function ExperienceSection({
         </div>
       </div>
 
-      <FeatureRow visible={visible} />
-      <AnnouncementRibbon />
+      <FeatureRow visible={visible} features={ambience.features} />
+      <AnnouncementRibbon items={ambience.ribbonItems.map((item) => item.text)} />
     </section>
   );
 }

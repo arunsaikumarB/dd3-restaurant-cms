@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ImageSequenceScroll from "../ImageSequenceScroll";
 import SectionPlaceholder from "../ui/SectionPlaceholder";
+import { usePageContent } from "../../context/PageContentContext";
 import { fetchFrameManifest, type FrameManifest } from "../../utils/frameManifest";
 import {
   CATERING_MANIFEST_URL,
@@ -10,7 +11,16 @@ import {
 } from "../../data/cateringSequence";
 import "./catering-sequence.css";
 
+const CATERING_OVERLAY_FALLBACK = {
+  label: CATERING_OVERLAY.label,
+  title: CATERING_OVERLAY.title,
+  description: CATERING_OVERLAY.description,
+  cta: { label: CATERING_OVERLAY.cta, url: CATERING_OVERLAY.href },
+};
+
 export default function CateringImageSequence() {
+  const { fetchSection } = usePageContent();
+  const overlay = fetchSection("home", "catering_overlay", CATERING_OVERLAY_FALLBACK);
   const [manifest, setManifest] = useState<FrameManifest | null>(null);
   const [error, setError] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -83,13 +93,13 @@ export default function CateringImageSequence() {
 
       <div className="catering-seq-content" ref={overlayRef}>
         <div className="catering-seq-content__panel">
-          <p className="catering-seq-content__label">{CATERING_OVERLAY.label}</p>
-          <h2 className="catering-seq-content__title">{CATERING_OVERLAY.title}</h2>
+          <p className="catering-seq-content__label">{overlay.label}</p>
+          <h2 className="catering-seq-content__title">{overlay.title}</h2>
           <p className="catering-seq-content__desc">
-            {CATERING_OVERLAY.description}
+            {overlay.description}
           </p>
-          <Link to={CATERING_OVERLAY.href} className="catering-seq-content__btn">
-            {CATERING_OVERLAY.cta}
+          <Link to={overlay.cta.url} className="catering-seq-content__btn">
+            {overlay.cta.label}
             <span className="catering-seq-content__btn-arrow" aria-hidden>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path

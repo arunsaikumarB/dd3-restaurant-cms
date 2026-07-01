@@ -12,10 +12,13 @@ import ProtectedRoute from "./admin/components/ProtectedRoute";
 import GuestRoute from "./admin/components/GuestRoute";
 import UnauthorizedRoute from "./admin/components/UnauthorizedRoute";
 import { LocationProvider } from "./context/LocationContext";
+import { PageContentProvider } from "./context/PageContentContext";
+import { usePageTracking } from "./hooks/usePageTracking";
 
 const AdminLoginPage = lazy(() => import("./admin/pages/LoginPage"));
 const AdminUnauthorizedPage = lazy(() => import("./admin/pages/UnauthorizedPage"));
 const AdminDashboardPage = lazy(() => import("./admin/pages/DashboardPage"));
+const AdminInsightsPage = lazy(() => import("./admin/pages/InsightsPage"));
 const AdminHomepagePage = lazy(() => import("./admin/pages/HomepagePage"));
 const AdminOffersPage = lazy(() => import("./admin/pages/OffersManagementPage"));
 const AdminGalleryPage = lazy(() => import("./admin/pages/GalleryPage"));
@@ -162,21 +165,25 @@ function PublicRoutes() {
 }
 
 function PublicSiteShell() {
+  usePageTracking();
+
   return (
     <LocationProvider>
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-saffron focus:px-4 focus:py-2 focus:text-cocoa"
-      >
-        Skip to main content
-      </a>
-      <PageSEO />
-      <ScrollToTop />
-      <Navbar />
-      <main id="main-content">
-        <PublicRoutes />
-      </main>
-      <Footer />
+      <PageContentProvider>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-saffron focus:px-4 focus:py-2 focus:text-cocoa"
+        >
+          Skip to main content
+        </a>
+        <PageSEO />
+        <ScrollToTop />
+        <Navbar />
+        <main id="main-content">
+          <PublicRoutes />
+        </main>
+        <Footer />
+      </PageContentProvider>
     </LocationProvider>
   );
 }
@@ -211,6 +218,7 @@ export default function App() {
         >
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboardPage />} />
+          <Route path="insights" element={<AdminInsightsPage />} />
           <Route path="homepage" element={<AdminHomepagePage />} />
           <Route path="offers" element={<AdminOffersPage />} />
           <Route path="gallery" element={<AdminGalleryPage />} />

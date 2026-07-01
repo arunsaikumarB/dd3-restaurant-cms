@@ -20,7 +20,9 @@ export function useSignatureDishes(locationId: LocationId | null) {
     () => resolvePublicLocationId(locationId),
     [locationId],
   );
-  const [dishes, setDishes] = useState<SignatureDish[]>([]);
+  const [dishes, setDishes] = useState<SignatureDish[]>(() =>
+    resolveFallbackDishes(resolvePublicLocationId(locationId)),
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,5 +59,8 @@ export function useSignatureDishes(locationId: LocationId | null) {
     };
   }, [resolvedLocationId]);
 
-  return { dishes, loading, error, locationId: resolvedLocationId };
+  return useMemo(
+    () => ({ dishes, loading, error, locationId: resolvedLocationId }),
+    [dishes, loading, error, resolvedLocationId],
+  );
 }

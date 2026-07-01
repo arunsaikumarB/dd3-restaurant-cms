@@ -5,15 +5,31 @@ import ImageGallery from "../components/reservation/ImageGallery";
 import ContactCards from "../components/reservation/ContactCards";
 import GoogleMap from "../components/reservation/GoogleMap";
 import PageHero from "../components/ui/PageHero";
+import { usePageContent } from "../context/PageContentContext";
 import { useLocationSelection } from "../context/LocationContext";
 import { useHomepageData } from "../hooks/useHomepageData";
 import { isExternalUrl, resolveReservationUrl } from "../utils/locationLinks";
 import "../components/reservation/reservation.css";
 
 export default function ReservationPage() {
-  const { selectedLocation, selectedLocationId } = useLocationSelection();
+  const { fetchSection, interpolate } = usePageContent();
+  const { selectedLocationId } = useLocationSelection();
   const { bundle } = useHomepageData();
   const reservationLink = resolveReservationUrl(bundle.settings, selectedLocationId);
+
+  const hero = fetchSection("reservation", "hero", {
+    label: "Reservations",
+    title: "Reserve Your Table",
+    subtitleTemplate:
+      "Experience authentic Indian hospitality, unforgettable flavours, and elegant dining at {location}.",
+  });
+  const stickyCta = fetchSection("reservation", "sticky_cta", {
+    reserveTableLabel: "Reserve My Table",
+    reserveOnlineLabel: "Reserve Online",
+  });
+
+  const heroSubtitle = interpolate(hero.subtitleTemplate);
+
   const scrollToBooking = () => {
     if (isExternalUrl(reservationLink)) {
       window.open(reservationLink, "_blank", "noopener,noreferrer");
@@ -28,9 +44,9 @@ export default function ReservationPage() {
       <div className="reservation-page__pattern" aria-hidden />
 
       <PageHero
-        label="Reservations"
-        title="Reserve Your Table"
-        subtitle={`Experience authentic Indian hospitality, unforgettable flavours, and elegant dining${selectedLocation ? ` at ${selectedLocation.shortName}` : ""}.`}
+        label={hero.label}
+        title={hero.title}
+        subtitle={heroSubtitle}
         backgroundImage="/reservation/interior/interior-01.png"
         breadcrumbItems={[
           { label: "Home", to: "/" },
@@ -64,8 +80,8 @@ export default function ReservationPage() {
           onClick={scrollToBooking}
         >
           {isExternalUrl(reservationLink)
-            ? "Reserve Online"
-            : "Reserve My Table"}
+            ? stickyCta.reserveOnlineLabel
+            : stickyCta.reserveTableLabel}
         </button>
       </div>
     </div>

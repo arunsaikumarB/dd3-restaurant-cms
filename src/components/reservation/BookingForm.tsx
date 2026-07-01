@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { RESERVATION_LOCATIONS } from "../../data/reservationPage";
+import { usePageContent } from "../../context/PageContentContext";
 import { useReservation } from "../../hooks/useReservation";
 import { EASE_POWER3, viewportOnce } from "../showcase/motion";
 
@@ -59,6 +60,32 @@ const icons = {
 };
 
 export default function BookingForm() {
+  const { fetchSection } = usePageContent();
+  const formCopy = fetchSection("reservation", "booking_form", {
+    stepLabel: "Step 1 of 1 — Your Details",
+    title: "Book Your Experience",
+    subtitle:
+      "Select your preferred date, time, and party size. We'll prepare an unforgettable evening.",
+    locationLabel: "Restaurant Location",
+    dateLabel: "Date",
+    guestsLabel: "Guests",
+    timeSlotsLabel: "Available Time Slots",
+    loadingSlots: "Finding available times…",
+    noSlots: "No times available for this date.",
+    nameLabel: "Name",
+    namePlaceholder: "Your full name",
+    phoneLabel: "Phone",
+    phonePlaceholder: "(555) 123-4567",
+    emailLabel: "Email",
+    emailPlaceholder: "you@example.com",
+    requestsLabel: "Special Requests",
+    requestsPlaceholder: "Allergies, celebrations, seating preferences…",
+    submitLabel: "Reserve My Table",
+    submittingLabel: "Reserving…",
+    successTitle: "Reservation Requested",
+    successAnotherLabel: "Make Another Reservation",
+  });
+
   const {
     form,
     timeSlots,
@@ -88,14 +115,14 @@ export default function BookingForm() {
       >
         <div className="reservation-form">
           <div className="reservation-form__success" role="status">
-            <p className="reservation-form__success-title">Reservation Requested</p>
+            <p className="reservation-form__success-title">{formCopy.successTitle}</p>
             <p className="reservation-form__success-text">{successMessage}</p>
             <button
               type="button"
               className="reservation-form__success-btn"
               onClick={reset}
             >
-              Make Another Reservation
+              {formCopy.successAnotherLabel}
             </button>
           </div>
         </div>
@@ -120,18 +147,15 @@ export default function BookingForm() {
         aria-label="Table reservation form"
       >
         <header className="reservation-form__header">
-          <p className="reservation-form__step">Step 1 of 1 — Your Details</p>
-          <h2 className="reservation-form__title">Book Your Experience</h2>
-          <p className="reservation-form__subtitle">
-            Select your preferred date, time, and party size. We&apos;ll prepare
-            an unforgettable evening.
-          </p>
+          <p className="reservation-form__step">{formCopy.stepLabel}</p>
+          <h2 className="reservation-form__title">{formCopy.title}</h2>
+          <p className="reservation-form__subtitle">{formCopy.subtitle}</p>
         </header>
 
         <div className="reservation-form__grid">
           <div className="reservation-field">
             <label className="reservation-field__label" htmlFor="location">
-              Restaurant Location
+              {formCopy.locationLabel}
             </label>
             <div className="reservation-field__control">
               <FieldIcon>{icons.location}</FieldIcon>
@@ -153,7 +177,7 @@ export default function BookingForm() {
           <div className="reservation-form__row reservation-form__row--2">
             <div className="reservation-field">
               <label className="reservation-field__label" htmlFor="date">
-                Date
+                {formCopy.dateLabel}
               </label>
               <div className="reservation-field__control">
                 <FieldIcon>{icons.calendar}</FieldIcon>
@@ -170,7 +194,7 @@ export default function BookingForm() {
             </div>
 
             <div className="reservation-field">
-              <span className="reservation-field__label">Guests</span>
+              <span className="reservation-field__label">{formCopy.guestsLabel}</span>
               <div className="reservation-guests" role="group" aria-label="Number of guests">
                 <button
                   type="button"
@@ -183,7 +207,7 @@ export default function BookingForm() {
                 </button>
                 <div className="reservation-guests__count">
                   {form.guests}
-                  <span className="reservation-guests__label">Guests</span>
+                  <span className="reservation-guests__label">{formCopy.guestsLabel}</span>
                 </div>
                 <button
                   type="button"
@@ -199,13 +223,11 @@ export default function BookingForm() {
           </div>
 
           <div className="reservation-field">
-            <span className="reservation-field__label">Available Time Slots</span>
+            <span className="reservation-field__label">{formCopy.timeSlotsLabel}</span>
             {loadingSlots ? (
-              <p className="reservation-slots__loading">Finding available times…</p>
+              <p className="reservation-slots__loading">{formCopy.loadingSlots}</p>
             ) : timeSlots.length === 0 ? (
-              <p className="reservation-slots__loading">
-                No times available for this date.
-              </p>
+              <p className="reservation-slots__loading">{formCopy.noSlots}</p>
             ) : (
               <div className="reservation-slots" role="radiogroup" aria-label="Time slot">
                 {timeSlots.map((slot) => (
@@ -232,7 +254,7 @@ export default function BookingForm() {
           <div className="reservation-form__row reservation-form__row--2">
             <div className="reservation-field">
               <label className="reservation-field__label" htmlFor="name">
-                Name
+                {formCopy.nameLabel}
               </label>
               <div className="reservation-field__control">
                 <FieldIcon>{icons.user}</FieldIcon>
@@ -240,7 +262,7 @@ export default function BookingForm() {
                   id="name"
                   type="text"
                   className="reservation-field__input"
-                  placeholder="Your full name"
+                  placeholder={formCopy.namePlaceholder}
                   value={form.name}
                   onChange={(e) => updateField("name", e.target.value)}
                   required
@@ -251,7 +273,7 @@ export default function BookingForm() {
 
             <div className="reservation-field">
               <label className="reservation-field__label" htmlFor="phone">
-                Phone
+                {formCopy.phoneLabel}
               </label>
               <div className="reservation-field__control">
                 <FieldIcon>{icons.phone}</FieldIcon>
@@ -259,7 +281,7 @@ export default function BookingForm() {
                   id="phone"
                   type="tel"
                   className="reservation-field__input"
-                  placeholder="(555) 123-4567"
+                  placeholder={formCopy.phonePlaceholder}
                   value={form.phone}
                   onChange={(e) => updateField("phone", e.target.value)}
                   required
@@ -271,7 +293,7 @@ export default function BookingForm() {
 
           <div className="reservation-field">
             <label className="reservation-field__label" htmlFor="email">
-              Email
+              {formCopy.emailLabel}
             </label>
             <div className="reservation-field__control">
               <FieldIcon>{icons.email}</FieldIcon>
@@ -279,7 +301,7 @@ export default function BookingForm() {
                 id="email"
                 type="email"
                 className="reservation-field__input"
-                placeholder="you@example.com"
+                placeholder={formCopy.emailPlaceholder}
                 value={form.email}
                 onChange={(e) => updateField("email", e.target.value)}
                 required
@@ -290,12 +312,12 @@ export default function BookingForm() {
 
           <div className="reservation-field">
             <label className="reservation-field__label" htmlFor="requests">
-              Special Requests
+              {formCopy.requestsLabel}
             </label>
             <textarea
               id="requests"
               className="reservation-field__textarea"
-              placeholder="Allergies, celebrations, seating preferences…"
+              placeholder={formCopy.requestsPlaceholder}
               value={form.specialRequests}
               onChange={(e) => updateField("specialRequests", e.target.value)}
               rows={3}
@@ -313,7 +335,7 @@ export default function BookingForm() {
             className="reservation-form__submit"
             disabled={submitting || loadingSlots}
           >
-            {submitting ? "Reserving…" : "Reserve My Table"}
+            {submitting ? formCopy.submittingLabel : formCopy.submitLabel}
             <span className="reservation-form__submit-arrow" aria-hidden>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path

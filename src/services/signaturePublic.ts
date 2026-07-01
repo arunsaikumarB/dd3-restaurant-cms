@@ -12,8 +12,8 @@ import type { MenuItem } from "../types/database";
 /** Minimum dishes shown in the carousel when the catalog allows it. */
 export const SIGNATURE_MIN_COUNT = 6;
 
-/** Max signature dishes shown in the homepage carousel. */
-const MAX_SIGNATURE_DISHES = 28;
+/** Max signature dishes in the carousel (matches original 7-card layout). */
+const MAX_SIGNATURE_DISHES = 7;
 
 type MenuItemJoinRow = MenuItem & {
   menu_categories: { name: string } | null;
@@ -41,7 +41,18 @@ function normalizeImageUrl(image: string | null | undefined): string | null {
     trimmed === "null" ||
     trimmed === "undefined" ||
     trimmed === "N/A" ||
-    trimmed === "none"
+    trimmed === "none" ||
+    trimmed === "#" ||
+    trimmed.endsWith("/null") ||
+    trimmed.endsWith("/undefined")
+  ) {
+    return null;
+  }
+  if (
+    !trimmed.startsWith("/") &&
+    !trimmed.startsWith("http://") &&
+    !trimmed.startsWith("https://") &&
+    !trimmed.startsWith("data:image/")
   ) {
     return null;
   }
@@ -108,23 +119,30 @@ export function selectSignatureDishes<T extends SelectableRow>(
     result.push(map(row));
   };
 
-  for (const row of chef) add(row);
+  for (const row of chef) {
+    add(row);
+    if (result.length >= MAX_SIGNATURE_DISHES) break;
+  }
 
   if (result.length < SIGNATURE_MIN_COUNT) {
     for (const row of popular) {
       add(row);
-      if (result.length >= SIGNATURE_MIN_COUNT) break;
+      if (result.length >= SIGNATURE_MIN_COUNT || result.length >= MAX_SIGNATURE_DISHES) {
+        break;
+      }
     }
   }
 
   if (result.length < SIGNATURE_MIN_COUNT) {
     for (const row of rest) {
       add(row);
-      if (result.length >= SIGNATURE_MIN_COUNT) break;
+      if (result.length >= SIGNATURE_MIN_COUNT || result.length >= MAX_SIGNATURE_DISHES) {
+        break;
+      }
     }
   }
 
-  return result;
+  return result.slice(0, MAX_SIGNATURE_DISHES);
 }
 
 /**

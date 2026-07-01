@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type { SignatureDish } from "../../data/signatureDishes";
 import {
@@ -13,11 +13,6 @@ import {
 export interface SignatureCardProps {
   dish: SignatureDish;
   orderBaseUrl: string;
-  isActive: boolean;
-  isHovered: boolean;
-  distance: number;
-  onHover: () => void;
-  onLeave: () => void;
   entranceDelay?: number;
   entranceVisible?: boolean;
 }
@@ -68,67 +63,51 @@ function DishIcon({ category }: { category: string }) {
   );
 }
 
-export default function SignatureCard({
+function SignatureCardComponent({
   dish,
   orderBaseUrl,
-  isActive,
-  isHovered,
-  distance,
-  onHover,
-  onLeave,
   entranceDelay = 0,
   entranceVisible = true,
 }: SignatureCardProps) {
-  const fallbackSrc = pickSignatureImage(null, dish.category, dish.name);
-  const [imageSrc, setImageSrc] = useState(dish.image || fallbackSrc);
+  const fallbackSrc = useMemo(
+    () => pickSignatureImage(null, dish.category, dish.name),
+    [dish.category, dish.name],
+  );
+  const [imageSrc, setImageSrc] = useState(
+    () => pickSignatureImage(dish.image, dish.category, dish.name),
+  );
 
   useEffect(() => {
-    setImageSrc(dish.image || fallbackSrc);
-  }, [dish.id, dish.image, fallbackSrc]);
+    setImageSrc(pickSignatureImage(dish.image, dish.category, dish.name));
+  }, [dish.id, dish.image, dish.category, dish.name]);
 
-  const perspective =
-    distance === 0
-      ? 0
-      : distance > 0
-        ? -3 * Math.min(distance, 2)
-        : 3 * Math.min(Math.abs(distance), 2);
+  const orderUrl = useMemo(
+    () =>
+      buildChefGaaMenuUrl(dish.category_name, dish.item_name, {
+        baseUrl: orderBaseUrl,
+      }),
+    [dish.category_name, dish.item_name, orderBaseUrl],
+  );
 
-  const className = [
-    "signature-card",
-    isActive && "is-active",
-    isHovered && "is-hovered",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  const orderUrl = buildChefGaaMenuUrl(dish.category_name, dish.item_name, {
-    baseUrl: orderBaseUrl,
-  });
-
-  const handleImageError = () => {
+  const handleImageError = useCallback(() => {
     setImageSrc((current) =>
       current === fallbackSrc ? DEFAULT_SHOWCASE_IMAGE : fallbackSrc,
     );
-  };
+  }, [fallbackSrc]);
 
   return (
     <motion.div
-      style={{ perspective: 900, rotateY: perspective }}
-      onMouseEnter={onHover}
-      onMouseLeave={onLeave}
-      initial={{ opacity: 0, y: 80 }}
-      animate={
-        entranceVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
-      }
+      initial={{ opacity: 0, y: 40 }}
+      animate={entranceVisible ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
       transition={{
-        duration: 0.7,
+        duration: 0.65,
         delay: entranceDelay,
         ease: [0.22, 1, 0.36, 1],
       }}
     >
       <a
         href={orderUrl}
-        className={className}
+        className="signature-card"
         aria-label={`Order ${dish.item_name} online`}
         {...EXTERNAL_ORDER_LINK_PROPS}
       >
@@ -140,7 +119,7 @@ export default function SignatureCard({
             className="signature-card__image"
             loading="lazy"
             decoding="async"
-            sizes="(max-width: 768px) 85vw, 320px"
+            sizes="(max-width: 768px) 85vw, 280px"
             draggable={false}
             onError={handleImageError}
           />
@@ -164,3 +143,9 @@ export default function SignatureCard({
     </motion.div>
   );
 }
+
+const SignatureCard = memo(SignatureCardComponent);
+
+SignatureCard.displayName = "SignatureCard";
+
+export default SignatureCard;

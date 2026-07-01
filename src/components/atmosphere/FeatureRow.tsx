@@ -56,13 +56,18 @@ const ICONS: Record<(typeof EXPERIENCE_FEATURES)[number]["icon"], ReactElement> 
 
 export interface FeatureRowProps {
   visible?: boolean;
+  features?: Array<{ title: string; description: string }>;
 }
 
-export default function FeatureRow({ visible = true }: FeatureRowProps) {
+export default function FeatureRow({ visible = true, features }: FeatureRowProps) {
+  const items = features ?? EXPERIENCE_FEATURES;
+
   return (
     <div className="exp-features">
       <div className="exp-features__row">
-        {EXPERIENCE_FEATURES.map((feature, index) => (
+        {items.map((feature, index) => {
+          const iconKey = EXPERIENCE_FEATURES[index]?.icon ?? "cuisine";
+          return (
           <motion.div
             key={feature.title}
             className="exp-feature"
@@ -74,13 +79,14 @@ export default function FeatureRow({ visible = true }: FeatureRowProps) {
               ease: EASE_POWER3,
             }}
           >
-            <div className="exp-feature__icon">{ICONS[feature.icon]}</div>
+            <div className="exp-feature__icon">{ICONS[iconKey]}</div>
             <div>
               <h4 className="exp-feature__title">{feature.title}</h4>
               <p className="exp-feature__desc">{feature.description}</p>
             </div>
           </motion.div>
-        ))}
+        );
+        })}
       </div>
     </div>
   );

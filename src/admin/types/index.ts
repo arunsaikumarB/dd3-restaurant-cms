@@ -11,6 +11,7 @@ export interface AdminStat {
   change?: string;
   trend?: "up" | "down" | "neutral";
   icon: string;
+  to?: string;
 }
 
 export interface ActivityItem {

@@ -2,12 +2,18 @@ import { createClientIfConfigured } from "../../lib/supabase/client";
 import { isSupabaseConfigured } from "../../lib/supabase/env";
 import { getLocationConfig, LOCATION_IDS, type LocationId } from "../../config/locations";
 import { fetchChefGaaLiveBundle } from "../../services/chefgaa/supabaseQueries";
+import {
+  fetchAnalyticsOfferPerformance,
+  fetchAnalyticsSummary,
+  pickTopOffer,
+} from "../../services/analyticsAdmin";
 import type { ChefGaaDashboardSummary } from "../../services/chefgaa/types";
 import type { AdminLocationScope } from "../types/location";
 import type { ActivityItem, AdminStat } from "../types";
 
 export type DashboardStats = {
   stats: AdminStat[];
+  insightStats: AdminStat[];
   locationLabel: string;
   chefGaa: ChefGaaDashboardSummary | null;
   recentActivity: ActivityItem[];
@@ -29,6 +35,96 @@ async function countRows(
   const { count, error } = await query;
   if (error) return 0;
   return count ?? 0;
+}
+
+async function countGalleryImages(scope: AdminLocationScope): Promise<number> {
+  if (!isSupabaseConfigured()) return 0;
+  const supabase = createClientIfConfigured();
+  if (!supabase) return 0;
+
+  if (scope === "all") {
+    const { count, error } = await supabase
+      .from("gallery")
+      .select("*", { count: "exact", head: true });
+    if (error) return 0;
+    return count ?? 0;
+  }
+
+  const { count, error } = await supabase
+    .from("gallery")
+    .select("*", { count: "exact", head: true })
+    .or(`location_id.eq.${scope},location_id.eq.all`);
+
+  if (error) return 0;
+  return count ?? 0;
+}
+
+function resolveInsightsLocationId(scope: AdminLocationScope): LocationId {
+  return scope === "all" ? LOCATION_IDS[0] : scope;
+}
+
+async function fetchInsightStats(scope: AdminLocationScope): Promise<AdminStat[]> {
+  const locationId = resolveInsightsLocationId(scope);
+  const to = new Date();
+  to.setHours(23, 59, 59, 999);
+  const from = new Date();
+  from.setDate(from.getDate() - 6);
+  from.setHours(0, 0, 0, 0);
+
+  const [summary, offers] = await Promise.all([
+    fetchAnalyticsSummary(locationId, from, to),
+    fetchAnalyticsOfferPerformance(locationId, from, to),
+  ]);
+
+  const topOffer = pickTopOffer(offers);
+
+  return [
+    {
+      id: "insight-page-views",
+      label: "Page Views (7d)",
+      value: summary.total_page_views,
+      change: "Last 7 days",
+      trend: "neutral",
+      icon: "eye",
+      to: "/admin/insights",
+    },
+    {
+      id: "insight-visitors",
+      label: "Unique Visitors (7d)",
+      value: summary.unique_sessions,
+      change: "Last 7 days",
+      trend: "neutral",
+      icon: "users",
+      to: "/admin/insights",
+    },
+    {
+      id: "insight-offers-page",
+      label: "Offers Page Views (7d)",
+      value: summary.offers_page_views,
+      change: "Last 7 days",
+      trend: "neutral",
+      icon: "chart",
+      to: "/admin/insights",
+    },
+    {
+      id: "insight-top-offer",
+      label: "Top Offer (7d)",
+      value: topOffer ? `${topOffer.offer_title} (${topOffer.clicks})` : "—",
+      change: "Last 7 days",
+      trend: "neutral",
+      icon: "click",
+      to: "/admin/insights",
+    },
+    {
+      id: "insight-order-clicks",
+      label: "Order Now Clicks (7d)",
+      value: summary.order_clicks,
+      change: "Last 7 days",
+      trend: "neutral",
+      icon: "chart",
+      to: "/admin/insights",
+    },
+  ];
 }
 
 async function sumAcrossLocations(
@@ -57,11 +153,12 @@ async function fetchScopeStats(scope: AdminLocationScope): Promise<DashboardStat
   const locationLabel =
     scope === "all" ? "All Locations" : getLocationConfig(scope).name;
 
-  const [activeOffers, galleryImages, approvedReviews, chefGaaBundle] = await Promise.all([
+  const [activeOffers, galleryImages, approvedReviews, chefGaaBundle, insightStats] = await Promise.all([
     sumAcrossLocations("offers", locationIds, [{ column: "active", value: true }]),
-    countRows("gallery", []),
+    countGalleryImages(scope),
     countRows("reviews", [{ column: "approved", value: true }]),
     fetchChefGaaLiveBundle(scope, { force: true }),
+    fetchInsightStats(scope),
   ]);
 
   const chefGaa = chefGaaBundle.dashboard;
@@ -129,7 +226,7 @@ async function fetchScopeStats(scope: AdminLocationScope): Promise<DashboardStat
       id: "gallery",
       label: "Gallery Images",
       value: galleryImages,
-      change: "Global gallery",
+      change: scope === "all" ? "Across all branches" : "For selected location",
       trend: "neutral",
       icon: "image",
     },
@@ -145,6 +242,7 @@ async function fetchScopeStats(scope: AdminLocationScope): Promise<DashboardStat
 
   return {
     stats,
+    insightStats,
     locationLabel,
     chefGaa,
     recentActivity: chefGaaBundle.activity,
@@ -158,6 +256,7 @@ export async function fetchDashboardStats(scope: AdminLocationScope): Promise<Da
     return {
       locationLabel: scope === "all" ? "All Locations" : getLocationConfig(scope as LocationId).name,
       stats: [],
+      insightStats: [],
       chefGaa: null,
       recentActivity: [],
     };

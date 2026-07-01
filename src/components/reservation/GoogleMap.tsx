@@ -1,18 +1,24 @@
 import { motion } from "framer-motion";
+import { usePageContent } from "../../context/PageContentContext";
 import { useHomepageData } from "../../hooks/useHomepageData";
 import SectionHeading from "../ui/SectionHeading";
 import { EASE_POWER3, viewportOnce } from "../showcase/motion";
 
 export default function GoogleMap() {
+  const { fetchSection } = usePageContent();
   const { bundle } = useHomepageData();
   const { settings } = bundle;
+  const section = fetchSection("reservation", "map_section", {
+    eyebrow: "Find Us",
+    title: "Visit Desi Dhamaka",
+  });
 
   return (
     <section className="reservation-map" aria-labelledby="map-title">
       <div className="reservation-map__inner">
         <SectionHeading
-          eyebrow="Find Us"
-          title="Visit Desi Dhamaka"
+          eyebrow={section.eyebrow}
+          title={section.title}
           subtitle={settings.address}
           align="center"
         />

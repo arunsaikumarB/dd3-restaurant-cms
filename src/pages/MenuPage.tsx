@@ -11,16 +11,44 @@ import {
 } from "../components/menu/MenuSkeleton";
 import SearchBar from "../components/menu/SearchBar";
 import { NAV_BAR_HEIGHT } from "../constants/navigation";
+import { usePageContent } from "../context/PageContentContext";
 import { useMenuData } from "../hooks/useMenuData";
 import { filterMenuData, flattenItems } from "../utils/menu";
 import { useLocationSelection } from "../context/LocationContext";
+import { useSectionImage } from "../hooks/useGallerySection";
+import { isExternalUrl } from "../utils/locationLinks";
 
 export default function MenuPage() {
-  const { selectedLocationId, selectedLocation } = useLocationSelection();
+  const { fetchSection, interpolate } = usePageContent();
+  const { selectedLocationId } = useLocationSelection();
+  const menuHeroImage = useSectionImage("menu_hero", "/showcase/biryani.jpg");
   const { data, loading, error } = useMenuData(selectedLocationId);
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  const hero = fetchSection("menu", "hero", {
+    label: "The Menu",
+    title: "Menu",
+    subtitleTemplate:
+      "Discover authentic Indian flavours crafted with tradition, premium ingredients and unforgettable taste at {location}.",
+  });
+  const emptyStates = fetchSection("menu", "empty_states", {
+    unavailableTitle: "Menu unavailable",
+    unavailableBody:
+      "We couldn't load the menu right now. Please refresh the page or try again later.",
+    comingSoonTitle: "Menu coming soon",
+    comingSoonBody: "Our menu is being updated. Please check back shortly.",
+    noResultsTitle: "No dishes found",
+    noResultsBody: "Try a different search term or category filter.",
+  });
+  const cta = fetchSection("menu", "cta", {
+    title: "Ready to Experience Desi Dhamaka?",
+    subtitle: "Reserve Your Table Today",
+    cta: { label: "Reserve Now", url: "/reservation" },
+  });
+
+  const heroSubtitle = interpolate(hero.subtitleTemplate);
 
   const filteredCategories = useMemo(() => {
     if (!data) return [];
@@ -29,7 +57,7 @@ export default function MenuPage() {
 
   const resultCount = useMemo(
     () => flattenItems(filteredCategories).length,
-    [filteredCategories]
+    [filteredCategories],
   );
 
   const handleTabSelect = useCallback((categoryId: string | null) => {
@@ -57,7 +85,7 @@ export default function MenuPage() {
           setActiveCategory(id);
         }
       },
-      { rootMargin: "-40% 0px -45% 0px", threshold: [0, 0.15, 0.35, 0.55] }
+      { rootMargin: "-40% 0px -45% 0px", threshold: [0, 0.15, 0.35, 0.55] },
     );
 
     sections.forEach((section) => observer.observe(section));
@@ -72,10 +100,10 @@ export default function MenuPage() {
   return (
     <div className="min-h-screen bg-ivory">
       <PageHero
-        label="The Menu"
-        title="Menu"
-        subtitle={`Discover authentic Indian flavours crafted with tradition, premium ingredients and unforgettable taste${selectedLocation ? ` at ${selectedLocation.shortName}` : ""}.`}
-        backgroundImage="/showcase/biryani.jpg"
+        label={hero.label}
+        title={hero.title}
+        subtitle={heroSubtitle}
+        backgroundImage={menuHeroImage}
         breadcrumbItems={[
           { label: "Home", to: "/" },
           { label: "Menu" },
@@ -128,23 +156,22 @@ export default function MenuPage() {
 
         {error && !data && (
           <div className="rounded-[24px] border border-cocoa/10 bg-white/60 p-10 text-center">
-            <p className="font-serif text-2xl text-cocoa">Menu unavailable</p>
-            <p className="mt-3 text-cocoa/60">
-              We couldn&apos;t load the menu right now. Please refresh the page or try again
-              later.
-            </p>
+            <p className="font-serif text-2xl text-cocoa">{emptyStates.unavailableTitle}</p>
+            <p className="mt-3 text-cocoa/60">{emptyStates.unavailableBody}</p>
           </div>
         )}
 
         {!loading && !error && data && filteredCategories.length === 0 && (
           <div className="rounded-[24px] border border-cocoa/10 bg-white/60 p-12 text-center">
             <p className="font-serif text-2xl text-cocoa">
-              {data.categories.length === 0 ? "Menu coming soon" : "No dishes found"}
+              {data.categories.length === 0
+                ? emptyStates.comingSoonTitle
+                : emptyStates.noResultsTitle}
             </p>
             <p className="mt-3 text-cocoa/60">
               {data.categories.length === 0
-                ? "Our menu is being updated. Please check back shortly."
-                : "Try a different search term or category filter."}
+                ? emptyStates.comingSoonBody
+                : emptyStates.noResultsBody}
             </p>
           </div>
         )}
@@ -164,10 +191,11 @@ export default function MenuPage() {
         {!loading && !error && data && filteredCategories.length > 0 && (
           <div className="mt-20 md:mt-28">
             <CTASection
-              title="Ready to Experience Desi Dhamaka?"
-              subtitle="Reserve Your Table Today"
-              buttonLabel="Reserve Now"
-              buttonTo="/reservation"
+              title={cta.title}
+              subtitle={cta.subtitle}
+              buttonLabel={cta.cta.label}
+              buttonTo={isExternalUrl(cta.cta.url) ? undefined : cta.cta.url}
+              buttonHref={isExternalUrl(cta.cta.url) ? cta.cta.url : undefined}
             />
           </div>
         )}

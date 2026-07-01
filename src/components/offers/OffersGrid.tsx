@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type { LocationId } from "../../config/locations";
 import type { LocationOffer } from "../../data/offers/types";
 import {
@@ -8,6 +8,8 @@ import {
   isInternalOfferOrderPath,
 } from "../../data/offers";
 import { EXTERNAL_ORDER_LINK_PROPS } from "../../constants/ordering";
+import { usePageContent } from "../../context/PageContentContext";
+import { trackOfferClick } from "../../services/analytics";
 import { EASE_POWER3 } from "../showcase/motion";
 import "./offers-page.css";
 
@@ -18,14 +20,32 @@ interface OffersGridProps {
 }
 
 export default function OffersGrid({ offers, locationId, locationName }: OffersGridProps) {
+  const { pathname } = useLocation();
+  const { fetchSection, interpolate } = usePageContent();
+  const grid = fetchSection("offers", "grid", {
+    viewDetailsLabel: "View Details",
+    orderNowLabel: "Order Now",
+  });
+  const emptyState = fetchSection("offers", "empty_state", {
+    title: "No offers available",
+    bodyTemplate:
+      "There are no active promotions for {location} right now. Check back soon.",
+    selectPrompt: "Select a location above to view available promotions.",
+  });
+
+  const handleOfferClick = (offer: LocationOffer) => {
+    if (!locationId) return;
+    trackOfferClick(offer.id, offer.title, locationId, pathname);
+  };
+
   if (offers.length === 0) {
     return (
       <div className="offers-empty">
-        <p className="offers-empty__title">No offers available</p>
+        <p className="offers-empty__title">{emptyState.title}</p>
         <p className="offers-empty__text">
           {locationName
-            ? `There are no active promotions for ${locationName} right now. Check back soon.`
-            : "Select a location above to view available promotions."}
+            ? interpolate(emptyState.bodyTemplate, { location: locationName })
+            : emptyState.selectPrompt}
         </p>
       </div>
     );
@@ -53,6 +73,7 @@ export default function OffersGrid({ offers, locationId, locationName }: OffersG
               to={detailPath}
               className="offers-card__main"
               aria-label={`View details for ${offer.title}`}
+              onClick={() => handleOfferClick(offer)}
             >
               <div className="offers-card__media">
                 <img
@@ -75,8 +96,12 @@ export default function OffersGrid({ offers, locationId, locationName }: OffersG
               </div>
             </Link>
             <div className="offers-card__footer">
-              <Link to={detailPath} className="offers-card__cta">
-                View Details
+              <Link
+                to={detailPath}
+                className="offers-card__cta"
+                onClick={() => handleOfferClick(offer)}
+              >
+                {grid.viewDetailsLabel}
               </Link>
               {orderPath ? (
                 orderIsInternal ? (
@@ -84,17 +109,19 @@ export default function OffersGrid({ offers, locationId, locationName }: OffersG
                     to={orderPath}
                     className="offers-card__order"
                     aria-label={`Order ${offer.title} online`}
+                    onClick={() => handleOfferClick(offer)}
                   >
-                    Order Now
+                    {grid.orderNowLabel}
                   </Link>
                 ) : (
                   <a
                     href={orderPath}
                     className="offers-card__order"
                     aria-label={`Order ${offer.title} online`}
+                    onClick={() => handleOfferClick(offer)}
                     {...EXTERNAL_ORDER_LINK_PROPS}
                   >
-                    Order Now
+                    {grid.orderNowLabel}
                   </a>
                 )
               ) : null}

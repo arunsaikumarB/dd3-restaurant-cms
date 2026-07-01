@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { EASE_POWER3 } from "../showcase/motion";
 import { ORDER_URL, RESERVE_URL } from "../../constants/navigation";
 import { SITE } from "../../constants/site";
+import { usePageContent } from "../../context/PageContentContext";
+import { useSectionImage } from "../../hooks/useGallerySection";
+import { useLocationSelection } from "../../context/LocationContext";
+import { trackOrderClick, trackReservationClick } from "../../services/analytics";
 import ExperienceCard from "./ExperienceCard";
 import "./experience.css";
 
@@ -13,6 +18,25 @@ const TICKER_ITEMS = [
   "Private Dining Available for Groups",
   "Authentic Dum Biryani — Slow-Cooked Daily",
 ];
+
+const EXPERIENCE_FALLBACK = {
+  eyebrowTemplate: "Discover {name}",
+  title: "Choose Your Experience",
+  subtitle:
+    "Whether you're dining in, ordering online, or exploring our menu, your next experience starts here.",
+  menuCardLabel: "The Menu",
+  menuCardHeadline: "{name} — a feast made with love",
+  menuCardSubtitle: "Explore our full collection of biryanis, curries, tandoori and desserts.",
+  menuCardCta: { label: "Explore Menu", url: "/menu" },
+  orderCardLabel: "The Kitchen",
+  orderCardHeadline: "In the heart of every flavour",
+  orderCardSubtitle: "Fresh, bold and delivered with the same passion as our dining room.",
+  reservationCardLabel: "Reservations",
+  reservationCardHeadline: "Of the city, every plate",
+  reservationCardSubtitleFallback: "An elegant setting for unforgettable evenings.",
+  reservationCardCta: { label: "Reserve a Table", url: RESERVE_URL },
+  tickerItems: TICKER_ITEMS.map((text) => ({ text })),
+};
 
 export interface ExperienceCardsProps {
   restaurantName?: string;
@@ -41,6 +65,14 @@ export default function ExperienceCards({
   orderCtaText = "Order Now",
   orderCtaLink = ORDER_URL,
 }: ExperienceCardsProps) {
+  const { pathname } = useLocation();
+  const { selectedLocationId } = useLocationSelection();
+  const { fetchSection, interpolate } = usePageContent();
+  const experience = fetchSection("home", "experience", EXPERIENCE_FALLBACK);
+  const menuImage = useSectionImage("choose_experience_menu", "/showcase/biryani.jpg");
+  const orderImage = useSectionImage("choose_experience_order", "/showcase/tandoori.jpg");
+  const visitImage = useSectionImage("choose_experience_visit", "/frames/frame_0060.jpg");
+
   const cards = useMemo(() => {
     const socialMeta = [
       instagram ? "Instagram" : null,
@@ -55,13 +87,13 @@ export default function ExperienceCards({
 
     return [
       {
-        label: "The Menu",
-        headline: `${restaurantName} — a feast made with love`,
-        subtitle: "Explore our full collection of biryanis, curries, tandoori and desserts.",
-        image: "/showcase/biryani.jpg",
+        label: experience.menuCardLabel,
+        headline: interpolate(experience.menuCardHeadline, { name: restaurantName }),
+        subtitle: experience.menuCardSubtitle,
+        image: menuImage,
         imageAlt: "Premium biryani from Desi Dhamaka",
-        buttonText: "Explore Menu",
-        link: "/menu",
+        buttonText: experience.menuCardCta.label,
+        link: experience.menuCardCta.url,
         favourites: [
           { src: "/showcase/biryani.jpg", alt: "Biryani" },
           { src: "/showcase/butter-chicken.jpg", alt: "Butter chicken" },
@@ -72,10 +104,10 @@ export default function ExperienceCards({
       },
       {
         title: "Order Online",
-        label: "The Kitchen",
-        headline: "In the heart of every flavour",
-        subtitle: "Fresh, bold and delivered with the same passion as our dining room.",
-        image: "/showcase/tandoori.jpg",
+        label: experience.orderCardLabel,
+        headline: experience.orderCardHeadline,
+        subtitle: experience.orderCardSubtitle,
+        image: orderImage,
         imageAlt: "Guests enjoying Desi Dhamaka",
         buttonText: orderCtaText,
         link: orderCtaLink,
@@ -84,19 +116,19 @@ export default function ExperienceCards({
         isCenter: true,
       },
       {
-        label: "Reservations",
-        headline: "Of the city, every plate",
-        subtitle: address || "An elegant setting for unforgettable evenings.",
+        label: experience.reservationCardLabel,
+        headline: experience.reservationCardHeadline,
+        subtitle: address || experience.reservationCardSubtitleFallback,
         meta: reservationMeta,
-        image: "/frames/frame_0060.jpg",
+        image: visitImage,
         imageAlt: "Desi Dhamaka restaurant interior",
-        buttonText: "Reserve a Table",
-        link: RESERVE_URL,
+        buttonText: experience.reservationCardCta.label,
+        link: experience.reservationCardCta.url,
         rotation: { rotateY: 14, rotateZ: 3, translateY: 12 },
         scrollDelay: 400,
       },
     ];
-  }, [restaurantName, hoursLabel, phone, email, address, facebook, instagram, youtube, mapsUrl, orderCtaText, orderCtaLink]);
+  }, [restaurantName, hoursLabel, phone, email, address, facebook, instagram, youtube, mapsUrl, orderCtaText, orderCtaLink, menuImage, orderImage, visitImage, experience, interpolate]);
 
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
@@ -142,13 +174,14 @@ export default function ExperienceCards({
         viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 0.8, ease: EASE_POWER3 }}
       >
-        <p className="experience-section__eyebrow">Discover {restaurantName}</p>
+        <p className="experience-section__eyebrow">
+          {interpolate(experience.eyebrowTemplate, { name: restaurantName })}
+        </p>
         <h2 id="experience-heading" className="experience-section__title">
-          Choose Your Experience
+          {experience.title}
         </h2>
         <p className="experience-section__subtitle">
-          Whether you&apos;re dining in, ordering online, or exploring our menu,
-          your next experience starts here.
+          {experience.subtitle}
         </p>
       </motion.div>
 
@@ -175,6 +208,15 @@ export default function ExperienceCards({
                 scrollDelay={card.scrollDelay}
                 visible={visible}
                 flat={flat}
+                onActivate={() => {
+                  if (card.isCenter) {
+                    trackOrderClick(pathname, selectedLocationId);
+                    return;
+                  }
+                  if (card.link === RESERVE_URL) {
+                    trackReservationClick(pathname, selectedLocationId);
+                  }
+                }}
               />
             ))}
           </div>
@@ -183,9 +225,9 @@ export default function ExperienceCards({
 
       <div className="experience-ticker" aria-hidden>
         <div className="experience-ticker__track">
-          {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
+          {[...experience.tickerItems, ...experience.tickerItems].map((item, i) => (
             <span key={i} className="experience-ticker__item">
-              {item}
+              {item.text}
               <span className="experience-ticker__dot">◆</span>
             </span>
           ))}

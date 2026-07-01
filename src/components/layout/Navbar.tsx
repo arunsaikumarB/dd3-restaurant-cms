@@ -12,16 +12,23 @@ import {
 import { EXTERNAL_ORDER_LINK_PROPS } from "../../constants/ordering";
 import { LOGO, logoSrcForBackground } from "../../constants/logo";
 import { useHomepageData } from "../../hooks/useHomepageData";
+import { usePageContent } from "../../context/PageContentContext";
 import { EASE_POWER3 } from "../showcase/motion";
 import LocationSwitcher from "../location/LocationSwitcher";
 import { useLocationSelection } from "../../context/LocationContext";
 import { isExternalUrl, resolveOrderUrl, resolveReservationUrl } from "../../utils/locationLinks";
+import { trackOrderClick, trackReservationClick } from "../../services/analytics";
 import "./navbar.css";
 
 type NavLinkItem = { label: string; path: string };
 
 export default function Navbar() {
   const { bundle, locationId: bundleLocationId } = useHomepageData();
+  const { fetchSection } = usePageContent();
+  const navbar = fetchSection("global", "navbar", {
+    orderLabel: "Order Now",
+    reserveLabel: "Reserve a Table",
+  });
   const { navigateWithLocationGuard, selectedLocationId } = useLocationSelection();
   const reservationLink = resolveReservationUrl(bundle.settings, selectedLocationId);
   const orderLink = resolveOrderUrl(bundle.settings, selectedLocationId, bundleLocationId);
@@ -92,13 +99,29 @@ export default function Navbar() {
   const isActive = (path: string) =>
     path === "/" ? pathname === "/" : pathname.startsWith(path);
 
-  const handleMaybeGuardedNav = (event: MouseEvent<HTMLElement>, path: string) => {
+  const handleOrderClick = () => {
+    trackOrderClick(pathname, selectedLocationId);
+  };
+
+  const handleReservationNav = (event: MouseEvent<HTMLElement>, path: string) => {
+    trackReservationClick(pathname, selectedLocationId);
     if (path === RESERVE_URL && isExternalUrl(reservationLink)) {
       event.preventDefault();
       window.open(reservationLink, "_blank", "noopener,noreferrer");
       return;
     }
     if (path === "/menu" || path === RESERVE_URL) {
+      event.preventDefault();
+      navigateWithLocationGuard(path);
+    }
+  };
+
+  const handleMaybeGuardedNav = (event: MouseEvent<HTMLElement>, path: string) => {
+    if (path === RESERVE_URL) {
+      handleReservationNav(event, path);
+      return;
+    }
+    if (path === "/menu") {
       event.preventDefault();
       navigateWithLocationGuard(path);
     }
@@ -161,17 +184,18 @@ export default function Navbar() {
           <div className="hidden flex-shrink-0 items-center gap-2 xl:flex 2xl:gap-3">
             <a
               href={orderLink}
+              onClick={handleOrderClick}
               className="whitespace-nowrap rounded-full bg-brand-primary px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#d43415] 2xl:px-5 2xl:py-2.5 2xl:text-xs"
               {...EXTERNAL_ORDER_LINK_PROPS}
             >
-              Order Now
+              {navbar.orderLabel}
             </a>
             <Link
               to={RESERVE_URL}
               onClick={(event) => handleMaybeGuardedNav(event, RESERVE_URL)}
               className="whitespace-nowrap rounded-full border border-white px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-cocoa 2xl:px-5 2xl:py-2.5 2xl:text-xs"
             >
-              Reserve a Table
+              {navbar.reserveLabel}
             </Link>
             <LocationSwitcher variant="header" tone={headerTone} />
           </div>
@@ -180,10 +204,11 @@ export default function Navbar() {
           <div className="flex flex-shrink-0 items-center justify-end gap-2 xl:hidden">
             <a
               href={orderLink}
+              onClick={handleOrderClick}
               className="whitespace-nowrap rounded-full bg-brand-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#d43415]"
               {...EXTERNAL_ORDER_LINK_PROPS}
             >
-              Order Now
+              {navbar.orderLabel}
             </a>
             <button
               ref={menuButtonRef}
@@ -249,17 +274,18 @@ export default function Navbar() {
             <div className="mt-4 flex w-full max-w-sm flex-col items-stretch gap-3">
               <a
                 href={orderLink}
+                onClick={handleOrderClick}
                 className="rounded-full bg-brand-primary px-5 py-3 text-center text-sm font-bold uppercase tracking-wider text-white"
                 {...EXTERNAL_ORDER_LINK_PROPS}
               >
-                Order Now
+                {navbar.orderLabel}
               </a>
               <Link
                 to={RESERVE_URL}
                 onClick={(event) => handleMaybeGuardedNav(event, RESERVE_URL)}
                 className="rounded-full border border-white px-5 py-3 text-center text-sm font-bold uppercase tracking-wider text-white"
               >
-                Reserve a Table
+                {navbar.reserveLabel}
               </Link>
               <LocationSwitcher variant="full" />
             </div>

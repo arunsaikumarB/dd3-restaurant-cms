@@ -1,4 +1,5 @@
 import type { MenuCategory } from "../../types/menu";
+import { usePageContent } from "../../context/PageContentContext";
 
 export interface FilterDropdownProps {
   categories: MenuCategory[];
@@ -11,6 +12,12 @@ export default function FilterDropdown({
   value,
   onChange,
 }: FilterDropdownProps) {
+  const { fetchSection } = usePageContent();
+  const toolbar = fetchSection("menu", "toolbar", {
+    searchPlaceholder: "Search by food name…",
+    allCategoriesLabel: "All Categories",
+  });
+
   return (
     <div className="relative w-full sm:w-auto">
       <label htmlFor="menu-filter" className="sr-only">
@@ -24,7 +31,7 @@ export default function FilterDropdown({
         }
         className="w-full cursor-pointer appearance-none rounded-full border border-cocoa/10 bg-white/80 py-3.5 pl-5 pr-12 text-[14px] font-medium text-cocoa shadow-sm outline-none transition-all duration-300 focus:border-saffron focus:ring-2 focus:ring-saffron/20 sm:min-w-[220px]"
       >
-        <option value="all">All Categories</option>
+        <option value="all">{toolbar.allCategoriesLabel}</option>
         {categories.map((cat) => (
           <option key={cat.id} value={cat.id}>
             {cat.name}

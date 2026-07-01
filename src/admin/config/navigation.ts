@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  LineChart,
   Home,
   Tag,
   Images,
@@ -26,6 +27,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   {
     items: [
       { label: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
+      { label: "Insights", path: "/admin/insights", icon: LineChart },
       { label: "Homepage", path: "/admin/homepage", icon: Home },
     ],
   },

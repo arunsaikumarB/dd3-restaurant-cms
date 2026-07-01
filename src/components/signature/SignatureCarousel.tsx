@@ -1,144 +1,84 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import useEmblaCarousel from "embla-carousel-react";
-import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import SignatureCard from "./SignatureCard";
 import NavigationArrows from "./NavigationArrows";
 import FeatureRow from "./FeatureRow";
 import { useLocationSelection } from "../../context/LocationContext";
+import { usePageContent } from "../../context/PageContentContext";
 import { useHomepageData } from "../../hooks/useHomepageData";
 import { useSignatureDishes } from "../../hooks/useSignatureDishes";
 import { resolveOrderUrl } from "../../utils/locationLinks";
+import { SIGNATURE_FEATURES } from "../../data/signatureDishes";
 import "./signature.css";
 
-const AUTOPLAY_MS = 4500;
+const CARD_WIDTH = 280;
+const CARD_GAP = 12;
+const SCROLL_STEP = (CARD_WIDTH + CARD_GAP) * 2;
+
+const SIGNATURE_FALLBACK = {
+  eyebrow: "Desi Dhamaka Signatures",
+  title: "Signature Special Dishes",
+  subtitle:
+    "Discover our chef's most celebrated creations, prepared with authentic Indian flavours, premium ingredients, and unforgettable presentation.",
+  viewMenuCta: { label: "View Full Menu", url: "/menu" },
+  features: SIGNATURE_FEATURES.map(({ title, description }) => ({ title, description })),
+};
 
 export default function SignatureCarousel() {
   const sectionRef = useRef<HTMLElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const [sectionVisible, setSectionVisible] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
 
   const { selectedLocationId } = useLocationSelection();
+  const { fetchSection } = usePageContent();
+  const signature = fetchSection("home", "signature", SIGNATURE_FALLBACK);
   const { bundle, locationId: bundleLocationId } = useHomepageData();
-  const { dishes, locationId: dishLocationId } = useSignatureDishes(
-    selectedLocationId,
+  const { dishes } = useSignatureDishes(selectedLocationId);
+  const orderBaseUrl = useMemo(
+    () =>
+      resolveOrderUrl(bundle.settings, selectedLocationId, bundleLocationId),
+    [bundle.settings, selectedLocationId, bundleLocationId],
   );
-  const orderBaseUrl = resolveOrderUrl(
-    bundle.settings,
-    selectedLocationId,
-    bundleLocationId,
-  );
-
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    {
-      align: "center",
-      loop: true,
-      skipSnaps: false,
-      duration: 35,
-    },
-    [WheelGesturesPlugin({ forceWheelAxis: "x" })],
-  );
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const onPointerDown = () => setIsDragging(true);
-    const onPointerUp = () => setIsDragging(false);
-
-    emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", onSelect);
-    emblaApi.on("pointerDown", onPointerDown);
-    emblaApi.on("pointerUp", onPointerUp);
-    onSelect();
-
-    return () => {
-      emblaApi.off("select", onSelect);
-      emblaApi.off("reInit", onSelect);
-      emblaApi.off("pointerDown", onPointerDown);
-      emblaApi.off("pointerUp", onPointerUp);
-    };
-  }, [emblaApi, onSelect]);
-
-  useEffect(() => {
-    if (!emblaApi || dishes.length === 0) return;
-    emblaApi.reInit();
-    const start = Math.floor(dishes.length / 2);
-    emblaApi.scrollTo(start, true);
-    setSelectedIndex(start);
-  }, [emblaApi, dishes, dishLocationId]);
-
-  useEffect(() => {
-    if (!emblaApi || isPaused || dishes.length < 2) return;
-    const timer = window.setInterval(() => emblaApi.scrollNext(), AUTOPLAY_MS);
-    return () => window.clearInterval(timer);
-  }, [emblaApi, isPaused, dishes.length]);
-
-  useEffect(() => {
-    if (!dishes.length) return;
-    const len = dishes.length;
-    const indices = [
-      (selectedIndex - 1 + len) % len,
-      selectedIndex,
-      (selectedIndex + 1) % len,
-    ];
-    for (const index of indices) {
-      const src = dishes[index]?.image;
-      if (!src) continue;
-      const img = new Image();
-      img.src = src;
-    }
-  }, [selectedIndex, dishes]);
 
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
+
+    const reveal = () => setSectionVisible(true);
+
+    if (typeof IntersectionObserver === "undefined") {
+      reveal();
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setSectionVisible(true);
+          reveal();
           observer.disconnect();
         }
       },
-      { threshold: 0.12 },
+      { threshold: 0.08 },
     );
     observer.observe(el);
+
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      reveal();
+      observer.disconnect();
+    }
+
     return () => observer.disconnect();
+  }, [dishes.length]);
+
+  const scrollPrev = useCallback(() => {
+    viewportRef.current?.scrollBy({ left: -SCROLL_STEP, behavior: "smooth" });
   }, []);
 
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
-
-  const handleCardHover = useCallback(
-    (index: number) => {
-      setHoveredIndex(index);
-      emblaApi?.scrollTo(index);
-    },
-    [emblaApi],
-  );
-
-  const handleCardLeave = useCallback(() => {
-    setHoveredIndex(null);
+  const scrollNext = useCallback(() => {
+    viewportRef.current?.scrollBy({ left: SCROLL_STEP, behavior: "smooth" });
   }, []);
-
-  const getDistance = useCallback(
-    (index: number) => {
-      const len = dishes.length;
-      if (len === 0) return 0;
-      let diff = Math.abs(index - selectedIndex);
-      if (diff > len / 2) diff = len - diff;
-      return diff;
-    },
-    [dishes.length, selectedIndex],
-  );
 
   return (
     <section
@@ -164,7 +104,7 @@ export default function SignatureCarousel() {
           animate={sectionVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
         >
-          Desi Dhamaka Signatures
+          {signature.eyebrow}
         </motion.p>
         <motion.h2
           id="signature-heading"
@@ -173,7 +113,7 @@ export default function SignatureCarousel() {
           animate={sectionVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.75, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
         >
-          Signature Special Dishes
+          {signature.title}
         </motion.h2>
         <motion.p
           className="signature-section__subtitle"
@@ -181,47 +121,37 @@ export default function SignatureCarousel() {
           animate={sectionVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.75, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         >
-          Discover our chef&apos;s most celebrated creations, prepared with authentic Indian
-          flavours, premium ingredients, and unforgettable presentation.
+          {signature.subtitle}
         </motion.p>
       </header>
 
-      <div
-        className="signature-carousel mx-auto max-w-[1400px] px-4 md:px-8 lg:px-12"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
+      <div className="signature-carousel w-full relative overflow-hidden">
+        <NavigationArrows
+          onPrev={scrollPrev}
+          onNext={scrollNext}
+          canScrollPrev
+          canScrollNext
+        />
+
         <div
-          className={`signature-carousel__viewport${isDragging ? " is-dragging" : ""}`}
-          ref={emblaRef}
+          ref={viewportRef}
+          className="signature-carousel__viewport"
           role="region"
           aria-label="Signature dishes carousel"
         >
-          <div className="signature-carousel__container">
+          <div className="signature-carousel__track">
             {dishes.map((dish, index) => (
               <div className="signature-carousel__slide" key={dish.id}>
                 <SignatureCard
                   dish={dish}
                   orderBaseUrl={orderBaseUrl}
-                  isActive={selectedIndex === index}
-                  isHovered={hoveredIndex === index}
-                  distance={getDistance(index)}
-                  onHover={() => handleCardHover(index)}
-                  onLeave={handleCardLeave}
                   entranceVisible={sectionVisible}
-                  entranceDelay={index * 0.1}
+                  entranceDelay={index * 0.08}
                 />
               </div>
             ))}
           </div>
         </div>
-
-        <NavigationArrows
-          onPrev={scrollPrev}
-          onNext={scrollNext}
-          canScrollPrev={Boolean(emblaApi)}
-          canScrollNext={Boolean(emblaApi)}
-        />
       </div>
 
       <div className="signature-section__cta-wrap">
@@ -232,16 +162,16 @@ export default function SignatureCarousel() {
           transition={{ duration: 0.65, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
           <Link
-            to="/menu"
+            to={signature.viewMenuCta.url}
             className="inline-flex items-center justify-center rounded-md border border-saffron/70 bg-transparent px-8 py-3 text-[11px] font-bold uppercase tracking-[0.18em] text-saffron transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-saffron hover:bg-saffron/10 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c0a09]"
           >
-            View Full Menu
+            {signature.viewMenuCta.label}
           </Link>
         </motion.div>
         <span className="signature-section__cta-line" aria-hidden />
       </div>
 
-      <FeatureRow visible={sectionVisible} />
+      <FeatureRow visible={sectionVisible} features={signature.features} />
     </section>
   );
 }

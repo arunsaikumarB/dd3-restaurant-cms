@@ -8,8 +8,11 @@ import {
   FeaturedReviewSkeleton,
   ReviewsGridSkeleton,
 } from "../components/testimonials/TestimonialsPageSkeleton";
+import { usePageContent } from "../context/PageContentContext";
 import { useReviewsData } from "../hooks/useReviewsData";
+import { useSectionImage } from "../hooks/useGallerySection";
 import { EASE_POWER3, prefersReducedMotion } from "../components/showcase/motion";
+import { isExternalUrl } from "../utils/locationLinks";
 
 function AnimatedRating({ value }: { value: number }) {
   const [display, setDisplay] = useState(0);
@@ -44,8 +47,41 @@ function AnimatedRating({ value }: { value: number }) {
 }
 
 export default function TestimonialsPage() {
+  const { fetchSection } = usePageContent();
   const { reviews, loading } = useReviewsData();
+  const heroBackground = useSectionImage("testimonials_hero", "/showcase/butter-chicken.jpg");
   const [index, setIndex] = useState(0);
+
+  const hero = fetchSection("testimonials", "hero", {
+    label: "Guest Reviews",
+    title: "Testimonials",
+    subtitle:
+      "Stories from guests who have experienced the warmth, flavour and hospitality of Desi Dhamaka.",
+  });
+  const ratingStats = fetchSection("testimonials", "rating_stats", {
+    averageLabel: "Average Rating",
+    ratingValue: "4.9",
+    reviewCountText: "Based on 500+ Google Reviews",
+    verifiedBadge: "Google Verified",
+    reviewSourceLabel: "Google Reviews",
+  });
+  const reviewsGrid = fetchSection("testimonials", "reviews_grid", {
+    eyebrow: "All Reviews",
+    title: "What our guests say",
+  });
+  const emptyStates = fetchSection("testimonials", "empty_states", {
+    featuredTitle: "Reviews coming soon",
+    featuredBody: "Guest testimonials will appear here once published.",
+    gridTitle: "No reviews yet",
+    gridBody: "Be the first to share your experience with us.",
+  });
+  const cta = fetchSection("testimonials", "cta", {
+    title: "Join Our Community of Happy Guests",
+    subtitle: "Reserve your table and create your own memorable experience.",
+    cta: { label: "Reserve Now", url: "/reservation" },
+  });
+
+  const ratingValue = Number.parseFloat(ratingStats.ratingValue) || 4.9;
 
   useEffect(() => {
     if (reviews.length === 0) return;
@@ -66,46 +102,53 @@ export default function TestimonialsPage() {
   return (
     <div className="bg-ivory">
       <PageHero
-        label="Guest Reviews"
-        title="Testimonials"
-        subtitle="Stories from guests who have experienced the warmth, flavour and hospitality of Desi Dhamaka."
-        backgroundImage="/showcase/butter-chicken.jpg"
+        label={hero.label}
+        title={hero.title}
+        subtitle={hero.subtitle}
+        backgroundImage={heroBackground}
         breadcrumbItems={[
           { label: "Home", to: "/" },
           { label: "Testimonials" },
         ]}
       />
 
-      {/* Featured review + rating */}
       <section className="page-content-start mx-auto max-w-[1400px] px-6 pb-24 md:px-10 lg:px-16">
         <div className="grid gap-12 lg:grid-cols-[1fr_2.5fr] lg:gap-20">
           <AnimatedContainer>
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-saffron">
-              Average Rating
+              {ratingStats.averageLabel}
             </p>
             <div className="mt-3 flex items-end gap-2">
-              <AnimatedRating value={4.9} />
+              <AnimatedRating value={ratingValue} />
               <span className="mb-2 font-serif text-[1.5rem] text-cocoa/30">/5</span>
             </div>
-            <div className="mt-2 flex gap-0.5 text-[1.2rem] text-saffron" aria-label="4.9 out of 5 stars">
+            <div
+              className="mt-2 flex gap-0.5 text-[1.2rem] text-saffron"
+              aria-label={`${ratingValue} out of 5 stars`}
+            >
               {"★★★★★"}
             </div>
             <p className="mt-4 text-[14px] leading-relaxed text-cocoa/55">
-              Based on 500+ Google Reviews
+              {ratingStats.reviewCountText}
             </p>
             <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-saffron/10 px-4 py-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden fill="currentColor" className="text-saffron">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                aria-hidden
+                fill="currentColor"
+                className="text-saffron"
+              >
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-saffron">Google Verified</span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-saffron">
+                {ratingStats.verifiedBadge}
+              </span>
             </div>
           </AnimatedContainer>
 
-          <div
-            className="relative"
-            aria-live="polite"
-            aria-atomic="true"
-          >
+          <div className="relative" aria-live="polite" aria-atomic="true">
             {loading ? (
               <FeaturedReviewSkeleton />
             ) : activeReview ? (
@@ -131,10 +174,15 @@ export default function TestimonialsPage() {
                           <cite className="not-italic block font-semibold text-cocoa">
                             {activeReview.name}
                           </cite>
-                          <p className="text-[12px] text-cocoa/45">{activeReview.source}</p>
+                          <p className="text-[12px] text-cocoa/45">
+                            {activeReview.source || ratingStats.reviewSourceLabel}
+                          </p>
                         </div>
                       </div>
-                      <span className="text-[1.1rem] tracking-wide text-saffron" aria-label={`${activeReview.rating} stars`}>
+                      <span
+                        className="text-[1.1rem] tracking-wide text-saffron"
+                        aria-label={`${activeReview.rating} stars`}
+                      >
                         {"★".repeat(activeReview.rating)}
                       </span>
                     </footer>
@@ -158,32 +206,27 @@ export default function TestimonialsPage() {
               </>
             ) : (
               <div className="rounded-[28px] border border-cocoa/10 bg-white/60 p-12 text-center">
-                <p className="font-serif text-2xl text-cocoa">Reviews coming soon</p>
-                <p className="mt-3 text-cocoa/60">
-                  Guest testimonials will appear here once published.
-                </p>
+                <p className="font-serif text-2xl text-cocoa">{emptyStates.featuredTitle}</p>
+                <p className="mt-3 text-cocoa/60">{emptyStates.featuredBody}</p>
               </div>
             )}
           </div>
         </div>
       </section>
 
-      {/* All reviews grid */}
       <section className="bg-[#FDFBF7] py-24">
         <div className="mx-auto max-w-[1400px] px-6 md:px-10 lg:px-16">
           <SectionHeading
-            eyebrow="All Reviews"
-            title="What our guests say"
+            eyebrow={reviewsGrid.eyebrow}
+            title={reviewsGrid.title}
             align="center"
           />
           {loading ? (
             <ReviewsGridSkeleton />
           ) : reviews.length === 0 ? (
             <div className="mt-14 rounded-[24px] border border-cocoa/10 bg-ivory p-12 text-center">
-              <p className="font-serif text-2xl text-cocoa">No reviews yet</p>
-              <p className="mt-3 text-cocoa/60">
-                Be the first to share your experience with us.
-              </p>
+              <p className="font-serif text-2xl text-cocoa">{emptyStates.gridTitle}</p>
+              <p className="mt-3 text-cocoa/60">{emptyStates.gridBody}</p>
             </div>
           ) : (
             <div className="mt-14 grid gap-5 md:grid-cols-2">
@@ -199,16 +242,22 @@ export default function TestimonialsPage() {
                     </div>
                     <div>
                       <p className="font-semibold text-cocoa">{item.name}</p>
-                      <p className="text-[12px] text-cocoa/45">{item.source}</p>
+                      <p className="text-[12px] text-cocoa/45">
+                        {item.source || ratingStats.reviewSourceLabel}
+                      </p>
                     </div>
-                    <span className="ml-auto shrink-0 text-[0.95rem] text-saffron" aria-label={`${item.rating} stars`}>
+                    <span
+                      className="ml-auto shrink-0 text-[0.95rem] text-saffron"
+                      aria-label={`${item.rating} stars`}
+                    >
                       {"★".repeat(item.rating)}
                     </span>
                   </div>
-                  <span className="mb-4 block h-px w-8 rounded-full bg-saffron/30 transition-all duration-300 group-hover:w-16 group-hover:bg-saffron/50" aria-hidden />
-                  <p className="text-[14.5px] leading-[1.75] text-cocoa/62">
-                    {item.text}
-                  </p>
+                  <span
+                    className="mb-4 block h-px w-8 rounded-full bg-saffron/30 transition-all duration-300 group-hover:w-16 group-hover:bg-saffron/50"
+                    aria-hidden
+                  />
+                  <p className="text-[14.5px] leading-[1.75] text-cocoa/62">{item.text}</p>
                 </AnimatedContainer>
               ))}
             </div>
@@ -216,13 +265,13 @@ export default function TestimonialsPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="mx-auto max-w-[1400px] px-6 py-24 md:px-10 lg:px-16">
         <CTASection
-          title="Join Our Community of Happy Guests"
-          subtitle="Reserve your table and create your own memorable experience."
-          buttonLabel="Reserve Now"
-          buttonTo="/reservation"
+          title={cta.title}
+          subtitle={cta.subtitle}
+          buttonLabel={cta.cta.label}
+          buttonTo={isExternalUrl(cta.cta.url) ? undefined : cta.cta.url}
+          buttonHref={isExternalUrl(cta.cta.url) ? cta.cta.url : undefined}
         />
       </section>
     </div>

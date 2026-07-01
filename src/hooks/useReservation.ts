@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
+import type { LocationId } from "../config/locations";
+import { usePageContent } from "../context/PageContentContext";
 import { RESERVATION_LOCATIONS } from "../data/reservationPage";
+import { trackReservationClick } from "../services/analytics";
 import {
   fetchAvailableTimeSlots,
   submitReservation,
@@ -38,6 +41,12 @@ const initialState: ReservationFormState = {
 };
 
 export function useReservation() {
+  const { fetchSection, interpolate } = usePageContent();
+  const bookingMessages = fetchSection("reservation", "booking_messages", {
+    successTemplate:
+      "Thank you, {name}. Your request for {guests} guest(s) has been received. We'll confirm shortly.",
+  });
+
   const [form, setForm] = useState<ReservationFormState>(initialState);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
@@ -146,11 +155,19 @@ export function useReservation() {
       specialRequests: form.specialRequests.trim() || undefined,
     };
 
+    trackReservationClick("/reservation", form.locationId as LocationId);
+
     setSubmitting(true);
     try {
-      const result = await submitReservation(payload);
+      await submitReservation(payload);
       setSubmitted(true);
-      setSuccessMessage(result.message);
+      const firstName = form.name.trim().split(" ")[0];
+      setSuccessMessage(
+        interpolate(bookingMessages.successTemplate, {
+          name: firstName,
+          guests: String(form.guests),
+        }),
+      );
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Something went wrong. Please try again.",
@@ -158,7 +175,7 @@ export function useReservation() {
     } finally {
       setSubmitting(false);
     }
-  }, [form]);
+  }, [form, bookingMessages.successTemplate, interpolate]);
 
   const reset = useCallback(() => {
     setForm(initialState);

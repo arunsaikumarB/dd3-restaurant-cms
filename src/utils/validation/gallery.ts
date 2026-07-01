@@ -13,6 +13,14 @@ export function validateGalleryForm(form: GalleryForm): GalleryErrors {
     errors.category = "Category is required.";
   }
 
+  if (!form.section.trim()) {
+    errors.section = "Section is required.";
+  }
+
+  if (!form.location_id.trim()) {
+    errors.location_id = "Location is required.";
+  }
+
   if (!form.alt_text.trim()) {
     errors.alt_text = "Alt text is required.";
   }

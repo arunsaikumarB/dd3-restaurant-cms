@@ -10,43 +10,65 @@ export function formatPrice(price: number): string {
 }
 
 /** Editorial subtitle for a category heading. */
-export function getCategorySubtitle(name: string): string {
+export type CategorySubtitleRules = {
+  items: Array<{ matchKey: string; subtitle: string }>;
+  defaultSubtitle: string;
+};
+
+const CATEGORY_SUBTITLE_MAP: Record<string, string> = {
+  biryani: "Traditional dum-cooked rice specialities",
+  soups: "Warm, aromatic beginnings",
+  desserts: "Sweet finales crafted with care",
+  naans: "Fresh from the tandoor",
+  chai: "Slow-steeped, soul-warming brews",
+  coffee: "Bold roasts and spiced pours",
+  breakfast: "Morning flavours to start your day",
+  mocktails: "Refreshing, alcohol-free creations",
+  "soft drinks": "Classic refreshments",
+  snacks: "Light bites and street-side favourites",
+  pulavs: "Fragrant rice delicacies",
+  thali: "Complete meals on a single platter",
+  trays: "Generous platters for sharing",
+  "kebab and tandoori": "Smoky, char-grilled perfection",
+  "vegetarian appetizers": "Plant-forward starters",
+  "non vegetarian appetizers": "Bold flavours to begin",
+  "vegetarian entrees": "Comforting vegetarian classics",
+  "non vegetarian entrees": "Rich, slow-simmered favourites",
+  "vegetarian rice & biryani": "Aromatic rice specialities",
+  "dd specials": "House signatures you won't forget",
+  "dd special mandi": "Slow-roasted mandi masterpieces",
+  "dd family packs (to go only)": "Feast-sized portions for home",
+  "grand opening buffet": "A celebratory spread for every palate",
+  "kids menu": "Flavours the little ones will love",
+  "cooker pulav": "One-pot rice comfort",
+  "monday offers": "Weekly delights at special value",
+};
+
+export const DEFAULT_CATEGORY_SUBTITLE_RULES: CategorySubtitleRules = {
+  items: Object.entries(CATEGORY_SUBTITLE_MAP).map(([matchKey, subtitle]) => ({
+    matchKey,
+    subtitle,
+  })),
+  defaultSubtitle: "Curated selections from our kitchen",
+};
+
+export function getCategorySubtitle(name: string, rules?: CategorySubtitleRules): string {
   const key = name.toLowerCase();
 
-  const map: Record<string, string> = {
-    biryani: "Traditional dum-cooked rice specialities",
-    soups: "Warm, aromatic beginnings",
-    desserts: "Sweet finales crafted with care",
-    naans: "Fresh from the tandoor",
-    chai: "Slow-steeped, soul-warming brews",
-    coffee: "Bold roasts and spiced pours",
-    breakfast: "Morning flavours to start your day",
-    mocktails: "Refreshing, alcohol-free creations",
-    "soft drinks": "Classic refreshments",
-    snacks: "Light bites and street-side favourites",
-    pulavs: "Fragrant rice delicacies",
-    thali: "Complete meals on a single platter",
-    trays: "Generous platters for sharing",
-    "kebab and tandoori": "Smoky, char-grilled perfection",
-    "vegetarian appetizers": "Plant-forward starters",
-    "non vegetarian appetizers": "Bold flavours to begin",
-    "vegetarian entrees": "Comforting vegetarian classics",
-    "non vegetarian entrees": "Rich, slow-simmered favourites",
-    "vegetarian rice & biryani": "Aromatic rice specialities",
-    "dd specials": "House signatures you won't forget",
-    "dd special mandi": "Slow-roasted mandi masterpieces",
-    "dd family packs (to go only)": "Feast-sized portions for home",
-    "grand opening buffet": "A celebratory spread for every palate",
-    "kids menu": "Flavours the little ones will love",
-    "cooker pulav": "One-pot rice comfort",
-    "monday offers": "Weekly delights at special value",
-  };
+  if (rules) {
+    for (const item of rules.items) {
+      if (key.includes(item.matchKey.toLowerCase())) {
+        return item.subtitle;
+      }
+    }
+    return rules.defaultSubtitle;
+  }
 
-  for (const [needle, subtitle] of Object.entries(map)) {
+  for (const [needle, subtitle] of Object.entries(CATEGORY_SUBTITLE_MAP)) {
     if (key.includes(needle)) return subtitle;
   }
 
-  return "Curated selections from our kitchen";
+  return DEFAULT_CATEGORY_SUBTITLE_RULES.defaultSubtitle;
 }
 
 /** Filter menu data by search query and optional category id. */

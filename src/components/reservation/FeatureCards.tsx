@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { RESERVATION_FEATURES } from "../../data/reservationPage";
+import { usePageContent } from "../../context/PageContentContext";
 import SectionHeading from "../ui/SectionHeading";
 import {
   containerVariants,
@@ -53,13 +54,32 @@ const featureIcons = {
 };
 
 export default function FeatureCards() {
+  const { fetchSection } = usePageContent();
+  const section = fetchSection("reservation", "features", {
+    eyebrow: "Why Reserve",
+    title: "An Experience Worth Savouring",
+    subtitle:
+      "From the first welcome to the final course, every detail is crafted for memorable dining.",
+    items: RESERVATION_FEATURES.map(({ title, description }) => ({ title, description })),
+  });
+
+  const features = section.items.map((item, index) => {
+    const fallback = RESERVATION_FEATURES[index];
+    return {
+      id: fallback?.id ?? `feature-${index}`,
+      title: item.title,
+      description: item.description,
+      icon: fallback?.icon ?? "cuisine",
+    };
+  });
+
   return (
     <section className="reservation-features" aria-labelledby="why-reserve-title">
       <div className="reservation-features__inner">
         <SectionHeading
-          eyebrow="Why Reserve"
-          title="An Experience Worth Savouring"
-          subtitle="From the first welcome to the final course, every detail is crafted for memorable dining."
+          eyebrow={section.eyebrow}
+          title={section.title}
+          subtitle={section.subtitle}
           align="center"
         />
 
@@ -70,7 +90,7 @@ export default function FeatureCards() {
           whileInView="visible"
           viewport={viewportOnce}
         >
-          {RESERVATION_FEATURES.map((feature) => (
+          {features.map((feature) => (
             <motion.article
               key={feature.id}
               className="reservation-feature"
@@ -79,7 +99,7 @@ export default function FeatureCards() {
               transition={{ duration: 0.45, ease: EASE_POWER3 }}
             >
               <div className="reservation-feature__icon">
-                {featureIcons[feature.icon]}
+                {featureIcons[feature.icon as keyof typeof featureIcons]}
               </div>
               <h3 className="reservation-feature__title">{feature.title}</h3>
               <p className="reservation-feature__desc">{feature.description}</p>

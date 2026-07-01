@@ -61,6 +61,15 @@ export interface HomepageContent extends Timestamps {
   about_description: string | null;
 }
 
+export interface PageContent {
+  id: string;
+  location_id: RestaurantLocationId;
+  page: string;
+  section: string;
+  content: Json;
+  updated_at: string;
+}
+
 export type RestaurantLocationId = "south-plainfield" | "oak-tree" | "lawrenceville";
 
 export interface MenuCategory extends Timestamps {
@@ -226,11 +235,48 @@ export interface GalleryImage extends Timestamps {
   image: string;
   category: string | null;
   alt_text: string | null;
+  title: string | null;
   caption: string | null;
   featured: boolean;
   visible: boolean;
   display_order: number;
+  section: string;
+  location_id: string;
+  page: string;
 }
+
+export type AnalyticsEventType =
+  | "page_view"
+  | "offer_view"
+  | "offer_click"
+  | "order_click"
+  | "reservation_click";
+
+export interface AnalyticsEvent {
+  id: string;
+  created_at: string;
+  location_id: RestaurantLocationId;
+  event_type: AnalyticsEventType;
+  page_path: string;
+  offer_id: string | null;
+  offer_title: string | null;
+  session_id: string;
+  referrer: string | null;
+  device: "mobile" | "tablet" | "desktop" | null;
+  user_agent: string | null;
+}
+
+export type AnalyticsEventInsert = {
+  location_id: RestaurantLocationId;
+  event_type: AnalyticsEventType;
+  page_path: string;
+  offer_id?: string | null;
+  offer_title?: string | null;
+  session_id: string;
+  referrer?: string | null;
+  device?: "mobile" | "tablet" | "desktop" | null;
+  user_agent?: string | null;
+};
 
 export interface Reservation extends Timestamps {
   id: string;
@@ -263,6 +309,9 @@ export type RestaurantSettingsInsert = Omit<RestaurantSettings, "id" | "created_
 
 export type HomepageContentInsert = Omit<HomepageContent, "id" | "created_at" | "updated_at"> &
   Partial<Pick<HomepageContent, "id" | "created_at" | "updated_at">>;
+
+export type PageContentInsert = Omit<PageContent, "id" | "updated_at"> &
+  Partial<Pick<PageContent, "id" | "updated_at">>;
 
 export type MenuCategoryInsert = {
   id?: string;
@@ -340,6 +389,12 @@ export interface Database {
         Update: Partial<HomepageContentInsert>;
         Relationships: [];
       };
+      page_content: {
+        Row: PageContent;
+        Insert: PageContentInsert;
+        Update: Partial<PageContentInsert>;
+        Relationships: [];
+      };
       menu_categories: {
         Row: MenuCategory;
         Insert: MenuCategoryInsert;
@@ -369,6 +424,12 @@ export interface Database {
         Row: GalleryImage;
         Insert: GalleryImageInsert;
         Update: Partial<GalleryImageInsert>;
+        Relationships: [];
+      };
+      analytics_events: {
+        Row: AnalyticsEvent;
+        Insert: AnalyticsEventInsert;
+        Update: Partial<AnalyticsEventInsert>;
         Relationships: [];
       };
       reservations: {
@@ -501,6 +562,47 @@ export interface Database {
       archive_legacy_menu_categories: {
         Args: { p_location_id: string };
         Returns: number;
+      };
+      analytics_summary: {
+        Args: { p_location: string; p_from: string; p_to: string };
+        Returns: {
+          total_page_views: number;
+          unique_sessions: number;
+          offers_page_views: number;
+          offer_clicks: number;
+          order_clicks: number;
+          reservation_clicks: number;
+        };
+      };
+      analytics_views_by_day: {
+        Args: { p_location: string; p_from: string; p_to: string };
+        Returns: { day: string; views: number; sessions: number };
+      };
+      analytics_views_by_page: {
+        Args: { p_location: string; p_from: string; p_to: string };
+        Returns: { page_path: string; views: number };
+      };
+      analytics_offer_performance: {
+        Args: { p_location: string; p_from: string; p_to: string };
+        Returns: {
+          offer_id: string;
+          offer_title: string;
+          is_active: boolean;
+          views: number;
+          clicks: number;
+        };
+      };
+      analytics_offer_daily: {
+        Args: { p_offer: string; p_location: string; p_from: string; p_to: string };
+        Returns: { day: string; views: number; clicks: number };
+      };
+      analytics_devices: {
+        Args: { p_location: string; p_from: string; p_to: string };
+        Returns: { device: string; views: number };
+      };
+      analytics_referrers: {
+        Args: { p_location: string; p_from: string; p_to: string };
+        Returns: { referrer: string; views: number };
       };
     };
     Enums: {

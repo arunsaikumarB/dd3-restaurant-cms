@@ -44,12 +44,16 @@ const ICONS: Record<(typeof SIGNATURE_FEATURES)[number]["icon"], ReactElement> =
 
 export interface FeatureRowProps {
   visible?: boolean;
+  features?: Array<{ title: string; description: string }>;
 }
 
-export default function FeatureRow({ visible = true }: FeatureRowProps) {
+export default function FeatureRow({ visible = true, features }: FeatureRowProps) {
+  const items = features ?? SIGNATURE_FEATURES;
   return (
     <div className="signature-features">
-      {SIGNATURE_FEATURES.map((feature, index) => (
+      {items.map((feature, index) => {
+        const iconKey = SIGNATURE_FEATURES[index]?.icon ?? "leaf";
+        return (
         <motion.div
           key={feature.title}
           className="signature-feature"
@@ -61,13 +65,14 @@ export default function FeatureRow({ visible = true }: FeatureRowProps) {
             ease: [0.22, 1, 0.36, 1],
           }}
         >
-          <div className="signature-feature__icon">{ICONS[feature.icon]}</div>
+          <div className="signature-feature__icon">{ICONS[iconKey]}</div>
           <div>
             <h4 className="signature-feature__title">{feature.title}</h4>
             <p className="signature-feature__desc">{feature.description}</p>
           </div>
         </motion.div>
-      ))}
+      );
+      })}
     </div>
   );
 }

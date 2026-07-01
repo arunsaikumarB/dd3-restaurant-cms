@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import {
   UtensilsCrossed,
   Tag,
@@ -11,6 +12,9 @@ import {
   PlugZap,
   Clock,
   Layers,
+  Eye,
+  BarChart2,
+  MousePointerClick,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAdminTheme } from "../../context/AdminThemeContext";
@@ -28,6 +32,9 @@ const iconMap: Record<string, LucideIcon> = {
   plug: PlugZap,
   clock: Clock,
   layers: Layers,
+  eye: Eye,
+  chart: BarChart2,
+  click: MousePointerClick,
 };
 
 export default function StatCard({ stat }: { stat: AdminStat }) {
@@ -35,7 +42,7 @@ export default function StatCard({ stat }: { stat: AdminStat }) {
   const Icon = iconMap[stat.icon] ?? Users;
   const TrendIcon = stat.trend === "down" ? TrendingDown : TrendingUp;
 
-  return (
+  const card = (
     <AdminCard className="group hover:shadow-admin-lg transition-shadow duration-300">
       <div className="flex items-start justify-between">
         <div
@@ -70,4 +77,10 @@ export default function StatCard({ stat }: { stat: AdminStat }) {
       <p className="mt-1 text-3xl font-semibold tracking-tight">{stat.value}</p>
     </AdminCard>
   );
+
+  if (stat.to) {
+    return <Link to={stat.to} className="block">{card}</Link>;
+  }
+
+  return card;
 }

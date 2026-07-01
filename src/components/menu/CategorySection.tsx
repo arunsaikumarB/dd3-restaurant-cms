@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { EASE_POWER3 } from "../showcase/motion";
 import { MENU_SCROLL_MARGIN } from "../../constants/navigation";
-import { getCategorySubtitle } from "../../utils/menu";
+import { usePageContent } from "../../context/PageContentContext";
+import { getCategorySubtitle, DEFAULT_CATEGORY_SUBTITLE_RULES } from "../../utils/menu";
 import type { MenuCategory } from "../../types/menu";
 import MenuCard from "./MenuCard";
 
@@ -36,6 +37,13 @@ const cardVariants = {
 };
 
 export default function CategorySection({ category, index }: CategorySectionProps) {
+  const { fetchSection } = usePageContent();
+  const subtitleRules = fetchSection(
+    "menu",
+    "category_subtitles",
+    DEFAULT_CATEGORY_SUBTITLE_RULES,
+  );
+
   return (
     <motion.section
       id={`category-${category.id}`}
@@ -58,7 +66,7 @@ export default function CategorySection({ category, index }: CategorySectionProp
           {category.name}
         </h2>
         <p className="mt-3 max-w-xl text-[16px] text-cocoa/55">
-          {getCategorySubtitle(category.name)}
+          {getCategorySubtitle(category.name, subtitleRules)}
         </p>
         <span className="mt-6 block h-px w-16 bg-saffron/60" aria-hidden />
       </div>

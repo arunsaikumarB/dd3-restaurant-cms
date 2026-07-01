@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { ABOUT_PARAGRAPHS, ABOUT_QUOTE } from "../../data/aboutSection";
+import { ABOUT_PARAGRAPHS, ABOUT_QUOTE, ABOUT_FEATURES } from "../../data/aboutSection";
+import { usePageContent } from "../../context/PageContentContext";
 import {
   containerVariants,
   fadeUpItem,
@@ -28,11 +29,22 @@ function splitTitleLines(title: string): string[] {
   return lines.length > 0 ? lines : [title];
 }
 
+const ABOUT_EXTENDED_FALLBACK = {
+  eyebrow: "Our Story",
+  paragraphs: ABOUT_PARAGRAPHS.map((text) => ({ text })),
+  quote: ABOUT_QUOTE,
+  features: ABOUT_FEATURES.map(({ title }) => ({ title })),
+  storyCta: { label: "Our Story", url: "/about" },
+};
+
 export default function AboutSection({
   title = DEFAULT_TITLE,
   description = DEFAULT_LEAD,
 }: AboutSectionProps) {
+  const { fetchSection } = usePageContent();
+  const extended = fetchSection("home", "about_extended", ABOUT_EXTENDED_FALLBACK);
   const titleLines = splitTitleLines(title);
+  const bodyParagraphs = extended.paragraphs.map((item) => item.text);
 
   return (
     <section className="about-section" aria-labelledby="about-section-title">
@@ -53,7 +65,7 @@ export default function AboutSection({
             viewport={viewportOnce}
           >
             <motion.p className="about-section__eyebrow" variants={fadeUpItem}>
-              Our Story
+              {extended.eyebrow}
             </motion.p>
 
             <motion.h2
@@ -80,7 +92,7 @@ export default function AboutSection({
             </motion.p>
 
             <div className="about-section__body">
-              {ABOUT_PARAGRAPHS.map((paragraph) => (
+              {bodyParagraphs.map((paragraph) => (
                 <motion.p
                   key={paragraph.slice(0, 32)}
                   className="about-section__paragraph"
@@ -95,11 +107,11 @@ export default function AboutSection({
               className="about-section__quote"
               variants={fadeUpItem}
             >
-              <p>{ABOUT_QUOTE}</p>
+              <p>{extended.quote}</p>
             </motion.blockquote>
 
-            <FeatureList />
-            <StoryButton />
+            <FeatureList features={extended.features} />
+            <StoryButton label={extended.storyCta.label} to={extended.storyCta.url} />
           </motion.div>
         </div>
       </div>

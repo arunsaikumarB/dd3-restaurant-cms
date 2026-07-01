@@ -82,52 +82,66 @@
   color: rgba(248, 245, 240, 0.62);
 }
 
-/* Carousel */
+/* Carousel — full-width horizontal scroll, no scale */
 .signature-carousel {
   position: relative;
   z-index: 2;
-  margin-top: clamp(2.5rem, 5vw, 4rem);
-  min-height: clamp(420px, 72vh, 680px);
-  padding-block: 3rem;
+  width: 100%;
+  margin-top: 50px;
+  padding: 0;
+  overflow: hidden;
 }
 
 .signature-carousel__viewport {
-  overflow: hidden;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 20px 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   cursor: grab;
-  touch-action: pan-y pinch-zoom;
 }
 
-.signature-carousel__viewport.is-dragging {
+.signature-carousel__viewport:active {
   cursor: grabbing;
 }
 
-.signature-carousel__container {
+.signature-carousel__viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.signature-carousel__track {
   display: flex;
-  align-items: flex-end;
-  margin-left: -6px;
+  flex-direction: row;
+  gap: 12px;
+  align-items: flex-start;
+  width: max-content;
+  padding: 20px 60px;
   backface-visibility: hidden;
 }
 
 .signature-carousel__slide {
-  flex: 0 0 77%;
-  min-width: 0;
-  padding-inline: 6px;
+  position: relative;
+  flex-shrink: 0;
+  width: 280px;
+  height: 420px;
+  z-index: 1;
 }
 
-@media (min-width: 768px) {
-  .signature-carousel__slide {
-    flex: 0 0 20%;
-  }
-}
-
-@media (min-width: 1024px) {
-  .signature-carousel__slide {
-    flex: 0 0 calc(100% / 7);
-  }
+.signature-carousel__slide > * {
+  height: 100%;
 }
 
 .signature-carousel__slide:hover {
-  z-index: 5;
+  z-index: 3;
+}
+
+.signature-carousel__slide.is-active,
+.signature-carousel__slide.active,
+.signature-carousel__slide.is-selected {
+  transform: none !important;
+  scale: 1 !important;
 }
 
 /* CTA */
@@ -138,7 +152,7 @@
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
-  margin-top: clamp(2.5rem, 4vw, 3.5rem);
+  margin-top: 40px;
   padding-inline: 1.5rem;
 }
 
@@ -155,137 +169,112 @@
   }
 }
 
-/* Card */
+/* Card — uniform portrait, subtle hover lift */
 .signature-card {
   --sig-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --sig-duration: 450ms;
+  --sig-duration: 250ms;
 
   position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  aspect-ratio: 3 / 4.15;
-  max-height: min(480px, 62vh);
-  margin-inline: auto;
-  border-radius: 24px;
+  display: block;
+  flex-shrink: 0;
+  width: 280px;
+  height: 420px;
+  min-height: 420px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   text-decoration: none;
   color: inherit;
-  transform: translate3d(0, 0, 0) scale(0.92);
-  opacity: 0.85;
+  transform: translateY(0) scale(1);
+  opacity: 1;
   transition:
     transform var(--sig-duration) var(--sig-ease),
-    opacity var(--sig-duration) var(--sig-ease),
     box-shadow var(--sig-duration) var(--sig-ease),
-    width var(--sig-duration) var(--sig-ease),
-    height var(--sig-duration) var(--sig-ease),
-    filter var(--sig-duration) var(--sig-ease);
-  will-change: transform, opacity;
+    border-color var(--sig-duration) var(--sig-ease);
   box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.55);
 }
 
-@media (min-width: 1024px) {
-  .signature-card {
-    width: 300px;
-    height: 560px;
-    max-height: none;
-    aspect-ratio: auto;
-    flex-shrink: 0;
-  }
-}
-
-.signature-card.is-active {
-  transform: translate3d(0, -20px, 0) scale(1.08);
-  opacity: 1;
-  z-index: 3;
-  box-shadow:
-    0 28px 50px -18px rgba(0, 0, 0, 0.65),
-    0 0 40px -8px rgba(201, 122, 43, 0.35);
-}
-
-@media (min-width: 1024px) {
-  .signature-card.is-active {
-    width: 320px;
-    height: 620px;
-    transform: translate3d(0, -20px, 0) scale(1);
-  }
-}
-
-.signature-card.is-hovered:not(.is-active) {
-  transform: translate3d(0, -12px, 0) scale(1.06);
-  opacity: 1;
-  z-index: 4;
-  box-shadow:
-    0 24px 48px -16px rgba(0, 0, 0, 0.6),
-    0 0 32px -10px rgba(201, 122, 43, 0.28);
+.signature-card.is-active,
+.signature-card.is-selected {
+  transform: translateY(0) scale(1) !important;
+  opacity: 1 !important;
+  width: 280px !important;
+  height: 420px !important;
+  min-height: 420px !important;
+  box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.55) !important;
 }
 
 .signature-card__border {
   position: absolute;
   inset: 0;
-  border-radius: 24px;
+  border-radius: 12px;
   border: 1px solid transparent;
   pointer-events: none;
   z-index: 4;
-  transition:
-    border-color var(--sig-duration) var(--sig-ease),
-    box-shadow var(--sig-duration) var(--sig-ease);
+  transition: border-color var(--sig-duration) var(--sig-ease);
 }
 
-.signature-card.is-active .signature-card__border,
-.signature-card.is-hovered .signature-card__border {
-  border-color: rgba(201, 122, 43, 0.75);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 180, 90, 0.15),
-    0 0 24px rgba(201, 122, 43, 0.25);
+@media (hover: hover) {
+  .signature-card:hover {
+    transform: translateY(-8px) scale(1.04);
+    box-shadow:
+      0 28px 52px -14px rgba(0, 0, 0, 0.7),
+      0 0 0 1px rgba(212, 163, 84, 0.35);
+  }
+
+  .signature-card:hover .signature-card__border {
+    border-color: rgba(212, 163, 84, 0.55);
+  }
 }
 
 .signature-card__image-wrap {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .signature-card__image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transform: scale(1.02);
-  filter: brightness(0.88) saturate(0.95);
-  transition:
-    transform var(--sig-duration) var(--sig-ease),
-    filter var(--sig-duration) var(--sig-ease);
+  transform: none;
+  filter: brightness(0.92) saturate(0.98);
+  transition: filter var(--sig-duration) var(--sig-ease);
 }
 
-.signature-card.is-active .signature-card__image,
-.signature-card.is-hovered .signature-card__image {
-  filter: brightness(1) saturate(1.05);
-  transform: scale(1.06);
+@media (hover: hover) {
+  .signature-card:hover .signature-card__image {
+    filter: brightness(1) saturate(1.02);
+    transform: none;
+  }
 }
 
 .signature-card__overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(12, 10, 9, 0.05) 0%,
-    rgba(12, 10, 9, 0.15) 35%,
-    rgba(12, 10, 9, 0.82) 72%,
-    rgba(12, 10, 9, 0.96) 100%
-  );
-  pointer-events: none;
+  display: none;
 }
 
 .signature-card__content {
-  position: relative;
-  z-index: 2;
-  margin-top: auto;
-  padding: 1.25rem 1.15rem 1.35rem;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  padding: 20px 16px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.92) 0%,
+    rgba(0, 0, 0, 0.6) 50%,
+    transparent 100%
+  );
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: flex-end;
   gap: 0.35rem;
 }
 
@@ -310,6 +299,10 @@
   font-weight: 600;
   line-height: 1.2;
   color: #f8f5f0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .signature-card__category {
@@ -334,53 +327,52 @@
   color: #c97a2b;
 }
 
-/* Navigation arrows */
+/* Navigation arrows — edge-aligned, outside card track */
 .signature-nav {
   position: absolute;
   top: 50%;
-  z-index: 5;
+  z-index: 20;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 
 .signature-nav--prev {
-  left: clamp(0.5rem, 2vw, 1.25rem);
+  left: 8px;
 }
 
 .signature-nav--next {
-  right: clamp(0.5rem, 2vw, 1.25rem);
+  right: 8px;
 }
 
 .signature-nav__btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 9999px;
-  border: 1px solid rgba(248, 245, 240, 0.22);
-  background: rgba(12, 10, 9, 0.72);
-  backdrop-filter: blur(8px);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.7);
   color: rgba(248, 245, 240, 0.85);
   cursor: pointer;
+  pointer-events: auto;
   transition:
-    transform 450ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 450ms cubic-bezier(0.22, 1, 0.36, 1),
-    background 450ms cubic-bezier(0.22, 1, 0.36, 1),
-    color 450ms cubic-bezier(0.22, 1, 0.36, 1);
+    border-color 200ms ease,
+    background 200ms ease,
+    color 200ms ease;
 }
 
 .signature-nav__btn:hover:not(:disabled) {
-  transform: scale(1.06);
-  border-color: rgba(201, 122, 43, 0.55);
-  background: rgba(201, 122, 43, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.85);
   color: #f8f5f0;
 }
 
 .signature-nav__btn:active:not(:disabled) {
-  transform: scale(0.96);
+  background: rgba(0, 0, 0, 0.9);
 }
 
 .signature-nav__btn:disabled {
@@ -462,13 +454,7 @@
     transition: none;
   }
 
-  .signature-card.is-active,
-  .signature-card.is-hovered:not(.is-active) {
-    transform: none;
-  }
-
-  .signature-card.is-active .signature-card__image,
-  .signature-card.is-hovered .signature-card__image {
+  .signature-card:hover {
     transform: none;
   }
 }

@@ -1,3 +1,5 @@
+import { usePageContent } from "../../context/PageContentContext";
+
 export interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
@@ -9,6 +11,12 @@ export default function SearchBar({
   onChange,
   resultCount,
 }: SearchBarProps) {
+  const { fetchSection } = usePageContent();
+  const toolbar = fetchSection("menu", "toolbar", {
+    searchPlaceholder: "Search by food name…",
+    allCategoriesLabel: "All Categories",
+  });
+
   return (
     <div className="relative w-full max-w-xl">
       <label htmlFor="menu-search" className="sr-only">
@@ -33,7 +41,7 @@ export default function SearchBar({
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Search by food name…"
+        placeholder={toolbar.searchPlaceholder}
         autoComplete="off"
         className="w-full rounded-full border border-cocoa/10 bg-white/80 py-3.5 pl-12 pr-5 text-[15px] text-cocoa shadow-sm outline-none transition-all duration-300 placeholder:text-cocoa/40 focus:border-saffron focus:ring-2 focus:ring-saffron/20"
         aria-describedby={resultCount != null ? "search-results-count" : undefined}

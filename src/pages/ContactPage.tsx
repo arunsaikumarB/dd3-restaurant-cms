@@ -3,15 +3,18 @@ import SectionHeading from "../components/ui/SectionHeading";
 import AnimatedContainer from "../components/ui/AnimatedContainer";
 import Button from "../components/ui/Button";
 import CTASection from "../components/ui/CTASection";
+import { usePageContent } from "../context/PageContentContext";
 import { useHomepageData } from "../hooks/useHomepageData";
 import { formatOpeningHoursRows } from "../services/homepagePublic";
 import { useContactForm } from "../hooks/useContactForm";
+import { useSectionImage } from "../hooks/useGallerySection";
 import { useLocationSelection } from "../context/LocationContext";
 import { isExternalUrl, resolveReservationUrl } from "../utils/locationLinks";
 
 export default function ContactPage() {
+  const { fetchSection, interpolate } = usePageContent();
   const { bundle } = useHomepageData();
-  const { selectedLocation, selectedLocationId } = useLocationSelection();
+  const { selectedLocationId } = useLocationSelection();
   const { settings } = bundle;
   const reservationLink = resolveReservationUrl(settings, selectedLocationId);
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
@@ -25,14 +28,54 @@ export default function ContactPage() {
     handleSubmit,
     reset,
   } = useContactForm();
+  const heroBackground = useSectionImage("contact_hero", "/showcase/mandi.jpg");
+
+  const hero = fetchSection("contact", "hero", {
+    label: "Get in Touch",
+    title: "Contact",
+    subtitleTemplate:
+      "We'd love to hear from you in {location} — reservations, catering enquiries or simply a hello.",
+  });
+  const infoSection = fetchSection("contact", "info_section", {
+    eyebrow: "Get in Touch",
+    title: "Visit or reach out",
+    subtitle:
+      "Our team is ready to assist with reservations, private events and catering requests.",
+    addressLabel: "Address",
+    phoneLabel: "Phone",
+    emailLabel: "Email",
+    hoursLabel: "Business Hours",
+  });
+  const formCopy = fetchSection("contact", "form", {
+    heading: "Send a message",
+    nameLabel: "Name",
+    namePlaceholder: "Your name",
+    emailLabel: "Email",
+    emailPlaceholder: "Email address",
+    phoneLabel: "Phone",
+    phonePlaceholder: "Phone number",
+    messageLabel: "Message",
+    messagePlaceholder: "How can we help?",
+    submitLabel: "Send Message",
+    submittingLabel: "Sending…",
+    sendAnotherLabel: "Send another message",
+  });
+  const bottomCta = fetchSection("contact", "bottom_cta", {
+    title: "Ready to Experience Desi Dhamaka?",
+    subtitle: "Reserve Your Table Today",
+    reserveNowLabel: "Reserve Now",
+    reserveOnlineLabel: "Reserve Online",
+  });
+
+  const heroSubtitle = interpolate(hero.subtitleTemplate);
 
   return (
     <div className="bg-ivory">
       <PageHero
-        label="Get in Touch"
-        title="Contact"
-        subtitle={`We'd love to hear from you${selectedLocation ? ` in ${selectedLocation.shortName}` : ""} — reservations, catering enquiries or simply a hello.`}
-        backgroundImage="/showcase/mandi.jpg"
+        label={hero.label}
+        title={hero.title}
+        subtitle={heroSubtitle}
+        backgroundImage={heroBackground}
         breadcrumbItems={[
           { label: "Home", to: "/" },
           { label: "Contact" },
@@ -43,21 +86,21 @@ export default function ContactPage() {
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           <div>
             <SectionHeading
-              eyebrow="Get in Touch"
-              title="Visit or reach out"
-              subtitle="Our team is ready to assist with reservations, private events and catering requests."
+              eyebrow={infoSection.eyebrow}
+              title={infoSection.title}
+              subtitle={infoSection.subtitle}
             />
 
             <AnimatedContainer delay={0.1} className="mt-10 space-y-6">
               <div>
                 <h3 className="text-[12px] font-semibold uppercase tracking-label text-saffron">
-                  Address
+                  {infoSection.addressLabel}
                 </h3>
                 <p className="mt-2 text-[16px] text-cocoa/70">{settings.address}</p>
               </div>
               <div>
                 <h3 className="text-[12px] font-semibold uppercase tracking-label text-saffron">
-                  Phone
+                  {infoSection.phoneLabel}
                 </h3>
                 <a
                   href={`tel:${settings.phone.replace(/\D/g, "")}`}
@@ -68,7 +111,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 className="text-[12px] font-semibold uppercase tracking-label text-saffron">
-                  Email
+                  {infoSection.emailLabel}
                 </h3>
                 <a
                   href={`mailto:${settings.email}`}
@@ -79,7 +122,7 @@ export default function ContactPage() {
               </div>
               <div id="reserve">
                 <h3 className="text-[12px] font-semibold uppercase tracking-label text-saffron">
-                  Business Hours
+                  {infoSection.hoursLabel}
                 </h3>
                 <ul className="mt-2 space-y-1">
                   {hoursRows.map((row) => (
@@ -98,109 +141,112 @@ export default function ContactPage() {
 
           <AnimatedContainer delay={0.15}>
             <section id="catering" aria-labelledby="catering-form-title">
-            <form
-              id="contact-form"
-              onSubmit={handleSubmit}
-              noValidate
-              className="rounded-[24px] bg-[#FDFBF7] p-8 shadow-premium md:p-10"
-              aria-label="Contact form"
-            >
-              <h3 id="catering-form-title" className="font-serif text-2xl text-cocoa">
-                Send a message
-              </h3>
+              <form
+                id="contact-form"
+                onSubmit={handleSubmit}
+                noValidate
+                className="rounded-[24px] bg-[#FDFBF7] p-8 shadow-premium md:p-10"
+                aria-label="Contact form"
+              >
+                <h3 id="catering-form-title" className="font-serif text-2xl text-cocoa">
+                  {formCopy.heading}
+                </h3>
 
-              {submitted ? (
-                <div className="mt-6" role="status">
-                  <p className="text-[16px] text-cocoa/70">{successMessage}</p>
-                  <button
-                    type="button"
-                    onClick={reset}
-                    className="mt-4 text-[14px] font-medium text-saffron underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
-                  >
-                    Send another message
-                  </button>
-                </div>
-              ) : (
-                <div className="mt-6 space-y-4">
-                  {error && (
-                    <p className="rounded-xl bg-red-50 px-4 py-3 text-[14px] text-red-700" role="alert">
-                      {error}
-                    </p>
-                  )}
-
-                  <div>
-                    <label htmlFor="contact-name" className="form-label">
-                      Name
-                    </label>
-                    <input
-                      id="contact-name"
-                      name="name"
-                      type="text"
-                      required
-                      autoComplete="name"
-                      value={form.name}
-                      onChange={(e) => updateField("name", e.target.value)}
-                      placeholder="Your name"
-                      className="form-input"
-                    />
+                {submitted ? (
+                  <div className="mt-6" role="status">
+                    <p className="text-[16px] text-cocoa/70">{successMessage}</p>
+                    <button
+                      type="button"
+                      onClick={reset}
+                      className="mt-4 text-[14px] font-medium text-saffron underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+                    >
+                      {formCopy.sendAnotherLabel}
+                    </button>
                   </div>
+                ) : (
+                  <div className="mt-6 space-y-4">
+                    {error && (
+                      <p
+                        className="rounded-xl bg-red-50 px-4 py-3 text-[14px] text-red-700"
+                        role="alert"
+                      >
+                        {error}
+                      </p>
+                    )}
 
-                  <div>
-                    <label htmlFor="contact-email" className="form-label">
-                      Email
-                    </label>
-                    <input
-                      id="contact-email"
-                      name="email"
-                      type="email"
-                      required
-                      autoComplete="email"
-                      value={form.email}
-                      onChange={(e) => updateField("email", e.target.value)}
-                      placeholder="Email address"
-                      className="form-input"
-                    />
+                    <div>
+                      <label htmlFor="contact-name" className="form-label">
+                        {formCopy.nameLabel}
+                      </label>
+                      <input
+                        id="contact-name"
+                        name="name"
+                        type="text"
+                        required
+                        autoComplete="name"
+                        value={form.name}
+                        onChange={(e) => updateField("name", e.target.value)}
+                        placeholder={formCopy.namePlaceholder}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="contact-email" className="form-label">
+                        {formCopy.emailLabel}
+                      </label>
+                      <input
+                        id="contact-email"
+                        name="email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        value={form.email}
+                        onChange={(e) => updateField("email", e.target.value)}
+                        placeholder={formCopy.emailPlaceholder}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="contact-phone" className="form-label">
+                        {formCopy.phoneLabel}
+                      </label>
+                      <input
+                        id="contact-phone"
+                        name="phone"
+                        type="tel"
+                        required
+                        autoComplete="tel"
+                        value={form.phone}
+                        onChange={(e) => updateField("phone", e.target.value)}
+                        placeholder={formCopy.phonePlaceholder}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="contact-message" className="form-label">
+                        {formCopy.messageLabel}
+                      </label>
+                      <textarea
+                        id="contact-message"
+                        name="message"
+                        required
+                        rows={5}
+                        value={form.message}
+                        onChange={(e) => updateField("message", e.target.value)}
+                        placeholder={formCopy.messagePlaceholder}
+                        className="form-input resize-none"
+                      />
+                    </div>
+
+                    <Button type="submit" variant="primary" disabled={submitting}>
+                      {submitting ? formCopy.submittingLabel : formCopy.submitLabel}
+                    </Button>
                   </div>
-
-                  <div>
-                    <label htmlFor="contact-phone" className="form-label">
-                      Phone
-                    </label>
-                    <input
-                      id="contact-phone"
-                      name="phone"
-                      type="tel"
-                      required
-                      autoComplete="tel"
-                      value={form.phone}
-                      onChange={(e) => updateField("phone", e.target.value)}
-                      placeholder="Phone number"
-                      className="form-input"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="contact-message" className="form-label">
-                      Message
-                    </label>
-                    <textarea
-                      id="contact-message"
-                      name="message"
-                      required
-                      rows={5}
-                      value={form.message}
-                      onChange={(e) => updateField("message", e.target.value)}
-                      placeholder="How can we help?"
-                      className="form-input resize-none"
-                    />
-                  </div>
-
-                  <Button type="submit" variant="primary" disabled={submitting}>
-                    {submitting ? "Sending…" : "Send Message"}
-                  </Button>
-                </div>
-              )}
-            </form>
+                )}
+              </form>
             </section>
           </AnimatedContainer>
         </div>
@@ -226,9 +272,13 @@ export default function ContactPage() {
         className="mx-auto max-w-[1400px] px-6 pb-20 md:px-10 lg:px-16"
       >
         <CTASection
-          title="Ready to Experience Desi Dhamaka?"
-          subtitle="Reserve Your Table Today"
-          buttonLabel={isExternalUrl(reservationLink) ? "Reserve Online" : "Reserve Now"}
+          title={bottomCta.title}
+          subtitle={bottomCta.subtitle}
+          buttonLabel={
+            isExternalUrl(reservationLink)
+              ? bottomCta.reserveOnlineLabel
+              : bottomCta.reserveNowLabel
+          }
           buttonTo={isExternalUrl(reservationLink) ? undefined : "/reservation"}
           buttonHref={isExternalUrl(reservationLink) ? reservationLink : undefined}
         />

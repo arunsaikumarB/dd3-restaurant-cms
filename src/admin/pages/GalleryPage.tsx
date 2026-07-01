@@ -1,84 +1,78 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Upload, Trash2, Search, Pencil, Star } from "lucide-react";
-import { motion } from "framer-motion";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown, ChevronRight, Link2, RefreshCw, Trash2, Upload } from "lucide-react";
 import AdminBreadcrumbs from "../components/shared/Breadcrumbs";
 import PageHeader from "../components/shared/PageHeader";
 import AdminCard from "../components/ui/Card";
 import AdminBadge from "../components/ui/Badge";
-import AdminSelect from "../components/ui/Select";
-import AdminModal, { ModalFooter } from "../components/ui/Modal";
 import AdminInput from "../components/ui/Input";
 import AdminTextarea from "../components/ui/Textarea";
 import AdminButton from "../components/ui/Button";
 import AdminToggle from "../components/ui/Toggle";
 import AdminToast from "../components/ui/Toast";
-import ImageUploadField from "../components/settings/ImageUploadField";
 import GalleryPageSkeleton from "../components/settings/GalleryPageSkeleton";
 import { useAdminTheme } from "../context/AdminThemeContext";
 import {
+  GALLERY_ADMIN_LOCATIONS,
+  GALLERY_PAGE_SECTIONS,
+  getGallerySectionDefinition,
+  getPageFromSection,
+  type GalleryAdminLocationId,
+  type GallerySectionKey,
+} from "../../config/gallerySections";
+import {
   createGalleryImage,
   deleteGalleryImage,
-  EMPTY_GALLERY_FORM,
   fetchGalleryImages,
-  getGalleryCategoryOptions,
-  rowToForm,
-  updateGalleryFeatured,
-  updateGalleryImage,
-  updateGalleryVisible,
+  matchesGalleryLocation,
+  updateGalleryFields,
+  uploadGalleryImageFile,
   type GalleryCardRow,
-  type GalleryForm,
 } from "../../services/gallery";
-import { uploadFile } from "../../services/storage/upload";
-import {
-  hasValidationErrors,
-  validateGalleryForm,
-  type GalleryErrors,
-} from "../../utils/validation/gallery";
+import { invalidateGallerySectionCache } from "../../services/galleryPublic";
 
-type SortOption = "display_order" | "newest" | "oldest" | "alphabetical";
-type VisibilityFilter = "all" | "visible" | "hidden" | "featured";
+const EXPANDED_PAGES_KEY = "dd3.admin.gallery.expandedPages";
+const SELECTED_SECTION_KEY = "dd3.admin.gallery.selectedSection";
 
-const SORT_OPTIONS = [
-  { value: "display_order", label: "Display Order" },
-  { value: "newest", label: "Newest" },
-  { value: "oldest", label: "Oldest" },
-  { value: "alphabetical", label: "Alphabetical" },
-] as const;
+function readExpandedPages(): Record<string, boolean> {
+  if (typeof window === "undefined") return { home: true };
+  try {
+    const raw = localStorage.getItem(EXPANDED_PAGES_KEY);
+    if (!raw) return { home: true };
+    return JSON.parse(raw) as Record<string, boolean>;
+  } catch {
+    return { home: true };
+  }
+}
 
-const VISIBILITY_FILTER_OPTIONS = [
-  { value: "all", label: "All Images" },
-  { value: "featured", label: "Featured" },
-  { value: "visible", label: "Visible" },
-  { value: "hidden", label: "Hidden" },
-];
+function readSelectedSection(): GallerySectionKey {
+  if (typeof window === "undefined") return "ambience";
+  const stored = localStorage.getItem(SELECTED_SECTION_KEY);
+  return (stored as GallerySectionKey) || "ambience";
+}
 
 export default function GalleryManagementPage() {
   const { dark } = useAdminTheme();
-  const [images, setImages] = useState<GalleryCardRow[]>([]);
+  const [allImages, setAllImages] = useState<GalleryCardRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [preview, setPreview] = useState<GalleryCardRow | null>(null);
-  const [category, setCategory] = useState("all");
-  const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>("all");
-  const [sortBy, setSortBy] = useState<SortOption>("display_order");
-  const [search, setSearch] = useState("");
-  const [dragOver, setDragOver] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [deletingImage, setDeletingImage] = useState<GalleryCardRow | null>(null);
-  const [form, setForm] = useState<GalleryForm>(EMPTY_GALLERY_FORM);
-  const [fieldErrors, setFieldErrors] = useState<GalleryErrors>({});
-  const [submitting, setSubmitting] = useState(false);
-  const [imageUploading, setImageUploading] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
-  const [dropUploading, setDropUploading] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<GalleryAdminLocationId>("south-plainfield");
+  const [selectedSection, setSelectedSection] = useState<GallerySectionKey>(readSelectedSection);
+  const [expandedPages, setExpandedPages] = useState<Record<string, boolean>>(readExpandedPages);
+  const [uploading, setUploading] = useState(false);
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [newTitle, setNewTitle] = useState("");
+  const [newCaption, setNewCaption] = useState("");
+  const [newUrl, setNewUrl] = useState("");
+  const [applyAllLocations, setApplyAllLocations] = useState(false);
   const [toast, setToast] = useState<{ open: boolean; message: string; variant: "success" | "error" }>({
     open: false,
     message: "",
     variant: "success",
   });
+
+  const sectionDef = getGallerySectionDefinition(selectedSection);
 
   const showToast = useCallback((message: string, variant: "success" | "error" = "success") => {
     setToast({ open: true, message, variant });
@@ -89,7 +83,8 @@ export default function GalleryManagementPage() {
     setLoadError(null);
     try {
       const rows = await fetchGalleryImages();
-      setImages(rows);
+      setAllImages(rows);
+      invalidateGallerySectionCache();
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : "Failed to load gallery images.");
     } finally {
@@ -101,201 +96,148 @@ export default function GalleryManagementPage() {
     void loadImages();
   }, [loadImages]);
 
-  const filtered = useMemo(() => {
-    let result = [...images];
-    const query = search.trim().toLowerCase();
-
-    if (query) {
-      result = result.filter(
-        (img) =>
-          img.category.toLowerCase().includes(query) ||
-          img.caption.toLowerCase().includes(query) ||
-          img.alt_text.toLowerCase().includes(query),
-      );
-    }
-
-    if (category !== "all") {
-      result = result.filter((img) => img.category === category);
-    }
-
-    if (visibilityFilter === "featured") {
-      result = result.filter((img) => img.featured);
-    } else if (visibilityFilter === "visible") {
-      result = result.filter((img) => img.visible);
-    } else if (visibilityFilter === "hidden") {
-      result = result.filter((img) => !img.visible);
-    }
-
-    result.sort((a, b) => {
-      switch (sortBy) {
-        case "newest":
-          return b.created_at.localeCompare(a.created_at);
-        case "oldest":
-          return a.created_at.localeCompare(b.created_at);
-        case "alphabetical":
-          return a.title.localeCompare(b.title);
-        case "display_order":
-        default: {
-          const orderDiff = a.display_order - b.display_order;
-          if (orderDiff !== 0) return orderDiff;
-          return b.created_at.localeCompare(a.created_at);
-        }
-      }
-    });
-
-    return result;
-  }, [images, search, category, visibilityFilter, sortBy]);
-
-  const categoryOptions = useMemo(
-    () => [{ value: "all", label: "All Categories" }, ...getGalleryCategoryOptions()],
-    [],
+  const countForSection = useCallback(
+    (section: GallerySectionKey, locationId: GalleryAdminLocationId) =>
+      allImages.filter(
+        (img) => img.section === section && matchesGalleryLocation(img.location_id, locationId),
+      ).length,
+    [allImages],
   );
 
-  const uploadGalleryImage = async (file: File) => {
-    const ext = file.name.split(".").pop() ?? "bin";
-    const path = `${crypto.randomUUID()}.${ext}`;
-    const { publicUrl } = await uploadFile({
-      bucket: "gallery-images",
-      file,
-      path,
-      upsert: true,
+  const sectionImages = useMemo(
+    () =>
+      sortGalleryRows(
+        allImages.filter(
+          (img) =>
+            img.section === selectedSection &&
+            matchesGalleryLocation(img.location_id, selectedLocation),
+        ),
+      ),
+    [allImages, selectedSection, selectedLocation],
+  );
+
+  const canAddMore =
+    !sectionDef || sectionDef.maxImages === 0 || sectionImages.length < sectionDef.maxImages;
+
+  const selectSection = (section: GallerySectionKey) => {
+    setSelectedSection(section);
+    localStorage.setItem(SELECTED_SECTION_KEY, section);
+    setNewTitle("");
+    setNewCaption("");
+    setNewUrl("");
+  };
+
+  const togglePage = (page: string) => {
+    setExpandedPages((prev) => {
+      const next = { ...prev, [page]: !prev[page] };
+      localStorage.setItem(EXPANDED_PAGES_KEY, JSON.stringify(next));
+      return next;
     });
-    return publicUrl;
   };
 
-  const openCreateModal = (initialForm?: Partial<GalleryForm>) => {
-    setEditingId(null);
-    setForm({ ...EMPTY_GALLERY_FORM, ...initialForm });
-    setFieldErrors({});
-    setModalOpen(true);
+  const refreshRow = (updated: GalleryCardRow) => {
+    setAllImages((prev) => prev.map((row) => (row.id === updated.id ? updated : row)));
+    invalidateGallerySectionCache();
   };
 
-  const openEditModal = (img: GalleryCardRow) => {
-    setEditingId(img.id);
-    setForm(rowToForm(img));
-    setFieldErrors({});
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    if (submitting || imageUploading) return;
-    setModalOpen(false);
-    setEditingId(null);
-    setFieldErrors({});
-  };
-
-  const handleImageUpload = async (file: File) => {
-    setImageUploading(true);
+  const handleFieldUpdate = async (
+    id: string,
+    patch: Parameters<typeof updateGalleryFields>[1],
+  ) => {
+    setSavingId(id);
     try {
-      return await uploadGalleryImage(file);
-    } finally {
-      setImageUploading(false);
-    }
-  };
-
-  const handleSave = async () => {
-    if (submitting || imageUploading) return;
-
-    const errors = validateGalleryForm(form);
-    setFieldErrors(errors);
-    if (hasValidationErrors(errors)) {
-      showToast("Please fix the highlighted fields.", "error");
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      if (editingId) {
-        await updateGalleryImage(editingId, form);
-        showToast("Image updated successfully.");
-      } else {
-        await createGalleryImage(form);
-        showToast("Image uploaded successfully.");
-      }
-      setModalOpen(false);
-      setEditingId(null);
-      setFieldErrors({});
-      await loadImages();
+      const updated = await updateGalleryFields(id, patch);
+      refreshRow(updated);
     } catch (err) {
-      showToast(err instanceof Error ? err.message : "Failed to save image.", "error");
+      showToast(err instanceof Error ? err.message : "Failed to save changes.", "error");
     } finally {
-      setSubmitting(false);
+      setSavingId(null);
     }
   };
 
-  const openDeleteModal = (img: GalleryCardRow) => {
-    setDeletingImage(img);
-    setDeleteOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (!deletingImage || deleting) return;
-
-    setDeleting(true);
+  const handleDelete = async (img: GalleryCardRow) => {
+    if (deletingId) return;
+    setDeletingId(img.id);
     try {
-      await deleteGalleryImage(deletingImage.id);
-      showToast("Image deleted successfully.");
-      setDeleteOpen(false);
-      setDeletingImage(null);
-      await loadImages();
+      await deleteGalleryImage(img.id, img.image);
+      setAllImages((prev) => prev.filter((row) => row.id !== img.id));
+      invalidateGallerySectionCache();
+      showToast("Image deleted.");
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to delete image.", "error");
     } finally {
-      setDeleting(false);
+      setDeletingId(null);
     }
   };
 
-  const handleToggleFeatured = async (img: GalleryCardRow) => {
-    if (togglingId) return;
-
-    const nextFeatured = !img.featured;
-    setTogglingId(img.id);
-    try {
-      const updated = await updateGalleryFeatured(img.id, nextFeatured);
-      setImages((prev) => prev.map((row) => (row.id === img.id ? updated : row)));
-      showToast(nextFeatured ? "Image marked as featured." : "Image removed from featured.");
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : "Failed to update featured status.", "error");
-    } finally {
-      setTogglingId(null);
-    }
-  };
-
-  const handleToggleVisible = async (img: GalleryCardRow) => {
-    if (togglingId) return;
-
-    const nextVisible = !img.visible;
-    setTogglingId(img.id);
-    try {
-      const updated = await updateGalleryVisible(img.id, nextVisible);
-      setImages((prev) => prev.map((row) => (row.id === img.id ? updated : row)));
-      showToast(nextVisible ? "Image is now visible." : "Image is now hidden.");
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : "Failed to update visibility.", "error");
-    } finally {
-      setTogglingId(null);
-    }
-  };
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-
-    const file = e.dataTransfer.files?.[0];
-    if (!file?.type.startsWith("image/")) {
-      showToast("Please drop a valid image file (PNG, JPG, or WebP).", "error");
+  const handleUploadFile = async (file: File) => {
+    if (!sectionDef) return;
+    if (!canAddMore && sectionDef.maxImages === 1 && sectionImages.length >= 1) {
+      showToast("This section allows only one image. Delete or replace the existing image first.", "error");
       return;
     }
 
-    openCreateModal();
-    setDropUploading(true);
+    setUploading(true);
     try {
-      const url = await uploadGalleryImage(file);
-      setForm((prev) => ({ ...prev, image: url }));
+      const publicUrl = await uploadGalleryImageFile(file, selectedSection);
+      const created = await createGalleryImage({
+        image: publicUrl,
+        category: "Ambiance",
+        alt_text: newTitle.trim() || sectionDef.label,
+        title: newTitle.trim(),
+        caption: newCaption.trim(),
+        display_order: sectionImages.length + 1,
+        featured: false,
+        visible: true,
+        section: selectedSection,
+        location_id: applyAllLocations ? "all" : selectedLocation,
+        page: getPageFromSection(selectedSection),
+      });
+      setAllImages((prev) => sortGalleryRows([...prev, created]));
+      invalidateGallerySectionCache();
+      setNewTitle("");
+      setNewCaption("");
+      setNewUrl("");
+      showToast("Image uploaded successfully.");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : "Failed to upload image.", "error");
+      showToast(err instanceof Error ? err.message : "Upload failed.", "error");
     } finally {
-      setDropUploading(false);
+      setUploading(false);
+    }
+  };
+
+  const handleAddFromUrl = async () => {
+    if (!newUrl.trim()) {
+      showToast("Paste an image URL first.", "error");
+      return;
+    }
+    if (!sectionDef) return;
+
+    setUploading(true);
+    try {
+      const created = await createGalleryImage({
+        image: newUrl.trim(),
+        category: "Ambiance",
+        alt_text: newTitle.trim() || sectionDef.label,
+        title: newTitle.trim(),
+        caption: newCaption.trim(),
+        display_order: sectionImages.length + 1,
+        featured: false,
+        visible: true,
+        section: selectedSection,
+        location_id: applyAllLocations ? "all" : selectedLocation,
+        page: getPageFromSection(selectedSection),
+      });
+      setAllImages((prev) => sortGalleryRows([...prev, created]));
+      invalidateGallerySectionCache();
+      setNewTitle("");
+      setNewCaption("");
+      setNewUrl("");
+      showToast("Image added successfully.");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Failed to add image.", "error");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -303,12 +245,7 @@ export default function GalleryManagementPage() {
     return (
       <div>
         <AdminBreadcrumbs items={[{ label: "Admin", path: "/admin/dashboard" }, { label: "Gallery" }]} />
-        <PageHeader
-          title="Gallery"
-          description="Manage restaurant photos and ambiance images."
-          actionLabel="Upload"
-          onAction={() => openCreateModal()}
-        />
+        <PageHeader title="Gallery" description="Manage all website images by section." />
         <GalleryPageSkeleton />
       </div>
     );
@@ -318,12 +255,7 @@ export default function GalleryManagementPage() {
     return (
       <div>
         <AdminBreadcrumbs items={[{ label: "Admin", path: "/admin/dashboard" }, { label: "Gallery" }]} />
-        <PageHeader
-          title="Gallery"
-          description="Manage restaurant photos and ambiance images."
-          actionLabel="Upload"
-          onAction={() => openCreateModal()}
-        />
+        <PageHeader title="Gallery" description="Manage all website images by section." />
         <AdminCard>
           <p className="text-sm text-admin-danger">{loadError}</p>
           <div className="mt-4">
@@ -339,201 +271,295 @@ export default function GalleryManagementPage() {
   return (
     <div>
       <AdminBreadcrumbs items={[{ label: "Admin", path: "/admin/dashboard" }, { label: "Gallery" }]} />
-      <PageHeader
-        title="Gallery"
-        description="Manage restaurant photos and ambiance images."
-        actionLabel="Upload"
-        onAction={() => openCreateModal()}
-      />
-
-      <div
-        className={[
-          "mb-6 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-10 transition-colors",
-          dragOver ? "border-admin-primary bg-admin-primary/5" : dark ? "border-admin-border-dark" : "border-admin-border",
-        ].join(" ")}
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => { void handleDrop(e); }}
-      >
-        <div className={`mb-3 flex h-12 w-12 items-center justify-center rounded-xl ${dark ? "bg-white/10" : "bg-admin-ivory"}`}>
-          <Upload size={22} className="text-admin-primary" />
-        </div>
-        <p className="text-sm font-medium">{dropUploading ? "Uploading…" : "Drag & drop images here"}</p>
-        <p className={`mt-1 text-xs ${dark ? "text-white/40" : "text-admin-muted"}`}>
-          PNG, JPG up to 10MB
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <PageHeader
+          title="Gallery"
+          description="Manage all website images by page section. Pick a location, choose a section, then upload or edit images."
+        />
+        <AdminButton variant="outline" onClick={() => void loadImages()}>
+          <RefreshCw size={16} />
+          Refresh
+        </AdminButton>
       </div>
 
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-        <div className="relative max-w-sm flex-1">
-          <Search
-            size={16}
-            className={`absolute left-3 top-1/2 -translate-y-1/2 ${dark ? "text-white/40" : "text-admin-muted"}`}
-          />
-          <input
-            type="search"
-            placeholder="Search gallery..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+      <div className="mb-6 flex flex-wrap gap-2">
+        {GALLERY_ADMIN_LOCATIONS.map((loc) => (
+          <button
+            key={loc.value}
+            type="button"
+            onClick={() => setSelectedLocation(loc.value)}
             className={[
-              "h-10 w-full rounded-xl border pl-9 pr-3 text-sm",
-              "focus:outline-none focus:ring-2 focus:ring-admin-orange/30",
-              dark ? "border-admin-border-dark bg-white/5 text-white" : "border-admin-border bg-white",
+              "rounded-xl px-4 py-2 text-sm font-medium transition-colors",
+              selectedLocation === loc.value
+                ? "bg-admin-primary text-white"
+                : dark
+                  ? "bg-white/10 text-white/80 hover:bg-white/15"
+                  : "bg-admin-ivory text-admin-text hover:bg-admin-border/40",
             ].join(" ")}
-          />
-        </div>
-        <div className="w-48">
-          <AdminSelect
-            label="Filter by category"
-            value={category}
-            onChange={setCategory}
-            options={categoryOptions}
-          />
-        </div>
-        <div className="w-48">
-          <AdminSelect
-            label="Filter"
-            value={visibilityFilter}
-            onChange={(v) => setVisibilityFilter(v as VisibilityFilter)}
-            options={VISIBILITY_FILTER_OPTIONS}
-          />
-        </div>
-        <div className="w-48">
-          <AdminSelect
-            label="Sort by"
-            value={sortBy}
-            onChange={(v) => setSortBy(v as SortOption)}
-            options={[...SORT_OPTIONS]}
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {filtered.map((img, i) => (
-          <motion.div
-            key={img.id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.03 }}
           >
-            <AdminCard className="group overflow-hidden p-0 cursor-pointer" padding="sm">
-              <div className="relative aspect-square overflow-hidden rounded-xl">
-                <img
-                  src={img.url}
-                  alt={img.title}
-                  className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${!img.visible ? "opacity-60" : ""}`}
-                  onClick={() => setPreview(img)}
-                />
-                {img.featured && (
-                  <div className="absolute left-2 top-2 rounded-lg bg-admin-gold/90 p-1.5 text-white">
-                    <Star size={14} fill="currentColor" />
-                  </div>
-                )}
-                <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
-                  <div className="flex w-full items-center justify-between">
-                    <AdminBadge variant="outline" className="!text-white !border-white/30">{img.category}</AdminBadge>
-                    <div className="flex gap-1">
-                      <button
-                        type="button"
-                        className="rounded-lg bg-white/20 p-1.5 text-white backdrop-blur-sm"
-                        onClick={(e) => { e.stopPropagation(); openEditModal(img); }}
-                        aria-label="Edit"
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        className="rounded-lg bg-admin-danger/90 p-1.5 text-white"
-                        onClick={(e) => { e.stopPropagation(); openDeleteModal(img); }}
-                        aria-label="Delete"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <p className="mt-2 truncate text-sm font-medium">{img.title}</p>
-              <div className="mt-2 flex flex-col gap-2">
-                <AdminToggle
-                  checked={img.featured}
-                  onChange={() => void handleToggleFeatured(img)}
-                  label={img.featured ? "Featured" : "Not featured"}
-                />
-                <AdminToggle
-                  checked={img.visible}
-                  onChange={() => void handleToggleVisible(img)}
-                  label={img.visible ? "Visible" : "Hidden"}
-                />
-              </div>
-            </AdminCard>
-          </motion.div>
+            {loc.label}
+          </button>
         ))}
       </div>
 
-      {filtered.length === 0 && (
-        <AdminCard className="mt-4">
-          <p className="py-8 text-center text-sm">
-            {images.length === 0 ? "No gallery images yet." : "No images match your search or filters."}
-          </p>
+      <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <AdminCard className="h-fit p-0" padding="sm">
+          <nav className="p-2" aria-label="Gallery sections">
+            {GALLERY_PAGE_SECTIONS.map((pageDef) => {
+              const isExpanded = expandedPages[pageDef.page] ?? pageDef.page === "home";
+              return (
+                <div key={pageDef.page} className="mb-1">
+                  <button
+                    type="button"
+                    onClick={() => togglePage(pageDef.page)}
+                    className={[
+                      "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold",
+                      dark ? "text-white/90 hover:bg-white/5" : "text-admin-text hover:bg-admin-ivory",
+                    ].join(" ")}
+                  >
+                    {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                    {pageDef.label}
+                  </button>
+                  {isExpanded ? (
+                    <ul className="mb-2 ml-2 space-y-0.5 border-l border-admin-border/40 pl-2 dark:border-white/10">
+                      {pageDef.sections.map((section) => {
+                        const count = countForSection(section.key, selectedLocation);
+                        const isActive = selectedSection === section.key;
+                        return (
+                          <li key={section.key}>
+                            <button
+                              type="button"
+                              onClick={() => selectSection(section.key)}
+                              className={[
+                                "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-xs",
+                                isActive
+                                  ? "bg-admin-primary/15 text-admin-primary"
+                                  : dark
+                                    ? "text-white/70 hover:bg-white/5"
+                                    : "text-admin-muted hover:bg-admin-ivory",
+                              ].join(" ")}
+                            >
+                              <span className="truncate">{section.label}</span>
+                              <span
+                                className={[
+                                  "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                                  count === 0
+                                    ? "bg-admin-danger/15 text-admin-danger"
+                                    : dark
+                                      ? "bg-white/10 text-white/60"
+                                      : "bg-admin-ivory text-admin-muted",
+                                ].join(" ")}
+                              >
+                                {count}
+                              </span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : null}
+                </div>
+              );
+            })}
+          </nav>
         </AdminCard>
-      )}
 
-      <AdminModal
-        open={modalOpen}
-        onClose={closeModal}
-        title={editingId ? "Edit Image" : "Upload Image"}
-        size="lg"
-        footer={
-          <ModalFooter
-            onCancel={closeModal}
-            onConfirm={() => void handleSave()}
-            confirmLabel={editingId ? "Save Changes" : "Upload"}
-            loading={submitting || imageUploading}
-          />
-        }
-      >
-        <GalleryFormFields
-          form={form}
-          fieldErrors={fieldErrors}
-          disabled={submitting || imageUploading}
-          onPatch={setForm}
-          onUpload={handleImageUpload}
-        />
-      </AdminModal>
+        <div className="space-y-6">
+          {sectionDef ? (
+            <AdminCard>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold">{sectionDef.label}</h2>
+                  <p className={`mt-1 text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>
+                    {sectionDef.description}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <AdminBadge variant="outline">
+                    {GALLERY_ADMIN_LOCATIONS.find((l) => l.value === selectedLocation)?.label}
+                  </AdminBadge>
+                  <AdminBadge variant="outline">
+                    {sectionDef.maxImages === 0
+                      ? `${sectionImages.length} images`
+                      : `${sectionImages.length} / ${sectionDef.maxImages}`}
+                  </AdminBadge>
+                </div>
+              </div>
 
-      <AdminModal open={!!preview} onClose={() => setPreview(null)} title={preview?.title ?? ""} size="lg">
-        {preview && (
-          <img src={preview.url} alt={preview.title} className="w-full rounded-xl object-cover max-h-[60vh]" />
-        )}
-      </AdminModal>
+              {sectionImages.length > 0 ? (
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {sectionImages.map((img) => (
+                    <div
+                      key={img.id}
+                      className={[
+                        "overflow-hidden rounded-xl border",
+                        dark ? "border-white/10 bg-white/5" : "border-admin-border bg-white",
+                      ].join(" ")}
+                    >
+                      <img
+                        src={img.image}
+                        alt={img.alt_text || img.title}
+                        className="aspect-[4/3] w-full object-cover"
+                      />
+                      <div className="space-y-3 p-3">
+                        <AdminInput
+                          label="Title"
+                          value={img.title}
+                          disabled={savingId === img.id}
+                          onChange={(e) =>
+                            setAllImages((prev) =>
+                              prev.map((row) =>
+                                row.id === img.id ? { ...row, title: e.target.value } : row,
+                              ),
+                            )
+                          }
+                          onBlur={(e) => void handleFieldUpdate(img.id, { title: e.target.value })}
+                        />
+                        <AdminTextarea
+                          label="Caption"
+                          value={img.caption}
+                          disabled={savingId === img.id}
+                          onChange={(e) =>
+                            setAllImages((prev) =>
+                              prev.map((row) =>
+                                row.id === img.id ? { ...row, caption: e.target.value } : row,
+                              ),
+                            )
+                          }
+                          onBlur={(e) => void handleFieldUpdate(img.id, { caption: e.target.value })}
+                        />
+                        <AdminInput
+                          label="Display order"
+                          type="number"
+                          min={0}
+                          value={String(img.display_order)}
+                          disabled={savingId === img.id}
+                          onChange={(e) =>
+                            setAllImages((prev) =>
+                              prev.map((row) =>
+                                row.id === img.id
+                                  ? { ...row, display_order: Number(e.target.value) }
+                                  : row,
+                              ),
+                            )
+                          }
+                          onBlur={(e) =>
+                            void handleFieldUpdate(img.id, {
+                              display_order: Math.max(0, Number(e.target.value) || 0),
+                            })
+                          }
+                        />
+                        <AdminToggle
+                          checked={img.visible}
+                          onChange={(checked) => void handleFieldUpdate(img.id, { visible: checked })}
+                          label={img.visible ? "Visible on website" : "Hidden"}
+                        />
+                        <AdminToggle
+                          checked={img.featured}
+                          onChange={(checked) => void handleFieldUpdate(img.id, { featured: checked })}
+                          label={img.featured ? "Featured" : "Not featured"}
+                        />
+                        <AdminButton
+                          type="button"
+                          variant="outline"
+                          className="w-full text-admin-danger"
+                          disabled={deletingId === img.id}
+                          onClick={() => void handleDelete(img)}
+                        >
+                          <Trash2 size={14} />
+                          Delete
+                        </AdminButton>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className={`mt-6 text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>
+                  No images for this section and location yet. The website will use fallback images until you upload one.
+                </p>
+              )}
 
-      <AdminModal
-        open={deleteOpen}
-        onClose={() => {
-          if (deleting) return;
-          setDeleteOpen(false);
-          setDeletingImage(null);
-        }}
-        title="Delete Image"
-        footer={
-          <ModalFooter
-            onCancel={() => {
-              if (deleting) return;
-              setDeleteOpen(false);
-              setDeletingImage(null);
-            }}
-            onConfirm={() => void handleDelete()}
-            confirmLabel="Delete"
-            loading={deleting}
-          />
-        }
-      >
-        <p className={`text-sm ${dark ? "text-white/70" : "text-admin-text/80"}`}>
-          Are you sure you want to delete{" "}
-          <span className="font-medium">{deletingImage?.title}</span>? This action cannot be undone.
-        </p>
-      </AdminModal>
+              {canAddMore ? (
+                <div
+                  className={[
+                    "mt-6 rounded-xl border border-dashed p-5",
+                    dark ? "border-white/15 bg-white/[0.02]" : "border-admin-border bg-admin-ivory/40",
+                  ].join(" ")}
+                >
+                  <h3 className="text-sm font-semibold">
+                    {sectionDef.maxImages === 1 && sectionImages.length === 0
+                      ? "Add image to this section"
+                      : sectionDef.maxImages === 1 && sectionImages.length >= 1
+                        ? "Replace image"
+                        : "Add image to this section"}
+                  </h3>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <AdminInput
+                      label="Title"
+                      placeholder={sectionDef.hasTitle ? "e.g. Reception" : "Optional title"}
+                      value={newTitle}
+                      onChange={(e) => setNewTitle(e.target.value)}
+                    />
+                    <AdminInput
+                      label="Caption"
+                      placeholder={sectionDef.hasCaption ? "e.g. Your First Welcome" : "Optional caption"}
+                      value={newCaption}
+                      onChange={(e) => setNewCaption(e.target.value)}
+                    />
+                  </div>
+                  <div className="mt-3">
+                    <AdminToggle
+                      checked={applyAllLocations}
+                      onChange={setApplyAllLocations}
+                      label="Apply to all locations"
+                    />
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) void handleUploadFile(file);
+                        e.target.value = "";
+                      }}
+                    />
+                    <AdminButton
+                      type="button"
+                      disabled={uploading}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload size={16} />
+                      {uploading ? "Uploading…" : "Upload from computer"}
+                    </AdminButton>
+                  </div>
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                    <AdminInput
+                      label="Or paste image URL"
+                      placeholder="https://..."
+                      value={newUrl}
+                      onChange={(e) => setNewUrl(e.target.value)}
+                    />
+                    <div className="flex items-end">
+                      <AdminButton
+                        type="button"
+                        variant="outline"
+                        disabled={uploading || !newUrl.trim()}
+                        onClick={() => void handleAddFromUrl()}
+                      >
+                        <Link2 size={16} />
+                        Add URL
+                      </AdminButton>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </AdminCard>
+          ) : null}
+        </div>
+      </div>
 
       <AdminToast
         open={toast.open}
@@ -545,70 +571,10 @@ export default function GalleryManagementPage() {
   );
 }
 
-interface GalleryFormFieldsProps {
-  form: GalleryForm;
-  fieldErrors: GalleryErrors;
-  disabled?: boolean;
-  onPatch: (updater: GalleryForm | ((prev: GalleryForm) => GalleryForm)) => void;
-  onUpload: (file: File) => Promise<string>;
-}
-
-function GalleryFormFields({ form, fieldErrors, disabled, onPatch, onUpload }: GalleryFormFieldsProps) {
-  const patch = (partial: Partial<GalleryForm>) => {
-    onPatch((prev) => ({ ...prev, ...partial }));
-  };
-
-  return (
-    <div className="space-y-4">
-      <ImageUploadField
-        label="Image"
-        value={form.image}
-        disabled={disabled}
-        onChange={(url) => patch({ image: url || null })}
-        onUpload={onUpload}
-      />
-      {fieldErrors.image && <p className="text-xs text-admin-danger">{fieldErrors.image}</p>}
-      <AdminSelect
-        label="Category"
-        value={form.category}
-        onChange={(value) => patch({ category: value })}
-        options={getGalleryCategoryOptions()}
-      />
-      {fieldErrors.category && <p className="text-xs text-admin-danger">{fieldErrors.category}</p>}
-      <AdminInput
-        label="Alt Text"
-        placeholder="Describe the image for accessibility"
-        value={form.alt_text}
-        error={fieldErrors.alt_text}
-        disabled={disabled}
-        onChange={(e) => patch({ alt_text: e.target.value })}
-      />
-      <AdminTextarea
-        label="Caption"
-        placeholder="Optional caption shown on the gallery"
-        value={form.caption}
-        disabled={disabled}
-        onChange={(e) => patch({ caption: e.target.value })}
-      />
-      <AdminInput
-        label="Display Order"
-        type="number"
-        min={0}
-        value={String(form.display_order)}
-        error={fieldErrors.display_order}
-        disabled={disabled}
-        onChange={(e) => patch({ display_order: Number(e.target.value) })}
-      />
-      <AdminToggle
-        checked={form.featured}
-        onChange={(checked) => patch({ featured: checked })}
-        label={form.featured ? "Featured" : "Not featured"}
-      />
-      <AdminToggle
-        checked={form.visible}
-        onChange={(checked) => patch({ visible: checked })}
-        label={form.visible ? "Visible" : "Hidden"}
-      />
-    </div>
-  );
+function sortGalleryRows(rows: GalleryCardRow[]): GalleryCardRow[] {
+  return [...rows].sort((a, b) => {
+    const orderDiff = a.display_order - b.display_order;
+    if (orderDiff !== 0) return orderDiff;
+    return b.created_at.localeCompare(a.created_at);
+  });
 }

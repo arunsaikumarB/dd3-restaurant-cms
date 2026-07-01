@@ -1,4 +1,5 @@
 import { FormEvent, useCallback, useState } from "react";
+import { usePageContent } from "../context/PageContentContext";
 import { submitContact } from "../services/contactApi";
 
 export interface ContactFormState {
@@ -15,22 +16,35 @@ const initialState: ContactFormState = {
   message: "",
 };
 
-function validate(form: ContactFormState): string | null {
-  if (!form.name.trim()) return "Please enter your name.";
-  if (!form.email.trim() || !form.email.includes("@")) {
-    return "Please enter a valid email address.";
-  }
-  if (!form.phone.trim()) return "Please enter your phone number.";
-  if (!form.message.trim()) return "Please enter a message.";
-  return null;
-}
-
 export function useContactForm() {
+  const { fetchSection, interpolate } = usePageContent();
+  const messages = fetchSection("contact", "form_messages", {
+    validationName: "Please enter your name.",
+    validationEmail: "Please enter a valid email address.",
+    validationPhone: "Please enter your phone number.",
+    validationMessage: "Please enter a message.",
+    successTemplate: "Thank you, {name}. We'll be in touch shortly.",
+    successFallback: "Thank you. We'll be in touch shortly.",
+  });
+
   const [form, setForm] = useState<ContactFormState>(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  const validate = useCallback(
+    (state: ContactFormState): string | null => {
+      if (!state.name.trim()) return messages.validationName;
+      if (!state.email.trim() || !state.email.includes("@")) {
+        return messages.validationEmail;
+      }
+      if (!state.phone.trim()) return messages.validationPhone;
+      if (!state.message.trim()) return messages.validationMessage;
+      return null;
+    },
+    [messages],
+  );
 
   const updateField = useCallback(
     (key: keyof ContactFormState, value: string) => {
@@ -53,14 +67,18 @@ export function useContactForm() {
 
       setSubmitting(true);
       try {
-        const result = await submitContact({
+        await submitContact({
           name: form.name.trim(),
           email: form.email.trim(),
           phone: form.phone.trim(),
           message: form.message.trim(),
         });
         setSubmitted(true);
-        setSuccessMessage(result.message);
+        const firstName = form.name.trim().split(" ")[0];
+        setSuccessMessage(
+          interpolate(messages.successTemplate, { name: firstName }) ||
+            messages.successFallback,
+        );
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Something went wrong. Please try again.",
@@ -69,7 +87,7 @@ export function useContactForm() {
         setSubmitting(false);
       }
     },
-    [form],
+    [form, interpolate, messages, validate],
   );
 
   const reset = useCallback(() => {

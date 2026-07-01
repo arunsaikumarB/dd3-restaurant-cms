@@ -59,7 +59,17 @@ const icons = {
   ),
 };
 
-export default function FeatureList() {
+export interface FeatureListProps {
+  features?: Array<{ title: string }>;
+}
+
+export default function FeatureList({ features }: FeatureListProps) {
+  const items =
+    features ??
+    ABOUT_FEATURES.map(({ title }) => ({
+      title,
+    }));
+
   return (
     <motion.ul
       className="about-features"
@@ -69,15 +79,17 @@ export default function FeatureList() {
       viewport={viewportOnce}
       aria-label="Restaurant highlights"
     >
-      {ABOUT_FEATURES.map((feature) => (
+      {items.map((feature, index) => (
         <motion.li
-          key={feature.id}
+          key={`${feature.title}-${index}`}
           className="about-features__item"
           variants={fadeUpItem}
           whileHover={{ y: -4 }}
           transition={{ duration: 0.45, ease: EASE_POWER3 }}
         >
-          <span className="about-features__icon">{icons[feature.icon]}</span>
+          <span className="about-features__icon">
+            {icons[ABOUT_FEATURES[index]?.icon ?? "recipes"]}
+          </span>
           <span className="about-features__label">{feature.title}</span>
         </motion.li>
       ))}

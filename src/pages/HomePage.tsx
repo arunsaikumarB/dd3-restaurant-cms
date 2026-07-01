@@ -1,8 +1,11 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import Hero from "../components/Hero";
 import LazyMount from "../components/ui/LazyMount";
 import SectionPlaceholder from "../components/ui/SectionPlaceholder";
+import type { PublicGalleryItem } from "../data/publicGallery";
 import { useHomepageData } from "../hooks/useHomepageData";
+import { usePageContent } from "../context/PageContentContext";
+import { useGallerySection } from "../hooks/useGallerySection";
 import { formatWeekdayHoursLabel } from "../services/homepagePublic";
 import { useLocationSelection } from "../context/LocationContext";
 import { resolveOrderUrl } from "../utils/locationLinks";
@@ -27,10 +30,32 @@ const ExperienceSection = lazy(
 
 export default function HomePage() {
   const { bundle, locationId: bundleLocationId } = useHomepageData();
+  const { fetchSection } = usePageContent();
   const { selectedLocationId } = useLocationSelection();
   const { content, settings } = bundle;
+  const heroUi = fetchSection("home", "hero_ui", { scrollHint: "Scroll" });
   const orderCtaLink = resolveOrderUrl(settings, selectedLocationId, bundleLocationId);
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
+
+  const heroPosterFallback = useMemo<PublicGalleryItem[]>(
+    () => [
+      {
+        id: "homepage-hero-poster",
+        image: content.hero_image || "/hero/hero-poster.jpg",
+        alt_text: logoAlt,
+        title: "Hero background",
+        caption: "",
+        category: "Ambiance",
+        featured: false,
+        display_order: 1,
+        section: "hero_background",
+      },
+    ],
+    [content.hero_image, logoAlt],
+  );
+  const heroPosterImages = useGallerySection("hero_background", heroPosterFallback);
+  const posterSrc =
+    heroPosterImages[0]?.image ?? content.hero_image ?? "/hero/hero-poster.jpg";
 
   return (
     <div className="page">
@@ -38,9 +63,10 @@ export default function HomePage() {
         title={content.hero_title}
         subtitle={content.hero_subtitle}
         videoSrc={content.hero_video}
-        posterSrc={content.hero_image}
+        posterSrc={posterSrc}
         logoSrc={settings.logo}
         logoAlt={logoAlt}
+        scrollHint={heroUi.scrollHint}
       />
 
       <LazyMount

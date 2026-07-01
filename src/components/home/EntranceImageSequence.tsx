@@ -1,9 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import ImageSequenceScroll from "../ImageSequenceScroll";
 import SectionPlaceholder from "../ui/SectionPlaceholder";
+import { usePageContent } from "../../context/PageContentContext";
 import { fetchFrameManifest, type FrameManifest } from "../../utils/frameManifest";
 
 export default function EntranceImageSequence() {
+  const { fetchSection } = usePageContent();
+  const entrance = fetchSection("home", "entrance", {
+    kicker: "A warm welcome",
+    headline: "Every detail, designed to greet you.",
+  });
   const [manifest, setManifest] = useState<FrameManifest | null>(null);
   const [error, setError] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -70,9 +76,9 @@ export default function EntranceImageSequence() {
     >
       <div className="seq-overlay">
         <div className="seq-overlay__inner" ref={overlayRef}>
-          <p className="seq-overlay__kicker">A warm welcome</p>
+          <p className="seq-overlay__kicker">{entrance.kicker}</p>
           <h2 className="seq-overlay__headline">
-            Every detail, designed to greet you.
+            {entrance.headline}
           </h2>
         </div>
       </div>

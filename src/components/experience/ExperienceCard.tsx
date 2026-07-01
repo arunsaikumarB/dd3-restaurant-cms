@@ -24,6 +24,7 @@ export interface ExperienceCardProps {
   scrollDelay?: number;
   visible?: boolean;
   flat?: boolean;
+  onActivate?: () => void;
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -46,6 +47,7 @@ export default function ExperienceCard({
   scrollDelay = 0,
   visible = true,
   flat = false,
+  onActivate,
 }: ExperienceCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -156,6 +158,10 @@ export default function ExperienceCard({
     onBlur: handleMouseLeave,
   };
 
+  const activate = () => {
+    onActivate?.();
+  };
+
   if (external || link.startsWith("http")) {
     return (
       <a
@@ -164,6 +170,7 @@ export default function ExperienceCard({
         className={className}
         style={style}
         aria-label={`${headline ?? title} — ${buttonText}`}
+        onClick={activate}
         {...handlers}
         target={external ? "_blank" : undefined}
         rel={external ? "noopener noreferrer" : undefined}
@@ -180,6 +187,7 @@ export default function ExperienceCard({
       className={className}
       style={style}
       aria-label={`${headline ?? title} — ${buttonText}`}
+      onClick={activate}
       {...handlers}
     >
       {content}
