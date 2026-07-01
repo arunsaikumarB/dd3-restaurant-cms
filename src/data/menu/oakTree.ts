@@ -2,7 +2,7 @@ import type { MenuData } from "../../types/menu";
 
 /** Oak Tree menu — imported from https://desidhamakanj.net/oak-tree/menu/ */
 const oakTreeMenu = {
-  "generatedAt": "2026-06-30T12:23:04.774Z",
+  "generatedAt": "2026-07-01T08:15:07.974Z",
   "source": "https://desidhamakanj.net/oak-tree/menu/",
   "totalItems": 324,
   "categories": [

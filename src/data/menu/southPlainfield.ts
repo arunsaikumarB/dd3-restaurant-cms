@@ -2,7 +2,7 @@ import type { MenuData } from "../../types/menu";
 
 /** South Plainfield menu — imported from https://desidhamakanj.net/south-plainfield/menu/ */
 const southPlainfieldMenu = {
-  "generatedAt": "2026-06-30T12:10:46.867Z",
+  "generatedAt": "2026-07-01T08:15:07.909Z",
   "source": "https://desidhamakanj.net/south-plainfield/menu/",
   "totalItems": 377,
   "categories": [

@@ -37,14 +37,17 @@ function pickImage(image: string | null, category: string, name: string): string
   return found?.image ?? DEFAULT_SHOWCASE_IMAGE;
 }
 
-function mapRowToSignatureDish(row: MenuItemJoinRow): SignatureDish {
+function mapRowToSignatureDish(
+  row: MenuItemJoinRow,
+  locationId: LocationId,
+): SignatureDish {
   const category = row.menu_categories?.name ?? "Chef's Special";
   return {
     id: row.id,
     name: row.name,
     category,
-    category_name: resolveChefGaaCategory(category),
-    item_name: resolveChefGaaItem(row.name),
+    category_name: resolveChefGaaCategory(category, locationId),
+    item_name: resolveChefGaaItem(row.name, locationId),
     price: Number(row.price),
     image: pickImage(row.image, category, row.name),
     badge: "Chef's Special",
@@ -81,5 +84,7 @@ export async function fetchPublicSignatureDishes(
     return null;
   }
 
-  return (data as MenuItemJoinRow[]).map(mapRowToSignatureDish);
+  return (data as MenuItemJoinRow[]).map((row) =>
+    mapRowToSignatureDish(row, locationId),
+  );
 }

@@ -1,14 +1,6 @@
 /**
  * Maps our database menu names to ChefGaa's exact catalog names for deep-linked
- * order URLs. The carousel order links use these values so a click lands on the
- * correct ChefGaa item/category.
- *
- * Left-hand side  = our value (category slug / DB item name).
- * Right-hand side = the EXACT name in the ChefGaa catalog.
- *
- * Defaults below are identity mappings (same name). If a ChefGaa name differs,
- * change only the right-hand value — no code changes needed. Unmapped names fall
- * back to the raw DB value automatically.
+ * order URLs. Names differ by location — always pass locationId when resolving.
  */
 
 import type { LocationId } from "../config/locations";
@@ -30,94 +22,143 @@ export function getOrderUrl(locationId: LocationId | string | null | undefined):
   return ORDER_URLS[DEFAULT_PUBLIC_LOCATION_ID];
 }
 
-/** Category slug (menu_categories.slug) -> ChefGaa category name. */
-export const CHEFGAA_CATEGORY_MAP: Record<string, string> = {
+const WEBSITE_CATEGORY_MAP = {
   soups: "Soups",
   "vegetarian-appetizers": "Vegetarian Appetizers",
-  "non-vegetarian-appetizers": "Non Vegetarian Appetizers",
-  breakfast: "Breakfast",
-  "kebab-tandooris": "Kebab and Tandoori",
-  "naans-breads": "Naans & Breads",
+  "non-vegetarian-appetizers": "Non-Vegetarian Appetizers",
+  "kebab-and-tandooris": "Kebab & Tandooris",
+  "naans-and-breads": "Naans & Breads",
   "vegetarian-entrees": "Vegetarian Entrees",
-  "non-vegetarian-entrees": "Non Vegetarian Entrees",
-  "vegetarian-rice-biryani": "Vegetarian Rice & Biryani",
-  "non-veg-biryani": "Non Veg Biryani",
+  "non-vegetarian-entrees": "Non-Vegetarian Entrees",
+  "vegetarian-rice-and-biryani": "Vegetarian Rice & Biryani",
+  "non-veg-biryani": "Non-Veg Biryani",
   "dd-special-mandi": "DD Special Mandi",
   "dd-specials": "DD Specials",
   "dd-family-packs": "DD Family Packs",
   "indo-chinese": "Indo Chinese",
   snacks: "Snacks",
-  "chai-coffee": "Chai & Coffee",
+  "chai-and-coffee": "Chai & Coffee",
   "soft-drinks": "Soft Drinks",
   "kids-menu": "Kids Menu",
   desserts: "Desserts",
-  "thali-cooker-pulav": "Thali & Cooker Pulav",
+  "thali-and-cooker-pulav": "Thali & Cooker Pulav",
+  thali: "Thali",
+} as const;
+
+/** Category slug (menu_categories.slug) -> ChefGaa category name, per location. */
+export const CHEFGAA_CATEGORY_MAP_BY_LOCATION: Record<
+  LocationId,
+  Record<string, string>
+> = {
+  "south-plainfield": { ...WEBSITE_CATEGORY_MAP },
+  "oak-tree": { ...WEBSITE_CATEGORY_MAP },
+  lawrenceville: { ...WEBSITE_CATEGORY_MAP },
 };
 
-/** DB item name (menu_items.name) -> ChefGaa item name. Covers all 28 chef specials. */
-export const CHEFGAA_ITEM_MAP: Record<string, string> = {
-  // Vegetarian Appetizers
-  "Paneer 555": "Paneer 555",
-  "Gobi 555": "Gobi 555",
-  "Baby Corn 555": "Baby Corn 555",
-  "Mushroom 555": "Mushroom 555",
-  "Paneer Majestic": "Paneer Majestic",
-  "Gobi Majestic": "Gobi Majestic",
-  "Mushroom Majestic": "Mushroom Majestic",
-  "Baby Corn Majestic": "Baby Corn Majestic",
-  // Non-Vegetarian Appetizers
-  "Chicken Majestic": "Chicken Majestic",
-  "Chicken 555": "Chicken 555",
-  "DD Spl Cilantro Fish": "DD Spl Cilantro Fish",
-  "Shrimp Majestic": "Shrimp Majestic",
-  // Kebab & Tandooris
-  "DD Spl Non Veg Kebab Platter": "DD Spl Non Veg Kebab Platter",
-  // Non-Vegetarian Entrees
-  "DD Chef's Special Chicken Curry (Homestyle)":
-    "DD Chef's Special Chicken Curry (Homestyle)",
-  "DD Chef's Special Mutton Curry (Homestyle)":
-    "DD Chef's Special Mutton Curry (Homestyle)",
-  // Non-Veg Biryani
-  "DD Special Chicken Biryani (Bone-In)": "DD Special Chicken Biryani (Bone-In)",
-  "DD Special Chicken Biryani (Boneless)":
-    "DD Special Chicken Biryani (Boneless)",
-  "DD Spl Natu Kodi Biryani": "DD Spl Natu Kodi Biryani",
-  "DD Spl Nalli Gosht Biryani": "DD Spl Nalli Gosht Biryani",
-  // DD Special Mandi
-  "DD Special Nalli Gosht Mandi (Single)":
-    "DD Special Nalli Gosht Mandi (Single)",
-  "DD Special Nalli Gosht Mandi (Half)": "DD Special Nalli Gosht Mandi (Half)",
-  "DD Special Nalli Gosht Mandi (Full)": "DD Special Nalli Gosht Mandi (Full)",
-  // DD Specials
-  "DD Chef's Special Tawa Fish (Bone-In)":
-    "DD Chef's Special Tawa Fish (Bone-In)",
-  "DD Chef's Special Tawa Fish (Boneless)":
-    "DD Chef's Special Tawa Fish (Boneless)",
-  "DD Spl Potlam Biryani": "DD Spl Potlam Biryani",
-  // DD Family Packs
-  "DD Spl Chicken Biryani Family Pack": "DD Spl Chicken Biryani Family Pack",
-  // Chai & Coffee
-  "DD Spl Filter Coffee": "DD Spl Filter Coffee",
-  // Desserts
-  "DD Special Sweet": "DD Special Sweet",
+/**
+ * DB category display name -> ChefGaa category name when they differ.
+ * Website DB names match the public site; ChefGaa may use alternate labels.
+ */
+export const CHEFGAA_CATEGORY_DISPLAY_MAP_BY_LOCATION: Partial<
+  Record<LocationId, Record<string, string>>
+> = {
+  "south-plainfield": {
+    "Kebab & Tandooris": "Kebab and Tandooris",
+    "Naans & Breads": "Naans",
+    "Non-Vegetarian Appetizers": "Non-Veg Appetizers",
+    "Non-Vegetarian Entrees": "Non-Veg Entrees",
+    "Vegetarian Rice & Biryani": "Vegetarian Rice & Biryanis",
+    "DD Family Packs": "DD Family Packs (To Go Only)",
+    "Chai & Coffee": "Chai",
+    "Thali & Cooker Pulav": "Thali",
+  },
+  "oak-tree": {
+    "Kebab & Tandooris": "Kebab and Tandooris",
+    "Naans & Breads": "Naans",
+    "Non-Vegetarian Appetizers": "Non-Veg Appetizers",
+    "Non-Vegetarian Entrees": "Non-Veg Entrees",
+    "Vegetarian Rice & Biryani": "Vegetarian Rice & Biryanis",
+    "DD Family Packs": "DD Family Packs (To Go Only)",
+    "Chai & Coffee": "Chai",
+  },
+  lawrenceville: {
+    "Kebab & Tandooris": "Kebab and Tandoori",
+    "Naans & Breads": "Naans",
+    "Non-Vegetarian Entrees": "Non Vegetarian Entrees",
+    "Non-Vegetarian Appetizers": "Non Vegetarian Appetizers",
+    "Vegetarian Rice & Biryani": "Vegetarian Rice & Biryani",
+    "Non-Veg Biryani": "Biryani",
+    "Chai & Coffee": "Chai",
+    "Thali & Cooker Pulav": "Cooker Pulav",
+  },
+};
+
+/** DB item name -> ChefGaa item name when they differ. Identity by default. */
+export const CHEFGAA_ITEM_MAP_BY_LOCATION: Partial<
+  Record<LocationId, Record<string, string>>
+> = {
+  "south-plainfield": {},
+  "oak-tree": {},
+  lawrenceville: {
+    "DD SPL Cilantro Fish": "DD Spl Cilantro Fish",
+    "DD SPL Non Veg Kebab Platter": "DD Spl Non Veg Kebab Platter",
+    "DD SPL Natu Kodi Biryani": "DD Spl Natu Kodi Biryani",
+    "DD SPL Potlam Biryani": "DD Spl Potlam Biryani",
+    "DD SPL Chicken Biryani Family Pack": "DD Spl Chicken Biryani Family Pack",
+    "DD SPL Filter Coffee": "DD Spl Filter Coffee",
+  },
 };
 
 /** Slugifies a category name to match menu_categories.slug values. */
 export function toCategorySlug(name: string): string {
   return name
     .toLowerCase()
-    .replace(/&/g, " ")
+    .replace(/&/g, " and ")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
 
+function resolveLocationCategoryMap(
+  locationId: LocationId | string | null | undefined,
+): Record<string, string> | null {
+  if (locationId && locationId in CHEFGAA_CATEGORY_MAP_BY_LOCATION) {
+    return CHEFGAA_CATEGORY_MAP_BY_LOCATION[locationId as LocationId];
+  }
+  return null;
+}
+
 /** Resolves the ChefGaa category name from a DB category display name. */
-export function resolveChefGaaCategory(categoryName: string): string {
+export function resolveChefGaaCategory(
+  categoryName: string,
+  locationId?: LocationId | string | null,
+): string {
+  if (locationId && locationId in CHEFGAA_CATEGORY_DISPLAY_MAP_BY_LOCATION) {
+    const displayMap =
+      CHEFGAA_CATEGORY_DISPLAY_MAP_BY_LOCATION[locationId as LocationId];
+    if (displayMap?.[categoryName]) {
+      return displayMap[categoryName];
+    }
+  }
+
   const slug = toCategorySlug(categoryName);
-  return CHEFGAA_CATEGORY_MAP[slug] ?? categoryName;
+  const locationMap = resolveLocationCategoryMap(locationId);
+  if (locationMap?.[slug]) {
+    return locationMap[slug];
+  }
+
+  return categoryName;
 }
 
 /** Resolves the ChefGaa item name from a DB item name. */
-export function resolveChefGaaItem(itemName: string): string {
-  return CHEFGAA_ITEM_MAP[itemName] ?? itemName;
+export function resolveChefGaaItem(
+  itemName: string,
+  locationId?: LocationId | string | null,
+): string {
+  if (locationId && locationId in CHEFGAA_ITEM_MAP_BY_LOCATION) {
+    const map = CHEFGAA_ITEM_MAP_BY_LOCATION[locationId as LocationId];
+    if (map?.[itemName]) {
+      return map[itemName];
+    }
+  }
+  return itemName;
 }

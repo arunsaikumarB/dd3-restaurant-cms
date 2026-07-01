@@ -2,7 +2,7 @@ import type { MenuData } from "../../types/menu";
 
 /** Lawrenceville menu — imported from https://desidhamakanj.net/lawrenceville/menu/ */
 const lawrencevilleMenu = {
-  "generatedAt": "2026-06-30T12:39:08.255Z",
+  "generatedAt": "2026-07-01T08:15:08.041Z",
   "source": "https://desidhamakanj.net/lawrenceville/menu/",
   "totalItems": 344,
   "categories": [
