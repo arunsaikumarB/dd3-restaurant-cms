@@ -1,20 +1,20 @@
 import { createClientIfConfigured } from "../../lib/supabase/client";
 import { isSupabaseConfigured } from "../../lib/supabase/env";
 import { getLocationConfig, LOCATION_IDS, type LocationId } from "../../config/locations";
+import { fetchChefGaaLiveBundle } from "../../services/chefgaa/supabaseQueries";
+import type { ChefGaaDashboardSummary } from "../../services/chefgaa/types";
 import type { AdminLocationScope } from "../types/location";
-import type { AdminStat } from "../types";
+import type { ActivityItem, AdminStat } from "../types";
 
 export type DashboardStats = {
   stats: AdminStat[];
   locationLabel: string;
+  chefGaa: ChefGaaDashboardSummary | null;
+  recentActivity: ActivityItem[];
 };
 
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
 async function countRows(
-  table: "menu_items" | "offers" | "reservations" | "gallery" | "reviews",
+  table: "offers" | "gallery" | "reviews" | "menu_categories" | "menu_items",
   filters: { column: string; value: string | boolean }[],
 ): Promise<number> {
   if (!isSupabaseConfigured()) return 0;
@@ -32,7 +32,7 @@ async function countRows(
 }
 
 async function sumAcrossLocations(
-  table: "menu_items" | "offers" | "reservations",
+  table: "offers",
   locationIds: LocationId[],
   extraFilters: { column: string; value: string | boolean }[] = [],
 ): Promise<number> {
@@ -44,26 +44,76 @@ async function sumAcrossLocations(
   return counts.reduce((sum, value) => sum + value, 0);
 }
 
+function formatLastSync(value: string | null): string {
+  if (!value) return "Never";
+  return new Date(value).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
 async function fetchScopeStats(scope: AdminLocationScope): Promise<DashboardStats> {
-  const today = todayIso();
   const locationIds = scope === "all" ? LOCATION_IDS : [scope];
   const locationLabel =
     scope === "all" ? "All Locations" : getLocationConfig(scope).name;
 
-  const [menuItems, activeOffers, reservationsToday, galleryImages, reviews] = await Promise.all([
-    sumAcrossLocations("menu_items", locationIds),
+  const [activeOffers, galleryImages, approvedReviews, chefGaaBundle] = await Promise.all([
     sumAcrossLocations("offers", locationIds, [{ column: "active", value: true }]),
-    sumAcrossLocations("reservations", locationIds, [{ column: "date", value: today }]),
     countRows("gallery", []),
-    countRows("reviews", []),
+    countRows("reviews", [{ column: "approved", value: true }]),
+    fetchChefGaaLiveBundle(scope, { force: true }),
   ]);
+
+  const chefGaa = chefGaaBundle.dashboard;
 
   const stats: AdminStat[] = [
     {
-      id: "menu",
+      id: "locations",
+      label: "Total Locations",
+      value: chefGaa.totalLocations,
+      change: scope === "all" ? "All branches" : "Selected branch",
+      trend: "neutral",
+      icon: "map",
+    },
+    {
+      id: "connected",
+      label: "Connected Locations",
+      value: chefGaa.connectedLocations,
+      change: "ChefGaa healthy",
+      trend: chefGaa.connectedLocations > 0 ? "up" : "neutral",
+      icon: "plug",
+    },
+    {
+      id: "failed",
+      label: "Failed Locations",
+      value: chefGaa.failedLocations,
+      change: chefGaa.failedLocations > 0 ? "Needs attention" : "All clear",
+      trend: chefGaa.failedLocations > 0 ? "down" : "up",
+      icon: "users",
+    },
+    {
+      id: "last-sync",
+      label: "Last Global Sync",
+      value: formatLastSync(chefGaa.lastGlobalSync),
+      change: chefGaa.lastSyncDurationMs
+        ? `${(chefGaa.lastSyncDurationMs / 1000).toFixed(1)}s duration`
+        : "Awaiting sync",
+      trend: "neutral",
+      icon: "clock",
+    },
+    {
+      id: "categories",
+      label: "Total Categories",
+      value: chefGaa.totalCategories,
+      change: scope === "all" ? "ChefGaa catalog (all locations)" : "ChefGaa catalog",
+      trend: "neutral",
+      icon: "layers",
+    },
+    {
+      id: "menu-items",
       label: "Total Menu Items",
-      value: menuItems,
-      change: scope === "all" ? "Across all branches" : "For selected location",
+      value: chefGaa.totalMenuItems,
+      change: "ChefGaa catalog",
       trend: "neutral",
       icon: "utensils",
     },
@@ -76,14 +126,6 @@ async function fetchScopeStats(scope: AdminLocationScope): Promise<DashboardStat
       icon: "tag",
     },
     {
-      id: "reservations",
-      label: "Reservations Today",
-      value: reservationsToday,
-      change: scope === "all" ? "All branches combined" : "For selected location",
-      trend: reservationsToday > 0 ? "up" : "neutral",
-      icon: "calendar",
-    },
-    {
       id: "gallery",
       label: "Gallery Images",
       value: galleryImages,
@@ -93,23 +135,20 @@ async function fetchScopeStats(scope: AdminLocationScope): Promise<DashboardStat
     },
     {
       id: "reviews",
-      label: "Reviews",
-      value: reviews,
-      change: "Global reviews",
+      label: "Approved Reviews",
+      value: approvedReviews,
+      change: "Published on site",
       trend: "neutral",
       icon: "star",
     },
-    {
-      id: "visitors",
-      label: "Website Visitors",
-      value: "—",
-      change: "Analytics coming soon",
-      trend: "neutral",
-      icon: "users",
-    },
   ];
 
-  return { stats, locationLabel };
+  return {
+    stats,
+    locationLabel,
+    chefGaa,
+    recentActivity: chefGaaBundle.activity,
+  };
 }
 
 export async function fetchDashboardStats(scope: AdminLocationScope): Promise<DashboardStats> {
@@ -119,6 +158,8 @@ export async function fetchDashboardStats(scope: AdminLocationScope): Promise<Da
     return {
       locationLabel: scope === "all" ? "All Locations" : getLocationConfig(scope as LocationId).name,
       stats: [],
+      chefGaa: null,
+      recentActivity: [],
     };
   }
 }

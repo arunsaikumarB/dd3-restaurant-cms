@@ -7,6 +7,10 @@ import {
   Users,
   TrendingUp,
   TrendingDown,
+  MapPin,
+  PlugZap,
+  Clock,
+  Layers,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAdminTheme } from "../../context/AdminThemeContext";
@@ -20,6 +24,10 @@ const iconMap: Record<string, LucideIcon> = {
   image: Image,
   star: Star,
   users: Users,
+  map: MapPin,
+  plug: PlugZap,
+  clock: Clock,
+  layers: Layers,
 };
 
 export default function StatCard({ stat }: { stat: AdminStat }) {

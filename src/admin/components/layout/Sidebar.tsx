@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronLeft, LogOut } from "lucide-react";
-import { ADMIN_NAV } from "../../config/navigation";
+import { ADMIN_NAV_SECTIONS } from "../../config/navigation";
 import { useAdminTheme } from "../../context/AdminThemeContext";
 import { useAuth } from "../../../hooks/useAuth";
 import { ADMIN_LOGIN_PATH } from "../../../lib/supabase/middleware";
@@ -52,29 +52,44 @@ export default function AdminSidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto admin-scrollbar px-3 py-4">
-        <ul className="space-y-1">
-          {ADMIN_NAV.map((item) => (
-            <li key={item.path}>
-              <NavLink
-                to={item.path}
-                title={sidebarCollapsed ? item.label : undefined}
-                className={({ isActive }) =>
-                  [
-                    "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                    isActive
-                      ? "bg-admin-primary text-white shadow-admin"
-                      : dark
-                        ? "text-white/60 hover:bg-white/5 hover:text-white"
-                        : "text-admin-muted hover:bg-admin-ivory hover:text-admin-text",
-                  ].join(" ")
-                }
-              >
-                <item.icon size={18} className="shrink-0" />
-                {!sidebarCollapsed && <span>{item.label}</span>}
-              </NavLink>
-            </li>
+        <div className="space-y-6">
+          {ADMIN_NAV_SECTIONS.map((section, sectionIndex) => (
+            <div key={section.title ?? `section-${sectionIndex}`}>
+              {section.title && !sidebarCollapsed ? (
+                <p
+                  className={`mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider ${dark ? "text-white/35" : "text-admin-muted/80"}`}
+                >
+                  {section.title}
+                </p>
+              ) : section.title && sidebarCollapsed ? (
+                <div className={`mx-3 mb-2 border-t ${dark ? "border-white/10" : "border-admin-border"}`} />
+              ) : null}
+              <ul className="space-y-1">
+                {section.items.map((item) => (
+                  <li key={item.path}>
+                    <NavLink
+                      to={item.path}
+                      title={sidebarCollapsed ? item.label : undefined}
+                      className={({ isActive }) =>
+                        [
+                          "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                          isActive
+                            ? "bg-admin-primary text-white shadow-admin"
+                            : dark
+                              ? "text-white/60 hover:bg-white/5 hover:text-white"
+                              : "text-admin-muted hover:bg-admin-ivory hover:text-admin-text",
+                        ].join(" ")
+                      }
+                    >
+                      <item.icon size={18} className="shrink-0" />
+                      {!sidebarCollapsed && <span>{item.label}</span>}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       </nav>
 
       <div className="border-t border-inherit p-3">

@@ -1,0 +1,830 @@
+{
+  "status": 200,
+  "categoryCount": 23,
+  "itemCount": 335,
+  "firstCategory": {
+    "name": "Soft Drinks",
+    "availability": {
+      "time_slots": [
+        {
+          "start_time": "09:00",
+          "end_time": "22:30"
+        }
+      ],
+      "order_types": [
+        {
+          "order_type": 108,
+          "available": true
+        }
+      ]
+    },
+    "OutletMenuItemCategory": 329,
+    "categoryAvailability": [
+      {
+        "id": 685,
+        "start_time": "09:00",
+        "end_time": "22:30"
+      }
+    ],
+    "sort_order": 20,
+    "menuItems": [
+      {
+        "name": "Poland Spring Water Bottle",
+        "unit_name": null,
+        "OutletMenuItem": 8200,
+        "cost_price": 0.99,
+        "selling_price": 0.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904293555-Poland_Spring_Water_Bottle.png",
+        "description": "Fresh, clean water to keep you cool and refreshed.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Thumps Up - Can",
+        "unit_name": null,
+        "OutletMenuItem": 8199,
+        "cost_price": 2.59,
+        "selling_price": 2.59,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904286849-Thumps_Up_-_Can.png",
+        "description": "India’s bold cola with a strong, fizzy kick — perfect with spicy dishes!",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Mango Lassi",
+        "unit_name": null,
+        "OutletMenuItem": 8190,
+        "cost_price": 4.99,
+        "selling_price": 4.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904282114-Mango_Lassi.png",
+        "description": "Rich and creamy yogurt drink blended with ripe mangoes — a perfect desi cooler.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Smart Water",
+        "unit_name": null,
+        "OutletMenuItem": 8151,
+        "cost_price": 3.99,
+        "selling_price": 3.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904258353-Smart_Water.png",
+        "description": "Hydration with a hint of purity — stay smart, stay refreshed.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Goli Soda",
+        "unit_name": null,
+        "OutletMenuItem": 8139,
+        "cost_price": 3.99,
+        "selling_price": 3.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904275127-Goli_Soda.png",
+        "description": "Old-school Indian soda pop — fun, fizzy, and full of nostalgia!",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Coke - Can",
+        "unit_name": null,
+        "OutletMenuItem": 8135,
+        "cost_price": 1.99,
+        "selling_price": 1.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904271064-Coke_-_Can.png",
+        "description": "The timeless favorite — fizzy, cool, and always satisfying.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Diet Coke - Can",
+        "unit_name": null,
+        "OutletMenuItem": 8134,
+        "cost_price": 1.99,
+        "selling_price": 1.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904297043-Diet_Coke_-_Can.png",
+        "description": "Light, bubbly, and refreshing — zero calories, all the flavor.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Fresh Lemon Soda",
+        "unit_name": null,
+        "OutletMenuItem": 8130,
+        "cost_price": 3.99,
+        "selling_price": 3.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904244961-Fresh_Lemon_Soda.png",
+        "description": "Freshly squeezed lemon with sparkling soda — sweet, salty, or both!",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "GingerAle Bottle",
+        "unit_name": null,
+        "OutletMenuItem": 8126,
+        "cost_price": 3.99,
+        "selling_price": 3.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904331539-GingerAle_Bottle.png",
+        "description": "Crisp and full-bodied ginger ale to refresh your palate.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Mexican Coke",
+        "unit_name": null,
+        "OutletMenuItem": 8082,
+        "cost_price": 4.99,
+        "selling_price": 4.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904302754-Mexican_Coke.png",
+        "description": "Made with real cane sugar — richer, smoother, and extra delicious!",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "sprite can",
+        "unit_name": null,
+        "OutletMenuItem": 8052,
+        "cost_price": 1.99,
+        "selling_price": 1.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904290115-sprite_can.png",
+        "description": "Crisp lemon-lime fizz that hits refresh instantly.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "CanadaDry Can",
+        "unit_name": null,
+        "OutletMenuItem": 8051,
+        "cost_price": 1.99,
+        "selling_price": 1.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904335640-CanadaDry_Can.png",
+        "description": "Classic bubbly ginger flavor in a crisp, chilled can.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Zero Coke - Can",
+        "unit_name": null,
+        "OutletMenuItem": 8009,
+        "cost_price": 1.99,
+        "selling_price": 1.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904251713-Zero_Coke_-_Can.png",
+        "description": "All the Coca-Cola taste with none of the sugar.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Butter Milk",
+        "unit_name": null,
+        "OutletMenuItem": 7991,
+        "cost_price": 3.99,
+        "selling_price": 3.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904262055-Butter_Milk.png",
+        "description": "Cool, spiced yogurt drink — refreshing and perfect after a hearty meal.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Gingerale Can",
+        "unit_name": null,
+        "OutletMenuItem": 7976,
+        "cost_price": 1.99,
+        "selling_price": 1.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904328012-Ginfger_Ale_Can.png",
+        "description": "Smooth and bubbly with a hint of ginger — a refreshing twist.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Coke - Bottle (20oz)",
+        "unit_name": null,
+        "OutletMenuItem": 7969,
+        "cost_price": 3.99,
+        "selling_price": 3.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "MTc2NTE4NjU2NjIwMTEy",
+        "description": "Refreshing, bubbly Coke served chilled for the perfect sip with any meal.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Sprite Bottle",
+        "unit_name": null,
+        "OutletMenuItem": 7950,
+        "cost_price": 3.99,
+        "selling_price": 3.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904313677-Sprite_Bottle.png",
+        "description": "Zingy lemon-lime refreshment in every sip.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Zero Coke - Bottle",
+        "unit_name": null,
+        "OutletMenuItem": 7943,
+        "cost_price": 3.99,
+        "selling_price": 3.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904339424-Zero_Coke_-_Bottle.png",
+        "description": "Full flavor, zero sugar — enjoy the lighter side of Coke.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Diet Coke - Bottle",
+        "unit_name": null,
+        "OutletMenuItem": 7940,
+        "cost_price": 3.99,
+        "selling_price": 3.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904317464-Diet_Coke_-_Bottle.png",
+        "description": "Light, fizzy, and refreshing — the perfect guilt-free cola.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Sweet Lassi",
+        "unit_name": null,
+        "OutletMenuItem": 7939,
+        "cost_price": 4.99,
+        "selling_price": 4.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904320829-Sweet_Lassi.png",
+        "description": "Creamy, sweet, and soothing — a traditional Indian favorite.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Can Drinks",
+        "unit_name": null,
+        "OutletMenuItem": 7936,
+        "cost_price": 1.99,
+        "selling_price": 1.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904346379-Can_Drinks.png",
+        "description": "Your favorite chilled sodas — pick your pop and refresh instantly.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Limca Can",
+        "unit_name": null,
+        "OutletMenuItem": 7918,
+        "cost_price": 2.59,
+        "selling_price": 2.59,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904241323-Limca_can.png",
+        "description": "Zesty lemon drink with that unmistakable Indian tang.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Canada Dry",
+        "unit_name": null,
+        "OutletMenuItem": 7917,
+        "cost_price": 2.99,
+        "selling_price": 2.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904324293-Canada_Dry.png",
+        "description": "Classic ginger ale that pairs perfectly with rich, spicy meals.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Salt Lassi",
+        "unit_name": null,
+        "OutletMenuItem": 7915,
+        "cost_price": 4.99,
+        "selling_price": 4.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904310105-Salt_Lassi.png",
+        "description": "A savory yogurt drink that cools you from the inside out.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Topo Chico",
+        "unit_name": null,
+        "OutletMenuItem": 7914,
+        "cost_price": 3.99,
+        "selling_price": 3.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904278578-Topo_Chico.png",
+        "description": "The premium sparkling mineral water with a crisp, refreshing fizz.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Limca",
+        "unit_name": null,
+        "OutletMenuItem": 7900,
+        "cost_price": 2.59,
+        "selling_price": 2.59,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904349890-Limca.png",
+        "description": "The iconic lemony soda from India — cool, crisp, and citrusy.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Topochico - Can",
+        "unit_name": null,
+        "OutletMenuItem": 7897,
+        "cost_price": 2.99,
+        "selling_price": 2.99,
+        "sort_order": null,
+        "mark_as_unavailable": false,
+        "item_available_in_store": true,
+        "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904353055-Topochico_-_Can.png",
+        "description": "Bright mineral fizz with natural sparkle — refreshingly different.",
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "22:30"
+            }
+          ],
+          "order_types": [
+            {
+              "order_type": 108,
+              "available": true
+            }
+          ]
+        }
+      }
+    ],
+    "isAnyActiveScheduledCategory": true
+  },
+  "firstItem": {
+    "name": "Poland Spring Water Bottle",
+    "unit_name": null,
+    "OutletMenuItem": 8200,
+    "cost_price": 0.99,
+    "selling_price": 0.99,
+    "sort_order": null,
+    "mark_as_unavailable": false,
+    "item_available_in_store": true,
+    "image": "https://chefgaadevstor.blob.core.windows.net/online-ordering-item-images-prod/1773904293555-Poland_Spring_Water_Bottle.png",
+    "description": "Fresh, clean water to keep you cool and refreshed.",
+    "is_customizable": false,
+    "availability": {
+      "time_slots": [
+        {
+          "start_time": "09:00",
+          "end_time": "22:30"
+        }
+      ],
+      "order_types": [
+        {
+          "order_type": 108,
+          "available": true
+        }
+      ]
+    }
+  },
+  "categoryNames": [
+    "Soft Drinks",
+    "Midnight Biryani",
+    "Soups",
+    "Vegetarian Appetizers",
+    "Non-Veg Appetizers",
+    "Vegetarian Entrees",
+    "Non-Veg Entrees",
+    "Kebab and Tandooris",
+    "Vegetarian Rice & Biryanis",
+    "Biryanis",
+    "Naans",
+    "DD Specials",
+    "DD Family Packs (To Go Only)",
+    "DD Special Mandi",
+    "Thali"
+  ],
+  "allKeysCategory": [
+    "name",
+    "availability",
+    "OutletMenuItemCategory",
+    "categoryAvailability",
+    "sort_order",
+    "menuItems",
+    "isAnyActiveScheduledCategory"
+  ],
+  "allKeysItem": [
+    "name",
+    "unit_name",
+    "OutletMenuItem",
+    "cost_price",
+    "selling_price",
+    "sort_order",
+    "mark_as_unavailable",
+    "item_available_in_store",
+    "image",
+    "description",
+    "is_customizable",
+    "availability"
+  ]
+}

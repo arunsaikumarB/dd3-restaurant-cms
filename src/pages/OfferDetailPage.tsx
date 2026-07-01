@@ -138,7 +138,7 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
             ) : null}
             {offer.validUntil ? (
               <div className="offer-detail-meta__item">
-                <span className="offer-detail-meta__label">Validity</span>
+                <span className="offer-detail-meta__label">Offer Availability</span>
                 <span className="offer-detail-meta__value">{offer.validUntil}</span>
               </div>
             ) : null}

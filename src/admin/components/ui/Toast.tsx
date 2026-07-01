@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, XCircle, X } from "lucide-react";
+import { CheckCircle2, XCircle, X, Info } from "lucide-react";
 import { useAdminTheme } from "../../context/AdminThemeContext";
 
-export type ToastVariant = "success" | "error";
+export type ToastVariant = "success" | "error" | "info";
 
 interface AdminToastProps {
   open: boolean;
@@ -26,7 +26,8 @@ export default function AdminToast({
     return () => window.clearTimeout(timer);
   }, [open, onClose]);
 
-  const Icon = variant === "success" ? CheckCircle2 : XCircle;
+  const Icon =
+    variant === "success" ? CheckCircle2 : variant === "error" ? XCircle : Info;
 
   return (
     <AnimatePresence>
@@ -38,13 +39,24 @@ export default function AdminToast({
           className="fixed bottom-6 right-6 z-[300] flex max-w-sm items-start gap-3 rounded-2xl border px-4 py-3 shadow-admin-lg"
           style={{
             background: dark ? "#1a1a1a" : "#fff",
-            borderColor: variant === "success" ? "rgba(22,163,74,0.35)" : "rgba(220,38,38,0.35)",
+            borderColor:
+              variant === "success"
+                ? "rgba(22,163,74,0.35)"
+                : variant === "error"
+                  ? "rgba(220,38,38,0.35)"
+                  : "rgba(59,130,246,0.35)",
           }}
           role="status"
         >
           <Icon
             size={20}
-            className={variant === "success" ? "text-admin-success shrink-0" : "text-admin-danger shrink-0"}
+            className={
+              variant === "success"
+                ? "text-admin-success shrink-0"
+                : variant === "error"
+                  ? "text-admin-danger shrink-0"
+                  : "text-blue-500 shrink-0"
+            }
           />
           <p className="flex-1 text-sm">{message}</p>
           <button

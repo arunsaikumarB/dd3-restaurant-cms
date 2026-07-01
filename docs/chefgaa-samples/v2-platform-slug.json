@@ -1,0 +1,17 @@
+{
+  "status": 422,
+  "body": {
+    "success": false,
+    "errors": [
+      {
+        "code": "error_platforms_not_found",
+        "message": "Can't process the request"
+      }
+    ],
+    "meta": {
+      "path": "/api/v1/public/menu/platforms/slug/desi-dhamaka",
+      "method": "GET"
+    }
+  },
+  "_note": "Probe used tenant-id/store-id from scripts/fetch-lv-menu.mjs (may be stale). Re-probe with credentials from ChefGaa admin or live orders.chefgaa.com bundle."
+}

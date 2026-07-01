@@ -1,12 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { resolvePublicLocationId, type LocationId } from "../config/locations";
 import { SIGNATURE_DISHES, type SignatureDish } from "../data/signatureDishes";
-import { fetchPublicSignatureDishes } from "../services/signaturePublic";
+import {
+  fetchPublicSignatureDishes,
+  staticSignatureDishesForLocation,
+} from "../services/signaturePublic";
+
+function resolveFallbackDishes(locationId: LocationId): SignatureDish[] {
+  const staticDishes = staticSignatureDishesForLocation(locationId);
+  return staticDishes.length > 0 ? staticDishes : SIGNATURE_DISHES;
+}
 
 /**
  * Returns the chef's-special dishes for the carousel. Prefers live database
- * content for the active location and falls back to the curated static list
- * when the database is empty or unavailable.
+ * content for the active location and falls back to location static data.
  */
 export function useSignatureDishes(locationId: LocationId | null) {
   const resolvedLocationId = useMemo(
@@ -26,15 +33,19 @@ export function useSignatureDishes(locationId: LocationId | null) {
       .then((result) => {
         if (cancelled) return;
         if (result === null) {
-          setDishes(SIGNATURE_DISHES);
+          setDishes(resolveFallbackDishes(resolvedLocationId));
           setError("Unable to load signature dishes from the database.");
           return;
         }
-        setDishes(result.length > 0 ? result : SIGNATURE_DISHES);
+        setDishes(
+          result.length > 0
+            ? result
+            : resolveFallbackDishes(resolvedLocationId),
+        );
       })
       .catch(() => {
         if (cancelled) return;
-        setDishes(SIGNATURE_DISHES);
+        setDishes(resolveFallbackDishes(resolvedLocationId));
         setError("Unable to load signature dishes from the database.");
       })
       .finally(() => {

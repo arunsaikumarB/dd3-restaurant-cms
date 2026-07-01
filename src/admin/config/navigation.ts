@@ -1,15 +1,13 @@
 import {
   LayoutDashboard,
   Home,
-  UtensilsCrossed,
-  FolderOpen,
   Tag,
   Images,
-  CalendarDays,
   Star,
   Settings,
   User,
   LogIn,
+  PlugZap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -19,18 +17,37 @@ export interface AdminNavItem {
   icon: LucideIcon;
 }
 
-export const ADMIN_NAV: AdminNavItem[] = [
-  { label: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Homepage", path: "/admin/homepage", icon: Home },
-  { label: "Menu", path: "/admin/menu", icon: UtensilsCrossed },
-  { label: "Categories", path: "/admin/categories", icon: FolderOpen },
-  { label: "Offers", path: "/admin/offers", icon: Tag },
-  { label: "Gallery", path: "/admin/gallery", icon: Images },
-  { label: "Reservations", path: "/admin/reservations", icon: CalendarDays },
-  { label: "Reviews", path: "/admin/reviews", icon: Star },
-  { label: "Settings", path: "/admin/settings", icon: Settings },
-  { label: "Profile", path: "/admin/profile", icon: User },
+export interface AdminNavSection {
+  title?: string;
+  items: AdminNavItem[];
+}
+
+export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
+  {
+    items: [
+      { label: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
+      { label: "Homepage", path: "/admin/homepage", icon: Home },
+    ],
+  },
+  {
+    items: [
+      { label: "Offers", path: "/admin/offers", icon: Tag },
+      { label: "Gallery", path: "/admin/gallery", icon: Images },
+      { label: "Reviews", path: "/admin/reviews", icon: Star },
+      { label: "Settings", path: "/admin/settings", icon: Settings },
+    ],
+  },
+  {
+    title: "Integrations",
+    items: [{ label: "ChefGaa Integration", path: "/admin/integrations/chefgaa", icon: PlugZap }],
+  },
+  {
+    items: [{ label: "Profile", path: "/admin/profile", icon: User }],
+  },
 ];
+
+/** Flat list of all admin nav items (for helpers and tests). */
+export const ADMIN_NAV: AdminNavItem[] = ADMIN_NAV_SECTIONS.flatMap((section) => section.items);
 
 export const ADMIN_LOGIN_PATH = "/admin/login";
 

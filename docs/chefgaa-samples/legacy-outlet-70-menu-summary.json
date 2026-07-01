@@ -1,0 +1,259 @@
+{
+  "status": 200,
+  "categoryCount": 29,
+  "itemCount": 433,
+  "firstCategory": {
+    "name": "Pulav",
+    "availability": {
+      "time_slots": [],
+      "order_types": [
+        {
+          "order_type": 106,
+          "available": true
+        }
+      ]
+    },
+    "OutletMenuItemCategory": 365,
+    "categoryAvailability": [],
+    "menuItems": [
+      {
+        "name": "Natukodi Pulav",
+        "unit_name": null,
+        "OutletMenuItem": 8727,
+        "cost_price": 24.99,
+        "selling_price": 24.99,
+        "sort_order": null,
+        "mark_as_unavailable": true,
+        "item_available_in_store": true,
+        "image": null,
+        "description": null,
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [],
+          "order_types": [
+            {
+              "order_type": 106,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Panner Pulav",
+        "unit_name": null,
+        "OutletMenuItem": 8726,
+        "cost_price": 16.99,
+        "selling_price": 16.99,
+        "sort_order": null,
+        "mark_as_unavailable": true,
+        "item_available_in_store": true,
+        "image": null,
+        "description": null,
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [],
+          "order_types": [
+            {
+              "order_type": 106,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Egg Pulav",
+        "unit_name": null,
+        "OutletMenuItem": 8725,
+        "cost_price": 16.99,
+        "selling_price": 16.99,
+        "sort_order": null,
+        "mark_as_unavailable": true,
+        "item_available_in_store": true,
+        "image": null,
+        "description": null,
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [],
+          "order_types": [
+            {
+              "order_type": 106,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Guttivankay Pulav",
+        "unit_name": null,
+        "OutletMenuItem": 8724,
+        "cost_price": 16.99,
+        "selling_price": 16.99,
+        "sort_order": null,
+        "mark_as_unavailable": true,
+        "item_available_in_store": true,
+        "image": null,
+        "description": null,
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [],
+          "order_types": [
+            {
+              "order_type": 106,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Mutton Boneless Pulav",
+        "unit_name": null,
+        "OutletMenuItem": 8723,
+        "cost_price": 22.99,
+        "selling_price": 22.99,
+        "sort_order": null,
+        "mark_as_unavailable": true,
+        "item_available_in_store": true,
+        "image": null,
+        "description": null,
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [],
+          "order_types": [
+            {
+              "order_type": 106,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Mutton Bone-in Pulav",
+        "unit_name": null,
+        "OutletMenuItem": 8722,
+        "cost_price": 20.99,
+        "selling_price": 20.99,
+        "sort_order": null,
+        "mark_as_unavailable": true,
+        "item_available_in_store": true,
+        "image": null,
+        "description": null,
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [],
+          "order_types": [
+            {
+              "order_type": 106,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Boneless Chicken Pulav",
+        "unit_name": null,
+        "OutletMenuItem": 8721,
+        "cost_price": 19.99,
+        "selling_price": 19.99,
+        "sort_order": null,
+        "mark_as_unavailable": true,
+        "item_available_in_store": true,
+        "image": null,
+        "description": null,
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [],
+          "order_types": [
+            {
+              "order_type": 106,
+              "available": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Bone-in Chicken Pulav",
+        "unit_name": null,
+        "OutletMenuItem": 8720,
+        "cost_price": 18.99,
+        "selling_price": 18.99,
+        "sort_order": null,
+        "mark_as_unavailable": true,
+        "item_available_in_store": true,
+        "image": null,
+        "description": null,
+        "is_customizable": false,
+        "availability": {
+          "time_slots": [],
+          "order_types": [
+            {
+              "order_type": 106,
+              "available": true
+            }
+          ]
+        }
+      }
+    ],
+    "isAnyActiveScheduledCategory": false
+  },
+  "firstItem": {
+    "name": "Natukodi Pulav",
+    "unit_name": null,
+    "OutletMenuItem": 8727,
+    "cost_price": 24.99,
+    "selling_price": 24.99,
+    "sort_order": null,
+    "mark_as_unavailable": true,
+    "item_available_in_store": true,
+    "image": null,
+    "description": null,
+    "is_customizable": false,
+    "availability": {
+      "time_slots": [],
+      "order_types": [
+        {
+          "order_type": 106,
+          "available": true
+        }
+      ]
+    }
+  },
+  "categoryNames": [
+    "Pulav",
+    "Add Ons",
+    "Quick Lunch",
+    "Ramdan Specials",
+    "Mocktails",
+    "Soups",
+    "Vegetarian Appetizers",
+    "Vegetarian Entrees",
+    "Vegetarian Rice & Biryanis",
+    "DD Family Packs (To Go Only)",
+    "Cooker Pulav",
+    "Naans",
+    "Kebab and Tandooris",
+    "Non-Veg Entrees",
+    "Non-Veg Appetizers"
+  ],
+  "allKeysCategory": [
+    "name",
+    "availability",
+    "OutletMenuItemCategory",
+    "categoryAvailability",
+    "menuItems",
+    "isAnyActiveScheduledCategory"
+  ],
+  "allKeysItem": [
+    "name",
+    "unit_name",
+    "OutletMenuItem",
+    "cost_price",
+    "selling_price",
+    "sort_order",
+    "mark_as_unavailable",
+    "item_available_in_store",
+    "image",
+    "description",
+    "is_customizable",
+    "availability"
+  ]
+}

@@ -1,29 +1,37 @@
 import { useEffect, useState } from "react";
-import {
-  getPublicOffersFallback,
-  loadPublicOffersData,
-  type PublicOffer,
-} from "../services/offersPublic";
+import { fetchPublicOffersData, type PublicOffer } from "../services/offersPublic";
 import type { LocationId } from "../config/locations";
 
 export function useOffersData(locationId: LocationId | null) {
-  const [offers, setOffers] = useState<PublicOffer[]>(() =>
-    getPublicOffersFallback(locationId ?? "lawrenceville"),
-  );
+  const [offers, setOffers] = useState<PublicOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    const resolvedLocation = locationId ?? "lawrenceville";
+
+    if (!locationId) {
+      setOffers([]);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
-    void loadPublicOffersData(resolvedLocation).then((result) => {
-      if (cancelled) return;
-      setOffers(result.offers);
-      setError(result.error);
-      setLoading(false);
-    });
+    void fetchPublicOffersData(locationId)
+      .then((data) => {
+        if (cancelled) return;
+        setOffers(data);
+        setError(null);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setOffers([]);
+        setError(err instanceof Error ? err.message : "Failed to load offers.");
+        setLoading(false);
+      });
 
     return () => {
       cancelled = true;

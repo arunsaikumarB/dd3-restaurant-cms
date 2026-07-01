@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import type { LocationId } from "../../config/locations";
-import type { LocationOffer } from "../../data/offers";
+import type { LocationOffer } from "../../data/offers/types";
 import {
   getOfferDetailPath,
   getOfferOrderPath,
@@ -21,10 +21,10 @@ export default function OffersGrid({ offers, locationId, locationName }: OffersG
   if (offers.length === 0) {
     return (
       <div className="offers-empty">
-        <p className="offers-empty__title">No active offers</p>
+        <p className="offers-empty__title">No offers available</p>
         <p className="offers-empty__text">
           {locationName
-            ? `There are no current promotions for ${locationName}. Check back soon.`
+            ? `There are no active promotions for ${locationName} right now. Check back soon.`
             : "Select a location above to view available promotions."}
         </p>
       </div>

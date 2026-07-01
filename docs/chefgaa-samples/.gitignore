@@ -1,0 +1,2 @@
+# Redact sensitive fields from outlet meta samples before committing.
+legacy-outlet-*-meta.json

@@ -11,11 +11,10 @@ import type {
 } from "../types";
 
 export const DASHBOARD_STATS: AdminStat[] = [
-  { id: "menu", label: "Total Menu Items", value: 86, change: "+4 this week", trend: "up", icon: "utensils" },
   { id: "offers", label: "Active Offers", value: 3, change: "1 ending soon", trend: "neutral", icon: "tag" },
-  { id: "reservations", label: "Reservations Today", value: 12, change: "+3 vs yesterday", trend: "up", icon: "calendar" },
   { id: "gallery", label: "Gallery Images", value: 48, change: "+6 uploaded", trend: "up", icon: "image" },
   { id: "reviews", label: "Reviews", value: 127, change: "4 pending", trend: "neutral", icon: "star" },
+  { id: "integrations", label: "ChefGaa Locations", value: 3, change: "Menu sync via integrations", trend: "neutral", icon: "users" },
   { id: "visitors", label: "Website Visitors", value: "2.4k", change: "+12% this month", trend: "up", icon: "users" },
 ];
 
@@ -29,21 +28,21 @@ export const VISITOR_CHART_DATA = [
   { label: "Sun", value: 720 },
 ];
 
-export const RESERVATION_CHART_DATA = [
-  { label: "Jan", value: 45 },
-  { label: "Feb", value: 52 },
-  { label: "Mar", value: 61 },
-  { label: "Apr", value: 58 },
-  { label: "May", value: 72 },
-  { label: "Jun", value: 68 },
+export const CONTENT_CHART_DATA = [
+  { label: "Jan", value: 12 },
+  { label: "Feb", value: 18 },
+  { label: "Mar", value: 15 },
+  { label: "Apr", value: 22 },
+  { label: "May", value: 19 },
+  { label: "Jun", value: 24 },
 ];
 
 export const RECENT_ACTIVITIES: ActivityItem[] = [
-  { id: "1", action: "New reservation", target: "Priya Sharma — 4 guests", time: "2 min ago", type: "reservation" },
-  { id: "2", action: "Menu item updated", target: "Chicken Dum Biryani", time: "18 min ago", type: "menu" },
-  { id: "3", action: "Review submitted", target: "Michael R. — 5 stars", time: "1 hr ago", type: "review" },
-  { id: "4", action: "Offer activated", target: "Weekend Biryani Special", time: "3 hrs ago", type: "offer" },
-  { id: "5", action: "Image uploaded", target: "Gallery — Tandoori Platter", time: "5 hrs ago", type: "gallery" },
+  { id: "1", action: "Offer activated", target: "Weekend Biryani Special", time: "18 min ago", type: "offer" },
+  { id: "2", action: "Review submitted", target: "Michael R. — 5 stars", time: "1 hr ago", type: "review" },
+  { id: "3", action: "Image uploaded", target: "Gallery — Tandoori Platter", time: "3 hrs ago", type: "gallery" },
+  { id: "4", action: "Homepage updated", target: "Hero section refreshed", time: "5 hrs ago", type: "settings" },
+  { id: "5", action: "ChefGaa integration viewed", target: "South Plainfield outlet 70", time: "Yesterday", type: "integration" },
   { id: "6", action: "Settings updated", target: "Opening hours changed", time: "Yesterday", type: "settings" },
 ];
 

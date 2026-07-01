@@ -4,12 +4,56 @@ import { fetchPublicMenuCategories } from "./menuCategories";
 import { fetchPublicMenuItems, type MenuItemTableRow } from "./menuItems";
 import { applyLocationToMenu, type LocationId } from "../config/locations";
 import { getStaticMenuForLocation } from "../data/menu";
+import { createClientIfConfigured } from "../lib/supabase/client";
 
 const CACHE_TTL_MS = 60_000;
 
 let cachedByLocation: Partial<Record<LocationId, MenuData>> = {};
 let cacheExpiresAtByLocation: Partial<Record<LocationId, number>> = {};
+const catalogRevisionByLocation: Partial<Record<LocationId, number>> = {};
 const inflightByLocation: Partial<Record<LocationId, Promise<MenuData>>> = {};
+
+async function fetchCatalogRevision(locationId: LocationId): Promise<number> {
+  const supabase = createClientIfConfigured();
+  if (!supabase) return 0;
+
+  const { data } = await supabase
+    .from("chefgaa_location_config")
+    .select("catalog_revision")
+    .eq("location_id", locationId)
+    .maybeSingle();
+
+  return Number((data as { catalog_revision?: number } | null)?.catalog_revision ?? 0);
+}
+
+async function ensureMenuCacheFresh(locationId: LocationId): Promise<void> {
+  const revision = await fetchCatalogRevision(locationId);
+  if (catalogRevisionByLocation[locationId] !== revision) {
+    delete cachedByLocation[locationId];
+    delete cacheExpiresAtByLocation[locationId];
+    catalogRevisionByLocation[locationId] = revision;
+  }
+}
+
+/** Clears in-memory public menu cache (e.g. after admin-triggered sync). */
+export function invalidatePublicMenuCache(locationId?: LocationId): void {
+  if (locationId) {
+    delete cachedByLocation[locationId];
+    delete cacheExpiresAtByLocation[locationId];
+    delete catalogRevisionByLocation[locationId];
+    delete inflightByLocation[locationId];
+    return;
+  }
+
+  cachedByLocation = {};
+  cacheExpiresAtByLocation = {};
+  for (const key of Object.keys(catalogRevisionByLocation) as LocationId[]) {
+    delete catalogRevisionByLocation[key];
+  }
+  for (const key of Object.keys(inflightByLocation) as LocationId[]) {
+    delete inflightByLocation[key];
+  }
+}
 
 async function resolveMenuData(locationId: LocationId): Promise<MenuData> {
   const supabaseData = await fetchSupabaseMenuData(locationId);
@@ -27,6 +71,8 @@ async function resolveMenuData(locationId: LocationId): Promise<MenuData> {
 }
 
 export async function fetchPublicMenuData(locationId: LocationId): Promise<MenuData> {
+  await ensureMenuCacheFresh(locationId);
+
   const now = Date.now();
   const cachedLocation = cachedByLocation[locationId];
   const cacheExpiresAt = cacheExpiresAtByLocation[locationId] ?? 0;

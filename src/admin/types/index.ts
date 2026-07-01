@@ -18,7 +18,7 @@ export interface ActivityItem {
   action: string;
   target: string;
   time: string;
-  type: "menu" | "reservation" | "review" | "offer" | "gallery" | "settings";
+  type: "menu" | "reservation" | "review" | "offer" | "gallery" | "settings" | "integration";
 }
 
 export interface MenuItem {

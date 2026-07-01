@@ -2,7 +2,12 @@
   command = "npm run build"
   publish = "dist"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 # VITE_SITE_URL, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY — set in Netlify UI
+# SUPABASE_SERVICE_ROLE_KEY — server only (Netlify functions + CLI sync; never expose to browser)
 # (Site configuration → Environment variables → Production / Deploy previews)
 
 # SPA fallback — required for React Router (main site + /admin/*)

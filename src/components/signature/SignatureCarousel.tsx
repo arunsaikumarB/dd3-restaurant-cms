@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import SignatureCard from "./SignatureCard";
@@ -10,16 +12,91 @@ import { useSignatureDishes } from "../../hooks/useSignatureDishes";
 import { resolveOrderUrl } from "../../utils/locationLinks";
 import "./signature.css";
 
-const SCROLL_STEP = 300;
+const AUTOPLAY_MS = 4500;
 
 export default function SignatureCarousel() {
   const sectionRef = useRef<HTMLElement>(null);
-  const viewportRef = useRef<HTMLDivElement>(null);
   const [sectionVisible, setSectionVisible] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
   const { selectedLocationId } = useLocationSelection();
   const { bundle, locationId: bundleLocationId } = useHomepageData();
-  const { dishes } = useSignatureDishes(selectedLocationId);
-  const orderBaseUrl = resolveOrderUrl(bundle.settings, selectedLocationId, bundleLocationId);
+  const { dishes, locationId: dishLocationId } = useSignatureDishes(
+    selectedLocationId,
+  );
+  const orderBaseUrl = resolveOrderUrl(
+    bundle.settings,
+    selectedLocationId,
+    bundleLocationId,
+  );
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      align: "center",
+      loop: true,
+      skipSnaps: false,
+      duration: 35,
+    },
+    [WheelGesturesPlugin({ forceWheelAxis: "x" })],
+  );
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const onPointerDown = () => setIsDragging(true);
+    const onPointerUp = () => setIsDragging(false);
+
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+    emblaApi.on("pointerDown", onPointerDown);
+    emblaApi.on("pointerUp", onPointerUp);
+    onSelect();
+
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+      emblaApi.off("pointerDown", onPointerDown);
+      emblaApi.off("pointerUp", onPointerUp);
+    };
+  }, [emblaApi, onSelect]);
+
+  useEffect(() => {
+    if (!emblaApi || dishes.length === 0) return;
+    emblaApi.reInit();
+    const start = Math.floor(dishes.length / 2);
+    emblaApi.scrollTo(start, true);
+    setSelectedIndex(start);
+  }, [emblaApi, dishes, dishLocationId]);
+
+  useEffect(() => {
+    if (!emblaApi || isPaused || dishes.length < 2) return;
+    const timer = window.setInterval(() => emblaApi.scrollNext(), AUTOPLAY_MS);
+    return () => window.clearInterval(timer);
+  }, [emblaApi, isPaused, dishes.length]);
+
+  useEffect(() => {
+    if (!dishes.length) return;
+    const len = dishes.length;
+    const indices = [
+      (selectedIndex - 1 + len) % len,
+      selectedIndex,
+      (selectedIndex + 1) % len,
+    ];
+    for (const index of indices) {
+      const src = dishes[index]?.image;
+      if (!src) continue;
+      const img = new Image();
+      img.src = src;
+    }
+  }, [selectedIndex, dishes]);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -37,16 +114,38 @@ export default function SignatureCarousel() {
     return () => observer.disconnect();
   }, []);
 
-  const scrollPrev = useCallback(() => {
-    viewportRef.current?.scrollBy({ left: -SCROLL_STEP, behavior: "smooth" });
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+
+  const handleCardHover = useCallback(
+    (index: number) => {
+      setHoveredIndex(index);
+      emblaApi?.scrollTo(index);
+    },
+    [emblaApi],
+  );
+
+  const handleCardLeave = useCallback(() => {
+    setHoveredIndex(null);
   }, []);
 
-  const scrollNext = useCallback(() => {
-    viewportRef.current?.scrollBy({ left: SCROLL_STEP, behavior: "smooth" });
-  }, []);
+  const getDistance = useCallback(
+    (index: number) => {
+      const len = dishes.length;
+      if (len === 0) return 0;
+      let diff = Math.abs(index - selectedIndex);
+      if (diff > len / 2) diff = len - diff;
+      return diff;
+    },
+    [dishes.length, selectedIndex],
+  );
 
   return (
-    <section ref={sectionRef} className="signature-section" aria-labelledby="signature-heading">
+    <section
+      ref={sectionRef}
+      className="signature-section"
+      aria-labelledby="signature-heading"
+    >
       <div className="signature-section__bg" aria-hidden />
       <div className="signature-section__texture" aria-hidden />
       <div className="signature-section__vignette" aria-hidden />
@@ -87,21 +186,30 @@ export default function SignatureCarousel() {
         </motion.p>
       </header>
 
-      <div className="signature-carousel">
+      <div
+        className="signature-carousel mx-auto max-w-[1400px] px-4 md:px-8 lg:px-12"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
         <div
-          ref={viewportRef}
-          className="signature-carousel__viewport"
+          className={`signature-carousel__viewport${isDragging ? " is-dragging" : ""}`}
+          ref={emblaRef}
           role="region"
           aria-label="Signature dishes carousel"
         >
-          <div className="signature-carousel__track">
+          <div className="signature-carousel__container">
             {dishes.map((dish, index) => (
               <div className="signature-carousel__slide" key={dish.id}>
                 <SignatureCard
                   dish={dish}
                   orderBaseUrl={orderBaseUrl}
+                  isActive={selectedIndex === index}
+                  isHovered={hoveredIndex === index}
+                  distance={getDistance(index)}
+                  onHover={() => handleCardHover(index)}
+                  onLeave={handleCardLeave}
                   entranceVisible={sectionVisible}
-                  entranceDelay={index * 0.08}
+                  entranceDelay={index * 0.1}
                 />
               </div>
             ))}
@@ -111,8 +219,8 @@ export default function SignatureCarousel() {
         <NavigationArrows
           onPrev={scrollPrev}
           onNext={scrollNext}
-          canScrollPrev
-          canScrollNext
+          canScrollPrev={Boolean(emblaApi)}
+          canScrollNext={Boolean(emblaApi)}
         />
       </div>
 

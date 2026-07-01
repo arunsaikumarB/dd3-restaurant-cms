@@ -1,0 +1,19 @@
+{
+  "data": {
+    "id": 7895,
+    "menu_items_id": 7782,
+    "outlet_id": 71,
+    "status": 1,
+    "name": "Aloo Mutter",
+    "display_name": "Aloo Mutter",
+    "image": "MTc2NTE4NDQyNzYzNTEy",
+    "description": "A comforting blend of potatoes and peas simmered in a rich, flavorful gravy.",
+    "mark_as_unavailable": false,
+    "is_recommended": 0,
+    "cost_price": 13.99,
+    "selling_price": 13.99,
+    "order_type": [],
+    "keywords": [],
+    "modifier_groups": [3650]
+  }
+}

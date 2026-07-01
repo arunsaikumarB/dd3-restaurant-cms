@@ -71,6 +71,11 @@ export interface MenuCategory extends Timestamps {
   image: string | null;
   display_order: number;
   status: ContentStatus;
+  chefgaa_category_id: string | null;
+  chefgaa_content_hash: string | null;
+  imported_from_chefgaa: boolean;
+  chefgaa_last_synced_at: string | null;
+  chefgaa_removed_at: string | null;
 }
 
 export interface MenuItem extends Timestamps {
@@ -87,18 +92,133 @@ export interface MenuItem extends Timestamps {
   spice_level: number | null;
   status: ContentStatus;
   display_order: number;
+  chefgaa_outlet_item_id: string | null;
+  chefgaa_catalog_item_id: string | null;
+  chefgaa_content_hash: string | null;
+  imported_from_chefgaa: boolean;
+  chefgaa_last_synced_at: string | null;
+  manual_override: boolean;
+  chefgaa_removed_at: string | null;
+}
+
+export interface ChefGaaLocationConfig extends Timestamps {
+  location_id: RestaurantLocationId;
+  api_version: "legacy" | "v2";
+  legacy_outlet_id: number | null;
+  legacy_partner_id: number;
+  legacy_order_type_id: number | null;
+  v2_tenant_id: string | null;
+  v2_store_id: string | null;
+  v2_platform_slug: string | null;
+  sync_enabled: boolean;
+  sync_schedule: "manual" | "15m" | "hourly" | "daily";
+  manual_override_mode: boolean;
+  last_sync_at: string | null;
+  last_sync_status: string | null;
+  last_sync_duration_ms: number | null;
+  last_sync_error: string | null;
+  catalog_revision: number;
+  consecutive_failures: number;
+  api_health_status: "unknown" | "healthy" | "warning" | "offline" | "critical";
+  critical_alert: boolean;
+  last_health_check_at: string | null;
+  chefgaa_initialized: boolean;
+  chefgaa_catalog_category_count: number | null;
+  chefgaa_catalog_item_count: number | null;
+}
+
+export interface ChefGaaSyncRun {
+  id: string;
+  location_id: RestaurantLocationId | string;
+  trigger: "manual" | "scheduled" | "retry";
+  status: "running" | "success" | "partial" | "failed";
+  started_at: string;
+  finished_at: string | null;
+  duration_ms: number | null;
+  categories_created: number;
+  categories_updated: number;
+  categories_deactivated: number;
+  items_created: number;
+  items_updated: number;
+  items_deactivated: number;
+  prices_changed: number;
+  items_failed: number;
+  error_summary: string | null;
+  metadata: Json;
+}
+
+export interface ChefGaaSyncRunEvent {
+  id: string;
+  run_id: string;
+  level: "info" | "warn" | "error";
+  message: string;
+  context: Json | null;
+  created_at: string;
+}
+
+export interface ChefGaaSyncLock {
+  id: number;
+  locked: boolean;
+  lock_holder: string | null;
+  locked_at: string | null;
+  expires_at: string | null;
+}
+
+export interface ChefGaaSyncQueueJob {
+  id: string;
+  location_id: string | null;
+  trigger: "manual" | "scheduled" | "retry";
+  requested_by: string | null;
+  status: "pending" | "processing" | "completed" | "skipped";
+  created_at: string;
+  processed_at: string | null;
+  result_message: string | null;
+}
+
+export interface ChefGaaSyncNotification {
+  id: string;
+  event_type: string;
+  location_id: string | null;
+  message: string;
+  severity: "info" | "success" | "warning" | "error" | "critical";
+  metadata: Json;
+  created_at: string;
+}
+
+export interface ChefGaaApiHealthCheck {
+  id: string;
+  location_id: string;
+  status: "healthy" | "warning" | "offline";
+  response_time_ms: number | null;
+  auth_ok: boolean | null;
+  data_received: boolean | null;
+  error_message: string | null;
+  checked_at: string;
 }
 
 export interface Offer extends Timestamps {
   id: string;
   location_id: RestaurantLocationId;
+  slug: string | null;
   title: string;
   description: string | null;
+  image: string | null;
+  gallery: Json;
+  badge: string | null;
+  category: string | null;
+  price: string | null;
+  valid_until: string | null;
+  featured: boolean;
+  terms: Json;
+  content: Json;
+  display_order: number;
+  order_category: string | null;
+  active: boolean;
+  /** Legacy columns kept for backward compatibility */
   banner: string | null;
   discount: string | null;
   start_date: string | null;
   end_date: string | null;
-  active: boolean;
 }
 
 export interface GalleryImage extends Timestamps {
@@ -144,11 +264,47 @@ export type RestaurantSettingsInsert = Omit<RestaurantSettings, "id" | "created_
 export type HomepageContentInsert = Omit<HomepageContent, "id" | "created_at" | "updated_at"> &
   Partial<Pick<HomepageContent, "id" | "created_at" | "updated_at">>;
 
-export type MenuCategoryInsert = Omit<MenuCategory, "id" | "created_at" | "updated_at"> &
-  Partial<Pick<MenuCategory, "id" | "created_at" | "updated_at">>;
+export type MenuCategoryInsert = {
+  id?: string;
+  location_id: RestaurantLocationId;
+  name: string;
+  slug: string;
+  image?: string | null;
+  display_order?: number;
+  status?: ContentStatus;
+  chefgaa_category_id?: string | null;
+  chefgaa_content_hash?: string | null;
+  imported_from_chefgaa?: boolean;
+  chefgaa_last_synced_at?: string | null;
+  chefgaa_removed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
 
-export type MenuItemInsert = Omit<MenuItem, "id" | "created_at" | "updated_at"> &
-  Partial<Pick<MenuItem, "id" | "created_at" | "updated_at">>;
+export type MenuItemInsert = {
+  id?: string;
+  location_id: RestaurantLocationId;
+  category_id: string;
+  name: string;
+  description?: string | null;
+  price: number;
+  image?: string | null;
+  veg?: boolean;
+  popular?: boolean;
+  chef_special?: boolean;
+  spice_level?: number | null;
+  status?: ContentStatus;
+  display_order?: number;
+  chefgaa_outlet_item_id?: string | null;
+  chefgaa_catalog_item_id?: string | null;
+  chefgaa_content_hash?: string | null;
+  imported_from_chefgaa?: boolean;
+  chefgaa_last_synced_at?: string | null;
+  manual_override?: boolean;
+  chefgaa_removed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
 
 export type OfferInsert = Omit<Offer, "id" | "created_at" | "updated_at"> &
   Partial<Pick<Offer, "id" | "created_at" | "updated_at">>;
@@ -227,12 +383,125 @@ export interface Database {
         Update: Partial<ReviewInsert>;
         Relationships: [];
       };
+      chefgaa_location_config: {
+        Row: ChefGaaLocationConfig;
+        Insert: {
+          location_id: RestaurantLocationId;
+          api_version: "legacy" | "v2";
+          legacy_outlet_id?: number | null;
+          legacy_partner_id?: number;
+          legacy_order_type_id?: number | null;
+          v2_tenant_id?: string | null;
+          v2_store_id?: string | null;
+          v2_platform_slug?: string | null;
+          sync_enabled?: boolean;
+          sync_schedule?: ChefGaaLocationConfig["sync_schedule"];
+          manual_override_mode?: boolean;
+        };
+        Update: Partial<ChefGaaLocationConfig>;
+        Relationships: [];
+      };
+      chefgaa_sync_runs: {
+        Row: ChefGaaSyncRun;
+        Insert: {
+          location_id: string;
+          trigger: ChefGaaSyncRun["trigger"];
+          status: ChefGaaSyncRun["status"];
+          started_at?: string;
+          finished_at?: string | null;
+          duration_ms?: number | null;
+          categories_created?: number;
+          categories_updated?: number;
+          categories_deactivated?: number;
+          items_created?: number;
+          items_updated?: number;
+          items_deactivated?: number;
+          prices_changed?: number;
+          items_failed?: number;
+          error_summary?: string | null;
+          metadata?: Json;
+        };
+        Update: Partial<ChefGaaSyncRun>;
+        Relationships: [];
+      };
+      chefgaa_sync_run_events: {
+        Row: ChefGaaSyncRunEvent;
+        Insert: {
+          run_id: string;
+          level: ChefGaaSyncRunEvent["level"];
+          message: string;
+          context?: Json | null;
+        };
+        Update: Partial<ChefGaaSyncRunEvent>;
+        Relationships: [];
+      };
+      chefgaa_sync_lock: {
+        Row: ChefGaaSyncLock;
+        Insert: Partial<ChefGaaSyncLock>;
+        Update: Partial<ChefGaaSyncLock>;
+        Relationships: [];
+      };
+      chefgaa_sync_queue: {
+        Row: ChefGaaSyncQueueJob;
+        Insert: {
+          location_id?: string | null;
+          trigger: ChefGaaSyncQueueJob["trigger"];
+          requested_by?: string | null;
+          status?: ChefGaaSyncQueueJob["status"];
+        };
+        Update: Partial<ChefGaaSyncQueueJob>;
+        Relationships: [];
+      };
+      chefgaa_sync_notifications: {
+        Row: ChefGaaSyncNotification;
+        Insert: {
+          event_type: string;
+          location_id?: string | null;
+          message: string;
+          severity?: ChefGaaSyncNotification["severity"];
+          metadata?: Json;
+        };
+        Update: Partial<ChefGaaSyncNotification>;
+        Relationships: [];
+      };
+      chefgaa_api_health_checks: {
+        Row: ChefGaaApiHealthCheck;
+        Insert: {
+          location_id: string;
+          status: ChefGaaApiHealthCheck["status"];
+          response_time_ms?: number | null;
+          auth_ok?: boolean | null;
+          data_received?: boolean | null;
+          error_message?: string | null;
+        };
+        Update: Partial<ChefGaaApiHealthCheck>;
+        Relationships: [];
+      };
+      menu_items_legacy_archive: {
+        Row: MenuItem & { archived_at: string; archive_reason: string };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: [];
+      };
+      menu_categories_legacy_archive: {
+        Row: MenuCategory & { archived_at: string; archive_reason: string };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      archive_legacy_menu_items: {
+        Args: { p_location_id: string };
+        Returns: number;
+      };
+      archive_legacy_menu_categories: {
+        Args: { p_location_id: string };
+        Returns: number;
+      };
     };
     Enums: {
       content_status: ContentStatus;

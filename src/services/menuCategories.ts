@@ -211,9 +211,23 @@ export async function fetchPublicMenuCategories(
     return null;
   }
 
-  const { data, error } = await categoriesTable(supabase)
+  const { data, error } = await (
+    categoriesTable(supabase) as unknown as {
+      select(columns: string): {
+        eq(column: string, value: string): {
+          eq(column: string, value: boolean): {
+            order(
+              column: string,
+              options: { ascending: boolean },
+            ): Promise<{ data: MenuCategory[] | null; error: SupabaseError | null }>;
+          };
+        };
+      };
+    }
+  )
     .select("*")
     .eq("location_id", locationId)
+    .eq("imported_from_chefgaa", true)
     .order("display_order", { ascending: true });
 
   if (error) {

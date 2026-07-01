@@ -17,11 +17,9 @@ const AdminLoginPage = lazy(() => import("./admin/pages/LoginPage"));
 const AdminUnauthorizedPage = lazy(() => import("./admin/pages/UnauthorizedPage"));
 const AdminDashboardPage = lazy(() => import("./admin/pages/DashboardPage"));
 const AdminHomepagePage = lazy(() => import("./admin/pages/HomepagePage"));
-const AdminMenuPage = lazy(() => import("./admin/pages/MenuPage"));
-const AdminCategoriesPage = lazy(() => import("./admin/pages/CategoriesPage"));
-const AdminOffersPage = lazy(() => import("./admin/pages/OffersPage"));
+const AdminOffersPage = lazy(() => import("./admin/pages/OffersManagementPage"));
 const AdminGalleryPage = lazy(() => import("./admin/pages/GalleryPage"));
-const AdminReservationsPage = lazy(() => import("./admin/pages/ReservationsPage"));
+const AdminChefGaaIntegrationPage = lazy(() => import("./admin/pages/ChefGaaIntegrationPage"));
 const AdminReviewsPage = lazy(() => import("./admin/pages/ReviewsPage"));
 const AdminSettingsPage = lazy(() => import("./admin/pages/SettingsPage"));
 const AdminProfilePage = lazy(() => import("./admin/pages/ProfilePage"));
@@ -214,11 +212,9 @@ export default function App() {
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboardPage />} />
           <Route path="homepage" element={<AdminHomepagePage />} />
-          <Route path="menu" element={<AdminMenuPage />} />
-          <Route path="categories" element={<AdminCategoriesPage />} />
           <Route path="offers" element={<AdminOffersPage />} />
           <Route path="gallery" element={<AdminGalleryPage />} />
-          <Route path="reservations" element={<AdminReservationsPage />} />
+          <Route path="integrations/chefgaa" element={<AdminChefGaaIntegrationPage />} />
           <Route path="reviews" element={<AdminReviewsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="profile" element={<AdminProfilePage />} />

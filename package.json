@@ -10,6 +10,10 @@
     "parse-menu": "node scripts/parse-menu.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build && node scripts/generate-seo-files.mjs",
+    "sync:chefgaa": "npx tsx scripts/sync-chefgaa.ts",
+    "sync:chefgaa:all": "npx tsx scripts/sync-chefgaa.ts --all",
+    "sync:chefgaa:scheduler": "npx tsx scripts/chefgaa-scheduler.ts",
+    "audit:menu": "node scripts/audit-menu-integrity.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

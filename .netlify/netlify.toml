@@ -1,16 +1,15 @@
+functionsDirectory = "C:\\Users\\LSITC210\\Downloads\\DD3 website AI\\netlify\\functions"
+functionsDirectoryOrigin = "config"
 headersOrigin = "config"
 redirectsOrigin = "config"
 plugins = []
-
-[functions]
-
-[functions."*"]
 
 [build]
 publish = "C:\\Users\\LSITC210\\Downloads\\DD3 website AI\\dist"
 publishOrigin = "config"
 commandOrigin = "config"
 command = "npm run build"
+functions = "C:\\Users\\LSITC210\\Downloads\\DD3 website AI\\netlify\\functions"
 
 [build.environment]
 
@@ -25,6 +24,11 @@ command = "npm run build"
 [build.processing.js]
 
 [build.services]
+
+[functions]
+
+[functions."*"]
+node_bundler = "esbuild"
 
 [[headers]]
 for = "/assets/*"

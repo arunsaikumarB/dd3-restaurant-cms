@@ -1,50 +1,78 @@
-import { getOffersForLocation } from "../data/offers";
-import type { LocationOffer } from "../data/offers";
+import type { LocationOffer, OfferContentSection } from "../data/offers/types";
 import { LOCATION_IDS, type LocationId } from "../config/locations";
 import type { Offer } from "../types/database";
 import { formatOfferDate, getOfferScheduleStatus } from "../utils/offers/schedule";
-import { slugify } from "../utils/slug";
 import { fetchPublicOffers } from "./offers";
 
 export type { LocationOffer as PublicOffer };
 
-export function getPublicOffersForLocation(locationId: LocationId): LocationOffer[] {
-  return getOffersForLocation(locationId);
+const CACHE_TTL_MS = 60_000;
+
+let cachedByLocation: Partial<Record<LocationId, LocationOffer[]>> = {};
+let cacheExpiresAtByLocation: Partial<Record<LocationId, number>> = {};
+const inflightByLocation: Partial<Record<LocationId, Promise<LocationOffer[]>>> = {};
+
+function parseStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry): entry is string => typeof entry === "string")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 }
 
-/** @deprecated Use getPublicOffersForLocation */
-export function getPublicOffersFallback(locationId: LocationId = "lawrenceville"): LocationOffer[] {
-  return getPublicOffersForLocation(locationId);
-}
+function parseContentSections(value: unknown, row: Offer): OfferContentSection[] {
+  if (Array.isArray(value) && value.length > 0) {
+    const sections: OfferContentSection[] = [];
 
-export function buildCmsOfferSlug(row: Pick<Offer, "id" | "title">): string {
-  return `${slugify(row.title)}-${row.id.slice(0, 8)}`;
+    for (const entry of value) {
+      if (!entry || typeof entry !== "object") continue;
+      const record = entry as Record<string, unknown>;
+      const heading = typeof record.heading === "string" ? record.heading : "";
+      const eyebrow = typeof record.eyebrow === "string" ? record.eyebrow : undefined;
+      const paragraphs = parseStringArray(record.paragraphs);
+      const list = parseStringArray(record.list);
+      if (!heading.trim() && paragraphs.length === 0) continue;
+
+      sections.push({
+        eyebrow,
+        heading: heading || row.title,
+        paragraphs,
+        list: list.length > 0 ? list : undefined,
+      });
+    }
+
+    if (sections.length > 0) return sections;
+  }
+
+  return [
+    {
+      heading: row.title,
+      paragraphs: row.description ? [row.description] : [],
+    },
+  ];
 }
 
 function mapDbOfferToLocationOffer(row: Offer): LocationOffer {
-  const endDate = formatOfferDate(row.end_date);
-  const slug = buildCmsOfferSlug(row);
+  const validUntil = row.valid_until?.trim() || null;
+  const image = row.image ?? row.banner ?? "/showcase/biryani.jpg";
+  const gallery = parseStringArray(row.gallery);
+  const terms = parseStringArray(row.terms);
 
   return {
     id: `cms-${row.id}`,
-    slug,
+    slug: row.slug ?? row.id,
     title: row.title,
     description: row.description ?? "",
-    content: [
-      {
-        heading: row.title,
-        paragraphs: row.description ? [row.description] : [],
-      },
-    ],
-    image: row.banner ?? "/showcase/biryani.jpg",
-    gallery: row.banner ? [row.banner] : [],
-    badge: row.discount || null,
-    price: null,
-    validUntil: endDate || null,
-    terms: [],
-    orderCategory: null,
-    featured: row.active,
-    category: row.discount || null,
+    content: parseContentSections(row.content, row),
+    image,
+    gallery: gallery.length > 0 ? gallery : image ? [image] : [],
+    badge: row.badge ?? row.discount ?? null,
+    price: row.price ?? null,
+    validUntil,
+    terms,
+    orderCategory: row.order_category ?? null,
+    featured: row.featured,
+    category: row.category ?? row.badge ?? row.discount ?? null,
   };
 }
 
@@ -55,21 +83,70 @@ function isVisibleCmsOffer(row: Offer): boolean {
   return getOfferScheduleStatus(startDate, endDate) !== "expired";
 }
 
-function mergeLocationOffers(staticOffers: LocationOffer[], cmsOffers: LocationOffer[]): LocationOffer[] {
-  if (cmsOffers.length === 0) return staticOffers;
-  return [...staticOffers, ...cmsOffers];
+function mapVisibleCmsOffers(dbOffers: Offer[]): LocationOffer[] {
+  const seenIds = new Set<string>();
+  const offers: LocationOffer[] = [];
+
+  for (const row of dbOffers) {
+    if (!isVisibleCmsOffer(row) || seenIds.has(row.id)) continue;
+    seenIds.add(row.id);
+    offers.push(mapDbOfferToLocationOffer(row));
+  }
+
+  return offers;
+}
+
+async function resolveOffersData(locationId: LocationId): Promise<LocationOffer[]> {
+  const dbOffers = await fetchPublicOffers(locationId);
+  return mapVisibleCmsOffers(dbOffers);
 }
 
 export async function fetchPublicOffersData(locationId: LocationId): Promise<LocationOffer[]> {
-  const staticOffers = getOffersForLocation(locationId);
-  const dbOffers = await fetchPublicOffers(locationId);
+  const now = Date.now();
+  const cached = cachedByLocation[locationId];
+  const cacheExpiresAt = cacheExpiresAtByLocation[locationId] ?? 0;
 
-  if (!dbOffers || dbOffers.length === 0) {
-    return staticOffers;
+  if (cached && now < cacheExpiresAt) {
+    return cached;
   }
 
-  const cmsOffers = dbOffers.filter(isVisibleCmsOffer).map(mapDbOfferToLocationOffer);
-  return mergeLocationOffers(staticOffers, cmsOffers);
+  const inflight = inflightByLocation[locationId];
+  if (inflight) {
+    return inflight;
+  }
+
+  const request = (async () => {
+    try {
+      const offers = await resolveOffersData(locationId);
+      cachedByLocation[locationId] = offers;
+      cacheExpiresAtByLocation[locationId] = Date.now() + CACHE_TTL_MS;
+      return offers;
+    } catch {
+      cachedByLocation[locationId] = [];
+      cacheExpiresAtByLocation[locationId] = Date.now() + CACHE_TTL_MS;
+      return [];
+    } finally {
+      delete inflightByLocation[locationId];
+    }
+  })();
+
+  inflightByLocation[locationId] = request;
+  return request;
+}
+
+export function invalidatePublicOffersCache(locationId?: LocationId): void {
+  if (locationId) {
+    delete cachedByLocation[locationId];
+    delete cacheExpiresAtByLocation[locationId];
+    delete inflightByLocation[locationId];
+    return;
+  }
+
+  cachedByLocation = {};
+  cacheExpiresAtByLocation = {};
+  for (const key of Object.keys(inflightByLocation) as LocationId[]) {
+    delete inflightByLocation[key];
+  }
 }
 
 export type PublicOffersResult = {
@@ -83,7 +160,7 @@ export async function loadPublicOffersData(locationId: LocationId): Promise<Publ
     return { offers, error: null };
   } catch (err) {
     return {
-      offers: getOffersForLocation(locationId),
+      offers: [],
       error: err instanceof Error ? err.message : "Failed to load offers.",
     };
   }

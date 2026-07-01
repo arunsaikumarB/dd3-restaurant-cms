@@ -203,6 +203,7 @@ export async function fetchAllMenuItems(): Promise<MenuItemTableRow[]> {
 
 /**
  * Public read-only fetch for the menu page (active items only via RLS).
+ * Only ChefGaa-imported rows and manual overrides are exposed publicly.
  */
 export async function fetchPublicMenuItems(
   locationId: LocationId,
@@ -216,9 +217,28 @@ export async function fetchPublicMenuItems(
     return null;
   }
 
-  const { data, error } = await menuItemsTable(supabase)
+  const { data, error } = await (
+    menuItemsTable(supabase) as unknown as {
+      select(columns: string): {
+        eq(column: string, value: string): {
+          or(expression: string): {
+            order(
+              column: string,
+              options: { ascending: boolean },
+            ): {
+              order(
+                column: string,
+                options: { ascending: boolean },
+              ): Promise<{ data: MenuItemJoinRow[] | null; error: SupabaseError | null }>;
+            };
+          };
+        };
+      };
+    }
+  )
     .select(MENU_ITEM_SELECT)
     .eq("location_id", locationId)
+    .or("imported_from_chefgaa.eq.true,manual_override.eq.true")
     .order("display_order", { ascending: true })
     .order("name", { ascending: true });
 
