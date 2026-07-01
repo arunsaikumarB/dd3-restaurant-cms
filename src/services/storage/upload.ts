@@ -1,5 +1,5 @@
 import { createClientIfConfigured } from "../../lib/supabase/client";
-import { validateUploadFileSize } from "../../constants/storage";
+import { STORAGE_CACHE_CONTROL, validateUploadFileSize } from "../../constants/storage";
 import type { StorageBucket } from "../../types/database";
 
 export interface UploadOptions {
@@ -44,7 +44,7 @@ export async function uploadFile({
   const objectPath = buildObjectPath(file, path);
 
   const { error } = await supabase.storage.from(bucket).upload(objectPath, file, {
-    cacheControl: "3600",
+    cacheControl: STORAGE_CACHE_CONTROL,
     upsert,
     contentType: file.type,
   });

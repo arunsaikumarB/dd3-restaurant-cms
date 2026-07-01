@@ -14,6 +14,7 @@ interface MediaUploadFieldProps {
   onUpload: (file: File) => Promise<string>;
   accept?: string;
   disabled?: boolean;
+  helpText?: string;
 }
 
 const DEFAULT_ACCEPT: Record<MediaKind, string> = {
@@ -29,6 +30,7 @@ export default function MediaUploadField({
   onUpload,
   accept,
   disabled = false,
+  helpText,
 }: MediaUploadFieldProps) {
   const { dark } = useAdminTheme();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -114,6 +116,9 @@ export default function MediaUploadField({
             </AdminButton>
           )}
           {uploadError && <p className="text-xs text-admin-danger">{uploadError}</p>}
+          {helpText ? (
+            <p className={`text-xs ${dark ? "text-white/45" : "text-admin-muted"}`}>{helpText}</p>
+          ) : null}
         </div>
       </div>
     </div>

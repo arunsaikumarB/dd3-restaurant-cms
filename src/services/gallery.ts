@@ -6,7 +6,9 @@ import {
   type GallerySectionKey,
 } from "../config/gallerySections";
 import type { GalleryImage, GalleryImageInsert, RestaurantLocationId } from "../types/database";
+import { STORAGE_CACHE_CONTROL } from "../constants/storage";
 import { deleteFile } from "./storage/upload";
+import { resizeImageForUpload } from "../utils/resizeImageForUpload";
 import { mapSupabaseError } from "../utils/supabase/errors";
 
 export const GALLERY_CATEGORIES = ["Food", "Ambiance", "Events", "Kitchen"] as const;
@@ -357,13 +359,14 @@ export async function uploadGalleryImageFile(
   file: File,
   section: GallerySectionKey,
 ): Promise<string> {
-  const ext = file.name.split(".").pop() ?? "bin";
+  const prepared = await resizeImageForUpload(file);
+  const ext = prepared.name.split(".").pop() ?? "bin";
   const fileName = `${section}/${Date.now()}.${ext}`;
   const supabase = requireClient();
-  const { error } = await supabase.storage.from("gallery-images").upload(fileName, file, {
-    cacheControl: "3600",
+  const { error } = await supabase.storage.from("gallery-images").upload(fileName, prepared, {
+    cacheControl: STORAGE_CACHE_CONTROL,
     upsert: false,
-    contentType: file.type,
+    contentType: prepared.type || file.type,
   });
   if (error) {
     throw new Error(error.message);

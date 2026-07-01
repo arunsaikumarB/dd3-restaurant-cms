@@ -9,7 +9,7 @@ import {
 import { EASE_POWER3 } from "./showcase/motion";
 import Logo from "./ui/Logo";
 
-const HERO_VIDEO = "/hero/videoplayback.mp4";
+const HERO_VIDEO = "/media/hero.mp4";
 const HERO_POSTER = "/hero/hero-poster.jpg";
 const DEFAULT_TITLE = "Step inside\nthe experience";
 const DEFAULT_SUBTITLE =

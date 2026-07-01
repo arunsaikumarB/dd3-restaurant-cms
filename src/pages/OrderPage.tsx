@@ -162,7 +162,7 @@ export default function OrderPage() {
         title="Order Online"
         subtitle={`Order authentic Indian food from Desi Dhamaka${selectedLocation ? ` ${selectedLocation.shortName}` : ""}. Choose pickup or delivery — freshly prepared, delivered your way.`}
         backgroundImage="/showcase/biryani.jpg"
-        backgroundVideo="/hero/videoplayback.mp4"
+        backgroundVideo="/media/hero.mp4"
         breadcrumbItems={[
           { label: "Home", to: "/" },
           { label: "Order Online" },

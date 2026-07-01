@@ -1,5 +1,8 @@
 import type { StorageBucket } from "../types/database";
 
+/** Cache-Control max-age for Supabase Storage uploads (1 year). */
+export const STORAGE_CACHE_CONTROL = "31536000";
+
 /** 10 MB — standard image uploads (menu, offers, gallery, settings, hero images). */
 export const STORAGE_IMAGE_MAX_BYTES = 10 * 1024 * 1024;
 

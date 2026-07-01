@@ -417,6 +417,7 @@ export default function HomepageManagementPage() {
                         kind="video"
                         value={form.hero_video}
                         disabled={saving}
+                        helpText="Tip: large videos increase bandwidth costs; keep under 5MB."
                         onChange={(url) =>
                           setForm((prev) => (prev ? { ...prev, hero_video: url || null } : prev))
                         }
