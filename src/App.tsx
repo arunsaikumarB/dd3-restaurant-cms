@@ -165,25 +165,33 @@ function PublicRoutes() {
   );
 }
 
-function PublicSiteShell() {
+function PublicSiteChrome() {
   usePageTracking();
 
   return (
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-saffron focus:px-4 focus:py-2 focus:text-cocoa"
+      >
+        Skip to main content
+      </a>
+      <PageSEO />
+      <ScrollToTop />
+      <Navbar />
+      <main id="main-content">
+        <PublicRoutes />
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+function PublicSiteShell() {
+  return (
     <LocationProvider>
       <PageContentProvider>
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-saffron focus:px-4 focus:py-2 focus:text-cocoa"
-        >
-          Skip to main content
-        </a>
-        <PageSEO />
-        <ScrollToTop />
-        <Navbar />
-        <main id="main-content">
-          <PublicRoutes />
-        </main>
-        <Footer />
+        <PublicSiteChrome />
       </PageContentProvider>
     </LocationProvider>
   );
