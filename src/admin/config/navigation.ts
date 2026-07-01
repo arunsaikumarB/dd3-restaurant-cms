@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   LineChart,
   Home,
+  FileText,
   Tag,
   Images,
   Star,
@@ -29,6 +30,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       { label: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
       { label: "Insights", path: "/admin/insights", icon: LineChart },
       { label: "Homepage", path: "/admin/homepage", icon: Home },
+      { label: "Pages", path: "/admin/pages", icon: FileText },
     ],
   },
   {

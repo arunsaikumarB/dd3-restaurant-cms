@@ -82,6 +82,21 @@ export async function fetchPageContentMap(
   }
 }
 
+export function invalidatePageContentCache(locationId?: LocationId): void {
+  if (locationId) {
+    delete cachedByLocation[locationId];
+    delete cacheExpiresAtByLocation[locationId];
+    delete inflightByLocation[locationId];
+    return;
+  }
+
+  cachedByLocation = {};
+  cacheExpiresAtByLocation = {};
+  for (const key of Object.keys(inflightByLocation) as LocationId[]) {
+    delete inflightByLocation[key];
+  }
+}
+
 export function getPageContentSectionFromMap(
   map: Map<PageContentSectionKey, Record<string, unknown>>,
   page: PageContentPageKey | string,

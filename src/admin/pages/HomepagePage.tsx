@@ -9,6 +9,14 @@ import AdminButton from "../components/ui/Button";
 import AdminToast from "../components/ui/Toast";
 import MediaUploadField from "../components/settings/MediaUploadField";
 import HomepagePageSkeleton from "../components/settings/HomepagePageSkeleton";
+import PageContentSectionPanel from "../components/pageContent/PageContentSectionPanel";
+import {
+  buildPageContentTabId,
+  HOME_PAGE_CONTENT_SECTION_ORDER,
+  HOME_PAGE_CONTENT_TAB_LABELS,
+  isPageContentTabId,
+  parsePageContentTabId,
+} from "../config/pageContentAdmin";
 import { useAdminTheme } from "../context/AdminThemeContext";
 import { useLocation } from "../hooks/useLocation";
 import { HOMEPAGE_SECTIONS } from "../data/mock";
@@ -29,6 +37,12 @@ import {
   type HomepageContentErrors,
 } from "../../utils/validation/homepageContent";
 
+type SidebarTab = {
+  id: string;
+  label: string;
+  kind: "legacy" | "page_content";
+};
+
 function fieldError(
   sectionId: string,
   key: string,
@@ -46,7 +60,7 @@ export default function HomepageManagementPage() {
   const { locationId, isAllLocations, scope } = useLocation();
   const [form, setForm] = useState<HomepageContentForm | null>(null);
   const [localSections, setLocalSections] = useState<HomepageSection[]>(getLocalHomepageSections);
-  const [activeId, setActiveId] = useState(HOMEPAGE_SECTIONS[0]?.id ?? "");
+  const [activeId, setActiveId] = useState<string>("hero");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -64,12 +78,31 @@ export default function HomepageManagementPage() {
     setToast({ open: true, message, variant });
   }, []);
 
-  const sections = useMemo(() => {
+  const sidebarTabs = useMemo<SidebarTab[]>(() => {
+    const heroTab: SidebarTab = { id: "hero", label: "Hero Banner", kind: "legacy" };
+    const pageContentTabs: SidebarTab[] = HOME_PAGE_CONTENT_SECTION_ORDER.map((section) => ({
+      id: buildPageContentTabId(section),
+      label: HOME_PAGE_CONTENT_TAB_LABELS[section],
+      kind: "page_content",
+    }));
+    const featuredTab: SidebarTab = { id: "featured", label: "Featured Dishes", kind: "legacy" };
+    const localTabs: SidebarTab[] = localSections.map((section) => ({
+      id: section.id,
+      label: section.label,
+      kind: "legacy",
+    }));
+    return [heroTab, ...pageContentTabs, featuredTab, ...localTabs];
+  }, [localSections]);
+
+  const legacySections = useMemo(() => {
     if (!form) return HOMEPAGE_SECTIONS;
     return [...buildSectionsFromForm(form), ...localSections];
   }, [form, localSections]);
 
-  const active = sections.find((section) => section.id === activeId);
+  const activeLegacy = legacySections.find((section) => section.id === activeId);
+  const activePageContentSection = isPageContentTabId(activeId)
+    ? parsePageContentTabId(activeId)
+    : null;
 
   const loadContent = useCallback(async () => {
     if (isAllLocations) {
@@ -244,86 +277,106 @@ export default function HomepageManagementPage() {
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <AdminCard padding="sm">
           <nav className="space-y-1">
-            {sections.map((section) => (
+            {sidebarTabs.map((tab) => (
               <button
-                key={section.id}
+                key={tab.id}
                 type="button"
-                onClick={() => setActiveId(section.id)}
+                onClick={() => setActiveId(tab.id)}
                 className={[
                   "w-full rounded-xl px-4 py-3 text-left text-sm transition-colors",
-                  activeId === section.id
+                  activeId === tab.id
                     ? "bg-admin-primary text-white"
-                    : dark ? "hover:bg-white/5" : "hover:bg-admin-ivory",
+                    : dark
+                      ? "hover:bg-white/5"
+                      : "hover:bg-admin-ivory",
                 ].join(" ")}
               >
-                {section.label}
+                {tab.label}
               </button>
             ))}
           </nav>
         </AdminCard>
 
-        {active && (
-          <motion.div
-            key={active.id}
-            initial={{ opacity: 0, x: 12 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <AdminCard>
-              <h2 className="text-lg font-semibold">{active.label}</h2>
-              <p className={`mt-1 text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>
-                {active.description}
-              </p>
-              <div className="mt-6 space-y-4">
-                {active.fields.map((field) =>
-                  field.type === "textarea" ? (
-                    <AdminTextarea
-                      key={field.key}
-                      label={field.label}
-                      value={field.value}
-                      onChange={(e) => updateField(active.id, field.key, e.target.value)}
-                    />
-                  ) : (
-                    <AdminInput
-                      key={field.key}
-                      label={field.label}
-                      value={field.value}
-                      error={fieldError(active.id, field.key, fieldErrors)}
-                      onChange={(e) => updateField(active.id, field.key, e.target.value)}
-                    />
-                  ),
-                )}
-                {active.id === "hero" && (
-                  <div className="grid gap-6 sm:grid-cols-2">
-                    <MediaUploadField
-                      label="Hero Image"
-                      kind="image"
-                      value={form.hero_image}
-                      disabled={saving}
-                      onChange={(url) => setForm((prev) => (prev ? { ...prev, hero_image: url || null } : prev))}
-                      onUpload={(file) => uploadMedia(file, "hero-image")}
-                    />
-                    <MediaUploadField
-                      label="Hero Video"
-                      kind="video"
-                      value={form.hero_video}
-                      disabled={saving}
-                      onChange={(url) => setForm((prev) => (prev ? { ...prev, hero_video: url || null } : prev))}
-                      onUpload={(file) => uploadMedia(file, "hero-video")}
-                    />
-                  </div>
-                )}
-              </div>
-              <div className="mt-6 flex justify-end gap-2">
-                <AdminButton type="button" variant="outline" disabled={saving} onClick={handleDiscard}>
-                  Discard
-                </AdminButton>
-                <AdminButton type="button" disabled={saving} onClick={() => void handleSave()}>
-                  {saving ? "Saving…" : "Save Changes"}
-                </AdminButton>
-              </div>
-            </AdminCard>
-          </motion.div>
+        {activePageContentSection ? (
+          <PageContentSectionPanel
+            page="home"
+            section={activePageContentSection}
+            onToast={showToast}
+            onSavingChange={setSaving}
+          />
+        ) : (
+          activeLegacy && (
+            <motion.div
+              key={activeLegacy.id}
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AdminCard>
+                <h2 className="text-lg font-semibold">{activeLegacy.label}</h2>
+                <p className={`mt-1 text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>
+                  {activeLegacy.description}
+                </p>
+                <div className="mt-6 space-y-4">
+                  {activeLegacy.fields.map((field) =>
+                    field.type === "textarea" ? (
+                      <AdminTextarea
+                        key={field.key}
+                        label={field.label}
+                        value={field.value}
+                        onChange={(e) => updateField(activeLegacy.id, field.key, e.target.value)}
+                      />
+                    ) : (
+                      <AdminInput
+                        key={field.key}
+                        label={field.label}
+                        value={field.value}
+                        error={fieldError(activeLegacy.id, field.key, fieldErrors)}
+                        onChange={(e) => updateField(activeLegacy.id, field.key, e.target.value)}
+                      />
+                    ),
+                  )}
+                  {activeLegacy.id === "hero" && (
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <MediaUploadField
+                        label="Hero Image"
+                        kind="image"
+                        value={form.hero_image}
+                        disabled={saving}
+                        onChange={(url) =>
+                          setForm((prev) => (prev ? { ...prev, hero_image: url || null } : prev))
+                        }
+                        onUpload={(file) => uploadMedia(file, "hero-image")}
+                      />
+                      <MediaUploadField
+                        label="Hero Video"
+                        kind="video"
+                        value={form.hero_video}
+                        disabled={saving}
+                        onChange={(url) =>
+                          setForm((prev) => (prev ? { ...prev, hero_video: url || null } : prev))
+                        }
+                        onUpload={(file) => uploadMedia(file, "hero-video")}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="mt-6 flex justify-end gap-2">
+                  <AdminButton
+                    type="button"
+                    variant="outline"
+                    disabled={saving}
+                    onClick={handleDiscard}
+                  >
+                    Discard
+                  </AdminButton>
+                  <AdminButton type="button" disabled={saving} onClick={() => void handleSave()}>
+                    {saving ? "Saving…" : "Save Changes"}
+                  </AdminButton>
+                </div>
+              </AdminCard>
+            </motion.div>
+          )
         )}
       </div>
 
