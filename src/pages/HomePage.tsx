@@ -16,6 +16,9 @@ const EntranceImageSequence = lazy(
 const SouthPlainfieldEntranceSequence = lazy(
   () => import("../components/home/SouthPlainfieldEntranceSequence"),
 );
+const OakTreeEntranceSequence = lazy(
+  () => import("../components/home/OakTreeEntranceSequence"),
+);
 const ExperienceCards = lazy(
   () => import("../components/experience/ExperienceCards"),
 );
@@ -36,6 +39,7 @@ export default function HomePage() {
   const { selectedLocationId } = useLocationSelection();
   const { content, settings } = bundle;
   const isSouthPlainfield = selectedLocationId === "south-plainfield";
+  const isOakTree = selectedLocationId === "oak-tree";
   const heroUi = fetchSection("home", "hero_ui", { scrollHint: "Scroll" });
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
 
@@ -89,6 +93,8 @@ export default function HomePage() {
         >
           {isSouthPlainfield ? (
             <SouthPlainfieldEntranceSequence />
+          ) : isOakTree ? (
+            <OakTreeEntranceSequence />
           ) : (
             <EntranceImageSequence />
           )}

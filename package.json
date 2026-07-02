@@ -8,6 +8,7 @@
     "extract": "node scripts/extract-frames.mjs",
     "extract:catering": "node scripts/extract-frames.mjs --input public/catering/catering-sequence.mp4 --out public/catering-frames --count 120 --width 1280 --quality 4",
     "extract:sp-entrance": "node scripts/extract-frames.mjs --input public/sp-entrance/sp-entrance.mp4 --out public/sp-entrance-frames --count 110 --width 1280 --quality 4",
+    "extract:oak-tree": "node scripts/extract-frames.mjs --input public/image-sequences/oak-tree.mp4 --out public/image-sequences/oak-tree --count 110 --width 1280 --quality 4",
     "parse-menu": "node scripts/parse-menu.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build && node scripts/generate-seo-files.mjs",
