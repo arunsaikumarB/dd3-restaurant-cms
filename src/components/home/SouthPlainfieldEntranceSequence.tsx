@@ -4,7 +4,6 @@ import SectionPlaceholder from "../ui/SectionPlaceholder";
 import { fetchFrameManifest, type FrameManifest } from "../../utils/frameManifest";
 import {
   SP_ENTRANCE_MANIFEST_URL,
-  SP_ENTRANCE_OVERLAY,
   SP_ENTRANCE_SCROLL_LENGTH,
   SP_ENTRANCE_VIDEO_SRC,
 } from "../../data/southPlainfieldEntrance";
@@ -55,6 +54,8 @@ export default function SouthPlainfieldEntranceSequence() {
     );
   }
 
+  // Overlay intentionally omitted — the cinematic sequence is the only
+  // storytelling element; supporting content lives in the next section.
   return (
     <ImageSequenceScroll
       frames={manifest.frames}
@@ -62,13 +63,6 @@ export default function SouthPlainfieldEntranceSequence() {
       width={manifest.width}
       height={manifest.height}
       scrollLength={SP_ENTRANCE_SCROLL_LENGTH}
-      overlay={0.45}
-      overlayHold={0.15}
-      eyebrow={SP_ENTRANCE_OVERLAY.eyebrow}
-      title={SP_ENTRANCE_OVERLAY.title}
-      subtitle={SP_ENTRANCE_OVERLAY.subtitle}
-      body={SP_ENTRANCE_OVERLAY.body}
-      scrollHint={SP_ENTRANCE_OVERLAY.scrollHint}
       videoSrc={SP_ENTRANCE_VIDEO_SRC}
     />
   );

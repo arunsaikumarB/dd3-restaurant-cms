@@ -115,6 +115,9 @@ export default function ImageSequenceScroll({
   };
 
   const total = frameCount ?? effectiveFrames.length;
+  const hasOverlayContent = Boolean(
+    eyebrow || title || subtitle || body || scrollHint,
+  );
 
   return (
     <BaseImageSequenceScroll
@@ -128,47 +131,51 @@ export default function ImageSequenceScroll({
       background="#050505"
       posterSrc={frames[0]}
       className={`iss-cinematic${className ? ` ${className}` : ""}`}
-      onProgress={handleProgress}
+      onProgress={hasOverlayContent ? handleProgress : undefined}
     >
-      <div
-        className="iss-scrim"
-        aria-hidden
-        style={{ opacity: overlay }}
-      />
-      <div className="iss-vignette" aria-hidden />
+      {hasOverlayContent ? (
+        <>
+          <div className="iss-scrim" aria-hidden style={{ opacity: overlay }} />
+          <div className="iss-vignette" aria-hidden />
 
-      <div
-        className="iss-overlay"
-        ref={overlayRef}
-        data-source={videoSrc}
-        data-frames={total}
-      >
-        <div className="iss-overlay__inner">
-          {eyebrow ? <p className="iss-overlay__eyebrow">{eyebrow}</p> : null}
-          {title || subtitle ? (
-            <h2 className="iss-overlay__heading">
-              {title ? <span className="iss-overlay__title">{title}</span> : null}
-              {subtitle ? (
-                <span className="iss-overlay__subtitle">{subtitle}</span>
+          <div
+            className="iss-overlay"
+            ref={overlayRef}
+            data-source={videoSrc}
+            data-frames={total}
+          >
+            <div className="iss-overlay__inner">
+              {eyebrow ? (
+                <p className="iss-overlay__eyebrow">{eyebrow}</p>
               ) : null}
-            </h2>
-          ) : null}
-          {body ? <p className="iss-overlay__body">{body}</p> : null}
-        </div>
+              {title || subtitle ? (
+                <h2 className="iss-overlay__heading">
+                  {title ? (
+                    <span className="iss-overlay__title">{title}</span>
+                  ) : null}
+                  {subtitle ? (
+                    <span className="iss-overlay__subtitle">{subtitle}</span>
+                  ) : null}
+                </h2>
+              ) : null}
+              {body ? <p className="iss-overlay__body">{body}</p> : null}
+            </div>
 
-        {scrollHint ? (
-          <div className="iss-overlay__hint">
-            <span className="iss-overlay__hint-arrow" aria-hidden>
-              &#8595;
-            </span>
-            <span className="iss-overlay__hint-label">{scrollHint}</span>
+            {scrollHint ? (
+              <div className="iss-overlay__hint">
+                <span className="iss-overlay__hint-arrow" aria-hidden>
+                  &#8595;
+                </span>
+                <span className="iss-overlay__hint-label">{scrollHint}</span>
+              </div>
+            ) : null}
           </div>
-        ) : null}
-      </div>
 
-      <div className="iss-progress" aria-hidden>
-        <div className="iss-progress__bar" ref={progressRef} />
-      </div>
+          <div className="iss-progress" aria-hidden>
+            <div className="iss-progress__bar" ref={progressRef} />
+          </div>
+        </>
+      ) : null}
     </BaseImageSequenceScroll>
   );
 }
