@@ -84,6 +84,7 @@ export default function AnimatedImage({
             variants={imageScale}
             src={src}
             alt={alt}
+            loading="lazy"
             decoding="async"
             className="h-full w-full object-cover"
           />

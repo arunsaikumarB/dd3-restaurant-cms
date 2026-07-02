@@ -29,6 +29,11 @@ import {
   type GalleryCardRow,
 } from "../../services/gallery";
 import { invalidateGallerySectionCache } from "../../services/galleryPublic";
+import {
+  imageUploadErrorMessage,
+  prepareAdminImageUpload,
+} from "../utils/prepareAdminImageUpload";
+import { ADMIN_IMAGE_ACCEPT } from "../../utils/imageOptimize";
 
 const EXPANDED_PAGES_KEY = "dd3.admin.gallery.expandedPages";
 const SELECTED_SECTION_KEY = "dd3.admin.gallery.selectedSection";
@@ -58,7 +63,9 @@ export default function GalleryManagementPage() {
   const [selectedLocation, setSelectedLocation] = useState<GalleryAdminLocationId>("south-plainfield");
   const [selectedSection, setSelectedSection] = useState<GallerySectionKey>(readSelectedSection);
   const [expandedPages, setExpandedPages] = useState<Record<string, boolean>>(readExpandedPages);
+  const [optimizing, setOptimizing] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [lastUploadSize, setLastUploadSize] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -118,6 +125,7 @@ export default function GalleryManagementPage() {
 
   const canAddMore =
     !sectionDef || sectionDef.maxImages === 0 || sectionImages.length < sectionDef.maxImages;
+  const uploadBusy = optimizing || uploading;
 
   const selectSection = (section: GallerySectionKey) => {
     setSelectedSection(section);
@@ -177,9 +185,21 @@ export default function GalleryManagementPage() {
       return;
     }
 
-    setUploading(true);
+    setOptimizing(true);
+    setUploading(false);
+    setLastUploadSize(null);
     try {
-      const publicUrl = await uploadGalleryImageFile(file, selectedSection);
+      const { url: publicUrl, sizeLabel } = await prepareAdminImageUpload(
+        file,
+        (prepared) => uploadGalleryImageFile(prepared, selectedSection),
+        {
+          onPhase: (phase) => {
+            setOptimizing(phase === "optimizing");
+            setUploading(phase === "uploading");
+          },
+        },
+      );
+      setLastUploadSize(sizeLabel);
       const created = await createGalleryImage({
         image: publicUrl,
         category: "Ambiance",
@@ -200,8 +220,9 @@ export default function GalleryManagementPage() {
       setNewUrl("");
       showToast("Image uploaded successfully.");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : "Upload failed.", "error");
+      showToast(imageUploadErrorMessage(err), "error");
     } finally {
+      setOptimizing(false);
       setUploading(false);
     }
   };
@@ -518,7 +539,7 @@ export default function GalleryManagementPage() {
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept="image/*"
+                      accept={ADMIN_IMAGE_ACCEPT}
                       className="hidden"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
@@ -528,12 +549,21 @@ export default function GalleryManagementPage() {
                     />
                     <AdminButton
                       type="button"
-                      disabled={uploading}
+                      disabled={uploadBusy}
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <Upload size={16} />
-                      {uploading ? "Uploading…" : "Upload from computer"}
+                      {optimizing
+                        ? "Optimizing image…"
+                        : uploading
+                          ? "Uploading…"
+                          : "Upload from computer"}
                     </AdminButton>
+                    {lastUploadSize && (
+                      <p className={`self-center text-xs ${dark ? "text-white/50" : "text-admin-muted"}`}>
+                        {lastUploadSize}
+                      </p>
+                    )}
                   </div>
                   <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                     <AdminInput
@@ -546,7 +576,7 @@ export default function GalleryManagementPage() {
                       <AdminButton
                         type="button"
                         variant="outline"
-                        disabled={uploading || !newUrl.trim()}
+                        disabled={uploadBusy || !newUrl.trim()}
                         onClick={() => void handleAddFromUrl()}
                       >
                         <Link2 size={16} />

@@ -228,6 +228,7 @@ export default function SettingsPage() {
             label="Favicon"
             value={form.favicon}
             disabled={saving}
+            skipOptimization
             onChange={(url) => patchForm({ favicon: url || null })}
             onUpload={(file) => uploadAsset(file, "favicon")}
           />

@@ -227,6 +227,8 @@ export default function Hero({
           alt=""
           aria-hidden
           decoding="async"
+          loading="eager"
+          fetchPriority="high"
         />
       )}
 

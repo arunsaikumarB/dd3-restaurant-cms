@@ -119,7 +119,16 @@ export default function ExperienceCard({
               <p className="experience-card__fav-label">Our Favourites</p>
               <div className="experience-card__fav-row">
                 {favourites.map((fav) => (
-                  <img key={fav.src} src={fav.src} alt="" loading="lazy" draggable={false} />
+                  <img
+                    key={fav.src}
+                    src={fav.src}
+                    alt=""
+                    width={52}
+                    height={52}
+                    loading="lazy"
+                    decoding="async"
+                    draggable={false}
+                  />
                 ))}
               </div>
             </div>

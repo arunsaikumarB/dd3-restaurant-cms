@@ -104,6 +104,7 @@ export default function AboutPage() {
               src={missionImage}
               alt={missionAlt}
               loading="lazy"
+              decoding="async"
               className="aspect-[4/3] w-full rounded-[28px] object-cover shadow-premium"
             />
           </AnimatedContainer>
@@ -143,6 +144,7 @@ export default function AboutPage() {
               src={cuisineImage}
               alt={cuisineAlt}
               loading="lazy"
+              decoding="async"
               className="aspect-[4/3] w-full rounded-[28px] object-cover shadow-premium"
             />
           </AnimatedContainer>
@@ -168,6 +170,7 @@ export default function AboutPage() {
                 src={chefImage}
                 alt={chefAlt}
                 loading="lazy"
+                decoding="async"
                 className="aspect-[4/3] w-full rounded-[28px] object-cover shadow-[0_40px_80px_-24px_rgba(0,0,0,0.6)]"
               />
             </AnimatedContainer>

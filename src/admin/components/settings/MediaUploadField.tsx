@@ -3,6 +3,12 @@ import { Upload } from "lucide-react";
 import { useAdminTheme } from "../../context/AdminThemeContext";
 import AdminButton from "../ui/Button";
 import { AdminSkeleton } from "../ui/Skeleton";
+import { ADMIN_IMAGE_ACCEPT } from "../../../utils/imageOptimize";
+import { validateAdminVideoUpload } from "../../../constants/storage";
+import {
+  imageUploadErrorMessage,
+  prepareAdminImageUpload,
+} from "../../utils/prepareAdminImageUpload";
 
 type MediaKind = "image" | "video";
 
@@ -18,7 +24,7 @@ interface MediaUploadFieldProps {
 }
 
 const DEFAULT_ACCEPT: Record<MediaKind, string> = {
-  image: "image/png,image/jpeg,image/webp",
+  image: ADMIN_IMAGE_ACCEPT,
   video: "video/mp4",
 };
 
@@ -34,24 +40,66 @@ export default function MediaUploadField({
 }: MediaUploadFieldProps) {
   const { dark } = useAdminTheme();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [optimizing, setOptimizing] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [optimizedSizeLabel, setOptimizedSizeLabel] = useState<string | null>(null);
+
+  const busy = optimizing || uploading;
+  const uploadLabel = kind === "image" ? "image" : "video";
 
   const handleFile = async (file: File) => {
     setUploadError(null);
-    setUploading(true);
+    setOptimizedSizeLabel(null);
+
+    if (kind === "video") {
+      const videoSizeError = validateAdminVideoUpload(file);
+      if (videoSizeError) {
+        setUploadError(videoSizeError);
+        if (inputRef.current) inputRef.current.value = "";
+        return;
+      }
+
+      setUploading(true);
+      try {
+        const url = await onUpload(file);
+        onChange(url);
+      } catch (err) {
+        setUploadError(imageUploadErrorMessage(err));
+      } finally {
+        setUploading(false);
+        if (inputRef.current) inputRef.current.value = "";
+      }
+      return;
+    }
+
+    setOptimizing(true);
+    setUploading(false);
     try {
-      const url = await onUpload(file);
+      const { url, sizeLabel } = await prepareAdminImageUpload(file, onUpload, {
+        onPhase: (phase) => {
+          setOptimizing(phase === "optimizing");
+          setUploading(phase === "uploading");
+        },
+      });
+      setOptimizedSizeLabel(sizeLabel);
       onChange(url);
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Upload failed.");
+      setUploadError(imageUploadErrorMessage(err));
     } finally {
+      setOptimizing(false);
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
     }
   };
 
-  const uploadLabel = kind === "image" ? "image" : "video";
+  const statusLabel = optimizing
+    ? "Optimizing image…"
+    : uploading
+      ? "Uploading…"
+      : value
+        ? `Replace ${uploadLabel}`
+        : `Upload ${uploadLabel}`;
 
   return (
     <div className="space-y-2">
@@ -70,7 +118,7 @@ export default function MediaUploadField({
             dark ? "border-admin-border-dark bg-white/5" : "border-admin-border bg-admin-ivory/50",
           ].join(" ")}
         >
-          {uploading ? (
+          {busy ? (
             <AdminSkeleton className="h-full w-full rounded-xl" />
           ) : value && kind === "image" ? (
             <img src={value} alt="" className="h-full w-full object-cover" />
@@ -88,7 +136,7 @@ export default function MediaUploadField({
             type="file"
             accept={accept ?? DEFAULT_ACCEPT[kind]}
             className="hidden"
-            disabled={disabled || uploading}
+            disabled={disabled || busy}
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) void handleFile(file);
@@ -98,22 +146,30 @@ export default function MediaUploadField({
             type="button"
             variant="outline"
             size="sm"
-            disabled={disabled || uploading}
+            disabled={disabled || busy}
             onClick={() => inputRef.current?.click()}
           >
             <Upload size={14} />
-            {uploading ? "Uploading…" : value ? `Replace ${uploadLabel}` : `Upload ${uploadLabel}`}
+            {busy ? statusLabel : value ? `Replace ${uploadLabel}` : `Upload ${uploadLabel}`}
           </AdminButton>
           {value && (
             <AdminButton
               type="button"
               variant="ghost"
               size="sm"
-              disabled={disabled || uploading}
-              onClick={() => onChange("")}
+              disabled={disabled || busy}
+              onClick={() => {
+                setOptimizedSizeLabel(null);
+                onChange("");
+              }}
             >
               Remove
             </AdminButton>
+          )}
+          {optimizedSizeLabel && kind === "image" && (
+            <p className={`text-xs ${dark ? "text-white/50" : "text-admin-muted"}`}>
+              {optimizedSizeLabel}
+            </p>
           )}
           {uploadError && <p className="text-xs text-admin-danger">{uploadError}</p>}
           {helpText ? (

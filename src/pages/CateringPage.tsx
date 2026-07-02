@@ -61,6 +61,7 @@ function CateringServiceBlock({
             src={image}
             alt={service.title}
             loading="lazy"
+            decoding="async"
             className="aspect-[4/3] w-full rounded-[28px] object-cover shadow-premium"
           />
         </div>

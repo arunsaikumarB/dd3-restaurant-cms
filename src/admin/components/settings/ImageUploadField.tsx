@@ -3,6 +3,11 @@ import { Upload } from "lucide-react";
 import { useAdminTheme } from "../../context/AdminThemeContext";
 import AdminButton from "../ui/Button";
 import { AdminSkeleton } from "../ui/Skeleton";
+import { ADMIN_IMAGE_ACCEPT } from "../../../utils/imageOptimize";
+import {
+  imageUploadErrorMessage,
+  prepareAdminImageUpload,
+} from "../../utils/prepareAdminImageUpload";
 
 interface ImageUploadFieldProps {
   label: string;
@@ -11,6 +16,8 @@ interface ImageUploadFieldProps {
   onUpload: (file: File) => Promise<string>;
   accept?: string;
   disabled?: boolean;
+  /** Skip WebP conversion for favicon / ICO uploads. */
+  skipOptimization?: boolean;
 }
 
 export default function ImageUploadField({
@@ -18,27 +25,50 @@ export default function ImageUploadField({
   value,
   onChange,
   onUpload,
-  accept = "image/png,image/jpeg,image/webp,image/x-icon,image/vnd.microsoft.icon",
+  accept = `${ADMIN_IMAGE_ACCEPT},image/x-icon,image/vnd.microsoft.icon`,
   disabled = false,
+  skipOptimization = false,
 }: ImageUploadFieldProps) {
   const { dark } = useAdminTheme();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [optimizing, setOptimizing] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [optimizedSizeLabel, setOptimizedSizeLabel] = useState<string | null>(null);
+
+  const busy = optimizing || uploading;
 
   const handleFile = async (file: File) => {
     setUploadError(null);
-    setUploading(true);
+    setOptimizedSizeLabel(null);
+    setOptimizing(true);
+    setUploading(false);
     try {
-      const url = await onUpload(file);
+      const { url, sizeLabel } = await prepareAdminImageUpload(file, onUpload, {
+        skipOptimization,
+        onPhase: (phase) => {
+          setOptimizing(phase === "optimizing");
+          setUploading(phase === "uploading");
+        },
+      });
+      setOptimizedSizeLabel(sizeLabel);
       onChange(url);
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Upload failed.");
+      setUploadError(imageUploadErrorMessage(err));
     } finally {
+      setOptimizing(false);
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
     }
   };
+
+  const statusLabel = optimizing
+    ? "Optimizing image…"
+    : uploading
+      ? "Uploading…"
+      : value
+        ? "Replace image"
+        : "Upload image";
 
   return (
     <div className="space-y-2">
@@ -57,7 +87,7 @@ export default function ImageUploadField({
             dark ? "border-admin-border-dark bg-white/5" : "border-admin-border bg-admin-ivory/50",
           ].join(" ")}
         >
-          {uploading ? (
+          {busy ? (
             <AdminSkeleton className="h-full w-full rounded-xl" />
           ) : value ? (
             <img src={value} alt="" className="h-full w-full object-contain" />
@@ -71,7 +101,7 @@ export default function ImageUploadField({
             type="file"
             accept={accept}
             className="hidden"
-            disabled={disabled || uploading}
+            disabled={disabled || busy}
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) void handleFile(file);
@@ -81,22 +111,30 @@ export default function ImageUploadField({
             type="button"
             variant="outline"
             size="sm"
-            disabled={disabled || uploading}
+            disabled={disabled || busy}
             onClick={() => inputRef.current?.click()}
           >
             <Upload size={14} />
-            {uploading ? "Uploading…" : value ? "Replace image" : "Upload image"}
+            {busy ? statusLabel : value ? "Replace image" : "Upload image"}
           </AdminButton>
           {value && (
             <AdminButton
               type="button"
               variant="ghost"
               size="sm"
-              disabled={disabled || uploading}
-              onClick={() => onChange("")}
+              disabled={disabled || busy}
+              onClick={() => {
+                setOptimizedSizeLabel(null);
+                onChange("");
+              }}
             >
               Remove
             </AdminButton>
+          )}
+          {optimizedSizeLabel && (
+            <p className={`text-xs ${dark ? "text-white/50" : "text-admin-muted"}`}>
+              {optimizedSizeLabel}
+            </p>
           )}
           {uploadError && <p className="text-xs text-admin-danger">{uploadError}</p>}
         </div>
