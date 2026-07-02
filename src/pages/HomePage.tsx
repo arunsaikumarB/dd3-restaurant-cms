@@ -73,8 +73,6 @@ export default function HomePage() {
         logoSrc={settings.logo}
         logoAlt={logoAlt}
         scrollHint={heroUi.scrollHint}
-        primaryCta={content.primary_cta}
-        secondaryCta={content.secondary_cta}
       />
 
       <LazyMount
