@@ -49,7 +49,7 @@ export default function PartiesPage() {
     icon: EVENTS[index]?.icon ?? "◈",
   }));
 
-  const heroBackground = useSectionImage("parties_hero", "/showcase/desserts-falooda.jpg");
+  const heroBackground = useSectionImage("parties_hero", "/showcase/desserts-falooda.webp");
   const partyGalleryImages = useGallerySection("parties_gallery");
   const galleryImages = toGalleryGridImages(partyGalleryImages);
 

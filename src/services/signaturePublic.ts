@@ -21,18 +21,18 @@ type MenuItemJoinRow = MenuItem & {
 
 /** Showcase images used when a menu item has no uploaded image yet. */
 const SHOWCASE_FALLBACKS: { match: string; image: string }[] = [
-  { match: "biryani", image: "/showcase/biryani.jpg" },
-  { match: "mandi", image: "/showcase/mandi.jpg" },
-  { match: "tandoor", image: "/showcase/tandoori.jpg" },
-  { match: "kebab", image: "/showcase/tandoori.jpg" },
-  { match: "tikka", image: "/showcase/tandoori.jpg" },
-  { match: "chinese", image: "/showcase/indo-chinese.jpg" },
-  { match: "manchur", image: "/showcase/indo-chinese.jpg" },
-  { match: "chilli", image: "/showcase/indo-chinese.jpg" },
-  { match: "paneer", image: "/showcase/butter-chicken.jpg" },
-  { match: "chicken", image: "/showcase/butter-chicken.jpg" },
+  { match: "biryani", image: "/showcase/biryani.webp" },
+  { match: "mandi", image: "/showcase/mandi.webp" },
+  { match: "tandoor", image: "/showcase/tandoori.webp" },
+  { match: "kebab", image: "/showcase/tandoori.webp" },
+  { match: "tikka", image: "/showcase/tandoori.webp" },
+  { match: "chinese", image: "/showcase/indo-chinese.webp" },
+  { match: "manchur", image: "/showcase/indo-chinese.webp" },
+  { match: "chilli", image: "/showcase/indo-chinese.webp" },
+  { match: "paneer", image: "/showcase/butter-chicken.webp" },
+  { match: "chicken", image: "/showcase/butter-chicken.webp" },
 ];
-export const DEFAULT_SHOWCASE_IMAGE = "/showcase/biryani.jpg";
+export const DEFAULT_SHOWCASE_IMAGE = "/showcase/biryani.webp";
 
 function normalizeImageUrl(image: string | null | undefined): string | null {
   if (!image?.trim()) return null;

@@ -56,31 +56,31 @@ export const RESERVATION_GALLERY = [
   {
     id: "reception",
     label: "Reception",
-    image: "/frames/frame_0025.jpg",
+    image: "/frames/frame_0025.webp",
     alt: "Desi Dhamaka reception lounge",
   },
   {
     id: "dining-hall",
     label: "Dining Hall",
-    image: "/frames/frame_0048.jpg",
+    image: "/frames/frame_0048.webp",
     alt: "Main dining hall at Desi Dhamaka",
   },
   {
     id: "private-dining",
     label: "Private Dining",
-    image: "/frames/frame_0055.jpg",
+    image: "/frames/frame_0055.webp",
     alt: "Private dining room",
   },
   {
     id: "buffet",
     label: "Buffet",
-    image: "/frames/frame_0092.jpg",
+    image: "/frames/frame_0092.webp",
     alt: "Weekend buffet spread",
   },
   {
     id: "chef",
     label: "Chef",
-    image: "/showcase/biryani.jpg",
+    image: "/showcase/biryani.webp",
     alt: "Chef preparing authentic Indian cuisine",
   },
 ] as const;
@@ -116,78 +116,78 @@ export const RESERVATION_CONTACT = [
   },
 ] as const;
 
-export const RESERVATION_BANNER = "/reservation/reservation-banner.png";
+export const RESERVATION_BANNER = "/reservation/reservation-banner.webp";
 
 /** Interior slideshow for the booking split-panel (left side). */
 export const RESERVATION_INTERIOR_SLIDES = [
   {
     id: "private-dining-entrance",
-    image: "/reservation/interior/interior-01.png",
+    image: "/reservation/interior/interior-01.webp",
     alt: "Private dining room entrance with marigold garland at Desi Dhamaka",
   },
   {
     id: "reception-lobby",
-    image: "/reservation/interior/interior-02.png",
+    image: "/reservation/interior/interior-02.webp",
     alt: "Reception lobby with fountain and chandelier",
   },
   {
     id: "private-dining-gold",
-    image: "/reservation/interior/interior-03.png",
+    image: "/reservation/interior/interior-03.webp",
     alt: "Private dining room with gold walls and horse statues",
   },
   {
     id: "weekend-buffet",
-    image: "/reservation/interior/interior-04.png",
+    image: "/reservation/interior/interior-04.webp",
     alt: "Weekend buffet service at Desi Dhamaka",
   },
   {
     id: "bar-lounge",
-    image: "/reservation/interior/interior-05.png",
+    image: "/reservation/interior/interior-05.webp",
     alt: "Bar and lounge seating area",
   },
   {
     id: "grand-lobby",
-    image: "/reservation/interior/interior-06.png",
+    image: "/reservation/interior/interior-06.webp",
     alt: "Grand lobby with red carpet and water feature",
   },
   {
     id: "banquet-hall",
-    image: "/reservation/interior/interior-07.png",
+    image: "/reservation/interior/interior-07.webp",
     alt: "Long banquet table in private dining hall",
   },
   {
     id: "private-room-arches",
-    image: "/reservation/interior/interior-08.png",
+    image: "/reservation/interior/interior-08.webp",
     alt: "Private dining room with arched niches",
   },
   {
     id: "formal-private-dining",
-    image: "/reservation/interior/interior-09.png",
+    image: "/reservation/interior/interior-09.webp",
     alt: "Formal private dining room with tapestry",
   },
   {
     id: "main-dining-chandelier",
-    image: "/reservation/interior/interior-10.png",
+    image: "/reservation/interior/interior-10.webp",
     alt: "Main dining hall with crystal chandelier",
   },
   {
     id: "elegant-private-room",
-    image: "/reservation/interior/interior-11.png",
+    image: "/reservation/interior/interior-11.webp",
     alt: "Elegant private dining room with gold wallpaper",
   },
   {
     id: "dining-hall-columns",
-    image: "/reservation/interior/interior-12.png",
+    image: "/reservation/interior/interior-12.webp",
     alt: "Main dining hall with ornate columns",
   },
   {
     id: "throne-seating",
-    image: "/reservation/interior/interior-13.png",
+    image: "/reservation/interior/interior-13.webp",
     alt: "Private dining with throne seating and crystal chandelier",
   },
   {
     id: "booth-dining",
-    image: "/reservation/interior/interior-14.png",
+    image: "/reservation/interior/interior-14.webp",
     alt: "Booth seating in the main dining area",
   },
 ] as const;

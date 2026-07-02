@@ -21,7 +21,7 @@ import { isExternalUrl } from "../utils/locationLinks";
 export default function MenuPage() {
   const { fetchSection, interpolate } = usePageContent();
   const { selectedLocationId } = useLocationSelection();
-  const menuHeroImage = useSectionImage("menu_hero", "/showcase/biryani.jpg");
+  const menuHeroImage = useSectionImage("menu_hero", "/showcase/biryani.webp");
   const { data, loading, error } = useMenuData(selectedLocationId);
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState<string | null>(null);

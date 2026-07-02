@@ -52,7 +52,7 @@ async function main(): Promise<void> {
   console.log(JSON.stringify(before, null, 2));
 
   for (const row of before) {
-    const heroImage = row.hero_image?.trim() ? row.hero_image : "/hero/hero-poster.jpg";
+    const heroImage = row.hero_image?.trim() ? row.hero_image : "/hero/hero-poster.webp";
     const { error } = await supabase
       .from("homepage_content")
       .update({

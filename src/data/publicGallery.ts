@@ -17,7 +17,7 @@ export type PublicGalleryItem = {
 const EXTRA_FRAMES: PublicGalleryItem[] = [
   {
     id: "fallback-frame-0025",
-    image: "/frames/frame_0025.jpg",
+    image: "/frames/frame_0025.webp",
     alt_text: "Restaurant lounge seating",
     title: "Restaurant lounge seating",
     caption: "Restaurant lounge seating",
@@ -27,7 +27,7 @@ const EXTRA_FRAMES: PublicGalleryItem[] = [
   },
   {
     id: "fallback-frame-0055",
-    image: "/frames/frame_0055.jpg",
+    image: "/frames/frame_0055.webp",
     alt_text: "Dining area detail",
     title: "Dining area detail",
     caption: "Dining area detail",
@@ -37,7 +37,7 @@ const EXTRA_FRAMES: PublicGalleryItem[] = [
   },
   {
     id: "fallback-frame-0070",
-    image: "/frames/frame_0070.jpg",
+    image: "/frames/frame_0070.webp",
     alt_text: "Open kitchen view",
     title: "Open kitchen view",
     caption: "Open kitchen view",
@@ -47,7 +47,7 @@ const EXTRA_FRAMES: PublicGalleryItem[] = [
   },
   {
     id: "fallback-frame-0095",
-    image: "/frames/frame_0095.jpg",
+    image: "/frames/frame_0095.webp",
     alt_text: "Evening atmosphere",
     title: "Evening atmosphere",
     caption: "Evening atmosphere",
@@ -57,7 +57,7 @@ const EXTRA_FRAMES: PublicGalleryItem[] = [
   },
   {
     id: "fallback-frame-0110",
-    image: "/frames/frame_0110.jpg",
+    image: "/frames/frame_0110.webp",
     alt_text: "Interior architecture",
     title: "Interior architecture",
     caption: "Interior architecture",

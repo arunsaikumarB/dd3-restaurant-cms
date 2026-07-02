@@ -28,7 +28,7 @@ export default function ContactPage() {
     handleSubmit,
     reset,
   } = useContactForm();
-  const heroBackground = useSectionImage("contact_hero", "/showcase/mandi.jpg");
+  const heroBackground = useSectionImage("contact_hero", "/showcase/mandi.webp");
 
   const hero = fetchSection("contact", "hero", {
     label: "Get in Touch",

@@ -69,9 +69,9 @@ export default function ExperienceCards({
   const { selectedLocationId } = useLocationSelection();
   const { fetchSection, interpolate } = usePageContent();
   const experience = fetchSection("home", "experience", EXPERIENCE_FALLBACK);
-  const menuImage = useSectionImage("choose_experience_menu", "/showcase/biryani.jpg");
-  const orderImage = useSectionImage("choose_experience_order", "/showcase/tandoori.jpg");
-  const visitImage = useSectionImage("choose_experience_visit", "/frames/frame_0060.jpg");
+  const menuImage = useSectionImage("choose_experience_menu", "/showcase/biryani.webp");
+  const orderImage = useSectionImage("choose_experience_order", "/showcase/tandoori.webp");
+  const visitImage = useSectionImage("choose_experience_visit", "/frames/frame_0060.webp");
 
   const cards = useMemo(() => {
     const socialMeta = [
@@ -95,9 +95,9 @@ export default function ExperienceCards({
         buttonText: experience.menuCardCta.label,
         link: experience.menuCardCta.url,
         favourites: [
-          { src: "/showcase/biryani.jpg", alt: "Biryani" },
-          { src: "/showcase/butter-chicken.jpg", alt: "Butter chicken" },
-          { src: "/showcase/desserts-falooda.jpg", alt: "Desserts" },
+          { src: "/showcase/biryani.webp", alt: "Biryani" },
+          { src: "/showcase/butter-chicken.webp", alt: "Butter chicken" },
+          { src: "/showcase/desserts-falooda.webp", alt: "Desserts" },
         ],
         rotation: { rotateY: -14, rotateZ: -3, translateY: 12 },
         scrollDelay: 200,

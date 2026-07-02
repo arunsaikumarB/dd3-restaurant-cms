@@ -14,7 +14,7 @@ export default function GalleryPage() {
         label="Gallery"
         title="Our Gallery"
         subtitle="Step inside Desi Dhamaka — elegant spaces, warm lighting, and the energy of authentic Indian hospitality."
-        backgroundImage="/frames/frame_0060.jpg"
+        backgroundImage="/frames/frame_0060.webp"
         breadcrumbItems={[
           { label: "Home", to: "/" },
           { label: "Gallery" },

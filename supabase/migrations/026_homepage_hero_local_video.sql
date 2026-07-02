@@ -5,4 +5,4 @@
 UPDATE public.homepage_content
 SET
   hero_video = '/media/hero.mp4',
-  hero_image = COALESCE(NULLIF(TRIM(hero_image), ''), '/hero/hero-poster.jpg');
+  hero_image = COALESCE(NULLIF(TRIM(hero_image), ''), '/hero/hero-poster.webp');

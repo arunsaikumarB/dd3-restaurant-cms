@@ -47,43 +47,43 @@ export const RECENT_ACTIVITIES: ActivityItem[] = [
 ];
 
 export const MOCK_MENU_ITEMS: MenuItem[] = [
-  { id: "1", name: "Chicken Dum Biryani", category: "Biryani", price: 16.99, image: "/showcase/biryani.jpg", status: "active", vegType: "non-veg", popular: true, chefSpecial: true },
-  { id: "2", name: "Mutton Mandi", category: "DD Special Mandi", price: 47.83, image: "/showcase/tandoori.jpg", status: "active", vegType: "non-veg", popular: true, chefSpecial: true },
-  { id: "3", name: "Butter Chicken", category: "North Indian", price: 16.99, image: "/showcase/biryani.jpg", status: "active", vegType: "non-veg", popular: true, chefSpecial: false },
-  { id: "4", name: "Tandoori Platter", category: "Kebab & Tandoori", price: 16.99, image: "/showcase/tandoori.jpg", status: "active", vegType: "non-veg", popular: false, chefSpecial: true },
-  { id: "5", name: "Paneer Tikka", category: "Appetizers", price: 12.99, image: "/showcase/biryani.jpg", status: "active", vegType: "veg", popular: true, chefSpecial: false },
-  { id: "6", name: "Garlic Naan", category: "Breads", price: 3.99, image: "/showcase/tandoori.jpg", status: "active", vegType: "veg", popular: false, chefSpecial: false },
-  { id: "7", name: "Mango Lassi", category: "Beverages", price: 4.99, image: "/showcase/biryani.jpg", status: "inactive", vegType: "veg", popular: false, chefSpecial: false },
-  { id: "8", name: "Lamb Seekh Kebab", category: "Kebab & Tandoori", price: 14.99, image: "/showcase/tandoori.jpg", status: "draft", vegType: "non-veg", popular: false, chefSpecial: false },
+  { id: "1", name: "Chicken Dum Biryani", category: "Biryani", price: 16.99, image: "/showcase/biryani.webp", status: "active", vegType: "non-veg", popular: true, chefSpecial: true },
+  { id: "2", name: "Mutton Mandi", category: "DD Special Mandi", price: 47.83, image: "/showcase/tandoori.webp", status: "active", vegType: "non-veg", popular: true, chefSpecial: true },
+  { id: "3", name: "Butter Chicken", category: "North Indian", price: 16.99, image: "/showcase/biryani.webp", status: "active", vegType: "non-veg", popular: true, chefSpecial: false },
+  { id: "4", name: "Tandoori Platter", category: "Kebab & Tandoori", price: 16.99, image: "/showcase/tandoori.webp", status: "active", vegType: "non-veg", popular: false, chefSpecial: true },
+  { id: "5", name: "Paneer Tikka", category: "Appetizers", price: 12.99, image: "/showcase/biryani.webp", status: "active", vegType: "veg", popular: true, chefSpecial: false },
+  { id: "6", name: "Garlic Naan", category: "Breads", price: 3.99, image: "/showcase/tandoori.webp", status: "active", vegType: "veg", popular: false, chefSpecial: false },
+  { id: "7", name: "Mango Lassi", category: "Beverages", price: 4.99, image: "/showcase/biryani.webp", status: "inactive", vegType: "veg", popular: false, chefSpecial: false },
+  { id: "8", name: "Lamb Seekh Kebab", category: "Kebab & Tandoori", price: 14.99, image: "/showcase/tandoori.webp", status: "draft", vegType: "non-veg", popular: false, chefSpecial: false },
 ];
 
 export const MOCK_CATEGORIES: Category[] = [
-  { id: "1", name: "Biryani", image: "/showcase/biryani.jpg", itemCount: 12 },
-  { id: "2", name: "North Indian", image: "/showcase/tandoori.jpg", itemCount: 18 },
-  { id: "3", name: "Kebab & Tandoori", image: "/showcase/tandoori.jpg", itemCount: 14 },
-  { id: "4", name: "DD Special Mandi", image: "/showcase/biryani.jpg", itemCount: 6 },
-  { id: "5", name: "Appetizers", image: "/showcase/tandoori.jpg", itemCount: 10 },
-  { id: "6", name: "Breads", image: "/showcase/biryani.jpg", itemCount: 8 },
-  { id: "7", name: "Beverages", image: "/showcase/tandoori.jpg", itemCount: 9 },
-  { id: "8", name: "Desserts", image: "/showcase/biryani.jpg", itemCount: 7 },
+  { id: "1", name: "Biryani", image: "/showcase/biryani.webp", itemCount: 12 },
+  { id: "2", name: "North Indian", image: "/showcase/tandoori.webp", itemCount: 18 },
+  { id: "3", name: "Kebab & Tandoori", image: "/showcase/tandoori.webp", itemCount: 14 },
+  { id: "4", name: "DD Special Mandi", image: "/showcase/biryani.webp", itemCount: 6 },
+  { id: "5", name: "Appetizers", image: "/showcase/tandoori.webp", itemCount: 10 },
+  { id: "6", name: "Breads", image: "/showcase/biryani.webp", itemCount: 8 },
+  { id: "7", name: "Beverages", image: "/showcase/tandoori.webp", itemCount: 9 },
+  { id: "8", name: "Desserts", image: "/showcase/biryani.webp", itemCount: 7 },
 ];
 
 export const MOCK_OFFERS: Offer[] = [
-  { id: "1", name: "Weekend Biryani Special", discount: "15% OFF", banner: "/showcase/biryani.jpg", startDate: "2026-06-01", endDate: "2026-06-30", status: "active" },
-  { id: "2", name: "Family Feast Combo", discount: "$10 OFF", banner: "/showcase/tandoori.jpg", startDate: "2026-06-15", endDate: "2026-07-15", status: "active" },
-  { id: "3", name: "Lunch Express", discount: "20% OFF", banner: "/showcase/biryani.jpg", startDate: "2026-05-01", endDate: "2026-05-31", status: "inactive" },
-  { id: "4", name: "Grand Opening Promo", discount: "25% OFF", banner: "/showcase/tandoori.jpg", startDate: "2026-07-01", endDate: "2026-07-31", status: "draft" },
+  { id: "1", name: "Weekend Biryani Special", discount: "15% OFF", banner: "/showcase/biryani.webp", startDate: "2026-06-01", endDate: "2026-06-30", status: "active" },
+  { id: "2", name: "Family Feast Combo", discount: "$10 OFF", banner: "/showcase/tandoori.webp", startDate: "2026-06-15", endDate: "2026-07-15", status: "active" },
+  { id: "3", name: "Lunch Express", discount: "20% OFF", banner: "/showcase/biryani.webp", startDate: "2026-05-01", endDate: "2026-05-31", status: "inactive" },
+  { id: "4", name: "Grand Opening Promo", discount: "25% OFF", banner: "/showcase/tandoori.webp", startDate: "2026-07-01", endDate: "2026-07-31", status: "draft" },
 ];
 
 export const MOCK_GALLERY: GalleryImage[] = [
-  { id: "1", url: "/showcase/biryani.jpg", category: "Food", title: "Chicken Dum Biryani" },
-  { id: "2", url: "/showcase/tandoori.jpg", category: "Food", title: "Tandoori Platter" },
-  { id: "3", url: "/showcase/biryani.jpg", category: "Ambiance", title: "Dining Room" },
-  { id: "4", url: "/showcase/tandoori.jpg", category: "Events", title: "Private Party Setup" },
-  { id: "5", url: "/showcase/biryani.jpg", category: "Food", title: "Mutton Mandi" },
-  { id: "6", url: "/showcase/tandoori.jpg", category: "Kitchen", title: "Tandoor Station" },
-  { id: "7", url: "/showcase/biryani.jpg", category: "Food", title: "Butter Chicken" },
-  { id: "8", url: "/showcase/tandoori.jpg", category: "Ambiance", title: "Bar Area" },
+  { id: "1", url: "/showcase/biryani.webp", category: "Food", title: "Chicken Dum Biryani" },
+  { id: "2", url: "/showcase/tandoori.webp", category: "Food", title: "Tandoori Platter" },
+  { id: "3", url: "/showcase/biryani.webp", category: "Ambiance", title: "Dining Room" },
+  { id: "4", url: "/showcase/tandoori.webp", category: "Events", title: "Private Party Setup" },
+  { id: "5", url: "/showcase/biryani.webp", category: "Food", title: "Mutton Mandi" },
+  { id: "6", url: "/showcase/tandoori.webp", category: "Kitchen", title: "Tandoor Station" },
+  { id: "7", url: "/showcase/biryani.webp", category: "Food", title: "Butter Chicken" },
+  { id: "8", url: "/showcase/tandoori.webp", category: "Ambiance", title: "Bar Area" },
 ];
 
 export const MOCK_RESERVATIONS: Reservation[] = [

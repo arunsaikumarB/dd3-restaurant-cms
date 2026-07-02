@@ -1,9 +1,9 @@
 /** Logo assets in `public/` — pick by background. */
 export const LOGO = {
   /** Black/dark tagline — ivory and light backgrounds */
-  onIvory: "/DD%20logo.png?v=2",
+  onIvory: "/DD%20logo.webp?v=2",
   /** White tagline — dark or transparent backgrounds */
-  onDark: "/Bold-01.png?v=1",
+  onDark: "/Bold-01.webp?v=1",
   alt: "Desi Dhamaka Indian Restaurant",
 } as const;
 

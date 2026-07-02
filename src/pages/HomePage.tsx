@@ -37,7 +37,7 @@ export default function HomePage() {
     () => [
       {
         id: "homepage-hero-poster",
-        image: content.hero_image || "/hero/hero-poster.jpg",
+        image: content.hero_image || "/hero/hero-poster.webp",
         alt_text: logoAlt,
         title: "Hero background",
         caption: "",
@@ -51,7 +51,7 @@ export default function HomePage() {
   );
   const heroPosterImages = useGallerySection("hero_background", heroPosterFallback);
   const posterSrc =
-    heroPosterImages[0]?.image ?? content.hero_image ?? "/hero/hero-poster.jpg";
+    heroPosterImages[0]?.image ?? content.hero_image ?? "/hero/hero-poster.webp";
 
   return (
     <div className="page">

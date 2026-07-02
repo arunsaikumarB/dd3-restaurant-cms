@@ -18,7 +18,7 @@ export default function ImageGallery() {
     return {
       id: fallback?.id ?? `gallery-${index}`,
       label: item.label,
-      image: fallback?.image ?? "/frames/frame_0025.jpg",
+      image: fallback?.image ?? "/frames/frame_0025.webp",
       alt: fallback?.alt ?? item.label,
     };
   });

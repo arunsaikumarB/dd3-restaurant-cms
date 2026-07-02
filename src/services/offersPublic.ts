@@ -54,7 +54,7 @@ function parseContentSections(value: unknown, row: Offer): OfferContentSection[]
 
 function mapDbOfferToLocationOffer(row: Offer): LocationOffer {
   const validUntil = row.valid_until?.trim() || null;
-  const image = row.image ?? row.banner ?? "/showcase/biryani.jpg";
+  const image = row.image ?? row.banner ?? "/showcase/biryani.webp";
   const gallery = parseStringArray(row.gallery);
   const terms = parseStringArray(row.terms);
 

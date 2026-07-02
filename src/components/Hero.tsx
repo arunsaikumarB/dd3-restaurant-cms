@@ -10,7 +10,7 @@ import { EASE_POWER3 } from "./showcase/motion";
 import Logo from "./ui/Logo";
 
 const HERO_VIDEO = "/media/hero.mp4";
-const HERO_POSTER = "/hero/hero-poster.jpg";
+const HERO_POSTER = "/hero/hero-poster.webp";
 const DEFAULT_TITLE = "Step inside\nthe experience";
 const DEFAULT_SUBTITLE =
   "Scroll to walk through our doors — from the entrance to the heart of the reception, frame by cinematic frame.";

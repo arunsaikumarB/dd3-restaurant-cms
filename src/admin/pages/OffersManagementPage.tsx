@@ -45,7 +45,7 @@ import {
   type OfferErrors,
 } from "../../utils/validation/offers";
 
-const FALLBACK_IMAGE = "/showcase/biryani.jpg";
+const FALLBACK_IMAGE = "/showcase/biryani.webp";
 
 type SortOption =
   | "display_order"
@@ -643,7 +643,7 @@ function OfferFormFields({
       />
       <AdminInput
         label="Hero Image URL"
-        placeholder="https://… or /showcase/biryani.jpg"
+        placeholder="https://… or /showcase/biryani.webp"
         value={form.image ?? ""}
         error={fieldErrors.image}
         disabled={disabled}

@@ -27,7 +27,7 @@ export const ORDER_OPTIONS: OrderOption[] = [
     badge: "Pickup Only",
     description:
       "Order directly from us for the freshest experience and the best service.",
-    image: "/showcase/biryani.jpg",
+    image: "/showcase/biryani.webp",
     imageAlt: "Fresh biryani from Desi Dhamaka",
     pills: ["Fresh Daily", "Best Value", "Personal Service"],
     buttonText: "Order Direct",
@@ -41,7 +41,7 @@ export const ORDER_OPTIONS: OrderOption[] = [
     title: "Delivery & Pickup",
     badge: "Available Now",
     description: "Enjoy fast delivery or pickup through Uber Eats.",
-    image: "/showcase/tandoori.jpg",
+    image: "/showcase/tandoori.webp",
     imageAlt: "Tandoori platter available on Uber Eats",
     pills: ["Fast Delivery", "Live Tracking", "Easy Pickup"],
     buttonText: "Order with Uber Eats",

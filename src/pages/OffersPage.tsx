@@ -44,7 +44,7 @@ export default function OffersPage() {
   };
 
   const activeLocation = pageLocationId ? getLocationConfig(pageLocationId) : null;
-  const offersHeroImage = useSectionImage("offers_hero", "/showcase/tandoori.jpg");
+  const offersHeroImage = useSectionImage("offers_hero", "/showcase/tandoori.webp");
   const loading = offersLoading || transitioning;
 
   useEffect(() => {

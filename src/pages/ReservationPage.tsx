@@ -47,7 +47,7 @@ export default function ReservationPage() {
         label={hero.label}
         title={hero.title}
         subtitle={heroSubtitle}
-        backgroundImage="/reservation/interior/interior-01.png"
+        backgroundImage="/reservation/interior/interior-01.webp"
         breadcrumbItems={[
           { label: "Home", to: "/" },
           { label: "Reservation" },

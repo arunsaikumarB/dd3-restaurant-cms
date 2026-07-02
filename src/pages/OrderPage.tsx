@@ -19,8 +19,8 @@ const ORDER_OPTION_META: Record<
   string,
   Pick<OrderOption, "image" | "buttonColor" | "variant">
 > = {
-  direct: { image: "/showcase/biryani.jpg", buttonColor: "#ED3C18", variant: "desi" },
-  uber: { image: "/showcase/tandoori.jpg", buttonColor: "#FA9040", variant: "uber" },
+  direct: { image: "/showcase/biryani.webp", buttonColor: "#ED3C18", variant: "desi" },
+  uber: { image: "/showcase/tandoori.webp", buttonColor: "#FA9040", variant: "uber" },
 };
 
 type OrderOptionCmsItem = {
@@ -161,7 +161,7 @@ export default function OrderPage() {
         label="Order Online"
         title="Order Online"
         subtitle={`Order authentic Indian food from Desi Dhamaka${selectedLocation ? ` ${selectedLocation.shortName}` : ""}. Choose pickup or delivery — freshly prepared, delivered your way.`}
-        backgroundImage="/showcase/biryani.jpg"
+        backgroundImage="/showcase/biryani.webp"
         backgroundVideo="/media/hero.mp4"
         breadcrumbItems={[
           { label: "Home", to: "/" },

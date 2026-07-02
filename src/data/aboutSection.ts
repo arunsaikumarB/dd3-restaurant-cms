@@ -1,10 +1,10 @@
 export const ABOUT_MAIN_IMAGE = {
-  src: "/showcase/biryani.jpg",
+  src: "/showcase/biryani.webp",
   alt: "A beautiful spread of authentic Indian cuisine at Desi Dhamaka",
 };
 
 export const ABOUT_FLOATING_IMAGE = {
-  src: "/reservation/interior/interior-02.png",
+  src: "/reservation/interior/interior-02.webp",
   alt: "Desi Dhamaka restaurant reception and dining atmosphere",
 };
 

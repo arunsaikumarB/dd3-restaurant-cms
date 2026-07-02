@@ -51,7 +51,7 @@ export default function PageHero({
 }: PageHeroProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [usePoster, setUsePoster] = useState(!backgroundVideo);
-  const mediaSrc = backgroundImage ?? image ?? "/showcase/biryani.jpg";
+  const mediaSrc = backgroundImage ?? image ?? "/showcase/biryani.webp";
 
   const crumbs: BreadcrumbItem[] =
     breadcrumbItems ??

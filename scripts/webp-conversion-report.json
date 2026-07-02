@@ -1,0 +1,1076 @@
+{
+  "inventory": [
+    {
+      "path": "public/Bold-01.png",
+      "sizeKB": 35
+    },
+    {
+      "path": "public/catering-frames/frame_0001.jpg",
+      "sizeKB": 154
+    },
+    {
+      "path": "public/catering-frames/frame_0002.jpg",
+      "sizeKB": 152
+    },
+    {
+      "path": "public/catering-frames/frame_0003.jpg",
+      "sizeKB": 152
+    },
+    {
+      "path": "public/catering-frames/frame_0004.jpg",
+      "sizeKB": 152
+    },
+    {
+      "path": "public/catering-frames/frame_0005.jpg",
+      "sizeKB": 151
+    },
+    {
+      "path": "public/catering-frames/frame_0006.jpg",
+      "sizeKB": 153
+    },
+    {
+      "path": "public/catering-frames/frame_0007.jpg",
+      "sizeKB": 150
+    },
+    {
+      "path": "public/catering-frames/frame_0008.jpg",
+      "sizeKB": 150
+    },
+    {
+      "path": "public/catering-frames/frame_0009.jpg",
+      "sizeKB": 150
+    },
+    {
+      "path": "public/catering-frames/frame_0010.jpg",
+      "sizeKB": 149
+    },
+    {
+      "path": "public/catering-frames/frame_0011.jpg",
+      "sizeKB": 151
+    },
+    {
+      "path": "public/catering-frames/frame_0012.jpg",
+      "sizeKB": 148
+    },
+    {
+      "path": "public/catering-frames/frame_0013.jpg",
+      "sizeKB": 148
+    },
+    {
+      "path": "public/catering-frames/frame_0014.jpg",
+      "sizeKB": 145
+    },
+    {
+      "path": "public/catering-frames/frame_0015.jpg",
+      "sizeKB": 142
+    },
+    {
+      "path": "public/catering-frames/frame_0016.jpg",
+      "sizeKB": 143
+    },
+    {
+      "path": "public/catering-frames/frame_0017.jpg",
+      "sizeKB": 136
+    },
+    {
+      "path": "public/catering-frames/frame_0018.jpg",
+      "sizeKB": 134
+    },
+    {
+      "path": "public/catering-frames/frame_0019.jpg",
+      "sizeKB": 131
+    },
+    {
+      "path": "public/catering-frames/frame_0020.jpg",
+      "sizeKB": 129
+    },
+    {
+      "path": "public/catering-frames/frame_0021.jpg",
+      "sizeKB": 127
+    },
+    {
+      "path": "public/catering-frames/frame_0022.jpg",
+      "sizeKB": 116
+    },
+    {
+      "path": "public/catering-frames/frame_0023.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0024.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0025.jpg",
+      "sizeKB": 105
+    },
+    {
+      "path": "public/catering-frames/frame_0026.jpg",
+      "sizeKB": 104
+    },
+    {
+      "path": "public/catering-frames/frame_0027.jpg",
+      "sizeKB": 107
+    },
+    {
+      "path": "public/catering-frames/frame_0028.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0029.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/catering-frames/frame_0030.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0031.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0032.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0033.jpg",
+      "sizeKB": 114
+    },
+    {
+      "path": "public/catering-frames/frame_0034.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/catering-frames/frame_0035.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0036.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0037.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0038.jpg",
+      "sizeKB": 115
+    },
+    {
+      "path": "public/catering-frames/frame_0039.jpg",
+      "sizeKB": 118
+    },
+    {
+      "path": "public/catering-frames/frame_0040.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0041.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0042.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0043.jpg",
+      "sizeKB": 114
+    },
+    {
+      "path": "public/catering-frames/frame_0044.jpg",
+      "sizeKB": 116
+    },
+    {
+      "path": "public/catering-frames/frame_0045.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0046.jpg",
+      "sizeKB": 111
+    },
+    {
+      "path": "public/catering-frames/frame_0047.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0048.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0049.jpg",
+      "sizeKB": 115
+    },
+    {
+      "path": "public/catering-frames/frame_0050.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0051.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0052.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0053.jpg",
+      "sizeKB": 115
+    },
+    {
+      "path": "public/catering-frames/frame_0054.jpg",
+      "sizeKB": 118
+    },
+    {
+      "path": "public/catering-frames/frame_0055.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0056.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0057.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0058.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0059.jpg",
+      "sizeKB": 115
+    },
+    {
+      "path": "public/catering-frames/frame_0060.jpg",
+      "sizeKB": 111
+    },
+    {
+      "path": "public/catering-frames/frame_0061.jpg",
+      "sizeKB": 110
+    },
+    {
+      "path": "public/catering-frames/frame_0062.jpg",
+      "sizeKB": 110
+    },
+    {
+      "path": "public/catering-frames/frame_0063.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0064.jpg",
+      "sizeKB": 115
+    },
+    {
+      "path": "public/catering-frames/frame_0065.jpg",
+      "sizeKB": 110
+    },
+    {
+      "path": "public/catering-frames/frame_0066.jpg",
+      "sizeKB": 111
+    },
+    {
+      "path": "public/catering-frames/frame_0067.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0068.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0069.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/catering-frames/frame_0070.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/catering-frames/frame_0071.jpg",
+      "sizeKB": 114
+    },
+    {
+      "path": "public/catering-frames/frame_0072.jpg",
+      "sizeKB": 115
+    },
+    {
+      "path": "public/catering-frames/frame_0073.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/catering-frames/frame_0074.jpg",
+      "sizeKB": 120
+    },
+    {
+      "path": "public/catering-frames/frame_0075.jpg",
+      "sizeKB": 116
+    },
+    {
+      "path": "public/catering-frames/frame_0076.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/catering-frames/frame_0077.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/catering-frames/frame_0078.jpg",
+      "sizeKB": 118
+    },
+    {
+      "path": "public/catering-frames/frame_0079.jpg",
+      "sizeKB": 121
+    },
+    {
+      "path": "public/catering-frames/frame_0080.jpg",
+      "sizeKB": 118
+    },
+    {
+      "path": "public/catering-frames/frame_0081.jpg",
+      "sizeKB": 116
+    },
+    {
+      "path": "public/catering-frames/frame_0082.jpg",
+      "sizeKB": 116
+    },
+    {
+      "path": "public/catering-frames/frame_0083.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/catering-frames/frame_0084.jpg",
+      "sizeKB": 119
+    },
+    {
+      "path": "public/catering-frames/frame_0085.jpg",
+      "sizeKB": 114
+    },
+    {
+      "path": "public/catering-frames/frame_0086.jpg",
+      "sizeKB": 110
+    },
+    {
+      "path": "public/catering-frames/frame_0087.jpg",
+      "sizeKB": 109
+    },
+    {
+      "path": "public/catering-frames/frame_0088.jpg",
+      "sizeKB": 110
+    },
+    {
+      "path": "public/catering-frames/frame_0089.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/catering-frames/frame_0090.jpg",
+      "sizeKB": 108
+    },
+    {
+      "path": "public/catering-frames/frame_0091.jpg",
+      "sizeKB": 107
+    },
+    {
+      "path": "public/catering-frames/frame_0092.jpg",
+      "sizeKB": 107
+    },
+    {
+      "path": "public/catering-frames/frame_0093.jpg",
+      "sizeKB": 109
+    },
+    {
+      "path": "public/catering-frames/frame_0094.jpg",
+      "sizeKB": 110
+    },
+    {
+      "path": "public/catering-frames/frame_0095.jpg",
+      "sizeKB": 107
+    },
+    {
+      "path": "public/catering-frames/frame_0096.jpg",
+      "sizeKB": 106
+    },
+    {
+      "path": "public/catering-frames/frame_0097.jpg",
+      "sizeKB": 107
+    },
+    {
+      "path": "public/catering-frames/frame_0098.jpg",
+      "sizeKB": 109
+    },
+    {
+      "path": "public/catering-frames/frame_0099.jpg",
+      "sizeKB": 111
+    },
+    {
+      "path": "public/catering-frames/frame_0100.jpg",
+      "sizeKB": 107
+    },
+    {
+      "path": "public/catering-frames/frame_0101.jpg",
+      "sizeKB": 106
+    },
+    {
+      "path": "public/catering-frames/frame_0102.jpg",
+      "sizeKB": 105
+    },
+    {
+      "path": "public/catering-frames/frame_0103.jpg",
+      "sizeKB": 106
+    },
+    {
+      "path": "public/catering-frames/frame_0104.jpg",
+      "sizeKB": 107
+    },
+    {
+      "path": "public/catering-frames/frame_0105.jpg",
+      "sizeKB": 102
+    },
+    {
+      "path": "public/catering-frames/frame_0106.jpg",
+      "sizeKB": 100
+    },
+    {
+      "path": "public/catering-frames/frame_0107.jpg",
+      "sizeKB": 96
+    },
+    {
+      "path": "public/catering-frames/frame_0108.jpg",
+      "sizeKB": 95
+    },
+    {
+      "path": "public/catering-frames/frame_0109.jpg",
+      "sizeKB": 95
+    },
+    {
+      "path": "public/catering-frames/frame_0110.jpg",
+      "sizeKB": 89
+    },
+    {
+      "path": "public/catering-frames/frame_0111.jpg",
+      "sizeKB": 89
+    },
+    {
+      "path": "public/catering-frames/frame_0112.jpg",
+      "sizeKB": 93
+    },
+    {
+      "path": "public/catering-frames/frame_0113.jpg",
+      "sizeKB": 96
+    },
+    {
+      "path": "public/catering-frames/frame_0114.jpg",
+      "sizeKB": 105
+    },
+    {
+      "path": "public/catering-frames/frame_0115.jpg",
+      "sizeKB": 109
+    },
+    {
+      "path": "public/catering-frames/frame_0116.jpg",
+      "sizeKB": 116
+    },
+    {
+      "path": "public/catering-frames/frame_0117.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/catering-frames/frame_0118.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/catering-frames/frame_0119.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/catering-frames/frame_0120.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/DD logo.png",
+      "sizeKB": 35
+    },
+    {
+      "path": "public/frames/frame_0001.jpg",
+      "sizeKB": 125
+    },
+    {
+      "path": "public/frames/frame_0002.jpg",
+      "sizeKB": 122
+    },
+    {
+      "path": "public/frames/frame_0003.jpg",
+      "sizeKB": 121
+    },
+    {
+      "path": "public/frames/frame_0004.jpg",
+      "sizeKB": 121
+    },
+    {
+      "path": "public/frames/frame_0005.jpg",
+      "sizeKB": 119
+    },
+    {
+      "path": "public/frames/frame_0006.jpg",
+      "sizeKB": 121
+    },
+    {
+      "path": "public/frames/frame_0007.jpg",
+      "sizeKB": 118
+    },
+    {
+      "path": "public/frames/frame_0008.jpg",
+      "sizeKB": 119
+    },
+    {
+      "path": "public/frames/frame_0009.jpg",
+      "sizeKB": 120
+    },
+    {
+      "path": "public/frames/frame_0010.jpg",
+      "sizeKB": 119
+    },
+    {
+      "path": "public/frames/frame_0011.jpg",
+      "sizeKB": 122
+    },
+    {
+      "path": "public/frames/frame_0012.jpg",
+      "sizeKB": 119
+    },
+    {
+      "path": "public/frames/frame_0013.jpg",
+      "sizeKB": 119
+    },
+    {
+      "path": "public/frames/frame_0014.jpg",
+      "sizeKB": 119
+    },
+    {
+      "path": "public/frames/frame_0015.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/frames/frame_0016.jpg",
+      "sizeKB": 121
+    },
+    {
+      "path": "public/frames/frame_0017.jpg",
+      "sizeKB": 118
+    },
+    {
+      "path": "public/frames/frame_0018.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/frames/frame_0019.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/frames/frame_0020.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/frames/frame_0021.jpg",
+      "sizeKB": 120
+    },
+    {
+      "path": "public/frames/frame_0022.jpg",
+      "sizeKB": 118
+    },
+    {
+      "path": "public/frames/frame_0023.jpg",
+      "sizeKB": 118
+    },
+    {
+      "path": "public/frames/frame_0024.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/frames/frame_0025.jpg",
+      "sizeKB": 116
+    },
+    {
+      "path": "public/frames/frame_0026.jpg",
+      "sizeKB": 119
+    },
+    {
+      "path": "public/frames/frame_0027.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/frames/frame_0028.jpg",
+      "sizeKB": 117
+    },
+    {
+      "path": "public/frames/frame_0029.jpg",
+      "sizeKB": 115
+    },
+    {
+      "path": "public/frames/frame_0030.jpg",
+      "sizeKB": 114
+    },
+    {
+      "path": "public/frames/frame_0031.jpg",
+      "sizeKB": 116
+    },
+    {
+      "path": "public/frames/frame_0032.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/frames/frame_0033.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/frames/frame_0034.jpg",
+      "sizeKB": 112
+    },
+    {
+      "path": "public/frames/frame_0035.jpg",
+      "sizeKB": 110
+    },
+    {
+      "path": "public/frames/frame_0036.jpg",
+      "sizeKB": 113
+    },
+    {
+      "path": "public/frames/frame_0037.jpg",
+      "sizeKB": 109
+    },
+    {
+      "path": "public/frames/frame_0038.jpg",
+      "sizeKB": 108
+    },
+    {
+      "path": "public/frames/frame_0039.jpg",
+      "sizeKB": 107
+    },
+    {
+      "path": "public/frames/frame_0040.jpg",
+      "sizeKB": 105
+    },
+    {
+      "path": "public/frames/frame_0041.jpg",
+      "sizeKB": 106
+    },
+    {
+      "path": "public/frames/frame_0042.jpg",
+      "sizeKB": 104
+    },
+    {
+      "path": "public/frames/frame_0043.jpg",
+      "sizeKB": 102
+    },
+    {
+      "path": "public/frames/frame_0044.jpg",
+      "sizeKB": 102
+    },
+    {
+      "path": "public/frames/frame_0045.jpg",
+      "sizeKB": 103
+    },
+    {
+      "path": "public/frames/frame_0046.jpg",
+      "sizeKB": 106
+    },
+    {
+      "path": "public/frames/frame_0047.jpg",
+      "sizeKB": 102
+    },
+    {
+      "path": "public/frames/frame_0048.jpg",
+      "sizeKB": 102
+    },
+    {
+      "path": "public/frames/frame_0049.jpg",
+      "sizeKB": 104
+    },
+    {
+      "path": "public/frames/frame_0050.jpg",
+      "sizeKB": 103
+    },
+    {
+      "path": "public/frames/frame_0051.jpg",
+      "sizeKB": 108
+    },
+    {
+      "path": "public/frames/frame_0052.jpg",
+      "sizeKB": 106
+    },
+    {
+      "path": "public/frames/frame_0053.jpg",
+      "sizeKB": 106
+    },
+    {
+      "path": "public/frames/frame_0054.jpg",
+      "sizeKB": 105
+    },
+    {
+      "path": "public/frames/frame_0055.jpg",
+      "sizeKB": 103
+    },
+    {
+      "path": "public/frames/frame_0056.jpg",
+      "sizeKB": 107
+    },
+    {
+      "path": "public/frames/frame_0057.jpg",
+      "sizeKB": 104
+    },
+    {
+      "path": "public/frames/frame_0058.jpg",
+      "sizeKB": 104
+    },
+    {
+      "path": "public/frames/frame_0059.jpg",
+      "sizeKB": 103
+    },
+    {
+      "path": "public/frames/frame_0060.jpg",
+      "sizeKB": 100
+    },
+    {
+      "path": "public/frames/frame_0061.jpg",
+      "sizeKB": 103
+    },
+    {
+      "path": "public/frames/frame_0062.jpg",
+      "sizeKB": 100
+    },
+    {
+      "path": "public/frames/frame_0063.jpg",
+      "sizeKB": 100
+    },
+    {
+      "path": "public/frames/frame_0064.jpg",
+      "sizeKB": 100
+    },
+    {
+      "path": "public/frames/frame_0065.jpg",
+      "sizeKB": 98
+    },
+    {
+      "path": "public/frames/frame_0066.jpg",
+      "sizeKB": 101
+    },
+    {
+      "path": "public/frames/frame_0067.jpg",
+      "sizeKB": 98
+    },
+    {
+      "path": "public/frames/frame_0068.jpg",
+      "sizeKB": 98
+    },
+    {
+      "path": "public/frames/frame_0069.jpg",
+      "sizeKB": 95
+    },
+    {
+      "path": "public/frames/frame_0070.jpg",
+      "sizeKB": 95
+    },
+    {
+      "path": "public/frames/frame_0071.jpg",
+      "sizeKB": 99
+    },
+    {
+      "path": "public/frames/frame_0072.jpg",
+      "sizeKB": 95
+    },
+    {
+      "path": "public/frames/frame_0073.jpg",
+      "sizeKB": 95
+    },
+    {
+      "path": "public/frames/frame_0074.jpg",
+      "sizeKB": 95
+    },
+    {
+      "path": "public/frames/frame_0075.jpg",
+      "sizeKB": 93
+    },
+    {
+      "path": "public/frames/frame_0076.jpg",
+      "sizeKB": 96
+    },
+    {
+      "path": "public/frames/frame_0077.jpg",
+      "sizeKB": 93
+    },
+    {
+      "path": "public/frames/frame_0078.jpg",
+      "sizeKB": 91
+    },
+    {
+      "path": "public/frames/frame_0079.jpg",
+      "sizeKB": 90
+    },
+    {
+      "path": "public/frames/frame_0080.jpg",
+      "sizeKB": 88
+    },
+    {
+      "path": "public/frames/frame_0081.jpg",
+      "sizeKB": 90
+    },
+    {
+      "path": "public/frames/frame_0082.jpg",
+      "sizeKB": 87
+    },
+    {
+      "path": "public/frames/frame_0083.jpg",
+      "sizeKB": 86
+    },
+    {
+      "path": "public/frames/frame_0084.jpg",
+      "sizeKB": 85
+    },
+    {
+      "path": "public/frames/frame_0085.jpg",
+      "sizeKB": 83
+    },
+    {
+      "path": "public/frames/frame_0086.jpg",
+      "sizeKB": 85
+    },
+    {
+      "path": "public/frames/frame_0087.jpg",
+      "sizeKB": 82
+    },
+    {
+      "path": "public/frames/frame_0088.jpg",
+      "sizeKB": 81
+    },
+    {
+      "path": "public/frames/frame_0089.jpg",
+      "sizeKB": 79
+    },
+    {
+      "path": "public/frames/frame_0090.jpg",
+      "sizeKB": 80
+    },
+    {
+      "path": "public/frames/frame_0091.jpg",
+      "sizeKB": 83
+    },
+    {
+      "path": "public/frames/frame_0092.jpg",
+      "sizeKB": 80
+    },
+    {
+      "path": "public/frames/frame_0093.jpg",
+      "sizeKB": 81
+    },
+    {
+      "path": "public/frames/frame_0094.jpg",
+      "sizeKB": 83
+    },
+    {
+      "path": "public/frames/frame_0095.jpg",
+      "sizeKB": 83
+    },
+    {
+      "path": "public/frames/frame_0096.jpg",
+      "sizeKB": 88
+    },
+    {
+      "path": "public/frames/frame_0097.jpg",
+      "sizeKB": 87
+    },
+    {
+      "path": "public/frames/frame_0098.jpg",
+      "sizeKB": 87
+    },
+    {
+      "path": "public/frames/frame_0099.jpg",
+      "sizeKB": 86
+    },
+    {
+      "path": "public/frames/frame_0100.jpg",
+      "sizeKB": 85
+    },
+    {
+      "path": "public/frames/frame_0101.jpg",
+      "sizeKB": 88
+    },
+    {
+      "path": "public/frames/frame_0102.jpg",
+      "sizeKB": 85
+    },
+    {
+      "path": "public/frames/frame_0103.jpg",
+      "sizeKB": 84
+    },
+    {
+      "path": "public/frames/frame_0104.jpg",
+      "sizeKB": 85
+    },
+    {
+      "path": "public/frames/frame_0105.jpg",
+      "sizeKB": 83
+    },
+    {
+      "path": "public/frames/frame_0106.jpg",
+      "sizeKB": 87
+    },
+    {
+      "path": "public/frames/frame_0107.jpg",
+      "sizeKB": 88
+    },
+    {
+      "path": "public/frames/frame_0108.jpg",
+      "sizeKB": 91
+    },
+    {
+      "path": "public/frames/frame_0109.jpg",
+      "sizeKB": 100
+    },
+    {
+      "path": "public/frames/frame_0110.jpg",
+      "sizeKB": 109
+    },
+    {
+      "path": "public/frames/frame_0111.jpg",
+      "sizeKB": 119
+    },
+    {
+      "path": "public/frames/frame_0112.jpg",
+      "sizeKB": 130
+    },
+    {
+      "path": "public/frames/frame_0113.jpg",
+      "sizeKB": 136
+    },
+    {
+      "path": "public/frames/frame_0114.jpg",
+      "sizeKB": 143
+    },
+    {
+      "path": "public/frames/frame_0115.jpg",
+      "sizeKB": 157
+    },
+    {
+      "path": "public/frames/frame_0116.jpg",
+      "sizeKB": 165
+    },
+    {
+      "path": "public/frames/frame_0117.jpg",
+      "sizeKB": 166
+    },
+    {
+      "path": "public/frames/frame_0118.jpg",
+      "sizeKB": 167
+    },
+    {
+      "path": "public/frames/frame_0119.jpg",
+      "sizeKB": 167
+    },
+    {
+      "path": "public/frames/frame_0120.jpg",
+      "sizeKB": 166
+    },
+    {
+      "path": "public/hero/hero-poster.jpg",
+      "sizeKB": 102
+    },
+    {
+      "path": "public/logo/desi-dhamaka-logo-source.jpg",
+      "sizeKB": 52
+    },
+    {
+      "path": "public/logo/desi-dhamaka-logo.png",
+      "sizeKB": 223
+    },
+    {
+      "path": "public/reservation/interior/interior-01.png",
+      "sizeKB": 121
+    },
+    {
+      "path": "public/reservation/interior/interior-02.png",
+      "sizeKB": 155
+    },
+    {
+      "path": "public/reservation/interior/interior-03.png",
+      "sizeKB": 122
+    },
+    {
+      "path": "public/reservation/interior/interior-04.png",
+      "sizeKB": 147
+    },
+    {
+      "path": "public/reservation/interior/interior-05.png",
+      "sizeKB": 133
+    },
+    {
+      "path": "public/reservation/interior/interior-06.png",
+      "sizeKB": 161
+    },
+    {
+      "path": "public/reservation/interior/interior-07.png",
+      "sizeKB": 176
+    },
+    {
+      "path": "public/reservation/interior/interior-08.png",
+      "sizeKB": 130
+    },
+    {
+      "path": "public/reservation/interior/interior-09.png",
+      "sizeKB": 144
+    },
+    {
+      "path": "public/reservation/interior/interior-10.png",
+      "sizeKB": 132
+    },
+    {
+      "path": "public/reservation/interior/interior-11.png",
+      "sizeKB": 116
+    },
+    {
+      "path": "public/reservation/interior/interior-12.png",
+      "sizeKB": 144
+    },
+    {
+      "path": "public/reservation/interior/interior-13.png",
+      "sizeKB": 168
+    },
+    {
+      "path": "public/reservation/interior/interior-14.png",
+      "sizeKB": 140
+    },
+    {
+      "path": "public/reservation/reservation-banner.png",
+      "sizeKB": 99
+    },
+    {
+      "path": "public/showcase/biryani.jpg",
+      "sizeKB": 423
+    },
+    {
+      "path": "public/showcase/butter-chicken.jpg",
+      "sizeKB": 401
+    },
+    {
+      "path": "public/showcase/desserts-falooda.jpg",
+      "sizeKB": 208
+    },
+    {
+      "path": "public/showcase/indo-chinese.jpg",
+      "sizeKB": 420
+    },
+    {
+      "path": "public/showcase/mandi.jpg",
+      "sizeKB": 374
+    },
+    {
+      "path": "public/showcase/tandoori.jpg",
+      "sizeKB": 462
+    }
+  ],
+  "totalBefore": 32383175,
+  "totalAfter": 22296318,
+  "saved": 10086857,
+  "keptOriginals": [
+    "showcase/biryani.jpg"
+  ],
+  "converted": 266,
+  "deleted": 265
+}

@@ -40,7 +40,7 @@ import {
   type MenuCategoryErrors,
 } from "../../utils/validation/menuCategories";
 
-const FALLBACK_IMAGE = "/showcase/biryani.jpg";
+const FALLBACK_IMAGE = "/showcase/biryani.webp";
 
 type SortOption = "display_order" | "name" | "newest" | "oldest";
 

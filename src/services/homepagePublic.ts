@@ -53,7 +53,7 @@ export type HomepageBundle = {
 const HERO_TITLE_FALLBACK = "Step inside\nthe experience";
 const HERO_SUBTITLE_FALLBACK =
   "Scroll to walk through our doors — from the entrance to the heart of the reception, frame by cinematic frame.";
-const HERO_IMAGE_FALLBACK = "/hero/hero-poster.jpg";
+const HERO_IMAGE_FALLBACK = "/hero/hero-poster.webp";
 const HERO_VIDEO_FALLBACK = "/media/hero.mp4";
 const ABOUT_TITLE_FALLBACK = "Authentic Flavours,\nWarm Hospitality";
 const ABOUT_DESCRIPTION_FALLBACK =

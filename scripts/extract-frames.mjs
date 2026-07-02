@@ -120,7 +120,7 @@ function run() {
   }
   mkdirSync(outDir, { recursive: true });
 
-  const pattern = "frame_%04d.jpg";
+  const pattern = "frame_%04d.webp";
   const ffmpegArgs = [
     "-y",
     "-i",
@@ -140,7 +140,7 @@ function run() {
   }
 
   const frames = readdirSync(outDir)
-    .filter((f) => f.endsWith(".jpg"))
+    .filter((f) => f.endsWith(".webp"))
     .sort();
 
   // Derive the public web path for the output dir (public/ is served at "/").
@@ -159,7 +159,7 @@ function run() {
     aspectRatio: outWidth / outHeight,
     duration,
     // URL template relative to the web root (public/ is served at "/").
-    urlPattern: `${urlBase}/frame_%04d.jpg`,
+    urlPattern: `${urlBase}/frame_%04d.webp`,
     frames: frames.map((f) => `${urlBase}/${f}`),
   };
 

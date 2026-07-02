@@ -22,7 +22,7 @@ export interface ImageSequenceScrollProps {
   /** Explicit list of frame image URLs, in playback order. */
   frames?: string[];
   /**
-   * URL template using printf-style padding, e.g. "/frames/frame_%04d.jpg".
+   * URL template using printf-style padding, e.g. "/frames/frame_%04d.webp".
    * Used together with `frameCount` when `frames` is not provided.
    */
   urlPattern?: string;
@@ -64,7 +64,7 @@ function pad(num: number, size: number): string {
   return String(num).padStart(size, "0");
 }
 
-/** Resolve "/frames/frame_%04d.jpg" with the given number. */
+/** Resolve "/frames/frame_%04d.webp" with the given number. */
 function formatPattern(pattern: string, value: number): string {
   return pattern.replace(/%0?(\d*)d/g, (_m, widthStr: string) => {
     const w = widthStr ? parseInt(widthStr, 10) : 0;

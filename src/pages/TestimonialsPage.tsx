@@ -49,7 +49,7 @@ function AnimatedRating({ value }: { value: number }) {
 export default function TestimonialsPage() {
   const { fetchSection } = usePageContent();
   const { reviews, loading } = useReviewsData();
-  const heroBackground = useSectionImage("testimonials_hero", "/showcase/butter-chicken.jpg");
+  const heroBackground = useSectionImage("testimonials_hero", "/showcase/butter-chicken.webp");
   const [index, setIndex] = useState(0);
 
   const hero = fetchSection("testimonials", "hero", {

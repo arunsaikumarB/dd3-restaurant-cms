@@ -41,7 +41,7 @@ import {
   type MenuItemErrors,
 } from "../../utils/validation/menuItems";
 
-const FALLBACK_IMAGE = "/showcase/biryani.jpg";
+const FALLBACK_IMAGE = "/showcase/biryani.webp";
 
 type SortOption =
   | "display_order"

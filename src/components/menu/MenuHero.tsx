@@ -8,7 +8,7 @@ export default function MenuHero() {
       aria-labelledby="menu-hero-title"
     >
       <img
-        src="/showcase/biryani.jpg"
+        src="/showcase/biryani.webp"
         alt=""
         aria-hidden
         className="absolute inset-0 h-full w-full object-cover"

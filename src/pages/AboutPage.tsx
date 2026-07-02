@@ -65,17 +65,17 @@ export default function AboutPage() {
     cta: { label: "Reserve Now", url: "/reservation" },
   });
 
-  const heroBackground = useSectionImage("about_hero", "/showcase/mandi.jpg");
+  const heroBackground = useSectionImage("about_hero", "/showcase/mandi.webp");
   const traditionImages = useGallerySection("about_tradition");
   const flavoursImages = useGallerySection("about_flavours");
   const craftedImages = useGallerySection("about_crafted");
   const journeyImages = useGallerySection("about_journey");
 
-  const missionImage = traditionImages[0]?.image ?? "/showcase/tandoori.jpg";
+  const missionImage = traditionImages[0]?.image ?? "/showcase/tandoori.webp";
   const missionAlt = traditionImages[0]?.alt_text ?? "Tandoori platter at Desi Dhamaka";
-  const cuisineImage = flavoursImages[0]?.image ?? "/showcase/butter-chicken.jpg";
+  const cuisineImage = flavoursImages[0]?.image ?? "/showcase/butter-chicken.webp";
   const cuisineAlt = flavoursImages[0]?.alt_text ?? "Authentic Indian cuisine";
-  const chefImage = craftedImages[0]?.image ?? "/showcase/indo-chinese.jpg";
+  const chefImage = craftedImages[0]?.image ?? "/showcase/indo-chinese.webp";
   const chefAlt = craftedImages[0]?.alt_text ?? "Chef preparing cuisine";
   const bottomGallery = toGalleryGridImages(journeyImages);
 

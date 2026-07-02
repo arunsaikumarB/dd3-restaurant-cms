@@ -35,7 +35,7 @@ export function buildDefaultHomepageContent(
       "subtitle",
       "Experience the rich flavors of India in Lawrenceville, NJ",
     ),
-    hero_image: "/hero/hero-poster.jpg",
+    hero_image: "/hero/hero-poster.webp",
     hero_video: "/media/hero.mp4",
     primary_cta_label: "Order Now",
     primary_cta_url: getOrderUrl(locationId),
