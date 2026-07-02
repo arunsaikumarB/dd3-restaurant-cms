@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { DEFAULT_PUBLIC_LOCATION_ID } from "../config/locations";
 import { useLocationSelection } from "../context/LocationContext";
-import { trackPageView } from "../services/analytics";
+import { trackPageView, normalizePagePath } from "../services/analytics";
 
 export function usePageTracking(): void {
   const { pathname } = useLocation();
@@ -22,6 +22,6 @@ export function usePageTracking(): void {
     }
 
     lastTrackedRef.current = { path: pathname, at: now };
-    trackPageView(pathname, selectedLocationId ?? DEFAULT_PUBLIC_LOCATION_ID);
+    trackPageView(normalizePagePath(pathname), selectedLocationId ?? DEFAULT_PUBLIC_LOCATION_ID);
   }, [pathname, selectedLocationId]);
 }

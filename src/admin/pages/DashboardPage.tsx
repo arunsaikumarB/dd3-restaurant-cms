@@ -25,7 +25,6 @@ import type { AdminStat, ActivityItem } from "../types";
 
 const activityIcons: Record<ActivityItem["type"], typeof Tag> = {
   menu: Tag,
-  reservation: Tag,
   offer: Tag,
   gallery: Image,
   review: Star,

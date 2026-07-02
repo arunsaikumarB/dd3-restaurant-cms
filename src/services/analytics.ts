@@ -38,6 +38,26 @@ function isTrackingEnabled(pathname: string): boolean {
   return true;
 }
 
+const LOCATION_PREFIX_RE =
+  /^\/(south-plainfield|oak-tree|lawrenceville)(?=\/|$)/;
+
+/**
+ * Normalizes a browser pathname for analytics: strips the location prefix
+ * (location_id is its own column) and the trailing slash, and maps legacy
+ * segment names to their canonical replacements.
+ * e.g. "/oak-tree/special-offers/" -> "/special-offers".
+ */
+export function normalizePagePath(pathname: string): string {
+  let path = pathname.replace(LOCATION_PREFIX_RE, "");
+  if (path.length > 1 && path.endsWith("/")) path = path.slice(0, -1);
+  if (path === "" ) path = "/";
+  if (path === "/offers" || path.startsWith("/offers/")) {
+    path = path.replace("/offers", "/special-offers");
+  }
+  if (path === "/order") path = "/online-ordering";
+  return path;
+}
+
 export function getSessionId(): string {
   if (typeof window === "undefined") return "server";
   try {
@@ -123,7 +143,7 @@ export function trackOfferView(
   offerId: string,
   offerTitle: string,
   locationId: LocationId,
-  pagePath = "/offers",
+  pagePath = "/special-offers",
 ): void {
   const dedupeKey = `${locationId}:${offerId}`;
   const seen = readOfferViewSet();

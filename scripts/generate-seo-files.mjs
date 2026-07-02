@@ -10,18 +10,28 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 const distDir = join(root, "dist");
 
+const LOCATION_IDS = ["south-plainfield", "oak-tree", "lawrenceville"];
+
+const LOCATION_PAGE_SEGMENTS = [
+  "", // location home, e.g. /south-plainfield/
+  "about",
+  "menu",
+  "special-offers",
+  "online-ordering",
+  "catering",
+  "parties",
+  "testimonials",
+  "contact",
+  "reservation",
+  "privacy-policy",
+  "terms-conditions",
+];
+
 const PUBLIC_ROUTES = [
   "/",
-  "/about",
-  "/menu",
-  "/catering",
-  "/parties",
-  "/testimonials",
-  "/contact",
-  "/order",
-  "/gallery",
-  "/offers",
-  "/reservation",
+  ...LOCATION_IDS.flatMap((loc) =>
+    LOCATION_PAGE_SEGMENTS.map((seg) => (seg ? `/${loc}/${seg}/` : `/${loc}/`)),
+  ),
 ];
 
 function loadEnvFile(path) {

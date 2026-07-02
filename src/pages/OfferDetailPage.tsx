@@ -1,11 +1,12 @@
 import { useEffect, useState, type MouseEvent } from "react";
-import { Link, Navigate, useLocation, useParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import OffersGrid from "../components/offers/OffersGrid";
 import Button from "../components/ui/Button";
 import SectionPlaceholder from "../components/ui/SectionPlaceholder";
 import type { LocationId } from "../config/locations";
 import { getLocationConfig } from "../config/locations";
 import { useLocationSelection } from "../context/LocationContext";
+import { locPath } from "../utils/locationPaths";
 import {
   getOfferOrderPath,
   isInternalOfferOrderPath,
@@ -31,7 +32,8 @@ type ResolvedOffer = {
 export default function OfferDetailPage({ forcedLocationId }: OfferDetailPageProps) {
   const { slug } = useParams<{ slug: string }>();
   const { pathname } = useLocation();
-  const { selectedLocationId, setLocation, navigateWithLocationGuard } = useLocationSelection();
+  const navigate = useNavigate();
+  const { selectedLocationId, setLocation } = useLocationSelection();
   const [resolved, setResolved] = useState<ResolvedOffer | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -76,7 +78,7 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
   }, [forcedLocationId, resolved, selectedLocationId, setLocation]);
 
   if (!slug) {
-    return <Navigate to="/offers" replace />;
+    return <Navigate to={locPath(selectedLocationId, "/special-offers")} replace />;
   }
 
   if (loading) {
@@ -84,7 +86,7 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
   }
 
   if (notFound || !resolved) {
-    return <Navigate to="/offers" replace />;
+    return <Navigate to={locPath(selectedLocationId, "/special-offers")} replace />;
   }
 
   const { locationId, offer, offers } = resolved;
@@ -93,20 +95,24 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
   const heroImage = offer.gallery[0] ?? offer.image;
   const orderPath = getOfferOrderPath(locationId, offer);
   const orderIsInternal = isInternalOfferOrderPath(orderPath);
+  const [orderPathBase, orderPathQuery] = orderPath.split("?");
+  const scopedOrderPath = `${locPath(locationId, orderPathBase)}${orderPathQuery ? `?${orderPathQuery}` : ""}`;
+  const scopedOffersPath = locPath(locationId, "/special-offers");
+  const scopedReservationPath = locPath(locationId, "/reservation");
 
   const handleOrderClick = (event: MouseEvent<HTMLElement>) => {
     trackOfferClick(offer.id, offer.title, locationId, pathname);
     if (!orderIsInternal) return;
     event.preventDefault();
     setLocation(locationId);
-    navigateWithLocationGuard(orderPath);
+    navigate(scopedOrderPath);
   };
 
   const handleReserveClick = (event: MouseEvent<HTMLElement>) => {
     trackOfferClick(offer.id, offer.title, locationId, pathname);
     event.preventDefault();
     setLocation(locationId);
-    navigateWithLocationGuard("/reservation");
+    navigate(scopedReservationPath);
   };
 
   return (
@@ -123,7 +129,7 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
           <div className="offer-detail-hero__overlay" aria-hidden />
         </div>
         <div className="offer-detail-hero__inner">
-          <Link to="/offers" className="offer-detail-hero__back">
+          <Link to={scopedOffersPath} className="offer-detail-hero__back">
             ← Back to Offers
           </Link>
           {offer.badge ? (
@@ -206,13 +212,13 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
 
         <section className="offer-detail-actions" aria-label="Offer actions">
           <Button
-            to="/reservation"
+            to={scopedReservationPath}
             onClick={handleReserveClick}
           >
             Reserve Table
           </Button>
           {orderIsInternal ? (
-            <Button variant="outline" to={orderPath} onClick={handleOrderClick}>
+            <Button variant="outline" to={scopedOrderPath} onClick={handleOrderClick}>
               Order Now
             </Button>
           ) : (
@@ -228,7 +234,7 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
               <h2 id="related-offers-title" className="offer-detail-related__title">
                 Related Offers
               </h2>
-              <Link to="/offers" className="offer-detail-related__link">
+              <Link to={scopedOffersPath} className="offer-detail-related__link">
                 View all offers
               </Link>
             </div>

@@ -11,6 +11,7 @@ import { useLocationSelection } from "../context/LocationContext";
 import { usePageContent } from "../context/PageContentContext";
 import { useHomepageData } from "../hooks/useHomepageData";
 import { resolveOrderUrl } from "../utils/locationLinks";
+import { locPath } from "../utils/locationPaths";
 import "../components/order/order.css";
 
 const ReservationCTA = lazy(() => import("../components/order/ReservationCTA"));
@@ -21,6 +22,7 @@ const ORDER_OPTION_META: Record<
 > = {
   direct: { image: "/showcase/biryani.webp", buttonColor: "#ED3C18", variant: "desi" },
   uber: { image: "/showcase/tandoori.webp", buttonColor: "#FA9040", variant: "uber" },
+  doordash: { image: "/showcase/biryani.webp", buttonColor: "#EF2B2D", variant: "doordash" },
 };
 
 type OrderOptionCmsItem = {
@@ -130,6 +132,12 @@ export default function OrderPage() {
         buttonText = interpolate(cmsItem.buttonTextTemplate);
       }
 
+      const platformHref: Record<string, string> = {
+        direct: directHref,
+        uber: selectedLocation?.uberEatsLink || locPath(selectedLocationId, "/online-ordering"),
+        doordash: selectedLocation?.doorDashLink || locPath(selectedLocationId, "/online-ordering"),
+      };
+
       return {
         id: cmsItem.id,
         brand: cmsItem.brand || fallback.brand,
@@ -140,7 +148,7 @@ export default function OrderPage() {
         imageAlt: cmsItem.imageAlt || fallback.imageAlt,
         pills: normalizePills(cmsItem.pills, fallback.pills),
         buttonText,
-        buttonHref: isDirect ? directHref : selectedLocation?.uberEatsLink ?? "/order",
+        buttonHref: platformHref[cmsItem.id] ?? locPath(selectedLocationId, "/online-ordering"),
         buttonColor: meta.buttonColor,
         variant: meta.variant,
       };
@@ -164,7 +172,7 @@ export default function OrderPage() {
         backgroundImage="/showcase/biryani.webp"
         backgroundVideo="/media/hero.mp4"
         breadcrumbItems={[
-          { label: "Home", to: "/" },
+          { label: "Home", to: locPath(selectedLocationId, "/") },
           { label: "Order Online" },
         ]}
       />

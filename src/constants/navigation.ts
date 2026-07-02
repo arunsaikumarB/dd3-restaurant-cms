@@ -2,7 +2,7 @@ export const NAV_LINKS = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about" },
   { label: "Menu", path: "/menu" },
-  { label: "Offers", path: "/offers" },
+  { label: "Offers", path: "/special-offers" },
   { label: "Catering", path: "/catering" },
   { label: "Parties", path: "/parties" },
   { label: "Testimonials", path: "/testimonials" },
@@ -13,16 +13,16 @@ export const FOOTER_LINKS = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about" },
   { label: "Menu", path: "/menu" },
-  { label: "Offers", path: "/offers" },
+  { label: "Offers", path: "/special-offers" },
   { label: "Catering", path: "/catering" },
   { label: "Parties", path: "/parties" },
   { label: "Testimonials", path: "/testimonials" },
   { label: "Contact", path: "/contact" },
-  { label: "Order Online", path: "/order" },
+  { label: "Order Online", path: "/online-ordering" },
   { label: "Reservations", path: "/reservation" },
 ] as const;
 
-export const ORDER_URL = "/order";
+export const ORDER_URL = "/online-ordering";
 export const RESERVE_URL = "/reservation";
 
 /** Fixed header height — keep sticky offsets in sync (matches h-20). */
@@ -41,7 +41,9 @@ export const TRANSPARENT_NAV_ROUTES = [
   "/testimonials",
   "/contact",
   "/gallery",
-  "/offers",
-  "/order",
+  "/special-offers",
+  "/online-ordering",
+  "/privacy-policy",
+  "/terms-conditions",
   "/reservation",
 ];

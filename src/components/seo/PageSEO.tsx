@@ -37,12 +37,20 @@ function upsertLink(rel: string, href: string) {
 
 const JSON_LD_ID = "desi-dhamaka-jsonld";
 
+/** Strips the `/:locationId` prefix from a pathname, e.g. "/oak-tree/about/" -> "/about". */
+function relativePath(pathname: string): string {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length <= 1) return "/";
+  return `/${segments.slice(1).join("/")}`;
+}
+
 export default function PageSEO() {
   const { pathname } = useLocation();
   const { bundle } = useHomepageData();
   const { settings } = bundle;
-  const baseConfig = PAGE_SEO[pathname] ?? PAGE_SEO["/404"];
-  const isHome = pathname === "/";
+  const relPath = relativePath(pathname);
+  const baseConfig = PAGE_SEO[relPath] ?? PAGE_SEO["/404"];
+  const isHome = relPath === "/";
 
   const config = useMemo(() => {
     if (!isHome) {
@@ -57,7 +65,7 @@ export default function PageSEO() {
   }, [baseConfig, isHome, settings.seo_description, settings.seo_title]);
 
   const siteUrl = getSiteUrl();
-  const canonical = `${siteUrl}${config.path === "/" ? "" : config.path}`;
+  const canonical = `${siteUrl}${pathname === "/" ? "" : pathname}`;
   const image = `${siteUrl}${config.image ?? SITE.ogImage}`;
   const keywords = isHome ? settings.seo_keywords.trim() : "";
 

@@ -1,11 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { FOOTER_LINKS, RESERVE_URL } from "../../constants/navigation";
-import { EXTERNAL_ORDER_LINK_PROPS } from "../../constants/ordering";
+import { FOOTER_LINKS, ORDER_URL, RESERVE_URL } from "../../constants/navigation";
 import { SITE, SOCIAL_LABELS } from "../../constants/site";
 import { useHomepageData } from "../../hooks/useHomepageData";
 import { usePageContent } from "../../context/PageContentContext";
 import { useLocationSelection } from "../../context/LocationContext";
-import { isExternalUrl, resolveOrderUrl, resolveReservationUrl } from "../../utils/locationLinks";
+import { isExternalUrl, resolveReservationUrl } from "../../utils/locationLinks";
+import { locPath } from "../../utils/locationPaths";
 import {
   buildPublicSocialLinks,
   formatOpeningHoursRows,
@@ -36,12 +36,12 @@ const SOCIAL_ICONS: Record<string, JSX.Element> = {
 export default function Footer() {
   const year = new Date().getFullYear();
   const { pathname } = useLocation();
-  const { bundle, locationId: bundleLocationId } = useHomepageData();
+  const { bundle } = useHomepageData();
   const { fetchSection } = usePageContent();
   const preCta = fetchSection("global", "footer_pre_cta", {
     eyebrow: "Ready to dine?",
     title: "Reserve your table or order online",
-    orderCta: { label: "Order Now", url: "/order" },
+    orderCta: { label: "Order Now", url: "/online-ordering" },
     reserveCta: { label: "Reserve a Table", url: "/reservation" },
   });
   const brand = fetchSection("global", "footer_brand", {
@@ -59,10 +59,11 @@ export default function Footer() {
     privacyCta: { label: "Privacy Policy", url: "/contact" },
     termsCta: { label: "Terms of Service", url: "/contact" },
   });
-  const { navigateWithLocationGuard, selectedLocation, selectedLocationId } = useLocationSelection();
+  const { selectedLocation, selectedLocationId } = useLocationSelection();
   const { settings } = bundle;
   const reservationLink = resolveReservationUrl(settings, selectedLocationId);
-  const orderLink = resolveOrderUrl(settings, selectedLocationId, bundleLocationId);
+  const orderPagePath = locPath(selectedLocationId, ORDER_URL);
+  const reserveUrl = locPath(selectedLocationId, RESERVE_URL);
   const socialLinks = buildPublicSocialLinks(settings);
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
@@ -81,24 +82,21 @@ export default function Footer() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <a
-              href={orderLink}
+            <Link
+              to={orderPagePath}
               onClick={() => trackOrderClick(pathname, selectedLocationId)}
               className="inline-flex h-[42px] items-center justify-center gap-2 rounded-full bg-brand-primary px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ivory shadow-[0_4px_16px_-4px_rgba(237,60,24,0.5)] transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:shadow-[0_8px_24px_-6px_rgba(237,60,24,0.55)] focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-cocoa"
-              {...EXTERNAL_ORDER_LINK_PROPS}
             >
               {preCta.orderCta.label}
-            </a>
+            </Link>
             <Link
-              to={RESERVE_URL}
+              to={reserveUrl}
               onClick={(event) => {
                 trackReservationClick(pathname, selectedLocationId);
-                event.preventDefault();
                 if (isExternalUrl(reservationLink)) {
+                  event.preventDefault();
                   window.open(reservationLink, "_blank", "noopener,noreferrer");
-                  return;
                 }
-                navigateWithLocationGuard(RESERVE_URL);
               }}
               className="inline-flex h-[42px] items-center justify-center gap-2 rounded-full border-2 border-ivory/30 px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ivory transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-ivory/60 hover:bg-ivory/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-cocoa"
             >
@@ -164,13 +162,7 @@ export default function Footer() {
               {FOOTER_LINKS.slice(0, 7).map((link) => (
                 <li key={link.path}>
                   <Link
-                    to={link.path}
-                    onClick={(event) => {
-                      if (link.path === "/menu") {
-                        event.preventDefault();
-                        navigateWithLocationGuard("/menu");
-                      }
-                    }}
+                    to={locPath(selectedLocationId, link.path)}
                     className="group flex items-center gap-2 text-[14px] text-cocoa/65 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
                   >
                     <span className="block h-px w-3 bg-cocoa/25 transition-all duration-300 group-hover:w-5 group-hover:bg-saffron" />
@@ -226,7 +218,7 @@ export default function Footer() {
 
             <div className="mt-7">
               <Link
-                to="/contact"
+                to={locPath(selectedLocationId, "/contact")}
                 className="inline-flex items-center gap-2 rounded-full border border-cocoa/15 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-cocoa/70 transition-all duration-300 hover:border-saffron/50 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
               >
                 {headings.getInTouch}
@@ -250,15 +242,27 @@ export default function Footer() {
             {[
               legal.privacyCta,
               legal.termsCta,
-            ].map((l) => (
-              <Link
-                key={l.label}
-                to={l.url}
-                className="text-[12px] text-cocoa/40 transition-colors duration-300 hover:text-saffron"
-              >
-                {l.label}
-              </Link>
-            ))}
+            ].map((l) =>
+              isExternalUrl(l.url) ? (
+                <a
+                  key={l.label}
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[12px] text-cocoa/40 transition-colors duration-300 hover:text-saffron"
+                >
+                  {l.label}
+                </a>
+              ) : (
+                <Link
+                  key={l.label}
+                  to={locPath(selectedLocationId, l.url)}
+                  className="text-[12px] text-cocoa/40 transition-colors duration-300 hover:text-saffron"
+                >
+                  {l.label}
+                </Link>
+              ),
+            )}
           </div>
         </div>
       </div>

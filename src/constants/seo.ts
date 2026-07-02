@@ -49,11 +49,11 @@ export const PAGE_SEO: Record<string, PageSeoConfig> = {
       "Contact Desi Dhamaka for reservations, catering enquiries and private events. Call, email or visit us in Lawrenceville, NJ.",
     path: "/contact",
   },
-  "/order": {
+  "/online-ordering": {
     title: "Order Online — Desi Dhamaka Indian Restaurant",
     description:
       "Order authentic Indian food from Desi Dhamaka. Pickup direct or delivery via Uber Eats — freshly prepared in Lawrenceville, NJ.",
-    path: "/order",
+    path: "/online-ordering",
   },
   "/gallery": {
     title: "Gallery — Desi Dhamaka Indian Restaurant",
@@ -61,17 +61,29 @@ export const PAGE_SEO: Record<string, PageSeoConfig> = {
       "Explore the elegant interiors, dining spaces and atmosphere of Desi Dhamaka in Lawrenceville, New Jersey.",
     path: "/gallery",
   },
-  "/offers": {
+  "/special-offers": {
     title: "Special Offers — Desi Dhamaka Indian Restaurant",
     description:
       "View current promotions and limited-time deals at Desi Dhamaka in Lawrenceville, New Jersey.",
-    path: "/offers",
+    path: "/special-offers",
   },
   "/reservation": {
     title: "Reserve a Table — Desi Dhamaka Indian Restaurant",
     description:
       "Book your table at Desi Dhamaka Lawrenceville. Reserve online for an unforgettable authentic Indian dining experience.",
     path: "/reservation",
+  },
+  "/privacy-policy": {
+    title: "Privacy Policy — Desi Dhamaka Indian Restaurant",
+    description:
+      "How Desi Dhamaka collects, uses and protects your personal information across our website and services.",
+    path: "/privacy-policy",
+  },
+  "/terms-conditions": {
+    title: "Terms & Conditions — Desi Dhamaka Indian Restaurant",
+    description:
+      "Terms and conditions for using the Desi Dhamaka website, online ordering and reservation services.",
+    path: "/terms-conditions",
   },
   "/404": {
     title: "Page Not Found — Desi Dhamaka",

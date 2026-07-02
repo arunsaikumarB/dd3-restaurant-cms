@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import { useLocationSelection } from "../../context/LocationContext";
+import { locPath } from "../../utils/locationPaths";
+import type { LocationId } from "../../config/locations";
 import LocationDropdown from "./LocationDropdown";
 
 type Props = {
@@ -12,13 +15,19 @@ export default function LocationSwitcher({
   tone = "light",
   className = "",
 }: Props) {
+  const navigate = useNavigate();
   const { selectedLocationId, options, setLocation } = useLocationSelection();
+
+  const handleSelect = (locationId: LocationId) => {
+    setLocation(locationId);
+    navigate(locPath(locationId, "/"));
+  };
 
   return (
     <LocationDropdown
       options={options}
       selectedLocationId={selectedLocationId}
-      onSelect={setLocation}
+      onSelect={handleSelect}
       variant={variant}
       tone={tone}
       className={className}

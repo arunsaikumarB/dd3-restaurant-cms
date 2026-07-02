@@ -1,12 +1,10 @@
 import type {
   ActivityItem,
   AdminStat,
-  Category,
   GalleryImage,
   HomepageSection,
   MenuItem,
   Offer,
-  Reservation,
   Review,
 } from "../types";
 
@@ -57,17 +55,6 @@ export const MOCK_MENU_ITEMS: MenuItem[] = [
   { id: "8", name: "Lamb Seekh Kebab", category: "Kebab & Tandoori", price: 14.99, image: "/showcase/tandoori.webp", status: "draft", vegType: "non-veg", popular: false, chefSpecial: false },
 ];
 
-export const MOCK_CATEGORIES: Category[] = [
-  { id: "1", name: "Biryani", image: "/showcase/biryani.webp", itemCount: 12 },
-  { id: "2", name: "North Indian", image: "/showcase/tandoori.webp", itemCount: 18 },
-  { id: "3", name: "Kebab & Tandoori", image: "/showcase/tandoori.webp", itemCount: 14 },
-  { id: "4", name: "DD Special Mandi", image: "/showcase/biryani.webp", itemCount: 6 },
-  { id: "5", name: "Appetizers", image: "/showcase/tandoori.webp", itemCount: 10 },
-  { id: "6", name: "Breads", image: "/showcase/biryani.webp", itemCount: 8 },
-  { id: "7", name: "Beverages", image: "/showcase/tandoori.webp", itemCount: 9 },
-  { id: "8", name: "Desserts", image: "/showcase/biryani.webp", itemCount: 7 },
-];
-
 export const MOCK_OFFERS: Offer[] = [
   { id: "1", name: "Weekend Biryani Special", discount: "15% OFF", banner: "/showcase/biryani.webp", startDate: "2026-06-01", endDate: "2026-06-30", status: "active" },
   { id: "2", name: "Family Feast Combo", discount: "$10 OFF", banner: "/showcase/tandoori.webp", startDate: "2026-06-15", endDate: "2026-07-15", status: "active" },
@@ -84,16 +71,6 @@ export const MOCK_GALLERY: GalleryImage[] = [
   { id: "6", url: "/showcase/tandoori.webp", category: "Kitchen", title: "Tandoor Station" },
   { id: "7", url: "/showcase/biryani.webp", category: "Food", title: "Butter Chicken" },
   { id: "8", url: "/showcase/tandoori.webp", category: "Ambiance", title: "Bar Area" },
-];
-
-export const MOCK_RESERVATIONS: Reservation[] = [
-  { id: "1", name: "Priya Sharma", date: "2026-06-30", time: "7:00 PM", guests: 4, phone: "(609) 555-0142", notes: "Birthday celebration", status: "confirmed" },
-  { id: "2", name: "James Wilson", date: "2026-06-30", time: "6:30 PM", guests: 2, phone: "(609) 555-0198", notes: "Window seat preferred", status: "pending" },
-  { id: "3", name: "Anita Patel", date: "2026-06-30", time: "8:00 PM", guests: 6, phone: "(609) 555-0234", notes: "Vegetarian options needed", status: "confirmed" },
-  { id: "4", name: "Robert Chen", date: "2026-07-01", time: "12:30 PM", guests: 3, phone: "(609) 555-0267", notes: "", status: "pending" },
-  { id: "5", name: "Sarah Johnson", date: "2026-07-01", time: "7:30 PM", guests: 8, phone: "(609) 555-0312", notes: "Corporate dinner", status: "confirmed" },
-  { id: "6", name: "David Kumar", date: "2026-06-29", time: "6:00 PM", guests: 2, phone: "(609) 555-0389", notes: "", status: "completed" },
-  { id: "7", name: "Emily Davis", date: "2026-06-28", time: "8:30 PM", guests: 4, phone: "(609) 555-0412", notes: "Cancelled due to weather", status: "cancelled" },
 ];
 
 export const MOCK_REVIEWS: Review[] = [

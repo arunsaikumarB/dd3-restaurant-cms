@@ -20,6 +20,7 @@ export type LocationConfig = {
   reservationLink: string;
   orderDirectLink: string;
   uberEatsLink: string;
+  doorDashLink: string;
   openingHours: LocationHours;
   menuPriceMultiplier: number;
   hiddenCategorySlugs: string[];
@@ -46,8 +47,9 @@ export const LOCATIONS: Record<LocationId, LocationConfig> = {
     googleMapsEmbed:
       "https://www.google.com/maps?q=4941+Stelton+Rd+South+Plainfield+NJ+07080&output=embed",
     reservationLink: "https://www.opentable.com/r/desi-dhamaka-south-plainfield",
-    orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka?order_type=106",
-    uberEatsLink: "https://www.ubereats.com/store/desi-dhamaka-south-plainfield/placeholder",
+    orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka/outlet/70",
+    uberEatsLink: "https://www.ubereats.com/store/desi-dhamaka-indian-restaurant/Flzpa94fTZWgImQYROzohQ?srsltid=AfmBOopzRGdQiLLrkwb-Na0COGReThF3Clv1tEtF7tnp5w4Qc3IdWt3d",
+    doorDashLink: "https://www.doordash.com/en/store/desi-dhamaka-indian-restaurant-south-plainfield-29592911/?srsltid=AfmBOoqoRUfHZsJzA3wsz-s29_cHH-BbXt4hdCOPTvr9g0Odhg8nNwRP",
     openingHours: {
       weekday: "11:00 AM - 10:00 PM",
       weekend: "11:00 AM - 11:00 PM",
@@ -68,8 +70,9 @@ export const LOCATIONS: Record<LocationId, LocationConfig> = {
     googleMapsEmbed:
       "https://www.google.com/maps?q=1676+Oak+Tree+Rd+Edison+NJ+08820&output=embed",
     reservationLink: "https://www.opentable.com/r/desi-dhamaka-oak-tree",
-    orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka?order_type=108",
-    uberEatsLink: "https://www.ubereats.com/store/desi-dhamaka-oak-tree/placeholder",
+    orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka/outlet/71",
+    uberEatsLink: "https://www.ubereats.com/store/desi-dhamaka/fJIwsyPVW965vXfss6xr6A?srsltid=AfmBOopIffZpYDcA32x2G2ZAJxcH1SFKWbDDJH_qvmiE7-qEOXbyl8M2",
+    doorDashLink: "https://www.doordash.com/store/desi-dhamaka-edison-34765901/72377746/",
     openingHours: {
       weekday: "11:30 AM - 10:00 PM",
       weekend: "11:30 AM - 11:30 PM",
@@ -92,7 +95,8 @@ export const LOCATIONS: Record<LocationId, LocationConfig> = {
     reservationLink: "/reservation",
     orderDirectLink: "https://orders.chefgaa.com/store/desi-dhamaka/menu",
     uberEatsLink:
-      "https://www.ubereats.com/store/desi-dhamaka-lawrence-township/kiykavZIUSO5gjxyTB_BOA",
+      "https://www.ubereats.com/store/desi-dhamaka-lawrence-township/kiykavZIUSO5gjxyTB_BOA?srsltid",
+    doorDashLink: "",
     openingHours: {
       weekday: "11:00 AM - 10:00 PM",
       weekend: "11:00 AM - 11:00 PM",
@@ -116,12 +120,6 @@ export const LOCATION_OPTIONS = (Object.keys(LOCATIONS) as LocationId[]).map((id
   name: LOCATIONS[id].name,
   address: LOCATIONS[id].address,
 }));
-
-export const LOCATION_REQUIRED_PATHS = ["/menu", "/order", "/reservation"];
-
-export function isLocationRequiredPath(pathname: string): boolean {
-  return LOCATION_REQUIRED_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
-}
 
 export function getLocationConfig(locationId: LocationId): LocationConfig {
   return LOCATIONS[locationId];

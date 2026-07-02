@@ -14,7 +14,7 @@ const HERO_POSTER = "/hero/hero-poster.webp";
 const DEFAULT_TITLE = "Step inside\nthe experience";
 const DEFAULT_SUBTITLE =
   "Scroll to walk through our doors — from the entrance to the heart of the reception, frame by cinematic frame.";
-const DEFAULT_PRIMARY_CTA = { label: "Order Now", url: "/order" };
+const DEFAULT_PRIMARY_CTA = { label: "Order Now", url: "/online-ordering" };
 const DEFAULT_SECONDARY_CTA = { label: "View Menu", url: "/menu" };
 
 export type HeroCta = {

@@ -38,7 +38,9 @@ export default function OrderOptionCard({ option, index = 0 }: OrderOptionCardPr
             className={
               option.variant === "uber"
                 ? "order-card__badge order-card__badge--uber"
-                : "order-card__badge"
+                : option.variant === "doordash"
+                  ? "order-card__badge order-card__badge--doordash"
+                  : "order-card__badge"
             }
           >
             {option.badge}

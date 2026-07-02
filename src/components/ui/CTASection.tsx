@@ -1,6 +1,7 @@
 import Button from "./Button";
 import AnimatedContainer from "./AnimatedContainer";
 import { useLocationSelection } from "../../context/LocationContext";
+import { locPath } from "../../utils/locationPaths";
 
 interface CTASectionProps {
   title: string;
@@ -19,7 +20,8 @@ export default function CTASection({
   buttonHref,
   dark = true,
 }: CTASectionProps) {
-  const { navigateWithLocationGuard } = useLocationSelection();
+  const { selectedLocationId } = useLocationSelection();
+  const scopedButtonTo = buttonTo ? locPath(selectedLocationId, buttonTo) : undefined;
   return (
     <AnimatedContainer>
       <section
@@ -72,14 +74,8 @@ export default function CTASection({
           )}
           <div className="mt-9 flex justify-center">
             <Button
-              to={buttonTo}
+              to={scopedButtonTo}
               href={buttonHref}
-              onClick={(event) => {
-                if (buttonTo === "/menu" || buttonTo === "/order" || buttonTo === "/reservation") {
-                  event.preventDefault();
-                  navigateWithLocationGuard(buttonTo);
-                }
-              }}
               variant={dark ? "outline" : "primary"}
               className={dark ? "!border-ivory/40 !text-ivory hover:!bg-ivory/10 hover:!border-ivory/70" : ""}
             >

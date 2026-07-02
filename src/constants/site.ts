@@ -28,7 +28,7 @@ export const SITE = {
       "https://www.google.com/maps/search/?api=1&query=Desi+Dhamaka+540+Lawrence+Square+Blvd+S+Lawrenceville+NJ",
   },
   /** Default OG image — restaurant showcase photo. */
-  ogImage: "/showcase/biryani.jpg",
+  ogImage: "/showcase/biryani.webp",
 } as const;
 
 export const SOCIAL_LABELS: Record<keyof typeof SITE.social, string> = {

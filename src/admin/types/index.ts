@@ -19,7 +19,7 @@ export interface ActivityItem {
   action: string;
   target: string;
   time: string;
-  type: "menu" | "reservation" | "review" | "offer" | "gallery" | "settings" | "integration";
+  type: "menu" | "review" | "offer" | "gallery" | "settings" | "integration";
 }
 
 export interface MenuItem {
@@ -32,13 +32,6 @@ export interface MenuItem {
   vegType: VegType;
   popular: boolean;
   chefSpecial: boolean;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  image: string;
-  itemCount: number;
 }
 
 export interface Offer {
@@ -56,17 +49,6 @@ export interface GalleryImage {
   url: string;
   category: string;
   title: string;
-}
-
-export interface Reservation {
-  id: string;
-  name: string;
-  date: string;
-  time: string;
-  guests: number;
-  phone: string;
-  notes: string;
-  status: "confirmed" | "pending" | "cancelled" | "completed";
 }
 
 export interface Review {

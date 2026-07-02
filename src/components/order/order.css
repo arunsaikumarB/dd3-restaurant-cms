@@ -99,9 +99,9 @@
 
 @media (min-width: 900px) {
   .order-options__grid {
-    grid-template-columns: repeat(2, minmax(0, 620px));
+    grid-template-columns: repeat(3, minmax(0, 420px));
     justify-content: center;
-    gap: 48px;
+    gap: 40px;
   }
 }
 
@@ -218,6 +218,11 @@
 .order-card__badge--uber {
   background: rgba(250, 144, 64, 0.12);
   color: #c96a10;
+}
+
+.order-card__badge--doordash {
+  background: rgba(239, 43, 45, 0.12);
+  color: #c81d1f;
 }
 
 .order-card__desc {

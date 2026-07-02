@@ -643,7 +643,7 @@ function OfferFormFields({
       />
       <AdminInput
         label="Hero Image URL"
-        placeholder="https://… or /showcase/biryani.webp"
+        placeholder="https://… or /showcase/biryani.jpg"
         value={form.image ?? ""}
         error={fieldErrors.image}
         disabled={disabled}

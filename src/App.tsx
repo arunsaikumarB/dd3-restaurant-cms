@@ -1,19 +1,21 @@
-import { lazy, Suspense } from "react";
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { lazy, Suspense, useLayoutEffect } from "react";
+import { Routes, Route, useLocation, Navigate, useParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import ScrollToTop from "./components/layout/ScrollToTop";
 import PageTransition from "./components/layout/PageTransition";
 import PageLoader from "./components/layout/PageLoader";
+import TrailingSlashRedirect from "./components/layout/TrailingSlashRedirect";
 import PageSEO from "./components/seo/PageSEO";
 import AdminLayout from "./admin/components/layout/AdminLayout";
 import ProtectedRoute from "./admin/components/ProtectedRoute";
 import GuestRoute from "./admin/components/GuestRoute";
 import UnauthorizedRoute from "./admin/components/UnauthorizedRoute";
-import { LocationProvider } from "./context/LocationContext";
+import { LocationProvider, useLocationSelection } from "./context/LocationContext";
 import { PageContentProvider } from "./context/PageContentContext";
 import { usePageTracking } from "./hooks/usePageTracking";
+import { isLocationId, resolvePublicLocationId } from "./config/locations";
 
 const AdminLoginPage = lazy(() => import("./admin/pages/LoginPage"));
 const AdminUnauthorizedPage = lazy(() => import("./admin/pages/UnauthorizedPage"));
@@ -28,6 +30,7 @@ const AdminReviewsPage = lazy(() => import("./admin/pages/ReviewsPage"));
 const AdminSettingsPage = lazy(() => import("./admin/pages/SettingsPage"));
 const AdminProfilePage = lazy(() => import("./admin/pages/ProfilePage"));
 
+const LocationGatePage = lazy(() => import("./pages/LocationGatePage"));
 const HomePage = lazy(() => import("./pages/HomePage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const MenuPage = lazy(() => import("./pages/MenuPage"));
@@ -40,16 +43,33 @@ const GalleryPage = lazy(() => import("./pages/GalleryPage"));
 const OffersPage = lazy(() => import("./pages/OffersPage"));
 const OfferDetailPage = lazy(() => import("./pages/OfferDetailPage"));
 const ReservationPage = lazy(() => import("./pages/ReservationPage"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const TermsConditionsPage = lazy(() => import("./pages/TermsConditionsPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
-function PublicRoutes() {
+/** Redirects a legacy segment (e.g. /order/) to its renamed path, preserving location + query. */
+function LegacySegmentRedirect({ to }: { to: string }) {
+  const { locationId } = useParams<{ locationId: string }>();
+  const { search, hash } = useLocation();
+  return <Navigate to={`/${locationId}/${to}/${search}${hash}`} replace />;
+}
+
+/** Redirects legacy /offers/:slug detail links to /special-offers/:slug. */
+function LegacyOfferDetailRedirect() {
+  const { locationId, slug } = useParams<{ locationId: string; slug: string }>();
+  const { search, hash } = useLocation();
+  return <Navigate to={`/${locationId}/special-offers/${slug}/${search}${hash}`} replace />;
+}
+
+/** Page routes for a single location, matched relative to `/:locationId/`. */
+function LocationPageRoutes() {
   const location = useLocation();
 
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+      <Routes key={location.pathname}>
         <Route
-          path="/"
+          index
           element={
             <PageTransition>
               <HomePage />
@@ -57,7 +77,7 @@ function PublicRoutes() {
           }
         />
         <Route
-          path="/about"
+          path="about"
           element={
             <PageTransition>
               <AboutPage />
@@ -65,7 +85,7 @@ function PublicRoutes() {
           }
         />
         <Route
-          path="/menu"
+          path="menu"
           element={
             <PageTransition>
               <MenuPage />
@@ -73,7 +93,7 @@ function PublicRoutes() {
           }
         />
         <Route
-          path="/catering"
+          path="catering"
           element={
             <PageTransition>
               <CateringPage />
@@ -81,7 +101,7 @@ function PublicRoutes() {
           }
         />
         <Route
-          path="/parties"
+          path="parties"
           element={
             <PageTransition>
               <PartiesPage />
@@ -89,7 +109,7 @@ function PublicRoutes() {
           }
         />
         <Route
-          path="/testimonials"
+          path="testimonials"
           element={
             <PageTransition>
               <TestimonialsPage />
@@ -97,7 +117,7 @@ function PublicRoutes() {
           }
         />
         <Route
-          path="/contact"
+          path="contact"
           element={
             <PageTransition>
               <ContactPage />
@@ -105,15 +125,16 @@ function PublicRoutes() {
           }
         />
         <Route
-          path="/order"
+          path="online-ordering"
           element={
             <PageTransition>
               <OrderPage />
             </PageTransition>
           }
         />
+        <Route path="order" element={<LegacySegmentRedirect to="online-ordering" />} />
         <Route
-          path="/gallery"
+          path="gallery"
           element={
             <PageTransition>
               <GalleryPage />
@@ -121,7 +142,7 @@ function PublicRoutes() {
           }
         />
         <Route
-          path="/offers"
+          path="special-offers"
           element={
             <PageTransition>
               <OffersPage />
@@ -129,23 +150,33 @@ function PublicRoutes() {
           }
         />
         <Route
-          path="/offers/oak-tree/:slug"
-          element={
-            <PageTransition>
-              <OfferDetailPage forcedLocationId="oak-tree" />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/offers/:slug"
+          path="special-offers/:slug"
           element={
             <PageTransition>
               <OfferDetailPage />
             </PageTransition>
           }
         />
+        <Route path="offers" element={<LegacySegmentRedirect to="special-offers" />} />
+        <Route path="offers/:slug" element={<LegacyOfferDetailRedirect />} />
         <Route
-          path="/reservation"
+          path="privacy-policy"
+          element={
+            <PageTransition>
+              <PrivacyPolicyPage />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="terms-conditions"
+          element={
+            <PageTransition>
+              <TermsConditionsPage />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="reservation"
           element={
             <PageTransition>
               <ReservationPage />
@@ -180,26 +211,48 @@ function PublicSiteChrome() {
       <ScrollToTop />
       <Navbar />
       <main id="main-content">
-        <PublicRoutes />
+        <LocationPageRoutes />
       </main>
       <Footer />
     </>
   );
 }
 
-function PublicSiteShell() {
+/**
+ * Validates `:locationId`, syncs it into context, and renders the site chrome.
+ * Any invalid segment (including legacy flat links like `/menu` left over
+ * from before location-prefixed routing) redirects to the same path under
+ * the visitor's stored or default location, so no internal link ever
+ * dead-ends into a blank page.
+ */
+function LocationSiteShell() {
+  const { locationId } = useParams<{ locationId: string }>();
+  const location = useLocation();
+  const { syncLocationFromUrl } = useLocationSelection();
+  const valid = !!locationId && isLocationId(locationId);
+
+  useLayoutEffect(() => {
+    if (valid && locationId) {
+      syncLocationFromUrl(locationId);
+    }
+  }, [locationId, syncLocationFromUrl, valid]);
+
+  if (!valid) {
+    const resolved = resolvePublicLocationId(null);
+    return <Navigate to={`/${resolved}${location.pathname}`} replace />;
+  }
+
   return (
-    <LocationProvider>
-      <PageContentProvider>
-        <PublicSiteChrome />
-      </PageContentProvider>
-    </LocationProvider>
+    <PageContentProvider>
+      <PublicSiteChrome />
+    </PageContentProvider>
   );
 }
 
 export default function App() {
   return (
     <Suspense fallback={<PageLoader />}>
+      <TrailingSlashRedirect />
       <Routes>
         <Route
           path="/admin/login"
@@ -237,7 +290,18 @@ export default function App() {
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="profile" element={<AdminProfilePage />} />
         </Route>
-        <Route path="*" element={<PublicSiteShell />} />
+
+        <Route
+          path="*"
+          element={
+            <LocationProvider>
+              <Routes>
+                <Route path="/" element={<LocationGatePage />} />
+                <Route path=":locationId/*" element={<LocationSiteShell />} />
+              </Routes>
+            </LocationProvider>
+          }
+        />
       </Routes>
     </Suspense>
   );

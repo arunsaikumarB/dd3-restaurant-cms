@@ -3,6 +3,8 @@ import { ORDER_DIRECT_URL } from "../constants/ordering";
 export { ORDER_DIRECT_URL };
 export const UBER_EATS_URL =
   "https://www.ubereats.com/store/desi-dhamaka-lawrence-township/kiykavZIUSO5gjxyTB_BOA";
+export const DOORDASH_URL =
+  "https://www.doordash.com/store/desi-dhamaka-lawrence-township/placeholder";
 
 export interface OrderOption {
   id: string;
@@ -15,8 +17,8 @@ export interface OrderOption {
   pills: string[];
   buttonText: string;
   buttonHref: string;
-  buttonColor: "#ED3C18" | "#FA9040";
-  variant: "desi" | "uber";
+  buttonColor: "#ED3C18" | "#FA9040" | "#EF2B2D";
+  variant: "desi" | "uber" | "doordash";
 }
 
 export const ORDER_OPTIONS: OrderOption[] = [
@@ -48,6 +50,20 @@ export const ORDER_OPTIONS: OrderOption[] = [
     buttonHref: UBER_EATS_URL,
     buttonColor: "#FA9040",
     variant: "uber",
+  },
+  {
+    id: "doordash",
+    brand: "DoorDash",
+    title: "Delivery & Pickup",
+    badge: "Available Now",
+    description: "Enjoy fast delivery or pickup through DoorDash.",
+    image: "/showcase/biryani.webp",
+    imageAlt: "Biryani available on DoorDash",
+    pills: ["Fast Delivery", "Live Tracking", "Easy Pickup"],
+    buttonText: "Order with DoorDash",
+    buttonHref: DOORDASH_URL,
+    buttonColor: "#EF2B2D",
+    variant: "doordash",
   },
 ];
 
