@@ -5,12 +5,16 @@ import SectionPlaceholder from "../components/ui/SectionPlaceholder";
 import type { PublicGalleryItem } from "../data/publicGallery";
 import { useHomepageData } from "../hooks/useHomepageData";
 import { usePageContent } from "../context/PageContentContext";
+import { useLocationSelection } from "../context/LocationContext";
 import { useGallerySection } from "../hooks/useGallerySection";
 import { formatWeekdayHoursLabel } from "../services/homepagePublic";
 import "../App.css";
 
 const EntranceImageSequence = lazy(
   () => import("../components/home/EntranceImageSequence"),
+);
+const SouthPlainfieldEntranceSequence = lazy(
+  () => import("../components/home/SouthPlainfieldEntranceSequence"),
 );
 const ExperienceCards = lazy(
   () => import("../components/experience/ExperienceCards"),
@@ -29,7 +33,9 @@ const ExperienceSection = lazy(
 export default function HomePage() {
   const { bundle } = useHomepageData();
   const { fetchSection } = usePageContent();
+  const { selectedLocationId } = useLocationSelection();
   const { content, settings } = bundle;
+  const isSouthPlainfield = selectedLocationId === "south-plainfield";
   const heroUi = fetchSection("home", "hero_ui", { scrollHint: "Scroll" });
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
 
@@ -81,7 +87,11 @@ export default function HomePage() {
             />
           }
         >
-          <EntranceImageSequence />
+          {isSouthPlainfield ? (
+            <SouthPlainfieldEntranceSequence />
+          ) : (
+            <EntranceImageSequence />
+          )}
         </Suspense>
       </LazyMount>
 

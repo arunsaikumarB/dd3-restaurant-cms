@@ -49,6 +49,11 @@ export interface ImageSequenceScrollProps {
   fit?: FrameFit;
   /** Canvas background color shown behind "contain" letterboxing (default "#000"). */
   background?: string;
+  /**
+   * Optional still shown behind the canvas until frames finish decoding
+   * (typically the first frame). Prevents a black flash / blank area.
+   */
+  posterSrc?: string;
 
   className?: string;
   /** Overlay content rendered above the canvas inside the pinned stage. */
@@ -102,6 +107,7 @@ export default function ImageSequenceScroll({
   scrub = 0.6,
   fit = "cover",
   background = "#000",
+  posterSrc,
   className,
   children,
   onReady,
@@ -335,6 +341,23 @@ export default function ImageSequenceScroll({
           background,
         }}
       >
+        {posterSrc && (
+          <img
+            src={posterSrc}
+            alt=""
+            aria-hidden
+            decoding="async"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: fit,
+              zIndex: 0,
+            }}
+          />
+        )}
+
         <canvas
           ref={canvasRef}
           style={{
@@ -343,6 +366,7 @@ export default function ImageSequenceScroll({
             width: "100%",
             height: "100%",
             display: "block",
+            zIndex: 1,
           }}
         />
 
@@ -359,7 +383,7 @@ export default function ImageSequenceScroll({
               alignItems: "center",
               justifyContent: "center",
               gap: 18,
-              background,
+              background: posterSrc ? "transparent" : background,
               color: "#fff",
               fontFamily:
                 "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",

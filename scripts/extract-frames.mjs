@@ -17,11 +17,12 @@
 //   --out      Output directory (default: public/frames)
 
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import ffmpegPath from "ffmpeg-static";
 import ffprobeStatic from "ffprobe-static";
+import sharp from "sharp";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..");
@@ -82,7 +83,7 @@ function probeVideo(input) {
   return { width, height, duration };
 }
 
-function run() {
+async function run() {
   const args = parseArgs(process.argv);
   const input = args.input ? resolve(args.input) : findDefaultVideo();
 
@@ -120,7 +121,10 @@ function run() {
   }
   mkdirSync(outDir, { recursive: true });
 
-  const pattern = "frame_%04d.webp";
+  // ffmpeg's WebP muxer collapses a "%04d" pattern into a single animated
+  // .webp, so we extract JPEGs first, then convert each frame to a standalone
+  // .webp with sharp (correct per-frame output + smaller files).
+  const jpgPattern = "frame_%04d.jpg";
   const ffmpegArgs = [
     "-y",
     "-i",
@@ -131,13 +135,31 @@ function run() {
     String(quality),
     "-vsync",
     "vfr",
-    join(outDir, pattern),
+    join(outDir, jpgPattern),
   ];
 
   const result = spawnSync(ffmpegPath, ffmpegArgs, { stdio: "inherit" });
   if (result.status !== 0) {
     throw new Error("ffmpeg frame extraction failed.");
   }
+
+  const jpgs = readdirSync(outDir)
+    .filter((f) => /^frame_\d+\.jpg$/i.test(f))
+    .sort();
+
+  if (jpgs.length === 0) {
+    throw new Error("ffmpeg produced no frames.");
+  }
+
+  console.log(`\nConverting ${jpgs.length} frames to WebP…`);
+  await Promise.all(
+    jpgs.map(async (name) => {
+      const jpgPath = join(outDir, name);
+      const webpPath = jpgPath.replace(/\.jpg$/i, ".webp");
+      await sharp(jpgPath).webp({ quality: 82 }).toFile(webpPath);
+      unlinkSync(jpgPath);
+    }),
+  );
 
   const frames = readdirSync(outDir)
     .filter((f) => f.endsWith(".webp"))
@@ -169,9 +191,7 @@ function run() {
   console.log(`Manifest written to ${join(outDir, "manifest.json")}`);
 }
 
-try {
-  run();
-} catch (err) {
+run().catch((err) => {
   console.error("\n[extract-frames] Error:", err.message);
   process.exit(1);
-}
+});

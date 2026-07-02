@@ -1,0 +1,172 @@
+/* ---------- Cinematic scroll-driven image sequence ---------- */
+
+.iss-cinematic {
+  background: #050505;
+}
+
+/* Dark cinematic scrim over the footage (opacity set inline, default 45%). */
+.iss-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(3, 3, 3, 0.55) 0%,
+    rgba(3, 3, 3, 0.32) 45%,
+    rgba(3, 3, 3, 0.6) 100%
+  );
+  pointer-events: none;
+}
+
+/* Subtle vignette for the luxury / cinematic edge falloff. */
+.iss-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: radial-gradient(
+    120% 120% at 50% 45%,
+    transparent 55%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  pointer-events: none;
+}
+
+/* Typographic overlay — fades in on mount, then driven by scroll progress. */
+.iss-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2rem, 6vh, 4rem);
+  padding: clamp(1.5rem, 4vw, 3rem);
+  text-align: center;
+  pointer-events: none;
+  color: #ffffff;
+  will-change: transform, opacity;
+  animation: iss-overlay-in 1200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes iss-overlay-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.iss-overlay__inner {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+.iss-overlay__eyebrow {
+  margin: 0;
+  font-size: clamp(10px, 1.4vw, 13px);
+  font-weight: 700;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: #ed3c18;
+}
+
+.iss-overlay__heading {
+  margin: clamp(1rem, 2.5vh, 1.6rem) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+}
+
+.iss-overlay__title {
+  font-size: clamp(2.4rem, 7vw, 5.25rem);
+  color: #ffffff;
+}
+
+.iss-overlay__subtitle {
+  font-size: clamp(1.4rem, 4vw, 3rem);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.iss-overlay__body {
+  margin: clamp(1.1rem, 3vh, 1.75rem) auto 0;
+  max-width: 620px;
+  font-size: clamp(0.95rem, 1.5vw, 1.18rem);
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* Scroll hint at the bottom. */
+.iss-overlay__hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.iss-overlay__hint-arrow {
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #ed3c18;
+  animation: iss-hint-bob 1.8s ease-in-out infinite;
+}
+
+@keyframes iss-hint-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+
+.iss-overlay__hint-label {
+  font-size: clamp(9px, 1.2vw, 11px);
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Thin scrub progress bar along the bottom. */
+.iss-progress {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  z-index: 4;
+  width: min(420px, 60vw);
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.iss-progress__bar {
+  height: 100%;
+  width: 100%;
+  background: #ed3c18;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iss-overlay {
+    animation: none;
+  }
+  .iss-overlay__hint-arrow {
+    animation: none;
+  }
+}
