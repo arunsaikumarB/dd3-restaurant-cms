@@ -54,16 +54,17 @@ export default function SouthPlainfieldEntranceSequence() {
     );
   }
 
-  // Overlay intentionally omitted — the cinematic sequence is the only
-  // storytelling element; supporting content lives in the next section.
+  // Clean cinematic walkthrough — no overlay, no copy. The footage tells the
+  // story; supporting content lives in the next homepage section.
   return (
     <ImageSequenceScroll
       frames={manifest.frames}
       frameCount={manifest.frameCount}
-      width={manifest.width}
-      height={manifest.height}
+      canvasWidth={manifest.width}
+      canvasHeight={manifest.height}
       scrollLength={SP_ENTRANCE_SCROLL_LENGTH}
-      videoSrc={SP_ENTRANCE_VIDEO_SRC}
+      video={SP_ENTRANCE_VIDEO_SRC}
+      location="south-plainfield"
     />
   );
 }

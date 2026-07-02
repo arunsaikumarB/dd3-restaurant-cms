@@ -63,6 +63,10 @@ export interface ImageSequenceScrollProps {
   posterSrc?: string;
 
   className?: string;
+  /** Optional `data-location` attribute for the section (provenance/analytics). */
+  dataLocation?: string;
+  /** Optional `data-source` attribute for the section (source video provenance). */
+  dataSource?: string;
   /** Overlay content rendered above the canvas inside the pinned stage. */
   children?: ReactNode;
 
@@ -118,6 +122,8 @@ export default function ImageSequenceScroll({
   background = "#000",
   posterSrc,
   className,
+  dataLocation,
+  dataSource,
   children,
   onReady,
   onProgress,
@@ -347,6 +353,8 @@ export default function ImageSequenceScroll({
       ref={sectionRef}
       className={className}
       data-aspect={`${width}/${height}`}
+      data-location={dataLocation}
+      data-source={dataSource}
       style={{
         position: "relative",
         width: "100%",

@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-07-02T14:33:09.949Z",
+  "generatedAt": "2026-07-02T15:35:48.693Z",
   "source": "sp-entrance.mp4",
   "frameCount": 109,
   "width": 1280,
   "height": 720,
   "aspectRatio": 1.7777777777777777,
-  "duration": 6.25,
+  "duration": 8,
   "urlPattern": "/sp-entrance-frames/frame_%04d.webp",
   "frames": [
     "/sp-entrance-frames/frame_0001.webp",
