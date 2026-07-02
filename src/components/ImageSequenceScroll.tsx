@@ -47,6 +47,13 @@ export interface ImageSequenceScrollProps {
   scrub?: number | boolean;
   /** How the frame fills the canvas (default "cover"). */
   fit?: FrameFit;
+  /**
+   * Horizontal focal point used to center the crop in "cover" mode, 0–1
+   * (0 = anchor left, 0.5 = center, 1 = anchor right). Default 0.5 (center-lock).
+   */
+  focalX?: number;
+  /** Vertical focal point, 0–1 (0.5 = center). Default 0.5 (center-lock). */
+  focalY?: number;
   /** Canvas background color shown behind "contain" letterboxing (default "#000"). */
   background?: string;
   /**
@@ -106,6 +113,8 @@ export default function ImageSequenceScroll({
   scrollDuration = 2.5,
   scrub = 0.6,
   fit = "cover",
+  focalX = 0.5,
+  focalY = 0.5,
   background = "#000",
   posterSrc,
   className,
@@ -141,7 +150,14 @@ export default function ImageSequenceScroll({
     });
   }, [frames, frameCount, getFrameUrl, urlPattern, startIndex]);
 
-  /** Draw a frame onto the canvas, fitting while preserving aspect ratio. */
+  /**
+   * Draw a frame with a "smart cover" algorithm:
+   *  1. Preserve the original aspect ratio (never distort).
+   *  2. Scale until the canvas is completely filled (no empty margins).
+   *  3. Crop only the outer edges, anchored to the focal point (center-lock).
+   * A small overscan + integer rounding removes sub-pixel hairline gaps and
+   * flicker during scrubbing.
+   */
   const drawFrame = useCallback(
     (index: number, force = false) => {
       const canvas = canvasRef.current;
@@ -161,20 +177,27 @@ export default function ImageSequenceScroll({
       const iw = img.naturalWidth;
       const ih = img.naturalHeight;
 
-      const scale =
-        fit === "cover"
-          ? Math.max(cw / iw, ch / ih)
-          : Math.min(cw / iw, ch / ih);
-      const dw = iw * scale;
-      const dh = ih * scale;
-      const dx = (cw - dw) / 2;
-      const dy = (ch - dh) / 2;
-
       ctx.fillStyle = background;
       ctx.fillRect(0, 0, cw, ch);
+
+      if (fit === "contain") {
+        const scale = Math.min(cw / iw, ch / ih);
+        const dw = iw * scale;
+        const dh = ih * scale;
+        ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+        return;
+      }
+
+      // Cover: fill the canvas completely, crop overflow toward the focal point.
+      const scale = Math.max(cw / iw, ch / ih);
+      // +1px overscan on each axis guards against sub-pixel rounding gaps.
+      const dw = Math.ceil(iw * scale) + 2;
+      const dh = Math.ceil(ih * scale) + 2;
+      const dx = Math.round((cw - dw) * focalX);
+      const dy = Math.round((ch - dh) * focalY);
       ctx.drawImage(img, dx, dy, dw, dh);
     },
-    [fit, background]
+    [fit, focalX, focalY, background]
   );
 
   /** Schedule a render coalesced into the next animation frame. */
@@ -353,6 +376,7 @@ export default function ImageSequenceScroll({
               width: "100%",
               height: "100%",
               objectFit: fit,
+              objectPosition: `${focalX * 100}% ${focalY * 100}%`,
               zIndex: 0,
             }}
           />
