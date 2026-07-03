@@ -83,11 +83,23 @@ function pagePathFilter(prefix?: string | null) {
 
 /**
  * Normalizes a PEM private key from Netlify environment-variable storage.
- * Handles escaped \\n, quoted strings, CRLF, and single-line PEM pastes.
+ *
+ * Accepts BOTH supported input shapes and produces a canonical PEM:
+ *   1. Escaped one-liner:
+ *      "-----BEGIN PRIVATE KEY-----\nMIIE...\n-----END PRIVATE KEY-----\n"
+ *   2. Real multiline PEM:
+ *      -----BEGIN PRIVATE KEY-----
+ *      MIIE...
+ *      -----END PRIVATE KEY-----
+ *
+ * Also tolerates surrounding quotes, CRLF line endings, double-escaped \\n,
+ * and headers/footers glued onto the base64 body on a single line.
  */
 function normalizePrivateKey(raw: string): string {
   let key = raw.trim();
+  if (!key) return "";
 
+  // Strip a single layer of wrapping quotes (Netlify UI sometimes keeps them).
   if (
     (key.startsWith('"') && key.endsWith('"')) ||
     (key.startsWith("'") && key.endsWith("'"))
@@ -95,16 +107,21 @@ function normalizePrivateKey(raw: string): string {
     key = key.slice(1, -1).trim();
   }
 
+  // Case 1: escaped newlines → real newlines (handle double-escaped first).
   key = key.replace(/\\\\n/g, "\\n").replace(/\\n/g, "\n");
+
+  // Normalize CRLF / lone CR to LF so multiline PEM (case 2) is consistent.
   key = key.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 
-  if (!key.includes("\n") && key.includes("BEGIN")) {
-    key = key
-      .replace(/-----BEGIN ([A-Z ]+)----- /, "-----BEGIN $1-----\n")
-      .replace(/ -----END ([A-Z ]+)-----$/, "\n-----END $1-----");
-  }
+  // If header/footer are on the same line as the body (no separating newline),
+  // insert newlines around them so the canonical reflow below can run.
+  key = key
+    .replace(/-----BEGIN ([A-Z0-9 ]+?)-----\s*/g, "-----BEGIN $1-----\n")
+    .replace(/\s*-----END ([A-Z0-9 ]+?)-----/g, "\n-----END $1-----");
 
-  const pemMatch = key.match(/-----BEGIN ([A-Z ]+)-----\n([\s\S]*?)\n-----END \1-----/);
+  // Canonicalize: strip all inner whitespace from the base64 body and re-wrap
+  // at 64 chars — this repairs both single-line and irregularly-wrapped keys.
+  const pemMatch = key.match(/-----BEGIN ([A-Z0-9 ]+)-----([\s\S]*?)-----END \1-----/);
   if (pemMatch) {
     const [, label, body] = pemMatch;
     const compact = body.replace(/\s+/g, "");
@@ -116,16 +133,46 @@ function normalizePrivateKey(raw: string): string {
   return key;
 }
 
-function isValidPrivateKey(key: string): boolean {
-  return /-----BEGIN (?:RSA )?PRIVATE KEY-----/.test(key);
+/**
+ * Validates a normalized PEM key. Returns a descriptive error string when
+ * invalid, or null when the key looks structurally sound.
+ */
+function validatePrivateKey(key: string): string | null {
+  if (!key.trim()) {
+    return "GA4_PRIVATE_KEY is empty. Set it in Netlify → Environment variables.";
+  }
+
+  const beginMatch = key.match(/-----BEGIN ((?:RSA |EC )?PRIVATE KEY)-----/);
+  const endMatch = key.match(/-----END ((?:RSA |EC )?PRIVATE KEY)-----/);
+
+  if (!beginMatch) {
+    return `GA4_PRIVATE_KEY is missing the "-----BEGIN PRIVATE KEY-----" header. ${ga4KeyHint()}`;
+  }
+  if (!endMatch) {
+    return `GA4_PRIVATE_KEY is missing the "-----END PRIVATE KEY-----" footer. ${ga4KeyHint()}`;
+  }
+
+  // Ensure there is a non-empty base64 body between header and footer.
+  const body = key
+    .slice(key.indexOf(beginMatch[0]) + beginMatch[0].length, key.lastIndexOf(endMatch[0]))
+    .replace(/\s+/g, "");
+  if (body.length === 0) {
+    return `GA4_PRIVATE_KEY has no key content between the header and footer. ${ga4KeyHint()}`;
+  }
+
+  return null;
+}
+
+function ga4KeyHint(): string {
+  return (
+    "Paste the full service-account key — either the escaped one-liner " +
+    "(-----BEGIN PRIVATE KEY-----\\n...\\n-----END PRIVATE KEY-----\\n) or the " +
+    "multiline PEM."
+  );
 }
 
 function ga4KeyConfigError(): string {
-  return (
-    "GA4_PRIVATE_KEY could not be parsed. In Netlify → Environment variables, " +
-    "set GA4_PRIVATE_KEY as one line with \\n between PEM lines, e.g. " +
-    "-----BEGIN PRIVATE KEY-----\\nMIIE...\\n-----END PRIVATE KEY-----\\n"
-  );
+  return `GA4_PRIVATE_KEY could not be decoded by OpenSSL. ${ga4KeyHint()}`;
 }
 
 function buildOverview(row: Record<string, number>): Ga4Overview {
@@ -167,13 +214,14 @@ export default async function handler(req: Request): Promise<Response> {
   const propertyId = process.env.GA4_PROPERTY_ID;
   const clientEmail = process.env.GA4_CLIENT_EMAIL;
   const privateKey = normalizePrivateKey(process.env.GA4_PRIVATE_KEY ?? "");
-  if (!propertyId || !clientEmail || !privateKey) {
+  if (!propertyId || !clientEmail) {
     return json(500, {
       error: "GA4 is not configured. Set GA4_PROPERTY_ID, GA4_CLIENT_EMAIL and GA4_PRIVATE_KEY.",
     });
   }
-  if (!isValidPrivateKey(privateKey)) {
-    return json(500, { error: ga4KeyConfigError() });
+  const keyError = validatePrivateKey(privateKey);
+  if (keyError) {
+    return json(500, { error: keyError });
   }
 
   let body: Ga4RequestBody = {};
