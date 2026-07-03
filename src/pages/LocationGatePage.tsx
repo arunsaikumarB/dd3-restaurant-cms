@@ -1,9 +1,23 @@
 import { useNavigate } from "react-router-dom";
-import { LOCATION_OPTIONS, getLocationConfig, type LocationId } from "../config/locations";
-import LocationOptionCard from "../components/location/LocationOptionCard";
+import {
+  LOCATION_IDS,
+  getLocationConfig,
+  type LocationId,
+} from "../config/locations";
+import PremiumLocationCard from "../components/location/PremiumLocationCard";
 import { LOGO } from "../constants/logo";
 import { locPath } from "../utils/locationPaths";
 import { useLocationSelection } from "../context/LocationContext";
+
+/** Full-bleed ambience image behind the picker. */
+const GATE_BACKGROUND = "/hero/hero-poster.webp";
+
+/** Per-location card imagery (decorative only). */
+const LOCATION_IMAGES: Record<LocationId, string> = {
+  "south-plainfield": "/showcase/biryani.webp",
+  "oak-tree": "/showcase/tandoori.webp",
+  lawrenceville: "/showcase/butter-chicken.webp",
+};
 
 /**
  * Landing page at "/". Always shows the location picker — visiting "/"
@@ -20,29 +34,54 @@ export default function LocationGatePage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-cocoa px-6 py-16">
-      <img src={LOGO.onDark} alt={LOGO.alt} className="mb-8 h-14 w-auto object-contain" />
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-wide text-brand-primary">
-          Choose Location
-        </p>
-        <h1 className="mt-1 font-serif text-2xl font-semibold text-cocoa">
-          Select a Desi Dhamaka Location
-        </h1>
-        <p className="mt-2 text-sm text-cocoa/60">
-          We&apos;ll show you the menu, pricing, offers and booking links for your location.
-        </p>
-        <div className="mt-6 space-y-2" role="listbox" aria-label="Restaurant locations">
-          {LOCATION_OPTIONS.map((option) => (
-            <LocationOptionCard
-              key={option.id}
-              option={{
-                ...option,
-                address: option.address || getLocationConfig(option.id).address,
-              }}
-              selected={false}
-              onSelect={handleSelect}
-            />
+    <div className="relative min-h-screen overflow-hidden bg-cocoa">
+      {/* Ambience background */}
+      <div className="absolute inset-0" aria-hidden>
+        <img
+          src={GATE_BACKGROUND}
+          alt=""
+          className="h-full w-full scale-105 object-cover blur-[3px]"
+          decoding="async"
+          fetchPriority="high"
+        />
+        <div className="absolute inset-0 bg-cocoa/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-cocoa/70 via-cocoa/60 to-cocoa/90" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col items-center px-6 py-14 sm:py-20">
+        <header className="flex flex-col items-center text-center">
+          <img
+            src={LOGO.onDark}
+            alt={LOGO.alt}
+            className="h-16 w-auto object-contain sm:h-20"
+            decoding="async"
+          />
+          <p className="mt-8 text-xs font-semibold uppercase tracking-[0.28em] text-brand-primary">
+            Choose Location
+          </p>
+          <h1 className="mt-3 max-w-2xl font-serif text-3xl font-semibold text-white sm:text-4xl md:text-5xl">
+            Choose Your Nearest Restaurant
+          </h1>
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-white/70">
+            Select a location to explore menus, online ordering, reservations and
+            exclusive offers.
+          </p>
+        </header>
+
+        <div
+          className="mt-12 grid w-full grid-cols-1 gap-6 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3"
+          role="list"
+          aria-label="Restaurant locations"
+        >
+          {LOCATION_IDS.map((id) => (
+            <div key={id} role="listitem" className="h-full">
+              <PremiumLocationCard
+                config={getLocationConfig(id)}
+                image={LOCATION_IMAGES[id]}
+                onSelect={handleSelect}
+              />
+            </div>
           ))}
         </div>
       </div>
