@@ -15,12 +15,6 @@ import { verifyAdminAccessToken } from "../../src/integrations/chefgaa/automatio
  *   GA4_PRIVATE_KEY   — service-account private key (\n escaped)
  */
 
-type HttpEvent = {
-  httpMethod?: string;
-  headers?: Record<string, string | undefined>;
-  body?: string | null;
-};
-
 type Ga4RequestBody = {
   /** GA4 date string, e.g. "2026-07-01" or "7daysAgo". */
   startDate?: string;
@@ -100,39 +94,43 @@ function buildOverview(row: Record<string, number>): Ga4Overview {
   };
 }
 
-export default async function handler(event: HttpEvent) {
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 204, body: "" };
+function json(status: number, data: unknown, extraHeaders?: Record<string, string>): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", ...extraHeaders },
+  });
+}
+
+export default async function handler(req: Request): Promise<Response> {
+  if (req.method === "OPTIONS") {
+    return new Response("", { status: 204 });
   }
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
+  if (req.method !== "POST") {
+    return json(405, { error: "Method not allowed" });
   }
 
-  const authHeader = event.headers?.authorization ?? event.headers?.Authorization ?? "";
+  const authHeader = req.headers.get("authorization") ?? req.headers.get("Authorization") ?? "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
   const auth = await verifyAdminAccessToken(token);
   if (!auth.ok) {
-    return { statusCode: 401, body: JSON.stringify({ error: auth.error }) };
+    return json(401, { error: auth.error });
   }
 
   const propertyId = process.env.GA4_PROPERTY_ID;
   const clientEmail = process.env.GA4_CLIENT_EMAIL;
   const privateKey = (process.env.GA4_PRIVATE_KEY ?? "").replace(/\\n/g, "\n");
   if (!propertyId || !clientEmail || !privateKey) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        error:
-          "GA4 is not configured. Set GA4_PROPERTY_ID, GA4_CLIENT_EMAIL and GA4_PRIVATE_KEY.",
-      }),
-    };
+    return json(500, {
+      error: "GA4 is not configured. Set GA4_PROPERTY_ID, GA4_CLIENT_EMAIL and GA4_PRIVATE_KEY.",
+    });
   }
 
   let body: Ga4RequestBody = {};
   try {
-    body = event.body ? (JSON.parse(event.body) as Ga4RequestBody) : {};
+    const raw = await req.text();
+    body = raw ? (JSON.parse(raw) as Ga4RequestBody) : {};
   } catch {
-    return { statusCode: 400, body: JSON.stringify({ error: "Invalid JSON body" }) };
+    return json(400, { error: "Invalid JSON body" });
   }
 
   const startDate = body.startDate || "7daysAgo";
@@ -148,11 +146,7 @@ export default async function handler(event: HttpEvent) {
   });
   const cached = cache.get(cacheKey);
   if (cached && cached.expires > Date.now()) {
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json", "X-Cache": "HIT" },
-      body: JSON.stringify(cached.payload),
-    };
+    return json(200, cached.payload, { "X-Cache": "HIT" });
   }
 
   const property = `properties/${propertyId}`;
@@ -321,16 +315,9 @@ export default async function handler(event: HttpEvent) {
 
     cache.set(cacheKey, { expires: Date.now() + CACHE_TTL_MS, payload });
 
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json", "X-Cache": "MISS" },
-      body: JSON.stringify(payload),
-    };
+    return json(200, payload, { "X-Cache": "MISS" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "GA4 request failed.";
-    return {
-      statusCode: 502,
-      body: JSON.stringify({ error: `Google Analytics request failed: ${message}` }),
-    };
+    return json(502, { error: `Google Analytics request failed: ${message}` });
   }
 }
