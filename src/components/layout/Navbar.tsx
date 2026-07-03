@@ -19,6 +19,12 @@ import { useLocationSelection } from "../../context/LocationContext";
 import { isExternalUrl, resolveReservationUrl } from "../../utils/locationLinks";
 import { locPath } from "../../utils/locationPaths";
 import { trackOrderClick, trackReservationClick } from "../../services/analytics";
+import {
+  isDirectOrderingMode,
+  redirectToChefGaaOrder,
+  useLocationOrderUrl,
+  useMenuExperience,
+} from "../../demo/menuExperience";
 import "./navbar.css";
 
 type NavLinkItem = { label: string; path: string };
@@ -38,6 +44,9 @@ export default function Navbar() {
     reserveLabel: "Reserve a Table",
   });
   const { selectedLocationId } = useLocationSelection();
+  const { mode: menuExperienceMode } = useMenuExperience();
+  const chefGaaOrderUrl = useLocationOrderUrl();
+  const directMenuOrdering = isDirectOrderingMode(menuExperienceMode);
   const reservationLink = resolveReservationUrl(bundle.settings, selectedLocationId);
   const orderPagePath = locPath(selectedLocationId, ORDER_URL);
   const reserveUrl = locPath(selectedLocationId, RESERVE_URL);
@@ -130,8 +139,27 @@ export default function Navbar() {
     "site-header__nav-link text-[12px] font-semibold whitespace-nowrap px-0.5 uppercase tracking-wide text-white/80 hover:text-white 2xl:text-sm 2xl:tracking-wider" +
     (active ? " site-header__nav-link--active" : "");
 
+  const handleDirectMenuNav = (event: MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    redirectToChefGaaOrder(chefGaaOrderUrl);
+  };
+
   const renderNavLink = (link: NavLinkItem) => {
     const active = isActive(link.path);
+
+    if (link.path === "/menu" && directMenuOrdering) {
+      return (
+        <a
+          key={link.path}
+          href={chefGaaOrderUrl}
+          className={navLinkClass(active)}
+          onClick={handleDirectMenuNav}
+        >
+          {link.label}
+        </a>
+      );
+    }
+
     return (
       <Link
         key={link.path}
@@ -239,6 +267,7 @@ export default function Navbar() {
             <nav className="flex w-full max-w-sm flex-col items-center gap-2" aria-label="Mobile">
               {NAV_LINKS.map((link, index) => {
                 const active = isActive(link.path);
+                const isDirectMenu = link.path === "/menu" && directMenuOrdering;
                 return (
                   <motion.div
                     key={link.path}
@@ -247,15 +276,28 @@ export default function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.04 + index * 0.03, ease: EASE_POWER3 }}
                   >
-                    <Link
-                      to={locPath(selectedLocationId, link.path)}
-                      className={
-                        "block py-2 text-2xl font-semibold transition-colors" +
-                        (active ? " text-brand-secondary" : " text-white hover:text-brand-secondary")
-                      }
-                    >
-                      {link.label}
-                    </Link>
+                    {isDirectMenu ? (
+                      <a
+                        href={chefGaaOrderUrl}
+                        onClick={handleDirectMenuNav}
+                        className={
+                          "block py-2 text-2xl font-semibold transition-colors" +
+                          (active ? " text-brand-secondary" : " text-white hover:text-brand-secondary")
+                        }
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        to={locPath(selectedLocationId, link.path)}
+                        className={
+                          "block py-2 text-2xl font-semibold transition-colors" +
+                          (active ? " text-brand-secondary" : " text-white hover:text-brand-secondary")
+                        }
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </motion.div>
                 );
               })}

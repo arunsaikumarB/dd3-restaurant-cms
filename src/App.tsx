@@ -15,6 +15,7 @@ import UnauthorizedRoute from "./admin/components/UnauthorizedRoute";
 import { LocationProvider, useLocationSelection } from "./context/LocationContext";
 import { PageContentProvider } from "./context/PageContentContext";
 import { usePageTracking } from "./hooks/usePageTracking";
+import { MenuExperienceSwitch } from "./demo/menuExperience";
 import { isLocationId, resolvePublicLocationId } from "./config/locations";
 
 const AdminLoginPage = lazy(() => import("./admin/pages/LoginPage"));
@@ -214,6 +215,7 @@ function PublicSiteChrome() {
         <LocationPageRoutes />
       </main>
       <Footer />
+      <MenuExperienceSwitch />
     </>
   );
 }

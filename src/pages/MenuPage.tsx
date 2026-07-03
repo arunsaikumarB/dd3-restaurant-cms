@@ -11,6 +11,12 @@ import {
 } from "../components/menu/MenuSkeleton";
 import SearchBar from "../components/menu/SearchBar";
 import { NAV_BAR_HEIGHT } from "../constants/navigation";
+import {
+  isDirectOrderingMode,
+  redirectToChefGaaOrder,
+  useLocationOrderUrl,
+  useMenuExperience,
+} from "../demo/menuExperience";
 import { usePageContent } from "../context/PageContentContext";
 import { useMenuData } from "../hooks/useMenuData";
 import { filterMenuData, flattenItems } from "../utils/menu";
@@ -21,6 +27,9 @@ import { isExternalUrl } from "../utils/locationLinks";
 export default function MenuPage() {
   const { fetchSection, interpolate } = usePageContent();
   const { selectedLocationId } = useLocationSelection();
+  const { mode: menuExperienceMode } = useMenuExperience();
+  const chefGaaOrderUrl = useLocationOrderUrl();
+  const directMenuOrdering = isDirectOrderingMode(menuExperienceMode);
   const menuHeroImage = useSectionImage("menu_hero", "/showcase/biryani.webp");
   const { data, loading, error } = useMenuData(selectedLocationId);
   const [search, setSearch] = useState("");
@@ -96,6 +105,15 @@ export default function MenuPage() {
     if (filterCategory) setActiveCategory(filterCategory);
     if (search.trim()) setActiveCategory(null);
   }, [filterCategory, search]);
+
+  useEffect(() => {
+    if (!directMenuOrdering) return;
+    redirectToChefGaaOrder(chefGaaOrderUrl);
+  }, [chefGaaOrderUrl, directMenuOrdering]);
+
+  if (directMenuOrdering) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-ivory">

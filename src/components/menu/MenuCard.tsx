@@ -1,3 +1,6 @@
+import PrimaryOutlineButton from "../showcase/PrimaryOutlineButton";
+import { buildChefGaaMenuUrl } from "../../constants/ordering";
+import { useLocationOrderUrl } from "../../demo/menuExperience";
 import { formatPrice } from "../../utils/menu";
 import type { MenuItem } from "../../types/menu";
 
@@ -6,6 +9,8 @@ export interface MenuCardProps {
 }
 
 export default function MenuCard({ item }: MenuCardProps) {
+  const orderBaseUrl = useLocationOrderUrl();
+  const cartUrl = buildChefGaaMenuUrl(item.category, item.name, { baseUrl: orderBaseUrl });
   const hasDescription = item.description.trim().length > 0;
 
   return (
@@ -34,10 +39,16 @@ export default function MenuCard({ item }: MenuCardProps) {
       <span className="mb-3 block h-px w-8 rounded-full bg-saffron/40 transition-all duration-300 group-hover:w-12 group-hover:bg-saffron/60" aria-hidden />
 
       {hasDescription ? (
-        <p className="text-[14px] leading-[1.7] text-cocoa/55">{item.description}</p>
+        <p className="mb-5 text-[14px] leading-[1.7] text-cocoa/55">{item.description}</p>
       ) : (
-        <span className="sr-only">No description available</span>
+        <span className="mb-5 block sr-only">No description available</span>
       )}
+
+      <div className="mt-auto pt-1">
+        <PrimaryOutlineButton href={cartUrl} external className="w-full justify-center px-5 py-3 text-[11px]">
+          Add to Cart
+        </PrimaryOutlineButton>
+      </div>
     </article>
   );
 }
