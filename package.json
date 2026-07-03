@@ -16,7 +16,8 @@
     "sync:chefgaa:all": "npx tsx scripts/sync-chefgaa.ts --all",
     "sync:chefgaa:scheduler": "npx tsx scripts/chefgaa-scheduler.ts",
     "audit:menu": "node scripts/audit-menu-integrity.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npx netlify deploy --prod --build"
   },
   "dependencies": {
     "@google-analytics/data": "^6.1.0",
