@@ -34,7 +34,7 @@ export default function LocationGatePage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-cocoa">
+    <div className="relative flex h-screen flex-col overflow-hidden bg-cocoa">
       {/* Ambience background */}
       <div className="absolute inset-0" aria-hidden>
         <img
@@ -49,28 +49,24 @@ export default function LocationGatePage() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col items-center px-6 py-14 sm:py-20">
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col items-center justify-center px-6 py-8">
         <header className="flex flex-col items-center text-center">
           <img
             src={LOGO.onDark}
             alt={LOGO.alt}
-            className="h-16 w-auto object-contain sm:h-20"
+            className="h-14 w-auto object-contain sm:h-16"
             decoding="async"
           />
-          <p className="mt-8 text-xs font-semibold uppercase tracking-[0.28em] text-brand-primary">
-            Choose Location
-          </p>
-          <h1 className="mt-3 max-w-2xl font-serif text-3xl font-semibold text-white sm:text-4xl md:text-5xl">
+          <h1 className="mt-6 whitespace-nowrap font-serif text-[clamp(1.5rem,4.5vw,3rem)] font-semibold text-white">
             Choose Your Nearest Restaurant
           </h1>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-white/70">
-            Select a location to explore menus, online ordering, reservations and
-            exclusive offers.
+          <p className="mt-3 whitespace-nowrap text-[clamp(0.7rem,1.8vw,1rem)] leading-relaxed text-white/70">
+            Select a location to explore menus, online ordering, reservations and exclusive offers.
           </p>
         </header>
 
         <div
-          className="mt-12 grid w-full grid-cols-1 gap-6 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3"
+          className="mt-10 grid w-full grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3 lg:gap-10"
           role="list"
           aria-label="Restaurant locations"
         >
