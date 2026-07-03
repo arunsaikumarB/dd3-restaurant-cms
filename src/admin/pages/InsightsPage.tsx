@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
+  Activity,
   BarChart3,
   ChevronDown,
   ChevronRight,
@@ -33,23 +34,23 @@ import {
   type LocationId,
 } from "../../config/locations";
 import {
-  fetchAnalyticsDevices,
   fetchAnalyticsOfferDaily,
   fetchAnalyticsOfferPerformance,
-  fetchAnalyticsReferrers,
   fetchAnalyticsSummary,
-  fetchAnalyticsViewsByDay,
-  fetchAnalyticsViewsByPage,
   getPreviousPeriod,
   percentChange,
-  type AnalyticsDayRow,
-  type AnalyticsDeviceRow,
   type AnalyticsOfferDayRow,
   type AnalyticsOfferRow,
-  type AnalyticsPageRow,
-  type AnalyticsReferrerRow,
   type AnalyticsSummary,
 } from "../../services/analyticsAdmin";
+import {
+  fetchGaAnalytics,
+  invalidateGaAnalyticsCache,
+  toGaDate,
+  Ga4Error,
+  type Ga4AnalyticsResponse,
+  type Ga4Overview,
+} from "../../services/gaAnalytics";
 
 type DatePreset = "today" | "7d" | "30d" | "90d" | "custom";
 
@@ -149,49 +150,53 @@ function SummaryStatCard({ card }: { card: SummaryCard }) {
   );
 }
 
-function buildSummaryCards(current: AnalyticsSummary, previous: AnalyticsSummary): SummaryCard[] {
-  const conversion =
-    current.offers_page_views > 0
-      ? `${((current.offer_clicks / current.offers_page_views) * 100).toFixed(1)}%`
-      : "0%";
+function SkeletonCard() {
+  const { dark } = useAdminTheme();
+  const bar = dark ? "bg-white/10" : "bg-admin-border/50";
+  return (
+    <AdminCard>
+      <div className="animate-pulse">
+        <div className={`h-11 w-11 rounded-xl ${bar}`} />
+        <div className={`mt-4 h-3 w-24 rounded ${bar}`} />
+        <div className={`mt-3 h-8 w-20 rounded ${bar}`} />
+      </div>
+    </AdminCard>
+  );
+}
+
+function buildGaSummaryCards(current: Ga4Overview, previous: Ga4Overview | null): SummaryCard[] {
+  const delta = (cur: number, prev: number | undefined): number | null =>
+    previous ? percentChange(cur, prev ?? 0) : null;
 
   return [
+    { id: "users", label: "Users", value: current.totalUsers, delta: delta(current.totalUsers, previous?.totalUsers) },
+    {
+      id: "active-users",
+      label: "Active Users",
+      value: current.activeUsers,
+      delta: delta(current.activeUsers, previous?.activeUsers),
+    },
+    { id: "sessions", label: "Sessions", value: current.sessions, delta: delta(current.sessions, previous?.sessions) },
     {
       id: "page-views",
-      label: "Total Page Views",
-      value: current.total_page_views,
-      delta: percentChange(current.total_page_views, previous.total_page_views),
+      label: "Page Views",
+      value: current.screenPageViews,
+      delta: delta(current.screenPageViews, previous?.screenPageViews),
+    },
+    { id: "new-users", label: "New Users", value: current.newUsers, delta: delta(current.newUsers, previous?.newUsers) },
+    {
+      id: "engagement",
+      label: "Avg Engagement Time",
+      value: current.avgEngagementSeconds,
+      delta: delta(current.avgEngagementSeconds, previous?.avgEngagementSeconds),
+      suffix: "sec",
     },
     {
-      id: "sessions",
-      label: "Unique Visitors",
-      value: current.unique_sessions,
-      delta: percentChange(current.unique_sessions, previous.unique_sessions),
-    },
-    {
-      id: "offers-page",
-      label: "Offers Page Views",
-      value: current.offers_page_views,
-      delta: percentChange(current.offers_page_views, previous.offers_page_views),
-    },
-    {
-      id: "offer-clicks",
-      label: "Offer Clicks",
-      value: current.offer_clicks,
-      delta: percentChange(current.offer_clicks, previous.offer_clicks),
-      suffix: conversion,
-    },
-    {
-      id: "order-clicks",
-      label: "Order Now Clicks",
-      value: current.order_clicks,
-      delta: percentChange(current.order_clicks, previous.order_clicks),
-    },
-    {
-      id: "reservation-clicks",
-      label: "Reservation Clicks",
-      value: current.reservation_clicks,
-      delta: percentChange(current.reservation_clicks, previous.reservation_clicks),
+      id: "bounce",
+      label: "Bounce Rate",
+      value: current.bounceRatePct,
+      delta: delta(current.bounceRatePct, previous?.bounceRatePct),
+      suffix: "%",
     },
   ];
 }
@@ -199,6 +204,15 @@ function buildSummaryCards(current: AnalyticsSummary, previous: AnalyticsSummary
 function formatCtr(views: number, clicks: number): string {
   if (views === 0) return "—";
   return `${((clicks / views) * 100).toFixed(1)}%`;
+}
+
+/** Parse a GA4 "YYYYMMDD" date dimension into a short label. */
+function formatGaDate(raw: string): string {
+  if (raw.length !== 8) return raw;
+  const year = Number(raw.slice(0, 4));
+  const month = Number(raw.slice(4, 6)) - 1;
+  const day = Number(raw.slice(6, 8));
+  return new Date(year, month, day).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 function OfferPerformanceTable({
@@ -355,6 +369,23 @@ function OfferPerformanceTable({
   );
 }
 
+function MetricList({ rows, empty }: { rows: { label: string; value: number }[]; empty: string }) {
+  const { dark } = useAdminTheme();
+  if (rows.length === 0) {
+    return <p className={`text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>{empty}</p>;
+  }
+  return (
+    <ul className="space-y-3">
+      {rows.map((row) => (
+        <li key={row.label} className="flex items-center justify-between gap-3 text-sm">
+          <span className="truncate font-medium">{row.label}</span>
+          <span className={dark ? "text-white/50" : "text-admin-muted"}>{formatNumber(row.value)}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function InsightsPage() {
   const { dark } = useAdminTheme();
   const { scope, locationId, isAllLocations, currentLocation } = useLocation();
@@ -362,15 +393,12 @@ export default function InsightsPage() {
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
   const [loading, setLoading] = useState(true);
-  const [summaryCards, setSummaryCards] = useState<SummaryCard[]>([]);
+  const [ga, setGa] = useState<Ga4AnalyticsResponse | null>(null);
+  const [gaError, setGaError] = useState<string | null>(null);
   const [comparisonRows, setComparisonRows] = useState<
     { locationId: LocationId; name: string; summary: AnalyticsSummary }[]
   >([]);
-  const [dayRows, setDayRows] = useState<AnalyticsDayRow[]>([]);
-  const [pageRows, setPageRows] = useState<AnalyticsPageRow[]>([]);
   const [offerRows, setOfferRows] = useState<AnalyticsOfferRow[]>([]);
-  const [deviceRows, setDeviceRows] = useState<AnalyticsDeviceRow[]>([]);
-  const [referrerRows, setReferrerRows] = useState<AnalyticsReferrerRow[]>([]);
 
   const range = useMemo(
     () => resolvePresetRange(preset, customFrom, customTo),
@@ -379,9 +407,31 @@ export default function InsightsPage() {
 
   const loadInsights = useCallback(async () => {
     setLoading(true);
+    setGaError(null);
     try {
       const previous = getPreviousPeriod(range.from, range.to);
+      const locationPrefix = isAllLocations ? null : `/${locationId}`;
 
+      // GA4 (site-wide or location-scoped) — the primary data source.
+      try {
+        const analytics = await fetchGaAnalytics({
+          startDate: toGaDate(range.from),
+          endDate: toGaDate(range.to),
+          compareStartDate: toGaDate(previous.from),
+          compareEndDate: toGaDate(previous.to),
+          locationPrefix,
+        });
+        setGa(analytics);
+      } catch (error) {
+        setGa(null);
+        setGaError(
+          error instanceof Ga4Error
+            ? error.message
+            : "Unable to load Google Analytics data.",
+        );
+      }
+
+      // First-party (Supabase) sections retained alongside GA4.
       if (isAllLocations) {
         const rows = await Promise.all(
           LOCATION_IDS.map(async (id) => ({
@@ -391,40 +441,12 @@ export default function InsightsPage() {
           })),
         );
         setComparisonRows(rows);
-        setSummaryCards([]);
-        setDayRows([]);
-        setPageRows([]);
         setOfferRows([]);
-        setDeviceRows([]);
-        setReferrerRows([]);
-        return;
+      } else {
+        const offers = await fetchAnalyticsOfferPerformance(locationId, range.from, range.to);
+        setComparisonRows([]);
+        setOfferRows(offers);
       }
-
-      const [
-        currentSummary,
-        previousSummary,
-        days,
-        pages,
-        offers,
-        devices,
-        referrers,
-      ] = await Promise.all([
-        fetchAnalyticsSummary(locationId, range.from, range.to),
-        fetchAnalyticsSummary(locationId, previous.from, previous.to),
-        fetchAnalyticsViewsByDay(locationId, range.from, range.to),
-        fetchAnalyticsViewsByPage(locationId, range.from, range.to),
-        fetchAnalyticsOfferPerformance(locationId, range.from, range.to),
-        fetchAnalyticsDevices(locationId, range.from, range.to),
-        fetchAnalyticsReferrers(locationId, range.from, range.to),
-      ]);
-
-      setComparisonRows([]);
-      setSummaryCards(buildSummaryCards(currentSummary, previousSummary));
-      setDayRows(days);
-      setPageRows(pages.slice(0, 10));
-      setOfferRows(offers);
-      setDeviceRows(devices);
-      setReferrerRows(referrers);
     } finally {
       setLoading(false);
     }
@@ -434,17 +456,20 @@ export default function InsightsPage() {
     void loadInsights();
   }, [loadInsights]);
 
-  const hasData = isAllLocations
-    ? comparisonRows.some((row) => row.summary.total_page_views > 0)
-    : summaryCards.some((card) => card.value > 0) ||
-      dayRows.length > 0 ||
-      offerRows.length > 0;
+  const handleRefresh = () => {
+    invalidateGaAnalyticsCache();
+    void loadInsights();
+  };
 
-  const chartData = dayRows.map((row) => ({
-    day: new Date(row.day).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+  const summaryCards = ga ? buildGaSummaryCards(ga.overview, ga.overviewPrevious) : [];
+
+  const chartData = (ga?.timeseries ?? []).map((row) => ({
+    day: formatGaDate(row.date),
     views: row.views,
     sessions: row.sessions,
   }));
+
+  const deviceData = (ga?.devices ?? []).map((row) => ({ device: row.label, value: row.value }));
 
   return (
     <div>
@@ -469,10 +494,10 @@ export default function InsightsPage() {
             </AdminBadge>
           </div>
           <p className={`mt-1 text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>
-            Website traffic and offer performance for the selected date range.
+            Live Google Analytics traffic and offer performance for the selected date range.
           </p>
         </div>
-        <AdminButton variant="outline" onClick={() => void loadInsights()} disabled={loading}>
+        <AdminButton variant="outline" onClick={handleRefresh} disabled={loading}>
           <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
           Refresh
         </AdminButton>
@@ -529,17 +554,119 @@ export default function InsightsPage() {
         </div>
       ) : null}
 
-      {!hasData && !loading ? (
+      {/* Realtime + loading skeletons */}
+      {loading && !ga ? (
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      ) : null}
+
+      {gaError && !loading ? (
         <AdminCard className="mt-8">
-          <p className={`py-10 text-center text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>
-            No data yet — insights appear as visitors browse the site.
+          <p className={`py-8 text-center text-sm ${dark ? "text-white/60" : "text-admin-muted"}`}>
+            {gaError}
           </p>
         </AdminCard>
       ) : null}
 
+      {ga ? (
+        <>
+          <AdminCard className="mt-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="relative flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-admin-success/70" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-admin-success" />
+                </span>
+                <div>
+                  <p className={`text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>
+                    Active users right now
+                  </p>
+                  <p className="text-2xl font-semibold tracking-tight">
+                    {formatNumber(ga.realtimeActiveUsers)}
+                    <span className={`ml-2 text-xs font-medium ${dark ? "text-white/40" : "text-admin-muted"}`}>
+                      last 30 min
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <Activity size={22} className={dark ? "text-white/40" : "text-admin-muted"} />
+            </div>
+          </AdminCard>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {summaryCards.map((card) => (
+              <SummaryStatCard key={card.id} card={card} />
+            ))}
+          </div>
+
+          {chartData.length > 0 ? (
+            <AdminCard className="mt-8">
+              <h2 className="mb-4 text-sm font-semibold">Views over time</h2>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={dark ? "rgba(255,255,255,0.08)" : "rgba(43,29,24,0.08)"} />
+                    <XAxis dataKey="day" stroke={dark ? "rgba(255,255,255,0.45)" : "rgba(43,29,24,0.45)"} />
+                    <YAxis stroke={dark ? "rgba(255,255,255,0.45)" : "rgba(43,29,24,0.45)"} />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="views" stroke="#ED3C18" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="sessions" stroke="#C97A2B" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </AdminCard>
+          ) : null}
+
+          <div className="mt-8 grid gap-6 xl:grid-cols-2">
+            <AdminCard>
+              <h2 className="mb-4 text-sm font-semibold">Top pages</h2>
+              <MetricList rows={ga.topPages} empty="No page views yet." />
+            </AdminCard>
+
+            <div className="grid gap-6">
+              <AdminCard>
+                <h2 className="mb-4 text-sm font-semibold">Devices</h2>
+                {deviceData.length === 0 ? (
+                  <p className={`text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>No device data yet.</p>
+                ) : (
+                  <div className="h-56">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={deviceData} dataKey="value" nameKey="device" innerRadius={50} outerRadius={80}>
+                          {deviceData.map((entry, index) => (
+                            <Cell key={entry.device} fill={DEVICE_COLORS[index % DEVICE_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </AdminCard>
+
+              <AdminCard>
+                <h2 className="mb-4 text-sm font-semibold">Traffic sources</h2>
+                <MetricList rows={ga.trafficSources} empty="No traffic source data yet." />
+              </AdminCard>
+            </div>
+          </div>
+
+          <AdminCard className="mt-8">
+            <h2 className="mb-4 text-sm font-semibold">Top countries</h2>
+            <MetricList rows={ga.countries} empty="No country data yet." />
+          </AdminCard>
+        </>
+      ) : null}
+
+      {/* First-party (Supabase) sections retained. */}
       {isAllLocations ? (
         <AdminCard className="mt-8 overflow-x-auto">
-          <h2 className="mb-4 text-sm font-semibold">Location comparison</h2>
+          <h2 className="mb-4 text-sm font-semibold">Offer performance by location</h2>
           <table className="min-w-full text-left text-sm">
             <thead className={dark ? "text-white/50" : "text-admin-muted"}>
               <tr>
@@ -568,99 +695,15 @@ export default function InsightsPage() {
           </table>
         </AdminCard>
       ) : (
-        <>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {summaryCards.map((card) => (
-              <SummaryStatCard key={card.id} card={card} />
-            ))}
-          </div>
-
-          {chartData.length > 0 ? (
-            <AdminCard className="mt-8">
-              <h2 className="mb-4 text-sm font-semibold">Views over time</h2>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={dark ? "rgba(255,255,255,0.08)" : "rgba(43,29,24,0.08)"} />
-                    <XAxis dataKey="day" stroke={dark ? "rgba(255,255,255,0.45)" : "rgba(43,29,24,0.45)"} />
-                    <YAxis stroke={dark ? "rgba(255,255,255,0.45)" : "rgba(43,29,24,0.45)"} />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="views" stroke="#ED3C18" strokeWidth={2} dot={false} />
-                    <Line type="monotone" dataKey="sessions" stroke="#C97A2B" strokeWidth={2} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </AdminCard>
-          ) : null}
-
-          <AdminCard className="mt-8 overflow-x-auto">
-            <h2 className="mb-4 text-sm font-semibold">Offers performance</h2>
-            <OfferPerformanceTable
-              rows={offerRows}
-              locationId={locationId}
-              from={range.from}
-              to={range.to}
-            />
-          </AdminCard>
-
-          <div className="mt-8 grid gap-6 xl:grid-cols-2">
-            <AdminCard>
-              <h2 className="mb-4 text-sm font-semibold">Top pages</h2>
-              {pageRows.length === 0 ? (
-                <p className={`text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>No page views yet.</p>
-              ) : (
-                <ul className="space-y-3">
-                  {pageRows.map((row) => (
-                    <li key={row.page_path} className="flex items-center justify-between gap-3 text-sm">
-                      <span className="truncate font-medium">{row.page_path}</span>
-                      <span className={dark ? "text-white/50" : "text-admin-muted"}>{formatNumber(row.views)}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </AdminCard>
-
-            <div className="grid gap-6">
-              <AdminCard>
-                <h2 className="mb-4 text-sm font-semibold">Devices</h2>
-                {deviceRows.length === 0 ? (
-                  <p className={`text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>No device data yet.</p>
-                ) : (
-                  <div className="h-56">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie data={deviceRows} dataKey="views" nameKey="device" innerRadius={50} outerRadius={80}>
-                          {deviceRows.map((entry, index) => (
-                            <Cell key={entry.device} fill={DEVICE_COLORS[index % DEVICE_COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
-              </AdminCard>
-
-              <AdminCard>
-                <h2 className="mb-4 text-sm font-semibold">Top referrers</h2>
-                {referrerRows.length === 0 ? (
-                  <p className={`text-sm ${dark ? "text-white/50" : "text-admin-muted"}`}>No referrer data yet.</p>
-                ) : (
-                  <ul className="space-y-3">
-                    {referrerRows.map((row) => (
-                      <li key={row.referrer} className="flex items-center justify-between gap-3 text-sm">
-                        <span className="truncate font-medium">{row.referrer}</span>
-                        <span className={dark ? "text-white/50" : "text-admin-muted"}>{formatNumber(row.views)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </AdminCard>
-            </div>
-          </div>
-        </>
+        <AdminCard className="mt-8 overflow-x-auto">
+          <h2 className="mb-4 text-sm font-semibold">Offers performance</h2>
+          <OfferPerformanceTable
+            rows={offerRows}
+            locationId={locationId}
+            from={range.from}
+            to={range.to}
+          />
+        </AdminCard>
       )}
     </div>
   );

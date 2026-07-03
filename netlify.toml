@@ -5,6 +5,13 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  # GA4 SDK uses gRPC/protobuf dynamic requires that don't survive esbuild
+  # bundling — ship it from node_modules instead.
+  external_node_modules = ["@google-analytics/data"]
+
+# GA4 service-account credentials — server only (Netlify functions).
+# GA4_PROPERTY_ID, GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY
+# (Site configuration → Environment variables). Never expose to the browser.
 
 # VITE_SITE_URL, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY — set in Netlify UI
 # SUPABASE_SERVICE_ROLE_KEY — server only (Netlify functions + CLI sync; never expose to browser)
