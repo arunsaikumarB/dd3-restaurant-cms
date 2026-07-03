@@ -1,4 +1,5 @@
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
+import { GoogleAuth } from "google-auth-library";
 import { verifyAdminAccessToken } from "../../src/integrations/chefgaa/automation/handler";
 
 /**
@@ -80,6 +81,53 @@ function pagePathFilter(prefix?: string | null) {
   };
 }
 
+/**
+ * Normalizes a PEM private key from Netlify environment-variable storage.
+ * Handles escaped \\n, quoted strings, CRLF, and single-line PEM pastes.
+ */
+function normalizePrivateKey(raw: string): string {
+  let key = raw.trim();
+
+  if (
+    (key.startsWith('"') && key.endsWith('"')) ||
+    (key.startsWith("'") && key.endsWith("'"))
+  ) {
+    key = key.slice(1, -1).trim();
+  }
+
+  key = key.replace(/\\\\n/g, "\\n").replace(/\\n/g, "\n");
+  key = key.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+  if (!key.includes("\n") && key.includes("BEGIN")) {
+    key = key
+      .replace(/-----BEGIN ([A-Z ]+)----- /, "-----BEGIN $1-----\n")
+      .replace(/ -----END ([A-Z ]+)-----$/, "\n-----END $1-----");
+  }
+
+  const pemMatch = key.match(/-----BEGIN ([A-Z ]+)-----\n([\s\S]*?)\n-----END \1-----/);
+  if (pemMatch) {
+    const [, label, body] = pemMatch;
+    const compact = body.replace(/\s+/g, "");
+    const lines = compact.match(/.{1,64}/g) ?? [compact];
+    key = `-----BEGIN ${label}-----\n${lines.join("\n")}\n-----END ${label}-----\n`;
+  }
+
+  if (!key.endsWith("\n")) key += "\n";
+  return key;
+}
+
+function isValidPrivateKey(key: string): boolean {
+  return /-----BEGIN (?:RSA )?PRIVATE KEY-----/.test(key);
+}
+
+function ga4KeyConfigError(): string {
+  return (
+    "GA4_PRIVATE_KEY could not be parsed. In Netlify → Environment variables, " +
+    "set GA4_PRIVATE_KEY as one line with \\n between PEM lines, e.g. " +
+    "-----BEGIN PRIVATE KEY-----\\nMIIE...\\n-----END PRIVATE KEY-----\\n"
+  );
+}
+
 function buildOverview(row: Record<string, number>): Ga4Overview {
   const activeUsers = row.activeUsers ?? 0;
   return {
@@ -118,11 +166,14 @@ export default async function handler(req: Request): Promise<Response> {
 
   const propertyId = process.env.GA4_PROPERTY_ID;
   const clientEmail = process.env.GA4_CLIENT_EMAIL;
-  const privateKey = (process.env.GA4_PRIVATE_KEY ?? "").replace(/\\n/g, "\n");
+  const privateKey = normalizePrivateKey(process.env.GA4_PRIVATE_KEY ?? "");
   if (!propertyId || !clientEmail || !privateKey) {
     return json(500, {
       error: "GA4 is not configured. Set GA4_PROPERTY_ID, GA4_CLIENT_EMAIL and GA4_PRIVATE_KEY.",
     });
+  }
+  if (!isValidPrivateKey(privateKey)) {
+    return json(500, { error: ga4KeyConfigError() });
   }
 
   let body: Ga4RequestBody = {};
@@ -153,9 +204,16 @@ export default async function handler(req: Request): Promise<Response> {
   const dimensionFilter = pagePathFilter(prefix);
 
   try {
-    const client = new BetaAnalyticsDataClient({
-      credentials: { client_email: clientEmail, private_key: privateKey },
+    const auth = new GoogleAuth({
+      credentials: {
+        type: "service_account",
+        client_email: clientEmail,
+        private_key: privateKey,
+      },
+      scopes: ["https://www.googleapis.com/auth/analytics.readonly"],
     });
+
+    const client = new BetaAnalyticsDataClient({ auth });
 
     const overviewMetrics = [
       { name: "totalUsers" },
@@ -318,6 +376,9 @@ export default async function handler(req: Request): Promise<Response> {
     return json(200, payload, { "X-Cache": "MISS" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "GA4 request failed.";
+    if (message.includes("DECODER routines") || message.includes("unsupported")) {
+      return json(502, { error: ga4KeyConfigError() });
+    }
     return json(502, { error: `Google Analytics request failed: ${message}` });
   }
 }
