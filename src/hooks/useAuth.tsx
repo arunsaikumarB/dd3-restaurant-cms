@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -35,22 +36,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const configured = isSupabaseConfigured();
   const devBypass = isAdminDevBypassEnabled();
 
+  // Tracks whether the very first session check has completed. After that,
+  // ANY background auth event (token refresh, tab-focus re-sync, etc.) — no
+  // matter what Supabase calls it — updates session/profile silently, never
+  // toggling `loading` again. This is what stops ProtectedRoute from
+  // unmounting/remounting admin pages (and wiping in-progress edits) every
+  // time the browser tab regains focus.
+  const hasLoadedOnce = useRef(false);
+
   const refreshSession = useCallback(async (): Promise<UserProfile | null> => {
     const supabase = createClientIfConfigured();
     if (!supabase) {
       setSession(null);
       setProfile(null);
       setLoading(false);
+      hasLoadedOnce.current = true;
       return null;
     }
 
-    setLoading(true);
+    if (!hasLoadedOnce.current) {
+      setLoading(true);
+    }
 
     const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError || !userData.user) {
       setSession(null);
       setProfile(null);
       setLoading(false);
+      hasLoadedOnce.current = true;
       return null;
     }
 
@@ -60,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const nextProfile = await fetchCurrentUserProfile();
     setProfile(nextProfile);
     setLoading(false);
+    hasLoadedOnce.current = true;
     return nextProfile;
   }, []);
 
@@ -67,6 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = createClientIfConfigured();
     if (!supabase) {
       setLoading(false);
+      hasLoadedOnce.current = true;
       return;
     }
 
