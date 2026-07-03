@@ -5,6 +5,7 @@ import {
   BarChart3,
   ChevronDown,
   ChevronRight,
+  FileText,
   RefreshCw,
   TrendingDown,
   TrendingUp,
@@ -26,6 +27,8 @@ import AdminBreadcrumbs from "../components/shared/Breadcrumbs";
 import AdminCard from "../components/ui/Card";
 import AdminBadge from "../components/ui/Badge";
 import AdminButton from "../components/ui/Button";
+import AdminToast from "../components/ui/Toast";
+import { exportInsightsPdf } from "../utils/exportInsightsPdf";
 import { useAdminTheme } from "../context/AdminThemeContext";
 import { useLocation } from "../hooks/useLocation";
 import {
@@ -91,6 +94,17 @@ function resolvePresetRange(preset: DatePreset, customFrom: string, customTo: st
   const days = preset === "7d" ? 6 : preset === "30d" ? 29 : 89;
   from.setDate(from.getDate() - days);
   return { from, to };
+}
+
+function formatDateRangeLabel(
+  preset: DatePreset,
+  range: { from: Date; to: Date },
+): string {
+  if (preset === "today") return "Today";
+  if (preset === "7d") return "Last 7 days";
+  if (preset === "30d") return "Last 30 days";
+  if (preset === "90d") return "Last 90 days";
+  return `${range.from.toLocaleDateString()} – ${range.to.toLocaleDateString()}`;
 }
 
 function formatNumber(value: number): string {
@@ -399,6 +413,12 @@ export default function InsightsPage() {
     { locationId: LocationId; name: string; summary: AnalyticsSummary }[]
   >([]);
   const [offerRows, setOfferRows] = useState<AnalyticsOfferRow[]>([]);
+  const [exporting, setExporting] = useState(false);
+  const [toast, setToast] = useState<{
+    open: boolean;
+    message: string;
+    variant: "success" | "error";
+  }>({ open: false, message: "", variant: "success" });
 
   const range = useMemo(
     () => resolvePresetRange(preset, customFrom, customTo),
@@ -461,6 +481,45 @@ export default function InsightsPage() {
     void loadInsights();
   };
 
+  const handleExportPdf = async () => {
+    setExporting(true);
+    try {
+      const firstPartySummary = isAllLocations
+        ? null
+        : await fetchAnalyticsSummary(locationId, range.from, range.to);
+
+      await exportInsightsPdf({
+        restaurantName: "Desi Dhamaka",
+        logoUrl: "/logo/desi-dhamaka-logo.webp",
+        locationLabel: isAllLocations ? "All Locations" : currentLocation?.name ?? scope,
+        dateRangeLabel: formatDateRangeLabel(preset, range),
+        generatedAt: new Date(),
+        ga,
+        gaError,
+        summaryCards: summaryCards.map((c) => ({
+          label: c.label,
+          value: c.value,
+          suffix: c.suffix,
+        })),
+        timeseries: chartData,
+        comparisonRows: comparisonRows.map((r) => ({ name: r.name, summary: r.summary })),
+        offerRows,
+        firstPartySummary,
+        isAllLocations,
+      });
+
+      setToast({ open: true, message: "Insights report downloaded successfully.", variant: "success" });
+    } catch (error) {
+      setToast({
+        open: true,
+        message: error instanceof Error ? error.message : "Failed to export PDF.",
+        variant: "error",
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const summaryCards = ga ? buildGaSummaryCards(ga.overview, ga.overviewPrevious) : [];
 
   const chartData = (ga?.timeseries ?? []).map((row) => ({
@@ -497,10 +556,20 @@ export default function InsightsPage() {
             Live Google Analytics traffic and offer performance for the selected date range.
           </p>
         </div>
-        <AdminButton variant="outline" onClick={handleRefresh} disabled={loading}>
-          <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-          Refresh
-        </AdminButton>
+        <div className="flex flex-wrap gap-2">
+          <AdminButton
+            variant="outline"
+            onClick={() => void handleExportPdf()}
+            disabled={loading || exporting}
+          >
+            <FileText size={16} className={exporting ? "animate-pulse" : ""} />
+            Export as PDF
+          </AdminButton>
+          <AdminButton variant="outline" onClick={handleRefresh} disabled={loading || exporting}>
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </AdminButton>
+        </div>
       </motion.div>
 
       <div className="mt-6 flex flex-wrap gap-2">
@@ -705,6 +774,12 @@ export default function InsightsPage() {
           />
         </AdminCard>
       )}
+      <AdminToast
+        open={toast.open}
+        message={toast.message}
+        variant={toast.variant}
+        onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+      />
     </div>
   );
 }
