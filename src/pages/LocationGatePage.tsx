@@ -12,11 +12,11 @@ import { useLocationSelection } from "../context/LocationContext";
 /** Full-bleed ambience image behind the picker. */
 const GATE_BACKGROUND = "/hero/hero-poster.webp";
 
-/** Per-location card imagery (decorative only). */
+/** Per-location storefront imagery (decorative only). */
 const LOCATION_IMAGES: Record<LocationId, string> = {
-  "south-plainfield": "/showcase/biryani.webp",
-  "oak-tree": "/showcase/tandoori.webp",
-  lawrenceville: "/showcase/butter-chicken.webp",
+  "south-plainfield": "/locations/south-plainfield.webp",
+  "oak-tree": "/locations/oak-tree.webp",
+  lawrenceville: "/locations/lawrenceville.webp",
 };
 
 /**

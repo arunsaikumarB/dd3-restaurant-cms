@@ -15,8 +15,8 @@ export default function PremiumLocationCard({ config, image, onSelect }: Props) 
       aria-label={`Continue to Desi Dhamaka ${config.name} — ${config.address}.`}
       className="group flex h-full w-full flex-col overflow-hidden rounded-3xl border border-white/15 bg-white/10 text-left shadow-[0_18px_50px_-20px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-2 hover:border-brand-primary/70 hover:bg-white/[0.14] hover:shadow-[0_30px_70px_-24px_rgba(237,60,24,0.55)] focus:outline-none focus-visible:-translate-y-2 focus-visible:border-brand-primary focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-cocoa"
     >
-      {/* Image */}
-      <div className="relative h-32 w-full overflow-hidden sm:h-36">
+      {/* Storefront image */}
+      <div className="relative h-[180px] w-full overflow-hidden rounded-t-3xl md:h-[200px] xl:h-[220px]">
         <img
           src={image}
           alt=""
@@ -26,7 +26,7 @@ export default function PremiumLocationCard({ config, image, onSelect }: Props) 
           draggable={false}
           className="h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-cocoa/90 via-cocoa/25 to-transparent" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-t from-cocoa via-cocoa/40 to-transparent" aria-hidden />
       </div>
 
       {/* Body */}
