@@ -144,7 +144,7 @@ export default function LocationDropdown({
       >
         <span className="location-dropdown__trigger-left">
           <span className="location-dropdown__icon-wrap" aria-hidden>
-            <MapPin size={18} strokeWidth={1.75} />
+            <MapPin size={16} strokeWidth={1.75} />
           </span>
           <span className="location-dropdown__text">
             <span className="location-dropdown__name" title={displayName}>
@@ -158,7 +158,7 @@ export default function LocationDropdown({
           </span>
         </span>
         <ChevronDown
-          size={20}
+          size={16}
           strokeWidth={1.75}
           className={"location-dropdown__chevron" + (open ? " location-dropdown__chevron--open" : "")}
           aria-hidden

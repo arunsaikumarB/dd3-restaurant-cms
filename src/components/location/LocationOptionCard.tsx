@@ -39,11 +39,11 @@ export default function LocationOptionCard({
       onClick={() => onSelect(option.id)}
     >
       <span className="location-option__icon" aria-hidden>
-        <MapPin size={17} strokeWidth={1.75} />
+        <MapPin size={16} strokeWidth={1.75} />
       </span>
       <span className="location-option__label">{option.name}</span>
       <span className="location-option__check" aria-hidden>
-        {selected ? <Check size={17} strokeWidth={2.25} /> : null}
+        {selected ? <Check size={16} strokeWidth={2.25} /> : null}
       </span>
     </button>
   );
