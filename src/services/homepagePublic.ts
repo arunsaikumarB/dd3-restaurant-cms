@@ -10,6 +10,12 @@ import {
   type OpeningHoursForm,
 } from "./restaurantSettings";
 import type { RestaurantSettings } from "../types/database";
+import {
+  formatPhonesInline,
+  parsePhonesFromRow,
+  phoneTelHref,
+  primaryPhone,
+} from "../utils/restaurantPhones";
 
 export type PublicHomepageCta = {
   label: string;
@@ -29,7 +35,9 @@ export type PublicHomepageContent = {
 
 export type PublicRestaurantSettings = {
   restaurant_name: string;
+  /** Primary phone — first entry in `phones`. */
   phone: string;
+  phones: string[];
   email: string;
   address: string;
   google_maps: string;
@@ -82,7 +90,8 @@ export function getHomepageFallbacks(locationId: LocationId = "south-plainfield"
     },
     settings: {
       restaurant_name: defaults.restaurant_name,
-      phone: defaults.phone ?? SITE.phone,
+      phone: primaryPhone([defaults.phone ?? SITE.phone]),
+      phones: parsePhonesFromRow(defaults.phones, defaults.phone ?? SITE.phone),
       email: defaults.email ?? SITE.email,
       address: defaults.address ?? SITE.address,
       google_maps: defaults.google_maps ?? SITE.mapEmbed,
@@ -157,10 +166,14 @@ function mapRestaurantSettings(
   locationId: LocationId,
 ): PublicRestaurantSettings {
   const fallbacks = getHomepageFallbacks(locationId).settings;
+  const phones = row
+    ? parsePhonesFromRow(row.phones, row.phone)
+    : fallbacks.phones;
 
   return {
     restaurant_name: row?.restaurant_name?.trim() || fallbacks.restaurant_name,
-    phone: row?.phone?.trim() || fallbacks.phone,
+    phones: phones.length > 0 ? phones : fallbacks.phones,
+    phone: primaryPhone(phones.length > 0 ? phones : fallbacks.phones),
     email: row?.email?.trim() || fallbacks.email,
     address: row?.address?.trim() || fallbacks.address,
     google_maps: row?.google_maps?.trim() || fallbacks.google_maps,
@@ -223,6 +236,7 @@ export type PublicContactCard = {
   title: string;
   value: string;
   href?: string;
+  phones?: string[];
   icon: "phone" | "email" | "location" | "clock";
 };
 
@@ -237,8 +251,9 @@ export function buildReservationContactCards(
     {
       id: "phone",
       title: "Call Us",
-      value: settings.phone,
-      href: `tel:${settings.phone.replace(/\D/g, "")}`,
+      value: formatPhonesInline(settings.phones),
+      href: settings.phones.length === 1 ? phoneTelHref(settings.phones[0]) : undefined,
+      phones: settings.phones,
       icon: "phone",
     },
     {
@@ -345,6 +360,8 @@ export function buildRestaurantJsonLd(
   const address = parsePostalAddress(settings.address);
   const image = absolutePublicUrl(settings.logo, SITE.ogImage);
   const openingHoursSpecification = buildOpeningHoursSpecification(settings.opening_hours);
+  const telephone =
+    settings.phones.length <= 1 ? settings.phone : settings.phones;
 
   return [
     {
@@ -354,7 +371,7 @@ export function buildRestaurantJsonLd(
       description:
         "Authentic Indian restaurant in Lawrenceville, NJ specializing in Andhra and Hyderabadi cuisine.",
       url: siteUrl,
-      telephone: settings.phone,
+      telephone,
       email: settings.email,
       image,
       address: {
@@ -375,7 +392,7 @@ export function buildRestaurantJsonLd(
       "@type": "LocalBusiness",
       name: settings.restaurant_name,
       url: pageUrl,
-      telephone: settings.phone,
+      telephone,
       email: settings.email,
       image,
       address: {

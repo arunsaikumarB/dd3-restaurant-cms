@@ -32,6 +32,7 @@ export interface RestaurantSettings extends Timestamps {
   location_id: RestaurantLocationId;
   restaurant_name: string;
   phone: string | null;
+  phones: Json | null;
   email: string | null;
   address: string | null;
   google_maps: string | null;

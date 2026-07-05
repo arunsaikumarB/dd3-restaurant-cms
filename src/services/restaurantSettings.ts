@@ -5,6 +5,11 @@ import { getOrderUrl } from "../data/chefgaaNameMap";
 import type { RestaurantSettings, RestaurantSettingsInsert } from "../types/database";
 import { LocationScopeError } from "../utils/supabase/locationScope";
 import { isOrderUrlForLocation } from "../utils/locationLinks";
+import {
+  normalizePhoneList,
+  parsePhonesFromRow,
+  primaryPhone,
+} from "../utils/restaurantPhones";
 
 export function getCanonicalOrderUrl(locationId: LocationId): string {
   return getOrderUrl(locationId);
@@ -18,7 +23,7 @@ export type OpeningHoursForm = {
 
 export type RestaurantSettingsForm = {
   restaurant_name: string;
-  phone: string;
+  phones: string[];
   email: string;
   address: string;
   google_maps: string;
@@ -43,6 +48,7 @@ export function buildDefaultRestaurantSettings(
     location_id: locationId,
     restaurant_name: `Desi Dhamaka — ${location.shortName}`,
     phone: location.phone,
+    phones: [location.phone],
     email: location.email,
     address: location.address,
     google_maps: location.googleMapsEmbed,
@@ -69,9 +75,10 @@ export function rowToForm(row: RestaurantSettings): RestaurantSettingsForm {
     row.opening_hours && typeof row.opening_hours === "object" && !Array.isArray(row.opening_hours)
       ? (row.opening_hours as Record<string, string>)
       : {};
+  const phones = parsePhonesFromRow(row.phones, row.phone);
   return {
     restaurant_name: row.restaurant_name ?? "",
-    phone: row.phone ?? "",
+    phones: phones.length > 0 ? phones : [""],
     email: row.email ?? "",
     address: row.address ?? "",
     google_maps: row.google_maps ?? "",
@@ -94,9 +101,11 @@ export function rowToForm(row: RestaurantSettings): RestaurantSettingsForm {
 }
 
 export function formToUpdatePayload(form: RestaurantSettingsForm) {
+  const phones = normalizePhoneList(form.phones);
   return {
     restaurant_name: form.restaurant_name.trim(),
-    phone: form.phone.trim() || null,
+    phone: primaryPhone(phones) || null,
+    phones,
     email: form.email.trim() || null,
     address: form.address.trim() || null,
     google_maps: form.google_maps.trim() || null,

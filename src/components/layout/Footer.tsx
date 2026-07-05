@@ -11,6 +11,7 @@ import {
   formatOpeningHoursRows,
 } from "../../services/homepagePublic";
 import { trackOrderClick, trackReservationClick } from "../../services/analytics";
+import PhoneLinks from "../ui/PhoneLinks";
 import Logo from "../ui/Logo";
 
 const SOCIAL_ICONS: Record<string, JSX.Element> = {
@@ -199,12 +200,10 @@ export default function Footer() {
             <address className="not-italic space-y-3 text-[14px] leading-relaxed text-cocoa/65">
               <p>{settings.address}</p>
               <p>
-                <a
-                  href={`tel:${settings.phone.replace(/\D/g, "")}`}
-                  className="transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
-                >
-                  {settings.phone}
-                </a>
+                <PhoneLinks
+                  phones={settings.phones}
+                  linkClassName="transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+                />
               </p>
               <p>
                 <a

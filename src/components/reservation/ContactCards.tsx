@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { usePageContent } from "../../context/PageContentContext";
 import { useHomepageData } from "../../hooks/useHomepageData";
 import { buildReservationContactCards } from "../../services/homepagePublic";
+import PhoneLinks from "../ui/PhoneLinks";
 import SectionHeading from "../ui/SectionHeading";
 import {
   containerVariants,
@@ -95,7 +96,12 @@ export default function ContactCards() {
             <motion.div key={item.id} className="reservation-contact__card" variants={fadeUpItem}>
               <div className="reservation-contact__icon">{contactIcons[item.icon]}</div>
               <h3 className="reservation-contact__title">{item.title}</h3>
-              {item.href ? (
+              {item.id === "phone" && item.phones && item.phones.length > 1 ? (
+                <PhoneLinks
+                  phones={item.phones}
+                  linkClassName="reservation-contact__value reservation-contact__link block"
+                />
+              ) : item.href ? (
                 <a href={item.href} className="reservation-contact__value reservation-contact__link">
                   {item.value}
                 </a>

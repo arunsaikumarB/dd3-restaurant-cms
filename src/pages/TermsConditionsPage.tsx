@@ -1,5 +1,6 @@
 import PageHero from "../components/ui/PageHero";
 import AnimatedContainer from "../components/ui/AnimatedContainer";
+import { formatPhonesInline } from "../utils/restaurantPhones";
 import { useHomepageData } from "../hooks/useHomepageData";
 import { useLocationSelection } from "../context/LocationContext";
 import { locPath } from "../utils/locationPaths";
@@ -65,7 +66,7 @@ export default function TermsConditionsPage() {
                 <a href={`mailto:${settings.email}`} className="text-brand-primary underline-offset-4 hover:underline">
                   {settings.email}
                 </a>{" "}
-                or {settings.phone}.
+                or {formatPhonesInline(settings.phones)}.
               </p>
             </div>
           </div>

@@ -23,6 +23,7 @@ import {
   validateRestaurantSettings,
   type RestaurantSettingsErrors,
 } from "../../utils/validation/restaurantSettings";
+import PhoneNumbersField from "../components/settings/PhoneNumbersField";
 
 export default function SettingsPage() {
   const { locationId, isAllLocations, scope } = useLocation();
@@ -192,17 +193,18 @@ export default function SettingsPage() {
             onChange={(e) => patchForm({ restaurant_name: e.target.value })}
           />
           <AdminInput
-            label="Phone"
-            value={form.phone}
-            error={fieldErrors.phone}
-            onChange={(e) => patchForm({ phone: e.target.value })}
-          />
-          <AdminInput
             label="Email"
             type="email"
             value={form.email}
             error={fieldErrors.email}
             onChange={(e) => patchForm({ email: e.target.value })}
+          />
+          <PhoneNumbersField
+            phones={form.phones}
+            error={fieldErrors.phones}
+            fieldErrors={fieldErrors.phoneFields}
+            disabled={saving}
+            onChange={(phones) => patchForm({ phones })}
           />
           <AdminInput
             label="Address"

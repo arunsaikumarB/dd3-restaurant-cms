@@ -8,6 +8,7 @@ import { usePageContent } from "../context/PageContentContext";
 import { useLocationSelection } from "../context/LocationContext";
 import { useGallerySection } from "../hooks/useGallerySection";
 import { formatWeekdayHoursLabel } from "../services/homepagePublic";
+import { formatPhonesInline } from "../utils/restaurantPhones";
 import "../App.css";
 
 const EntranceImageSequence = lazy(
@@ -116,7 +117,7 @@ export default function HomePage() {
           <ExperienceCards
             restaurantName={settings.restaurant_name}
             hoursLabel={formatWeekdayHoursLabel(settings.opening_hours)}
-            phone={settings.phone}
+            phone={formatPhonesInline(settings.phones)}
             email={settings.email}
             address={settings.address}
             facebook={settings.facebook}

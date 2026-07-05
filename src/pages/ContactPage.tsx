@@ -10,6 +10,7 @@ import { useContactForm } from "../hooks/useContactForm";
 import { useSectionImage } from "../hooks/useGallerySection";
 import { useLocationSelection } from "../context/LocationContext";
 import { isExternalUrl, resolveReservationUrl } from "../utils/locationLinks";
+import PhoneLinks from "../components/ui/PhoneLinks";
 
 export default function ContactPage() {
   const { fetchSection, interpolate } = usePageContent();
@@ -102,12 +103,9 @@ export default function ContactPage() {
                 <h3 className="text-[12px] font-semibold uppercase tracking-label text-saffron">
                   {infoSection.phoneLabel}
                 </h3>
-                <a
-                  href={`tel:${settings.phone.replace(/\D/g, "")}`}
-                  className="mt-2 block text-[16px] text-cocoa/70 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
-                >
-                  {settings.phone}
-                </a>
+                <div className="mt-2">
+                  <PhoneLinks phones={settings.phones} />
+                </div>
               </div>
               <div>
                 <h3 className="text-[12px] font-semibold uppercase tracking-label text-saffron">

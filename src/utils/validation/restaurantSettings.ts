@@ -1,4 +1,9 @@
 import type { RestaurantSettingsForm } from "../../services/restaurantSettings";
+import {
+  MAX_RESTAURANT_PHONES,
+  MIN_RESTAURANT_PHONES,
+  normalizePhoneList,
+} from "../restaurantPhones";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[\d\s().-]{7,20}$/;
@@ -20,12 +25,15 @@ export type RestaurantSettingsErrors = Partial<
     | "opening_hours.sunday",
     string
   >
->;
+> & {
+  phoneFields?: Partial<Record<number, string>>;
+};
 
 export function validateRestaurantSettings(
   form: RestaurantSettingsForm,
 ): RestaurantSettingsErrors {
   const errors: RestaurantSettingsErrors = {};
+  const phoneFields: Partial<Record<number, string>> = {};
 
   const name = form.restaurant_name.trim();
   if (!name) {
@@ -37,9 +45,22 @@ export function validateRestaurantSettings(
     errors.email = "Enter a valid email address.";
   }
 
-  const phone = form.phone.trim();
-  if (phone && !PHONE_RE.test(phone)) {
-    errors.phone = "Enter a valid phone number.";
+  form.phones.forEach((phone, index) => {
+    const trimmed = phone.trim();
+    if (trimmed && !PHONE_RE.test(trimmed)) {
+      phoneFields[index] = "Enter a valid phone number.";
+    }
+  });
+
+  const normalizedPhones = normalizePhoneList(form.phones);
+  if (normalizedPhones.length < MIN_RESTAURANT_PHONES) {
+    errors.phones = "Add at least one phone number.";
+  } else if (form.phones.filter((phone) => phone.trim()).length > MAX_RESTAURANT_PHONES) {
+    errors.phones = `You can add up to ${MAX_RESTAURANT_PHONES} phone numbers.`;
+  }
+
+  if (Object.keys(phoneFields).length > 0) {
+    errors.phoneFields = phoneFields;
   }
 
   const googleMaps = form.google_maps.trim();
@@ -76,5 +97,6 @@ export function validateRestaurantSettings(
 }
 
 export function hasValidationErrors(errors: RestaurantSettingsErrors): boolean {
-  return Object.keys(errors).length > 0;
+  const { phoneFields, ...rest } = errors;
+  return Object.keys(rest).length > 0 || Boolean(phoneFields && Object.keys(phoneFields).length > 0);
 }

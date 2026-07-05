@@ -111,6 +111,7 @@ export default function PageSEO() {
     siteUrl,
     settings.restaurant_name,
     settings.phone,
+    settings.phones,
     settings.email,
     settings.address,
     settings.logo,
