@@ -73,6 +73,16 @@ export interface PageContent {
   updated_at: string;
 }
 
+export interface SeoMetadata extends Timestamps {
+  id: string;
+  page_key: string;
+  location_id: RestaurantLocationId;
+  data: Json;
+}
+
+export type SeoMetadataInsert = Omit<SeoMetadata, "id" | "created_at" | "updated_at"> &
+  Partial<Pick<SeoMetadata, "id" | "created_at" | "updated_at">>;
+
 export type RestaurantLocationId = "south-plainfield" | "oak-tree" | "lawrenceville";
 
 export interface MenuCategory extends Timestamps {
@@ -396,6 +406,12 @@ export interface Database {
         Row: PageContent;
         Insert: PageContentInsert;
         Update: Partial<PageContentInsert>;
+        Relationships: [];
+      };
+      seo_metadata: {
+        Row: SeoMetadata;
+        Insert: SeoMetadataInsert;
+        Update: Partial<SeoMetadataInsert>;
         Relationships: [];
       };
       menu_categories: {

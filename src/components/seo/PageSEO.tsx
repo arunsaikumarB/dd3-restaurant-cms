@@ -1,10 +1,14 @@
 import { useEffect, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { PAGE_SEO } from "../../constants/seo";
 import { SITE } from "../../constants/site";
 import { getSiteUrl } from "../../config/env";
+import { resolveSeoPageKeyFromPath } from "../../config/seoPages";
+import { isLocationId } from "../../config/locations";
 import { useHomepageData } from "../../hooks/useHomepageData";
+import { useSeoMetadata } from "../../hooks/useSeoMetadata";
 import { buildRestaurantJsonLd } from "../../services/homepagePublic";
+import { resolveEffectiveJsonLd } from "../../utils/seo/schemaGenerator";
 
 function upsertMeta(
   key: string,
@@ -37,7 +41,6 @@ function upsertLink(rel: string, href: string) {
 
 const JSON_LD_ID = "desi-dhamaka-jsonld";
 
-/** Strips the `/:locationId` prefix from a pathname, e.g. "/oak-tree/about/" -> "/about". */
 function relativePath(pathname: string): string {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length <= 1) return "/";
@@ -46,28 +49,75 @@ function relativePath(pathname: string): string {
 
 export default function PageSEO() {
   const { pathname } = useLocation();
+  const params = useParams();
   const { bundle } = useHomepageData();
   const { settings } = bundle;
   const relPath = relativePath(pathname);
   const baseConfig = PAGE_SEO[relPath] ?? PAGE_SEO["/404"];
-  const isHome = relPath === "/";
+  const pageKey = resolveSeoPageKeyFromPath(relPath);
+  const locationParam = params.locationId;
+  const locationId = locationParam && isLocationId(locationParam) ? locationParam : null;
+  const { form: seoForm } = useSeoMetadata(locationId ?? "south-plainfield", locationId ? pageKey : null);
 
   const config = useMemo(() => {
-    if (!isHome) {
-      return baseConfig;
+    if (seoForm) {
+      return {
+        title: seoForm.basic.seoTitle.trim() || baseConfig.title,
+        description: seoForm.basic.metaDescription.trim() || baseConfig.description,
+        path: baseConfig.path,
+        keywords: [seoForm.basic.focusKeyword, seoForm.basic.secondaryKeywords]
+          .filter(Boolean)
+          .join(", "),
+        ogTitle: seoForm.openGraph.ogTitle.trim() || seoForm.basic.seoTitle.trim() || baseConfig.title,
+        ogDescription:
+          seoForm.openGraph.ogDescription.trim() ||
+          seoForm.basic.metaDescription.trim() ||
+          baseConfig.description,
+        ogImage: seoForm.openGraph.ogImage.trim() || seoForm.twitter.twitterImage.trim(),
+        ogType: seoForm.openGraph.ogType.trim() || "website",
+        twitterTitle: seoForm.twitter.twitterTitle.trim() || seoForm.basic.seoTitle.trim() || baseConfig.title,
+        twitterDescription:
+          seoForm.twitter.twitterDescription.trim() ||
+          seoForm.basic.metaDescription.trim() ||
+          baseConfig.description,
+        twitterImage: seoForm.twitter.twitterImage.trim() || seoForm.openGraph.ogImage.trim(),
+        twitterCard: seoForm.twitter.twitterCardType,
+        robotsIndex: seoForm.basic.robotsIndex !== "noindex" && !seoForm.advanced.noIndex,
+        canonicalOverride: seoForm.basic.canonicalUrl.trim() || seoForm.advanced.canonicalUrl.trim(),
+      };
     }
 
+    const isHome = relPath === "/";
     return {
-      ...baseConfig,
-      title: settings.seo_title.trim() || baseConfig.title,
-      description: settings.seo_description.trim() || baseConfig.description,
+      title: isHome && settings.seo_title.trim() ? settings.seo_title.trim() : baseConfig.title,
+      description:
+        isHome && settings.seo_description.trim()
+          ? settings.seo_description.trim()
+          : baseConfig.description,
+      path: baseConfig.path,
+      keywords: isHome ? settings.seo_keywords.trim() : "",
+      ogTitle: isHome && settings.seo_title.trim() ? settings.seo_title.trim() : baseConfig.title,
+      ogDescription:
+        isHome && settings.seo_description.trim()
+          ? settings.seo_description.trim()
+          : baseConfig.description,
+      ogImage: "",
+      ogType: "website",
+      twitterTitle: isHome && settings.seo_title.trim() ? settings.seo_title.trim() : baseConfig.title,
+      twitterDescription:
+        isHome && settings.seo_description.trim()
+          ? settings.seo_description.trim()
+          : baseConfig.description,
+      twitterImage: "",
+      twitterCard: "summary_large_image" as const,
+      robotsIndex: true,
+      canonicalOverride: "",
     };
-  }, [baseConfig, isHome, settings.seo_description, settings.seo_title]);
+  }, [baseConfig, relPath, seoForm, settings.seo_description, settings.seo_keywords, settings.seo_title]);
 
   const siteUrl = getSiteUrl();
-  const canonical = `${siteUrl}${pathname === "/" ? "" : pathname}`;
-  const image = `${siteUrl}${config.image ?? SITE.ogImage}`;
-  const keywords = isHome ? settings.seo_keywords.trim() : "";
+  const canonical = config.canonicalOverride || `${siteUrl}${pathname === "/" ? "" : pathname}`;
+  const image = config.ogImage ? config.ogImage : `${siteUrl}${config.path === "/" ? SITE.ogImage : SITE.ogImage}`;
 
   useEffect(() => {
     document.title = config.title;
@@ -75,23 +125,29 @@ export default function PageSEO() {
     upsertMeta("description", config.description);
     upsertLink("canonical", canonical);
 
-    if (keywords) {
-      upsertMeta("keywords", keywords);
+    if (config.keywords) {
+      upsertMeta("keywords", config.keywords);
     } else {
       removeMeta("keywords");
     }
 
-    upsertMeta("og:title", config.title, "property");
-    upsertMeta("og:description", config.description, "property");
+    if (config.robotsIndex) {
+      removeMeta("robots");
+    } else {
+      upsertMeta("robots", "noindex, nofollow");
+    }
+
+    upsertMeta("og:title", config.ogTitle, "property");
+    upsertMeta("og:description", config.ogDescription, "property");
     upsertMeta("og:url", canonical, "property");
-    upsertMeta("og:type", "website", "property");
+    upsertMeta("og:type", config.ogType, "property");
     upsertMeta("og:image", image, "property");
     upsertMeta("og:site_name", settings.restaurant_name, "property");
 
-    upsertMeta("twitter:card", "summary_large_image");
-    upsertMeta("twitter:title", config.title);
-    upsertMeta("twitter:description", config.description);
-    upsertMeta("twitter:image", image);
+    upsertMeta("twitter:card", config.twitterCard);
+    upsertMeta("twitter:title", config.twitterTitle);
+    upsertMeta("twitter:description", config.twitterDescription);
+    upsertMeta("twitter:image", config.twitterImage || image);
 
     let script = document.getElementById(JSON_LD_ID) as HTMLScriptElement | null;
     if (!script) {
@@ -100,24 +156,31 @@ export default function PageSEO() {
       script.type = "application/ld+json";
       document.head.appendChild(script);
     }
-    script.textContent = JSON.stringify(buildRestaurantJsonLd(settings, config.path));
+
+    if (seoForm && locationId && pageKey) {
+      script.textContent = resolveEffectiveJsonLd(seoForm, locationId, pageKey);
+    } else {
+      script.textContent = JSON.stringify(buildRestaurantJsonLd(settings, config.path));
+    }
   }, [
-    config.title,
-    config.description,
-    config.path,
     canonical,
+    config.description,
+    config.keywords,
+    config.ogDescription,
+    config.ogTitle,
+    config.ogType,
+    config.path,
+    config.robotsIndex,
+    config.title,
+    config.twitterCard,
+    config.twitterDescription,
+    config.twitterImage,
+    config.twitterTitle,
     image,
-    keywords,
-    siteUrl,
-    settings.restaurant_name,
-    settings.phone,
-    settings.phones,
-    settings.email,
-    settings.address,
-    settings.logo,
-    settings.opening_hours.weekday,
-    settings.opening_hours.weekend,
-    settings.opening_hours.sunday,
+    locationId,
+    pageKey,
+    seoForm,
+    settings,
   ]);
 
   return null;
