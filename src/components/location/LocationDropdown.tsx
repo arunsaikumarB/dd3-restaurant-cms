@@ -2,12 +2,13 @@ import {
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   type KeyboardEvent,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, MapPin } from "lucide-react";
+import { Check, ChevronDown, MapPin } from "lucide-react";
 import { getLocationConfig, type LocationId } from "../../config/locations";
 import LocationOptionCard, { type LocationOption } from "./LocationOptionCard";
 import "./location-dropdown.css";
@@ -39,6 +40,14 @@ export default function LocationDropdown({
   const displayName = selected?.name ?? "Select Location";
   const isHeader = variant === "header" || variant === "navbar";
   const showSubtitle = !isHeader;
+  const widestOptionName = useMemo(
+    () =>
+      options.reduce(
+        (widest, option) => (option.name.length > widest.length ? option.name : widest),
+        displayName,
+      ),
+    [displayName, options],
+  );
 
   const close = useCallback(() => {
     setOpen(false);
@@ -132,6 +141,34 @@ export default function LocationDropdown({
         className
       }
     >
+      <div className="location-dropdown__size-probe" aria-hidden>
+        <div className="location-dropdown__size-probe-trigger">
+          <span className="location-dropdown__trigger-left">
+            <span className="location-dropdown__size-probe-icon" />
+            <span
+              className={
+                "location-dropdown__name" +
+                (isHeader ? " location-dropdown__name--header-probe" : "")
+              }
+            >
+              {widestOptionName}
+            </span>
+          </span>
+          <span className="location-dropdown__size-probe-chevron" />
+        </div>
+        <div className="location-dropdown__size-probe-panel">
+          <div className="location-dropdown__size-probe-option">
+            <span className="location-option__icon">
+              <MapPin size={16} strokeWidth={1.75} />
+            </span>
+            <span className="location-option__label">{widestOptionName}</span>
+            <span className="location-option__check">
+              <Check size={16} strokeWidth={2.25} />
+            </span>
+          </div>
+        </div>
+      </div>
+
       <button
         ref={triggerRef}
         type="button"
