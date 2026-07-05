@@ -8,6 +8,8 @@ import { getOrderUrl } from "../data/chefgaaNameMap";
 type LinkSettings = {
   reservation_url?: string | null;
   order_url?: string | null;
+  google_maps?: string | null;
+  address?: string | null;
 };
 
 /** True when a CMS order URL targets the same ChefGaa store as the location default. */
@@ -66,4 +68,29 @@ export function resolveOrderUrl(
 
 export function isExternalUrl(url: string): boolean {
   return url.startsWith("http://") || url.startsWith("https://");
+}
+
+/** Opens Google Maps directions for the active outlet in a new tab. */
+export function resolveGoogleMapsDirectionsUrl(
+  settings: LinkSettings | null | undefined,
+  locationId: LocationId | null,
+): string {
+  const resolved = resolvePublicLocationId(locationId);
+  const config = getLocationConfig(resolved);
+  const embed = settings?.google_maps?.trim();
+
+  if (embed) {
+    try {
+      const url = new URL(embed);
+      const query = url.searchParams.get("q");
+      if (query) {
+        return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(query)}`;
+      }
+    } catch {
+      /* fall through */
+    }
+  }
+
+  const destination = settings?.address?.trim() || config.address;
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
 }

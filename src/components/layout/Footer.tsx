@@ -4,7 +4,11 @@ import { SITE, SOCIAL_LABELS } from "../../constants/site";
 import { useHomepageData } from "../../hooks/useHomepageData";
 import { usePageContent } from "../../context/PageContentContext";
 import { useLocationSelection } from "../../context/LocationContext";
-import { isExternalUrl, resolveReservationUrl } from "../../utils/locationLinks";
+import {
+  isExternalUrl,
+  resolveGoogleMapsDirectionsUrl,
+  resolveReservationUrl,
+} from "../../utils/locationLinks";
 import { locPath } from "../../utils/locationPaths";
 import {
   buildPublicSocialLinks,
@@ -13,6 +17,10 @@ import {
 import { trackOrderClick, trackReservationClick } from "../../services/analytics";
 import PhoneLinks from "../ui/PhoneLinks";
 import Logo from "../ui/Logo";
+
+const FOOTER_QUICK_LINKS = FOOTER_LINKS.slice(0, 8);
+const FOOTER_TAGLINE = "Authentic Indian Cuisine Since 2018";
+const CHEFGAA_URL = "https://www.chefgaa.com";
 
 const SOCIAL_ICONS: Record<string, JSX.Element> = {
   instagram: (
@@ -45,24 +53,16 @@ export default function Footer() {
     orderCta: { label: "Order Now", url: "/online-ordering" },
     reserveCta: { label: "Reserve a Table", url: "/reservation" },
   });
-  const brand = fetchSection("global", "footer_brand", {
-    tagline: "Authentic Indian Restaurant",
-    blurb:
-      "Authentic Indian flavours crafted with tradition, premium ingredients and unforgettable hospitality — since 2018.",
-  });
   const headings = fetchSection("global", "footer_headings", {
     quickLinks: "Quick Links",
     openingHours: "Opening Hours",
     contactUs: "Contact Us",
-    getInTouch: "Get in Touch",
+    getDirections: "Get Directions",
   });
-  const legal = fetchSection("global", "footer_legal", {
-    privacyCta: { label: "Privacy Policy", url: "/contact" },
-    termsCta: { label: "Terms of Service", url: "/contact" },
-  });
-  const { selectedLocation, selectedLocationId } = useLocationSelection();
+  const { selectedLocationId } = useLocationSelection();
   const { settings } = bundle;
   const reservationLink = resolveReservationUrl(settings, selectedLocationId);
+  const directionsUrl = resolveGoogleMapsDirectionsUrl(settings, selectedLocationId);
   const orderPagePath = locPath(selectedLocationId, ORDER_URL);
   const reserveUrl = locPath(selectedLocationId, RESERVE_URL);
   const socialLinks = buildPublicSocialLinks(settings);
@@ -108,42 +108,27 @@ export default function Footer() {
       </div>
 
       {/* Main footer body */}
-      <div className="mx-auto max-w-[1400px] px-6 py-16 md:px-10 lg:px-16 lg:py-20">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1.5fr] lg:gap-10 xl:gap-16">
-
-          {/* Brand column */}
+      <div className="mx-auto max-w-[1400px] px-6 py-12 md:px-10 lg:px-16">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+          {/* Brand */}
           <div className="flex flex-col">
             <Link
               to="/"
-              className="mb-6 inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2"
+              className="mb-5 inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2"
               aria-label="Desi Dhamaka home"
             >
               <Logo size="footer" background="ivory" src={settings.logo} alt={logoAlt} />
             </Link>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-saffron">
-              {brand.tagline}
-            </p>
-            {selectedLocation && (
-              <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-cocoa/55">
-                {selectedLocation.name}
-              </p>
-            )}
-            <p className="mt-1 text-[13px] text-cocoa/50">
-              {settings.address.split(",").slice(-2).join(",").trim() || settings.address}
-            </p>
-            <p className="mt-5 max-w-xs text-[15px] leading-[1.7] text-cocoa/60">
-              {brand.blurb}
-            </p>
+            <p className="text-[13px] leading-relaxed text-cocoa/55">{FOOTER_TAGLINE}</p>
 
-            {/* Social icons */}
-            <div className="mt-7 flex gap-2.5" aria-label="Social media">
+            <div className="mt-6 flex gap-2.5" aria-label="Social media">
               {Object.entries(socialLinks).map(([name, url]) => (
                 <a
                   key={name}
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-cocoa/10 text-cocoa/50 transition-all duration-300 hover:border-saffron/60 hover:bg-saffron/8 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-cocoa/10 text-cocoa/45 transition-all duration-300 hover:-translate-y-0.5 hover:border-saffron/50 hover:bg-saffron/8 hover:text-saffron hover:shadow-[0_6px_16px_-8px_rgba(237,60,24,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
                   aria-label={SOCIAL_LABELS[name as keyof typeof SITE.social] ?? name}
                 >
                   {SOCIAL_ICONS[name] ?? (
@@ -156,17 +141,17 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="mb-5 text-[10px] font-bold uppercase tracking-[0.28em] text-saffron">
+            <h3 className="mb-4 text-[10px] font-bold uppercase tracking-[0.28em] text-saffron">
               {headings.quickLinks}
             </h3>
-            <ul className="space-y-3">
-              {FOOTER_LINKS.slice(0, 7).map((link) => (
+            <ul className="space-y-2.5">
+              {FOOTER_QUICK_LINKS.map((link) => (
                 <li key={link.path}>
                   <Link
                     to={locPath(selectedLocationId, link.path)}
-                    className="group flex items-center gap-2 text-[14px] text-cocoa/65 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+                    className="group inline-flex items-center gap-2.5 text-[14px] text-cocoa/65 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
                   >
-                    <span className="block h-px w-3 bg-cocoa/25 transition-all duration-300 group-hover:w-5 group-hover:bg-saffron" />
+                    <span className="block h-px w-3 bg-cocoa/20 transition-all duration-300 group-hover:w-4 group-hover:bg-saffron" />
                     {link.label}
                   </Link>
                 </li>
@@ -176,17 +161,17 @@ export default function Footer() {
 
           {/* Opening Hours */}
           <div>
-            <h3 className="mb-5 text-[10px] font-bold uppercase tracking-[0.28em] text-saffron">
+            <h3 className="mb-4 text-[10px] font-bold uppercase tracking-[0.28em] text-saffron">
               {headings.openingHours}
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {hoursRows.map((row) => (
                 <li
                   key={row.days}
-                  className="flex items-start justify-between gap-3 text-[14px] leading-snug text-cocoa/65"
+                  className="grid grid-cols-[5.75rem_1fr] items-baseline gap-x-4 text-[14px] leading-snug text-cocoa/65"
                 >
-                  <span className="shrink-0">{row.days}</span>
-                  <span className="text-right text-cocoa/50">{row.time}</span>
+                  <span className="font-medium text-cocoa/70">{row.days}</span>
+                  <span className="text-cocoa/55">{row.time}</span>
                 </li>
               ))}
             </ul>
@@ -194,7 +179,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="mb-5 text-[10px] font-bold uppercase tracking-[0.28em] text-saffron">
+            <h3 className="mb-4 text-[10px] font-bold uppercase tracking-[0.28em] text-saffron">
               {headings.contactUs}
             </h3>
             <address className="not-italic space-y-3 text-[14px] leading-relaxed text-cocoa/65">
@@ -202,66 +187,68 @@ export default function Footer() {
               <p>
                 <PhoneLinks
                   phones={settings.phones}
-                  linkClassName="transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+                  linkClassName="text-[14px] text-cocoa/65 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
                 />
-              </p>
-              <p>
-                <a
-                  href={`mailto:${settings.email}`}
-                  className="transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
-                >
-                  {settings.email}
-                </a>
               </p>
             </address>
 
-            <div className="mt-7">
-              <Link
-                to={locPath(selectedLocationId, "/contact")}
-                className="inline-flex items-center gap-2 rounded-full border border-cocoa/15 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-cocoa/70 transition-all duration-300 hover:border-saffron/50 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+            <div className="mt-6">
+              <a
+                href={directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 rounded-full border border-cocoa/15 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-cocoa/70 transition-all duration-300 hover:-translate-y-0.5 hover:border-saffron/50 hover:bg-saffron/5 hover:text-saffron hover:shadow-[0_8px_20px_-12px_rgba(237,60,24,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
               >
-                {headings.getInTouch}
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
-                  <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                {headings.getDirections ?? "Get Directions"}
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden
+                  className="transition-transform duration-300 group-hover:translate-x-0.5"
+                >
+                  <path
+                    d="M5 12h14M13 6l6 6-6 6"
+                    stroke="currentColor"
+                    strokeWidth="1.75"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
-              </Link>
+              </a>
             </div>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-cocoa/8 pt-8 md:flex-row">
-          <p className="font-serif text-[15px] tracking-wide text-cocoa/60">
-            {settings.restaurant_name}
-          </p>
-          <p className="text-[12px] uppercase tracking-[0.18em] text-cocoa/40">
-            © {year} {settings.restaurant_name}. All rights reserved.
-          </p>
-          <div className="flex gap-5">
-            {[
-              legal.privacyCta,
-              legal.termsCta,
-            ].map((l) =>
-              isExternalUrl(l.url) ? (
-                <a
-                  key={l.label}
-                  href={l.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[12px] text-cocoa/40 transition-colors duration-300 hover:text-saffron"
-                >
-                  {l.label}
-                </a>
-              ) : (
-                <Link
-                  key={l.label}
-                  to={locPath(selectedLocationId, l.url)}
-                  className="text-[12px] text-cocoa/40 transition-colors duration-300 hover:text-saffron"
-                >
-                  {l.label}
-                </Link>
-              ),
-            )}
+        <div className="mt-10 border-t border-cocoa/6 pt-6">
+          <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
+            <p className="text-[12px] text-cocoa/45">
+              © {year} Desi Dhamaka Indian Restaurant. All Rights Reserved.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 md:justify-end">
+              <Link
+                to={locPath(selectedLocationId, "/privacy-policy")}
+                className="text-[12px] text-cocoa/45 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                to={locPath(selectedLocationId, "/terms-conditions")}
+                className="text-[12px] text-cocoa/45 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+              >
+                Terms &amp; Conditions
+              </Link>
+              <a
+                href={CHEFGAA_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[12px] text-cocoa/45 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+              >
+                Powered by ChefGaa
+              </a>
+            </div>
           </div>
         </div>
       </div>
