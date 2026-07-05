@@ -23,10 +23,10 @@ export default function LocationOptionCard({
   id,
 }: Props) {
   const stateClass = selected
-    ? "bg-orange-50 border border-orange-300"
+    ? " location-option--selected"
     : highlighted
-      ? "bg-orange-50 border border-orange-200"
-      : "border border-transparent hover:bg-orange-50";
+      ? " location-option--highlighted"
+      : "";
 
   return (
     <button
@@ -34,19 +34,17 @@ export default function LocationOptionCard({
       id={id}
       role="option"
       aria-selected={selected}
-      className={`flex w-full cursor-pointer items-center gap-3 rounded-xl p-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 ${stateClass}`}
+      title={option.name}
+      className={`location-option${stateClass}`}
       onClick={() => onSelect(option.id)}
     >
-      <span
-        className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-orange-100"
-        aria-hidden
-      >
-        <MapPin size={18} color="#ea580c" strokeWidth={1.75} />
+      <span className="location-option__icon" aria-hidden>
+        <MapPin size={17} strokeWidth={1.75} />
       </span>
-      <span className="flex-1 text-base font-semibold text-gray-900">{option.name}</span>
-      {selected && (
-        <Check size={18} color="#ea580c" strokeWidth={2} className="flex-shrink-0" aria-hidden />
-      )}
+      <span className="location-option__label">{option.name}</span>
+      <span className="location-option__check" aria-hidden>
+        {selected ? <Check size={17} strokeWidth={2.25} /> : null}
+      </span>
     </button>
   );
 }

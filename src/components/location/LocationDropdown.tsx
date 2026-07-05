@@ -147,7 +147,9 @@ export default function LocationDropdown({
             <MapPin size={18} strokeWidth={1.75} />
           </span>
           <span className="location-dropdown__text">
-            <span className="location-dropdown__name">{displayName}</span>
+            <span className="location-dropdown__name" title={displayName}>
+              {displayName}
+            </span>
             {showSubtitle && (
               <span className="location-dropdown__subtitle">
                 Serving Authentic Indian Cuisine
@@ -173,10 +175,10 @@ export default function LocationDropdown({
               "location-dropdown__panel" +
               (isHeader ? " location-dropdown__panel--header" : "")
             }
-            initial={{ opacity: 0, scale: 0.96, y: -6 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: -6 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
             <ul className="location-dropdown__list">
               {options.map((option, index) => (
