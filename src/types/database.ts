@@ -75,9 +75,30 @@ export interface PageContent {
 
 export interface SeoMetadata extends Timestamps {
   id: string;
-  page_key: string;
   location_id: RestaurantLocationId;
-  data: Json;
+  page_key: string;
+  seo_title: string | null;
+  meta_description: string | null;
+  focus_keyword: string | null;
+  secondary_keywords: string[] | null;
+  canonical_url: string | null;
+  slug: string | null;
+  robots: string | null;
+  og_title: string | null;
+  og_description: string | null;
+  og_image: string | null;
+  og_location: string | null;
+  twitter_title: string | null;
+  twitter_description: string | null;
+  twitter_image: string | null;
+  schema_json: Json;
+  h1: string | null;
+  h2: Json;
+  h3: Json;
+  seo_intro: string | null;
+  seo_footer_content: string | null;
+  conclusion: string | null;
+  faq: Json;
 }
 
 export type SeoMetadataInsert = Omit<SeoMetadata, "id" | "created_at" | "updated_at"> &

@@ -1,7 +1,8 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import type { LocationId } from "../config/locations";
+import type { SeoMetadata } from "../types/database";
 import type { SeoMetadataForm, SeoPageKey } from "../types/seoMetadata";
-import { normalizeSeoMetadataForm } from "../utils/seo/seoDefaults";
+import { rowToSeoForm } from "../utils/seo/seoDefaults";
 
 const CACHE_TTL_MS = 60_000;
 
@@ -32,16 +33,14 @@ async function fetchSeoMap(locationId: LocationId): Promise<Partial<Record<SeoPa
   const client = createClientIfConfigured();
   if (!client) return {};
 
-  const { data, error } = await client
-    .from("seo_metadata")
-    .select("page_key, data")
-    .eq("location_id", locationId);
+  const { data, error } = await client.from("seo_metadata").select("*").eq("location_id", locationId);
 
   if (error || !data) return {};
 
   const map: Partial<Record<SeoPageKey, SeoMetadataForm>> = {};
-  for (const row of data as Array<{ page_key: SeoPageKey; data: unknown }>) {
-    map[row.page_key] = normalizeSeoMetadataForm(row.data, locationId, row.page_key);
+  for (const row of data as SeoMetadata[]) {
+    const pageKey = row.page_key as SeoPageKey;
+    map[pageKey] = rowToSeoForm(row, locationId, pageKey);
   }
   return map;
 }

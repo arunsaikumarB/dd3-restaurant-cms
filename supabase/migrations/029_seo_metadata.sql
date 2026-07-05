@@ -4,13 +4,9 @@
 
 CREATE TABLE IF NOT EXISTS public.seo_metadata (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  page_key TEXT NOT NULL,
   location_id TEXT NOT NULL CHECK (location_id IN
     ('south-plainfield', 'oak-tree', 'lawrenceville')),
-  data JSONB NOT NULL DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT seo_metadata_page_key_check CHECK (page_key IN (
+  page_key TEXT NOT NULL CHECK (page_key IN (
     'homepage',
     'about',
     'menu',
@@ -24,6 +20,30 @@ CREATE TABLE IF NOT EXISTS public.seo_metadata (
     'events',
     'custom'
   )),
+  seo_title TEXT,
+  meta_description TEXT,
+  focus_keyword TEXT,
+  secondary_keywords TEXT[] DEFAULT '{}',
+  canonical_url TEXT,
+  slug TEXT,
+  robots TEXT DEFAULT 'index',
+  og_title TEXT,
+  og_description TEXT,
+  og_image TEXT,
+  og_location TEXT,
+  twitter_title TEXT,
+  twitter_description TEXT,
+  twitter_image TEXT,
+  schema_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+  h1 TEXT,
+  h2 JSONB NOT NULL DEFAULT '[]'::jsonb,
+  h3 JSONB NOT NULL DEFAULT '[]'::jsonb,
+  seo_intro TEXT,
+  seo_footer_content TEXT,
+  conclusion TEXT,
+  faq JSONB NOT NULL DEFAULT '[]'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT seo_metadata_location_page_key UNIQUE (location_id, page_key)
 );
 
@@ -32,6 +52,9 @@ CREATE INDEX IF NOT EXISTS seo_metadata_location_idx
 
 CREATE INDEX IF NOT EXISTS seo_metadata_page_key_idx
   ON public.seo_metadata (page_key);
+
+CREATE INDEX IF NOT EXISTS seo_metadata_location_page_idx
+  ON public.seo_metadata (location_id, page_key);
 
 CREATE OR REPLACE FUNCTION public.set_seo_metadata_updated_at()
 RETURNS TRIGGER AS $$
@@ -55,12 +78,24 @@ CREATE POLICY "seo_metadata_public_read"
   TO anon, authenticated
   USING (TRUE);
 
-DROP POLICY IF EXISTS "seo_metadata_authenticated_all" ON public.seo_metadata;
-CREATE POLICY "seo_metadata_authenticated_all"
-  ON public.seo_metadata FOR ALL
+DROP POLICY IF EXISTS "seo_metadata_admin_write" ON public.seo_metadata;
+CREATE POLICY "seo_metadata_admin_write"
+  ON public.seo_metadata FOR INSERT
+  TO authenticated
+  WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "seo_metadata_admin_update" ON public.seo_metadata;
+CREATE POLICY "seo_metadata_admin_update"
+  ON public.seo_metadata FOR UPDATE
   TO authenticated
   USING (public.is_admin())
   WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "seo_metadata_admin_delete" ON public.seo_metadata;
+CREATE POLICY "seo_metadata_admin_delete"
+  ON public.seo_metadata FOR DELETE
+  TO authenticated
+  USING (public.is_admin());
 
 GRANT SELECT ON public.seo_metadata TO anon, authenticated;
 GRANT INSERT, UPDATE, DELETE ON public.seo_metadata TO authenticated;

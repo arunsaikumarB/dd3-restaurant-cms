@@ -1,11 +1,11 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
 import type { LocationId } from "../config/locations";
-import type { Json, SeoMetadata } from "../types/database";
+import type { SeoMetadata } from "../types/database";
 import type { SeoMetadataForm, SeoMetadataRow, SeoPageKey } from "../types/seoMetadata";
 import {
   buildDefaultSeoMetadataForm,
-  formToSeoPayload,
+  formToDbRow,
   rowToSeoForm,
 } from "../utils/seo/seoDefaults";
 import { invalidateSeoMetadataCache } from "./seoMetadataPublic";
@@ -13,6 +13,8 @@ import { invalidateSeoMetadataCache } from "./seoMetadataPublic";
 type SupabaseError = { message: string; code?: string };
 
 type SeoMetadataDbRow = SeoMetadata;
+
+type SeoMetadataInsertRow = ReturnType<typeof formToDbRow>;
 
 type SeoMetadataQuery = {
   select(columns: string): {
@@ -26,12 +28,12 @@ type SeoMetadataQuery = {
       }>;
     };
   };
-  insert(row: { page_key: SeoPageKey; location_id: LocationId; data: Json }): {
+  insert(row: SeoMetadataInsertRow): {
     select(columns: string): {
       single(): Promise<{ data: SeoMetadataDbRow | null; error: SupabaseError | null }>;
     };
   };
-  update(row: { data: Json }): {
+  update(row: Partial<SeoMetadataInsertRow>): {
     eq(column: string, value: string): {
       select(columns: string): {
         single(): Promise<{ data: SeoMetadataDbRow | null; error: SupabaseError | null }>;
@@ -46,6 +48,9 @@ type SeoMetadataQuery = {
 function mapSupabaseError(error: { message: string; code?: string }): string {
   if (error.code === "42501" || error.message.toLowerCase().includes("permission")) {
     return "You do not have permission to update SEO metadata. Please sign in as an admin.";
+  }
+  if (error.code === "42P01") {
+    return 'SEO table is missing. Run migration "029_seo_metadata.sql" in Supabase.';
   }
   return error.message || "Failed to save SEO metadata.";
 }
@@ -117,13 +122,8 @@ export async function createSeoMetadata(
   const client = createClientIfConfigured();
   if (!client) throw new Error("Supabase client unavailable.");
 
-  const payload = formToSeoPayload(form);
   const { data, error } = await seoMetadataTable(client)
-    .insert({
-      page_key: pageKey,
-      location_id: locationId,
-      data: payload as unknown as Json,
-    })
+    .insert(formToDbRow(form, locationId, pageKey))
     .select("*")
     .single();
 
@@ -147,9 +147,8 @@ export async function updateSeoMetadata(
   const client = createClientIfConfigured();
   if (!client) throw new Error("Supabase client unavailable.");
 
-  const payload = formToSeoPayload(form);
   const { data, error } = await seoMetadataTable(client)
-    .update({ data: payload as unknown as Json })
+    .update(formToDbRow(form, locationId, pageKey))
     .eq("id", id)
     .select("*")
     .single();
