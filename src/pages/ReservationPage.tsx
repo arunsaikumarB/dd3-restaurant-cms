@@ -1,10 +1,10 @@
-import ReservationInfo from "../components/reservation/ReservationInfo";
+import ReservationHero from "../components/reservation/ReservationHero";
 import BookingForm from "../components/reservation/BookingForm";
-import FeatureCards from "../components/reservation/FeatureCards";
-import ImageGallery from "../components/reservation/ImageGallery";
+import ReservationWhyDine from "../components/reservation/ReservationWhyDine";
+import ReservationTimeline from "../components/reservation/ReservationTimeline";
+import ReservationPolicy from "../components/reservation/ReservationPolicy";
+import ReservationPrivateDiningCta from "../components/reservation/ReservationPrivateDiningCta";
 import ContactCards from "../components/reservation/ContactCards";
-import GoogleMap from "../components/reservation/GoogleMap";
-import PageHero from "../components/ui/PageHero";
 import { usePageContent } from "../context/PageContentContext";
 import { useLocationSelection } from "../context/LocationContext";
 import { useHomepageData } from "../hooks/useHomepageData";
@@ -12,23 +12,15 @@ import { isExternalUrl, resolveReservationUrl } from "../utils/locationLinks";
 import "../components/reservation/reservation.css";
 
 export default function ReservationPage() {
-  const { fetchSection, interpolate } = usePageContent();
+  const { fetchSection } = usePageContent();
   const { selectedLocationId } = useLocationSelection();
   const { bundle } = useHomepageData();
   const reservationLink = resolveReservationUrl(bundle.settings, selectedLocationId);
 
-  const hero = fetchSection("reservation", "hero", {
-    label: "Reservations",
-    title: "Reserve Your Table",
-    subtitleTemplate:
-      "Experience authentic Indian hospitality, unforgettable flavours, and elegant dining at {location}.",
-  });
   const stickyCta = fetchSection("reservation", "sticky_cta", {
-    reserveTableLabel: "Reserve My Table",
+    reserveTableLabel: "Reserve Table",
     reserveOnlineLabel: "Reserve Online",
   });
-
-  const heroSubtitle = interpolate(hero.subtitleTemplate);
 
   const scrollToBooking = () => {
     if (isExternalUrl(reservationLink)) {
@@ -43,35 +35,32 @@ export default function ReservationPage() {
       <div className="reservation-page__texture" aria-hidden />
       <div className="reservation-page__pattern" aria-hidden />
 
-      <PageHero
-        label={hero.label}
-        title={hero.title}
-        subtitle={heroSubtitle}
-        backgroundImage="/reservation/interior/interior-01.webp"
-        breadcrumbItems={[
-          { label: "Home", to: "/" },
-          { label: "Reservation" },
-        ]}
-      />
+      <ReservationHero />
 
       <section
         id="booking"
-        className="reservation-booking page-content-start"
+        className="reservation-experience"
         aria-labelledby="booking-section-title"
       >
         <h2 id="booking-section-title" className="sr-only">
           Book a table
         </h2>
-        <div className="reservation-booking__inner">
-          <ReservationInfo />
-          <BookingForm />
+
+        <div className="reservation-experience__inner">
+          <div className="reservation-experience__form-col">
+            <BookingForm />
+          </div>
+          <div className="reservation-experience__aside-col">
+            <ReservationWhyDine />
+          </div>
         </div>
+
+        <ReservationTimeline />
       </section>
 
-      <FeatureCards />
-      <ImageGallery />
+      <ReservationPolicy />
+      <ReservationPrivateDiningCta />
       <ContactCards />
-      <GoogleMap />
 
       <div className="reservation-sticky">
         <button

@@ -62,25 +62,24 @@ const icons = {
 export default function BookingForm() {
   const { fetchSection } = usePageContent();
   const formCopy = fetchSection("reservation", "booking_form", {
-    stepLabel: "Step 1 of 1 — Your Details",
-    title: "Book Your Experience",
+    title: "Reserve Your Table",
     subtitle:
-      "Select your preferred date, time, and party size. We'll prepare an unforgettable evening.",
+      "Fill in your details and we'll confirm your reservation shortly.",
     locationLabel: "Restaurant Location",
     dateLabel: "Date",
     guestsLabel: "Guests",
     timeSlotsLabel: "Available Time Slots",
     loadingSlots: "Finding available times…",
     noSlots: "No times available for this date.",
-    nameLabel: "Name",
+    nameLabel: "Full Name",
     namePlaceholder: "Your full name",
-    phoneLabel: "Phone",
+    phoneLabel: "Phone Number",
     phonePlaceholder: "(555) 123-4567",
-    emailLabel: "Email",
+    emailLabel: "Email Address",
     emailPlaceholder: "you@example.com",
     requestsLabel: "Special Requests",
     requestsPlaceholder: "Allergies, celebrations, seating preferences…",
-    submitLabel: "Reserve My Table",
+    submitLabel: "Reserve Table",
     submittingLabel: "Reserving…",
     successTitle: "Reservation Requested",
     successAnotherLabel: "Make Another Reservation",
@@ -147,7 +146,6 @@ export default function BookingForm() {
         aria-label="Table reservation form"
       >
         <header className="reservation-form__header">
-          <p className="reservation-form__step">{formCopy.stepLabel}</p>
           <h2 className="reservation-form__title">{formCopy.title}</h2>
           <p className="reservation-form__subtitle">{formCopy.subtitle}</p>
         </header>
@@ -161,9 +159,11 @@ export default function BookingForm() {
               <FieldIcon>{icons.location}</FieldIcon>
               <select
                 id="location"
-                className="reservation-field__select"
+                className="reservation-field__select reservation-field__select--locked"
                 value={form.locationId}
                 onChange={(e) => updateField("locationId", e.target.value)}
+                aria-readonly="true"
+                disabled
               >
                 {RESERVATION_LOCATIONS.map((loc) => (
                   <option key={loc.id} value={loc.id}>

@@ -56,21 +56,27 @@ export default function ContactCards() {
   const { fetchSection } = usePageContent();
   const { bundle } = useHomepageData();
   const section = fetchSection("reservation", "contact_section", {
-    eyebrow: "Restaurant Information",
+    eyebrow: "Get in Touch",
     title: "We're Here for You",
-    subtitle: "Reach out directly or visit us — our team is ready to welcome you.",
+    subtitle: "Reach out directly or visit us in South Plainfield — our team is ready to welcome you.",
     phoneTitle: "Call Us",
-    emailTitle: "Email",
+    emailTitle: "Write Us",
     visitTitle: "Visit Us",
     hoursTitle: "Business Hours",
   });
-  const contactItems = buildReservationContactCards(bundle.settings).map((item) => {
-    const titleKey = CONTACT_TITLE_KEYS[item.id as keyof typeof CONTACT_TITLE_KEYS];
-    return {
-      ...item,
-      title: titleKey ? section[titleKey] : item.title,
-    };
-  });
+  const contactItems = buildReservationContactCards(bundle.settings)
+    .filter((item) => item.id === "email" || item.id === "phone" || item.id === "visit")
+    .sort((a, b) => {
+      const order = { email: 0, phone: 1, visit: 2 };
+      return (order[a.id as keyof typeof order] ?? 9) - (order[b.id as keyof typeof order] ?? 9);
+    })
+    .map((item) => {
+      const titleKey = CONTACT_TITLE_KEYS[item.id as keyof typeof CONTACT_TITLE_KEYS];
+      return {
+        ...item,
+        title: titleKey ? section[titleKey] : item.title,
+      };
+    });
 
   return (
     <section className="reservation-contact" aria-labelledby="contact-title">
@@ -86,14 +92,18 @@ export default function ContactCards() {
         </h2>
 
         <motion.div
-          className="reservation-contact__grid"
+          className="reservation-contact__grid reservation-contact__grid--glass"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
         >
           {contactItems.map((item) => (
-            <motion.div key={item.id} className="reservation-contact__card" variants={fadeUpItem}>
+            <motion.div
+              key={item.id}
+              className="reservation-contact__card reservation-contact__card--glass"
+              variants={fadeUpItem}
+            >
               <div className="reservation-contact__icon">{contactIcons[item.icon]}</div>
               <h3 className="reservation-contact__title">{item.title}</h3>
               {item.id === "phone" && item.phones && item.phones.length > 1 ? (

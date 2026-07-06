@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { LocationId } from "../config/locations";
 import { usePageContent } from "../context/PageContentContext";
-import { RESERVATION_LOCATIONS } from "../data/reservationPage";
 import { trackReservationClick } from "../services/analytics";
 import {
   fetchAvailableTimeSlots,
@@ -30,7 +29,7 @@ function todayIso(): string {
 }
 
 const initialState: ReservationFormState = {
-  locationId: RESERVATION_LOCATIONS[0].id,
+  locationId: "south-plainfield",
   date: todayIso(),
   time: "",
   guests: 2,
