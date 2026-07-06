@@ -1,5 +1,7 @@
-import { LOCATIONS, type LocationId } from "../config/locations";
 import { SITE } from "../constants/site";
+import { getLocationConfig } from "../config/locations";
+
+const SOUTH_PLAINFIELD = getLocationConfig("south-plainfield");
 
 export interface ReservationLocation {
   id: string;
@@ -7,13 +9,105 @@ export interface ReservationLocation {
   address: string;
 }
 
-export const RESERVATION_LOCATIONS: ReservationLocation[] = (
-  Object.keys(LOCATIONS) as LocationId[]
-).map((id) => ({
-  id,
-  name: `Desi Dhamaka — ${LOCATIONS[id].name}`,
-  address: LOCATIONS[id].address.replace(/\n/g, ", ").trim(),
-}));
+/** South Plainfield only — reservation page is location-specific. */
+export const RESERVATION_LOCATIONS: ReservationLocation[] = [
+  {
+    id: "south-plainfield",
+    name: `Desi Dhamaka — ${SOUTH_PLAINFIELD.shortName}`,
+    address: SOUTH_PLAINFIELD.address.replace(/\n/g, ", "),
+  },
+];
+
+export const RESERVATION_HERO_FEATURES = [
+  { id: "cuisine", title: "Authentic Cuisine", icon: "cuisine" as const },
+  { id: "family", title: "Family Friendly", icon: "family" as const },
+  { id: "ingredients", title: "Fresh Ingredients", icon: "ingredients" as const },
+  { id: "reservations", title: "Easy Reservations", icon: "reservations" as const },
+] as const;
+
+export const RESERVATION_WHY_DINE = [
+  {
+    id: "cuisine",
+    title: "Authentic Indian Cuisine",
+    description:
+      "Traditional recipes from across India, prepared with premium spices and time-honoured technique.",
+    icon: "cuisine" as const,
+  },
+  {
+    id: "ingredients",
+    title: "Fresh Ingredients",
+    description: "Quality produce and whole spices selected daily for vibrant, unforgettable flavour.",
+    icon: "ingredients" as const,
+  },
+  {
+    id: "hospitality",
+    title: "Warm Hospitality",
+    description: "Attentive service in an elegant setting — every guest welcomed like family.",
+    icon: "hospitality" as const,
+  },
+  {
+    id: "private",
+    title: "Private Dining Available",
+    description: "Intimate rooms and bespoke menus for celebrations, meetings, and special evenings.",
+    icon: "private" as const,
+  },
+] as const;
+
+export const RESERVATION_TIMELINE = [
+  {
+    id: "date",
+    title: "Choose Date",
+    description: "Pick your preferred evening and party size.",
+  },
+  {
+    id: "reserve",
+    title: "Reserve Table",
+    description: "Submit your details — we prepare your table with care.",
+  },
+  {
+    id: "confirm",
+    title: "Confirmation",
+    description: "Receive confirmation from our hospitality team shortly.",
+  },
+  {
+    id: "enjoy",
+    title: "Enjoy Your Meal",
+    description: "Arrive, relax, and savour an unforgettable dining experience.",
+  },
+] as const;
+
+export const RESERVATION_POLICIES = [
+  {
+    id: "cancellation",
+    title: "Cancellation Policy",
+    description:
+      "Please notify us at least 2 hours before your reservation if your plans change. For large parties, 24 hours notice is appreciated.",
+  },
+  {
+    id: "arrival",
+    title: "Arrival Time",
+    description:
+      "We hold tables for 15 minutes past your reservation time. Contact us if you are running late.",
+  },
+  {
+    id: "groups",
+    title: "Group Booking",
+    description:
+      "Parties of 8 or more may require a set menu or deposit. Our team will reach out to coordinate details.",
+  },
+  {
+    id: "requests",
+    title: "Special Requests",
+    description:
+      "Allergies, celebrations, and seating preferences can be noted in the form — we do our best to accommodate.",
+  },
+  {
+    id: "parking",
+    title: "Parking Information",
+    description:
+      "Complimentary parking is available in the restaurant lot on Hadley Road, South Plainfield.",
+  },
+] as const;
 
 export const RESERVATION_STATS = [
   { id: "rating", label: "Google Rating", value: "★★★★★", accent: true },
