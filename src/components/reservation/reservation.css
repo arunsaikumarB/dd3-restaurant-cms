@@ -34,6 +34,12 @@
   background: #3b0f12;
 }
 
+.reservation-hero__banner-wrap {
+  display: block;
+  width: 100%;
+  line-height: 0;
+}
+
 .reservation-hero__banner-link {
   display: block;
   width: 100%;
@@ -150,6 +156,18 @@
   font-size: clamp(0.95rem, 1.5vw, 1.05rem);
   line-height: 1.75;
   color: rgba(31, 31, 31, 0.58);
+}
+
+/* Booking — form directly below hero banner */
+.reservation-booking--direct {
+  padding: clamp(1rem, 2.5vw, 1.75rem) clamp(1.25rem, 3vw, 2rem)
+    clamp(3rem, 6vw, 4.5rem);
+}
+
+.reservation-booking__inner--centered {
+  max-width: 720px;
+  margin-inline: auto;
+  display: block;
 }
 
 /* Booking split */
@@ -303,146 +321,6 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(31, 31, 31, 0.5);
-}
-
-/* OpenTable reservation panel */
-.reservation-opentable__location {
-  display: grid;
-  gap: 1.25rem;
-  margin-bottom: 1.75rem;
-  padding: 1.25rem 1.35rem;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(31, 31, 31, 0.06);
-}
-
-.reservation-opentable__location-row {
-  display: flex;
-  gap: 0.85rem;
-  color: rgba(31, 31, 31, 0.45);
-}
-
-.reservation-opentable__location-row svg {
-  flex-shrink: 0;
-  margin-top: 0.15rem;
-  color: #c97a2b;
-}
-
-.reservation-opentable__location-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(31, 31, 31, 0.42);
-}
-
-.reservation-opentable__location-value {
-  margin-top: 0.2rem;
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: #1f1f1f;
-}
-
-.reservation-opentable__location-meta {
-  margin-top: 0.35rem;
-  font-size: 0.92rem;
-  line-height: 1.55;
-  color: rgba(31, 31, 31, 0.62);
-}
-
-.reservation-opentable__phone {
-  display: inline-block;
-  margin-top: 0.35rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #ed3c18;
-  transition: color 200ms ease;
-}
-
-.reservation-opentable__phone:hover {
-  color: #c97a2b;
-}
-
-.reservation-opentable__hours {
-  margin-top: 0.35rem;
-  display: grid;
-  gap: 0.35rem;
-  list-style: none;
-  padding: 0;
-}
-
-.reservation-opentable__hours li {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  font-size: 0.9rem;
-  color: rgba(31, 31, 31, 0.68);
-}
-
-.reservation-opentable__perks {
-  display: grid;
-  gap: 0.65rem;
-  margin: 0 0 1.75rem;
-  padding: 0;
-  list-style: none;
-}
-
-.reservation-opentable__perks li {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  font-size: 0.92rem;
-  color: rgba(31, 31, 31, 0.68);
-}
-
-.reservation-opentable__perks svg {
-  color: #ed3c18;
-  flex-shrink: 0;
-}
-
-.reservation-opentable__actions {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.reservation-opentable__cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  width: 100%;
-  min-height: 52px;
-  padding: 0.9rem 1.5rem;
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #ed3c18 0%, #c97a2b 100%);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  cursor: pointer;
-  box-shadow: 0 16px 40px -16px rgba(237, 60, 24, 0.55);
-  transition:
-    transform 350ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 350ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.reservation-opentable__cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 48px -14px rgba(237, 60, 24, 0.62);
-}
-
-.reservation-opentable__cta:focus-visible {
-  outline: 2px solid #c97a2b;
-  outline-offset: 3px;
-}
-
-.reservation-opentable__note {
-  text-align: center;
-  font-size: 0.82rem;
-  color: rgba(31, 31, 31, 0.45);
 }
 
 /* Booking form card */

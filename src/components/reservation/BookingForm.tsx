@@ -80,7 +80,7 @@ export default function BookingForm() {
     emailPlaceholder: "you@example.com",
     requestsLabel: "Special Requests",
     requestsPlaceholder: "Allergies, celebrations, seating preferences…",
-    submitLabel: "Reserve My Table",
+    submitLabel: "Request Reservation",
     submittingLabel: "Reserving…",
     successTitle: "Reservation Requested",
     successAnotherLabel: "Make Another Reservation",

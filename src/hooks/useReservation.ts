@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import type { LocationId } from "../config/locations";
+import { DEFAULT_PUBLIC_LOCATION_ID, type LocationId } from "../config/locations";
+import { useLocationSelection } from "../context/LocationContext";
 import { usePageContent } from "../context/PageContentContext";
-import { RESERVATION_LOCATIONS } from "../data/reservationPage";
 import { trackReservationClick } from "../services/analytics";
 import {
   fetchAvailableTimeSlots,
@@ -29,8 +29,8 @@ function todayIso(): string {
   return d.toISOString().slice(0, 10);
 }
 
-const initialState: ReservationFormState = {
-  locationId: RESERVATION_LOCATIONS[0].id,
+const initialState = (locationId: string): ReservationFormState => ({
+  locationId,
   date: todayIso(),
   time: "",
   guests: 2,
@@ -38,22 +38,30 @@ const initialState: ReservationFormState = {
   phone: "",
   email: "",
   specialRequests: "",
-};
+});
 
 export function useReservation() {
+  const { selectedLocationId } = useLocationSelection();
+  const activeLocationId = selectedLocationId ?? DEFAULT_PUBLIC_LOCATION_ID;
   const { fetchSection, interpolate } = usePageContent();
   const bookingMessages = fetchSection("reservation", "booking_messages", {
     successTemplate:
       "Thank you, {name}. Your request for {guests} guest(s) has been received. We'll confirm shortly.",
   });
 
-  const [form, setForm] = useState<ReservationFormState>(initialState);
+  const [form, setForm] = useState<ReservationFormState>(() =>
+    initialState(activeLocationId),
+  );
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setForm((prev) => ({ ...prev, locationId: activeLocationId }));
+  }, [activeLocationId]);
 
   const updateField = useCallback(
     <K extends keyof ReservationFormState>(
@@ -178,11 +186,11 @@ export function useReservation() {
   }, [form, bookingMessages.successTemplate, interpolate]);
 
   const reset = useCallback(() => {
-    setForm(initialState);
+    setForm(initialState(activeLocationId));
     setSubmitted(false);
     setSuccessMessage("");
     setError(null);
-  }, []);
+  }, [activeLocationId]);
 
   return {
     form,

@@ -13,24 +13,17 @@ export default function ReservationHero() {
   });
   const bannerY = useTransform(scrollYProgress, [0, 1], [0, 40]);
 
-  const scrollToBooking = () => {
-    document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <section
       ref={sectionRef}
       className="reservation-hero reservation-hero--banner"
       aria-label="Reserve your table at Desi Dhamaka"
     >
-      <motion.button
-        type="button"
-        className="reservation-hero__banner-link"
-        onClick={scrollToBooking}
+      <motion.div
+        className="reservation-hero__banner-wrap"
         initial={{ opacity: 0, y: 12 }}
         animate={loaded ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.9, ease: EASE_POWER3 }}
-        aria-label="Scroll to book your table"
       >
         <motion.img
           className="reservation-hero__banner"
@@ -41,20 +34,7 @@ export default function ReservationHero() {
           decoding="async"
           fetchPriority="high"
         />
-      </motion.button>
-
-      <motion.button
-        type="button"
-        className="reservation-hero__scroll"
-        onClick={scrollToBooking}
-        initial={{ opacity: 0 }}
-        animate={loaded ? { opacity: 1 } : {}}
-        transition={{ duration: 0.8, delay: 0.5, ease: EASE_POWER3 }}
-        aria-label="Scroll to booking"
-      >
-        <span className="reservation-hero__scroll-dot" />
-        Scroll
-      </motion.button>
+      </motion.div>
     </section>
   );
 }

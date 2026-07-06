@@ -1,3 +1,4 @@
+import { LOCATIONS, type LocationId } from "../config/locations";
 import { SITE } from "../constants/site";
 
 export interface ReservationLocation {
@@ -6,13 +7,13 @@ export interface ReservationLocation {
   address: string;
 }
 
-export const RESERVATION_LOCATIONS: ReservationLocation[] = [
-  {
-    id: "lawrence",
-    name: "Desi Dhamaka — Lawrence Township",
-    address: "540 Lawrence Square Blvd S, Lawrenceville, NJ 08648",
-  },
-];
+export const RESERVATION_LOCATIONS: ReservationLocation[] = (
+  Object.keys(LOCATIONS) as LocationId[]
+).map((id) => ({
+  id,
+  name: `Desi Dhamaka — ${LOCATIONS[id].name}`,
+  address: LOCATIONS[id].address.replace(/\n/g, ", ").trim(),
+}));
 
 export const RESERVATION_STATS = [
   { id: "rating", label: "Google Rating", value: "★★★★★", accent: true },
