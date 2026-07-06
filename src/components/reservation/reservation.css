@@ -34,6 +34,12 @@
   background: #3b0f12;
 }
 
+.reservation-hero__banner-wrap {
+  display: block;
+  width: 100%;
+  line-height: 0;
+}
+
 .reservation-hero__banner-link {
   display: block;
   width: 100%;
@@ -150,6 +156,18 @@
   font-size: clamp(0.95rem, 1.5vw, 1.05rem);
   line-height: 1.75;
   color: rgba(31, 31, 31, 0.58);
+}
+
+/* Booking — form directly below hero banner */
+.reservation-booking--direct {
+  padding: clamp(1rem, 2.5vw, 1.75rem) clamp(1.25rem, 3vw, 2rem)
+    clamp(3rem, 6vw, 4.5rem);
+}
+
+.reservation-booking__inner--centered {
+  max-width: 720px;
+  margin-inline: auto;
+  display: block;
 }
 
 /* Booking split */

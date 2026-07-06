@@ -16,7 +16,6 @@ import { usePageContent } from "../../context/PageContentContext";
 import { EASE_POWER3 } from "../showcase/motion";
 import LocationSwitcher from "../location/LocationSwitcher";
 import { useLocationSelection } from "../../context/LocationContext";
-import { isExternalUrl, resolveReservationUrl } from "../../utils/locationLinks";
 import { locPath } from "../../utils/locationPaths";
 import { trackOrderClick, trackReservationClick } from "../../services/analytics";
 import {
@@ -47,7 +46,6 @@ export default function Navbar() {
   const { mode: menuExperienceMode } = useMenuExperience();
   const chefGaaOrderUrl = useLocationOrderUrl();
   const directMenuOrdering = isDirectOrderingMode(menuExperienceMode);
-  const reservationLink = resolveReservationUrl(bundle.settings, selectedLocationId);
   const orderPagePath = locPath(selectedLocationId, ORDER_URL);
   const reserveUrl = locPath(selectedLocationId, RESERVE_URL);
   const logoAlt = `${bundle.settings.restaurant_name} home`;
@@ -122,12 +120,8 @@ export default function Navbar() {
     trackOrderClick(pathname, selectedLocationId);
   };
 
-  const handleReservationNav = (event: MouseEvent<HTMLElement>) => {
+  const handleReservationNav = () => {
     trackReservationClick(pathname, selectedLocationId);
-    if (isExternalUrl(reservationLink)) {
-      event.preventDefault();
-      window.open(reservationLink, "_blank", "noopener,noreferrer");
-    }
   };
 
   const headerClass =
