@@ -4,14 +4,17 @@ import PageHeader from "../components/shared/PageHeader";
 import AdminCard from "../components/ui/Card";
 import AdminToast from "../components/ui/Toast";
 import PageContentSectionPanel from "../components/pageContent/PageContentSectionPanel";
+import PageSeoPanel from "../components/seo/PageSeoPanel";
 import HomepagePageSkeleton from "../components/settings/HomepagePageSkeleton";
-import { ADMIN_PAGES_TAB_ORDER } from "../config/pageContentAdmin";
+import { ADMIN_PAGES_TAB_ORDER, PAGE_CONTENT_TO_SEO_KEY } from "../config/pageContentAdmin";
 import { useAdminTheme } from "../context/AdminThemeContext";
 import { useLocation } from "../hooks/useLocation";
 import {
   getPageContentSectionsForPage,
   type PageContentPageKey,
 } from "../../config/pageContentSchema";
+
+const SEO_TAB_KEY = "__seo__";
 
 export default function PagesManagementPage() {
   const { dark } = useAdminTheme();
@@ -28,16 +31,25 @@ export default function PagesManagementPage() {
     () => getPageContentSectionsForPage(activePage),
     [activePage],
   );
+  const seoPageKey = PAGE_CONTENT_TO_SEO_KEY[activePage];
+
+  const navItems = useMemo(() => {
+    const items = pageSections.map((section) => ({ key: section.section, label: section.label }));
+    if (seoPageKey) {
+      items.push({ key: SEO_TAB_KEY, label: "SEO" });
+    }
+    return items;
+  }, [pageSections, seoPageKey]);
 
   useEffect(() => {
-    if (pageSections.length === 0) {
+    if (navItems.length === 0) {
       setActiveSection("");
       return;
     }
-    if (!pageSections.some((section) => section.section === activeSection)) {
-      setActiveSection(pageSections[0].section);
+    if (!navItems.some((item) => item.key === activeSection)) {
+      setActiveSection(navItems[0].key);
     }
-  }, [activeSection, pageSections]);
+  }, [activeSection, navItems]);
 
   const showToast = useCallback((message: string, variant: "success" | "error" = "success") => {
     setToast({ open: true, message, variant });
@@ -94,7 +106,7 @@ export default function PagesManagementPage() {
         </div>
       </AdminCard>
 
-      {pageSections.length === 0 ? (
+      {navItems.length === 0 ? (
         <AdminCard>
           <p className="text-sm text-admin-muted">No sections configured for this page.</p>
         </AdminCard>
@@ -102,27 +114,29 @@ export default function PagesManagementPage() {
         <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
           <AdminCard padding="sm">
             <nav className="space-y-1">
-              {pageSections.map((section) => (
+              {navItems.map((item) => (
                 <button
-                  key={section.section}
+                  key={item.key}
                   type="button"
-                  onClick={() => setActiveSection(section.section)}
+                  onClick={() => setActiveSection(item.key)}
                   className={[
                     "w-full rounded-xl px-4 py-3 text-left text-sm transition-colors",
-                    activeSection === section.section
+                    activeSection === item.key
                       ? "bg-admin-primary text-white"
                       : dark
                         ? "hover:bg-white/5"
                         : "hover:bg-admin-ivory",
                   ].join(" ")}
                 >
-                  {section.label}
+                  {item.label}
                 </button>
               ))}
             </nav>
           </AdminCard>
 
-          {activeSection ? (
+          {activeSection === SEO_TAB_KEY && seoPageKey ? (
+            <PageSeoPanel pageKey={seoPageKey} onToast={showToast} />
+          ) : activeSection ? (
             <PageContentSectionPanel
               page={activePage}
               section={activeSection}

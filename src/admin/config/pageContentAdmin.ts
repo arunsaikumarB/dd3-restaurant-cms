@@ -1,4 +1,5 @@
 import type { PageContentPageKey } from "../../config/pageContentSchema";
+import type { SeoPageKey } from "../../types/seoMetadata";
 
 export const HOME_PAGE_CONTENT_SECTION_ORDER = [
   "hero_ui",
@@ -24,6 +25,19 @@ export const ADMIN_PAGES_TAB_ORDER: Array<{ key: PageContentPageKey; label: stri
   { key: "order", label: "Order" },
   { key: "global", label: "Global" },
 ];
+
+/** Maps a Pages-section tab to its corresponding SEO page key, where one exists. */
+export const PAGE_CONTENT_TO_SEO_KEY: Partial<Record<PageContentPageKey, SeoPageKey>> = {
+  home: "homepage",
+  about: "about",
+  menu: "menu",
+  offers: "offers",
+  catering: "catering",
+  parties: "private-dining",
+  testimonials: "testimonials",
+  contact: "contact",
+  reservation: "reservation",
+};
 
 export function isPageContentTabId(tabId: string): boolean {
   return tabId.startsWith("pc:");

@@ -7,7 +7,6 @@ import {
   Images,
   Star,
   Settings,
-  Search,
   User,
   LogIn,
   PlugZap,
@@ -32,7 +31,6 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       { label: "Insights", path: "/admin/insights", icon: LineChart },
       { label: "Homepage", path: "/admin/homepage", icon: Home },
       { label: "Pages", path: "/admin/pages", icon: FileText },
-      { label: "SEO", path: "/admin/seo", icon: Search },
     ],
   },
   {
