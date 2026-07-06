@@ -183,15 +183,6 @@ export default function SeoEditorPanel({
             value={form.basic.seoSlug}
             onChange={(e) => patchBasic({ seoSlug: e.target.value })}
           />
-          <AdminSelect
-            label="Robots"
-            value={form.basic.robotsIndex}
-            onChange={(value) => patchBasic({ robotsIndex: value as "index" | "noindex" })}
-            options={[
-              { value: "index", label: "Index" },
-              { value: "noindex", label: "NoIndex" },
-            ]}
-          />
         </div>
       </SectionCard>
     );
