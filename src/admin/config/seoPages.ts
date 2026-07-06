@@ -18,13 +18,19 @@ export type SeoEditorSectionKey = (typeof SEO_EDITOR_SECTIONS)[number]["key"];
 export type SeoEditorSectionTab = { key: SeoEditorSectionKey; label: string };
 
 /** Sections shown in each page's own SEO tab (Pages / Homepage edit view). */
-const PAGE_TAB_SECTION_KEYS: SeoEditorSectionKey[] = ["basic", "openGraph", "schema", "advanced"];
+const PAGE_TAB_SECTION_KEYS: SeoEditorSectionKey[] = [
+  "basic",
+  "openGraph",
+  "schema",
+  "advanced",
+  "preview",
+];
 export const SEO_PAGE_TAB_SECTIONS: SeoEditorSectionTab[] = SEO_EDITOR_SECTIONS.filter((section) =>
   PAGE_TAB_SECTION_KEYS.includes(section.key),
 );
 
 /** Sections shown on the sidebar-level "SEO Summary" page (site-wide, Yoast-style overview). */
-const SUMMARY_SECTION_KEYS: SeoEditorSectionKey[] = ["localSeo", "preview"];
+const SUMMARY_SECTION_KEYS: SeoEditorSectionKey[] = ["localSeo"];
 export const SEO_SUMMARY_SECTIONS: SeoEditorSectionTab[] = SEO_EDITOR_SECTIONS.filter((section) =>
   SUMMARY_SECTION_KEYS.includes(section.key),
 );

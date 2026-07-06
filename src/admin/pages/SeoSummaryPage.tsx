@@ -4,15 +4,11 @@ import PageHeader from "../components/shared/PageHeader";
 import PageSeoPanel from "../components/seo/PageSeoPanel";
 import AdminCard from "../components/ui/Card";
 import AdminToast from "../components/ui/Toast";
-import { SEO_PAGE_TABS, SEO_SUMMARY_SECTIONS } from "../config/seoPages";
-import { useAdminTheme } from "../context/AdminThemeContext";
+import { SEO_SUMMARY_SECTIONS } from "../config/seoPages";
 import { useLocation } from "../hooks/useLocation";
-import type { SeoPageKey } from "../../types/seoMetadata";
 
 export default function SeoSummaryPage() {
-  const { dark } = useAdminTheme();
   const { isAllLocations } = useLocation();
-  const [activePage, setActivePage] = useState<SeoPageKey>("homepage");
   const [toast, setToast] = useState<{ open: boolean; message: string; variant: "success" | "error" }>({
     open: false,
     message: "",
@@ -30,7 +26,7 @@ export default function SeoSummaryPage() {
       />
       <PageHeader
         title="SEO Summary"
-        description="Site-wide local business details and a live search-result preview for each page."
+        description="Site-wide local business details used across every page's SEO metadata."
       />
 
       {isAllLocations ? (
@@ -40,31 +36,12 @@ export default function SeoSummaryPage() {
           </p>
         </AdminCard>
       ) : (
-        <>
-          <AdminCard padding="sm" className="mb-6">
-            <div className="flex flex-wrap gap-2">
-              {SEO_PAGE_TABS.map((tab) => (
-                <button
-                  key={tab.key}
-                  type="button"
-                  onClick={() => setActivePage(tab.key)}
-                  className={[
-                    "rounded-xl px-4 py-2.5 text-sm font-medium transition-colors",
-                    activePage === tab.key
-                      ? "bg-admin-primary text-white"
-                      : dark
-                        ? "text-white/70 hover:bg-white/5"
-                        : "text-admin-muted hover:bg-admin-ivory",
-                  ].join(" ")}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </AdminCard>
-
-          <PageSeoPanel pageKey={activePage} onToast={showToast} sections={SEO_SUMMARY_SECTIONS} />
-        </>
+        <PageSeoPanel
+          pageKey="homepage"
+          onToast={showToast}
+          sections={SEO_SUMMARY_SECTIONS}
+          showValidation={false}
+        />
       )}
 
       <AdminToast

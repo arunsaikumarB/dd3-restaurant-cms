@@ -32,9 +32,15 @@ type PageSeoPanelProps = {
   pageKey: SeoPageKey;
   onToast: (message: string, variant?: "success" | "error") => void;
   sections?: SeoEditorSectionTab[];
+  showValidation?: boolean;
 };
 
-export default function PageSeoPanel({ pageKey, onToast, sections = SEO_PAGE_TAB_SECTIONS }: PageSeoPanelProps) {
+export default function PageSeoPanel({
+  pageKey,
+  onToast,
+  sections = SEO_PAGE_TAB_SECTIONS,
+  showValidation = true,
+}: PageSeoPanelProps) {
   const { dark } = useAdminTheme();
   const { locationId, isAllLocations, scope } = useLocation();
   const [activeSection, setActiveSection] = useState<SeoEditorSectionKey>(
@@ -183,31 +189,42 @@ export default function PageSeoPanel({ pageKey, onToast, sections = SEO_PAGE_TAB
         </div>
       </div>
 
-      <SeoValidationAlerts issues={validationIssues} />
+      {showValidation ? <SeoValidationAlerts issues={validationIssues} /> : null}
 
-      <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
-        <AdminCard padding="sm">
-          <nav className="space-y-1">
-            {sections.map((section) => (
-              <button
-                key={section.key}
-                type="button"
-                onClick={() => setActiveSection(section.key)}
-                className={[
-                  "w-full rounded-xl px-4 py-3 text-left text-sm transition-colors",
-                  activeSection === section.key
-                    ? "bg-admin-primary text-white"
-                    : dark
-                      ? "hover:bg-white/5"
-                      : "hover:bg-admin-ivory",
-                ].join(" ")}
-              >
-                {section.label}
-              </button>
-            ))}
-          </nav>
-        </AdminCard>
+      {sections.length > 1 ? (
+        <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
+          <AdminCard padding="sm">
+            <nav className="space-y-1">
+              {sections.map((section) => (
+                <button
+                  key={section.key}
+                  type="button"
+                  onClick={() => setActiveSection(section.key)}
+                  className={[
+                    "w-full rounded-xl px-4 py-3 text-left text-sm transition-colors",
+                    activeSection === section.key
+                      ? "bg-admin-primary text-white"
+                      : dark
+                        ? "hover:bg-white/5"
+                        : "hover:bg-admin-ivory",
+                  ].join(" ")}
+                >
+                  {section.label}
+                </button>
+              ))}
+            </nav>
+          </AdminCard>
 
+          <SeoEditorPanel
+            form={form}
+            pageKey={pageKey}
+            locationId={locationId}
+            activeSection={activeSection}
+            saving={saving}
+            onChange={setForm}
+          />
+        </div>
+      ) : (
         <SeoEditorPanel
           form={form}
           pageKey={pageKey}
@@ -216,7 +233,7 @@ export default function PageSeoPanel({ pageKey, onToast, sections = SEO_PAGE_TAB
           saving={saving}
           onChange={setForm}
         />
-      </div>
+      )}
     </div>
   );
 }
