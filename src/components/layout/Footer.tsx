@@ -5,9 +5,7 @@ import { useHomepageData } from "../../hooks/useHomepageData";
 import { usePageContent } from "../../context/PageContentContext";
 import { useLocationSelection } from "../../context/LocationContext";
 import {
-  isExternalUrl,
   resolveGoogleMapsDirectionsUrl,
-  resolveReservationUrl,
 } from "../../utils/locationLinks";
 import { locPath } from "../../utils/locationPaths";
 import {
@@ -61,7 +59,6 @@ export default function Footer() {
   });
   const { selectedLocationId } = useLocationSelection();
   const { settings } = bundle;
-  const reservationLink = resolveReservationUrl(settings, selectedLocationId);
   const directionsUrl = resolveGoogleMapsDirectionsUrl(settings, selectedLocationId);
   const orderPagePath = locPath(selectedLocationId, ORDER_URL);
   const reserveUrl = locPath(selectedLocationId, RESERVE_URL);
@@ -92,13 +89,7 @@ export default function Footer() {
             </Link>
             <Link
               to={reserveUrl}
-              onClick={(event) => {
-                trackReservationClick(pathname, selectedLocationId);
-                if (isExternalUrl(reservationLink)) {
-                  event.preventDefault();
-                  window.open(reservationLink, "_blank", "noopener,noreferrer");
-                }
-              }}
+              onClick={() => trackReservationClick(pathname, selectedLocationId)}
               className="inline-flex h-[42px] items-center justify-center gap-2 rounded-full border-2 border-ivory/30 px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ivory transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-ivory/60 hover:bg-ivory/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-cocoa"
             >
               {preCta.reserveCta.label}

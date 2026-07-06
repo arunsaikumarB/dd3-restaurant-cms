@@ -1,5 +1,6 @@
 import ReservationInfo from "../components/reservation/ReservationInfo";
 import BookingForm from "../components/reservation/BookingForm";
+import OpenTableReservationPanel from "../components/reservation/OpenTableReservationPanel";
 import FeatureCards from "../components/reservation/FeatureCards";
 import ImageGallery from "../components/reservation/ImageGallery";
 import ContactCards from "../components/reservation/ContactCards";
@@ -8,14 +9,18 @@ import PageHero from "../components/ui/PageHero";
 import { usePageContent } from "../context/PageContentContext";
 import { useLocationSelection } from "../context/LocationContext";
 import { useHomepageData } from "../hooks/useHomepageData";
-import { isExternalUrl, resolveReservationUrl } from "../utils/locationLinks";
+import { resolveExternalReservationUrl } from "../utils/locationLinks";
 import "../components/reservation/reservation.css";
 
 export default function ReservationPage() {
   const { fetchSection, interpolate } = usePageContent();
   const { selectedLocationId } = useLocationSelection();
   const { bundle } = useHomepageData();
-  const reservationLink = resolveReservationUrl(bundle.settings, selectedLocationId);
+  const externalReservationUrl = resolveExternalReservationUrl(
+    bundle.settings,
+    selectedLocationId,
+  );
+  const usesOpenTable = Boolean(externalReservationUrl);
 
   const hero = fetchSection("reservation", "hero", {
     label: "Reservations",
@@ -25,14 +30,14 @@ export default function ReservationPage() {
   });
   const stickyCta = fetchSection("reservation", "sticky_cta", {
     reserveTableLabel: "Reserve My Table",
-    reserveOnlineLabel: "Reserve Online",
+    reserveOnlineLabel: "Reserve on OpenTable",
   });
 
   const heroSubtitle = interpolate(hero.subtitleTemplate);
 
   const scrollToBooking = () => {
-    if (isExternalUrl(reservationLink)) {
-      window.open(reservationLink, "_blank", "noopener,noreferrer");
+    if (usesOpenTable && externalReservationUrl) {
+      window.open(externalReservationUrl, "_blank", "noopener,noreferrer");
       return;
     }
     document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" });
@@ -64,7 +69,11 @@ export default function ReservationPage() {
         </h2>
         <div className="reservation-booking__inner">
           <ReservationInfo />
-          <BookingForm />
+          {usesOpenTable && externalReservationUrl ? (
+            <OpenTableReservationPanel openTableUrl={externalReservationUrl} />
+          ) : (
+            <BookingForm />
+          )}
         </div>
       </section>
 
@@ -79,9 +88,7 @@ export default function ReservationPage() {
           className="reservation-sticky__btn"
           onClick={scrollToBooking}
         >
-          {isExternalUrl(reservationLink)
-            ? stickyCta.reserveOnlineLabel
-            : stickyCta.reserveTableLabel}
+          {usesOpenTable ? stickyCta.reserveOnlineLabel : stickyCta.reserveTableLabel}
         </button>
       </div>
     </div>

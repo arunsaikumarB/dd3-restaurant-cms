@@ -17,7 +17,10 @@ export type LocationConfig = {
   phone: string;
   email: string;
   googleMapsEmbed: string;
+  /** In-site reservation route, typically `/reservation`. */
   reservationLink: string;
+  /** OpenTable or other external booking URL when reservations are handled off-site. */
+  openTableUrl?: string;
   orderDirectLink: string;
   uberEatsLink: string;
   doorDashLink: string;
@@ -47,7 +50,8 @@ South Plainfield, NJ 07080`,
     email: "southplainfield@desidhamaka.com",
     googleMapsEmbed:
       "https://www.google.com/maps?q=4941+Stelton+Rd+South+Plainfield+NJ+07080&output=embed",
-    reservationLink: "https://www.opentable.com/r/desi-dhamaka-south-plainfield",
+    reservationLink: "/reservation",
+    openTableUrl: "https://www.opentable.com/r/desi-dhamaka-south-plainfield",
     orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka/outlet/70",
     uberEatsLink: "https://www.ubereats.com/store/desi-dhamaka-indian-restaurant/Flzpa94fTZWgImQYROzohQ?srsltid=AfmBOopzRGdQiLLrkwb-Na0COGReThF3Clv1tEtF7tnp5w4Qc3IdWt3d",
     doorDashLink: "https://www.doordash.com/en/store/desi-dhamaka-indian-restaurant-south-plainfield-29592911/?srsltid=AfmBOoqoRUfHZsJzA3wsz-s29_cHH-BbXt4hdCOPTvr9g0Odhg8nNwRP",
@@ -70,7 +74,8 @@ South Plainfield, NJ 07080`,
     email: "oaktree@desidhamaka.com",
     googleMapsEmbed:
       "https://www.google.com/maps?q=1676+Oak+Tree+Rd+Edison+NJ+08820&output=embed",
-    reservationLink: "https://www.opentable.com/r/desi-dhamaka-oak-tree",
+    reservationLink: "/reservation",
+    openTableUrl: "https://www.opentable.com/r/desi-dhamaka-oak-tree",
     orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka/outlet/71",
     uberEatsLink: "https://www.ubereats.com/store/desi-dhamaka/fJIwsyPVW965vXfss6xr6A?srsltid=AfmBOopIffZpYDcA32x2G2ZAJxcH1SFKWbDDJH_qvmiE7-qEOXbyl8M2",
     doorDashLink: "https://www.doordash.com/store/desi-dhamaka-edison-34765901/72377746/",

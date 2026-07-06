@@ -9,7 +9,7 @@ import { formatOpeningHoursRows } from "../services/homepagePublic";
 import { useContactForm } from "../hooks/useContactForm";
 import { useSectionImage } from "../hooks/useGallerySection";
 import { useLocationSelection } from "../context/LocationContext";
-import { isExternalUrl, resolveReservationUrl } from "../utils/locationLinks";
+import { resolveExternalReservationUrl } from "../utils/locationLinks";
 import PhoneLinks from "../components/ui/PhoneLinks";
 
 export default function ContactPage() {
@@ -17,7 +17,7 @@ export default function ContactPage() {
   const { bundle } = useHomepageData();
   const { selectedLocationId } = useLocationSelection();
   const { settings } = bundle;
-  const reservationLink = resolveReservationUrl(settings, selectedLocationId);
+  const externalReservationUrl = resolveExternalReservationUrl(settings, selectedLocationId);
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
   const {
     form,
@@ -273,12 +273,11 @@ export default function ContactPage() {
           title={bottomCta.title}
           subtitle={bottomCta.subtitle}
           buttonLabel={
-            isExternalUrl(reservationLink)
+            externalReservationUrl
               ? bottomCta.reserveOnlineLabel
               : bottomCta.reserveNowLabel
           }
-          buttonTo={isExternalUrl(reservationLink) ? undefined : "/reservation"}
-          buttonHref={isExternalUrl(reservationLink) ? reservationLink : undefined}
+          buttonTo="/reservation"
         />
       </section>
     </div>

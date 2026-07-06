@@ -34,6 +34,18 @@ export function isOrderUrlForLocation(url: string, locationId: LocationId): bool
   }
 }
 
+export function resolveExternalReservationUrl(
+  settings: LinkSettings | null | undefined,
+  locationId: LocationId | null,
+): string | null {
+  const fromCms = settings?.reservation_url?.trim();
+  if (fromCms && isExternalUrl(fromCms)) return fromCms;
+
+  const resolved = resolvePublicLocationId(locationId);
+  const openTable = getLocationConfig(resolved).openTableUrl?.trim();
+  return openTable || null;
+}
+
 export function resolveReservationUrl(
   settings: LinkSettings | null | undefined,
   locationId: LocationId | null,
