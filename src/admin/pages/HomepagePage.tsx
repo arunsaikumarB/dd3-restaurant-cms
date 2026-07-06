@@ -10,6 +10,7 @@ import AdminToast from "../components/ui/Toast";
 import MediaUploadField from "../components/settings/MediaUploadField";
 import HomepagePageSkeleton from "../components/settings/HomepagePageSkeleton";
 import PageContentSectionPanel from "../components/pageContent/PageContentSectionPanel";
+import PageSeoPanel from "../components/seo/PageSeoPanel";
 import {
   buildPageContentTabId,
   HOME_PAGE_CONTENT_SECTION_ORDER,
@@ -40,8 +41,10 @@ import {
 type SidebarTab = {
   id: string;
   label: string;
-  kind: "legacy" | "page_content";
+  kind: "legacy" | "page_content" | "seo";
 };
+
+const SEO_TAB_ID = "__seo__";
 
 function fieldError(
   sectionId: string,
@@ -150,7 +153,8 @@ export default function HomepageManagementPage() {
       label: section.label,
       kind: "legacy",
     }));
-    return [heroTab, ...pageContentTabs, featuredTab, ...localTabs];
+    const seoTab: SidebarTab = { id: SEO_TAB_ID, label: "SEO", kind: "seo" };
+    return [heroTab, ...pageContentTabs, featuredTab, ...localTabs, seoTab];
   }, [localSections]);
 
   const legacySections = useMemo(() => {
@@ -356,7 +360,9 @@ export default function HomepageManagementPage() {
           </nav>
         </AdminCard>
 
-        {activePageContentSection ? (
+        {activeId === SEO_TAB_ID ? (
+          <PageSeoPanel pageKey="homepage" onToast={showToast} />
+        ) : activePageContentSection ? (
           <PageContentSectionPanel
             page="home"
             section={activePageContentSection}

@@ -146,19 +146,21 @@ export default function SeoEditorPanel({
     return (
       <SectionCard title="Basic SEO">
         <div className="grid gap-4 sm:grid-cols-2">
-          <AdminInput
-            label="SEO Title"
-            value={form.basic.seoTitle}
-            onChange={(e) => patchBasic({ seoTitle: e.target.value })}
-            className="sm:col-span-2"
-          />
-          <AdminTextarea
-            label="Meta Description"
-            value={form.basic.metaDescription}
-            onChange={(e) => patchBasic({ metaDescription: e.target.value })}
-            rows={4}
-            className="sm:col-span-2"
-          />
+          <div className="sm:col-span-2">
+            <AdminInput
+              label="SEO Title"
+              value={form.basic.seoTitle}
+              onChange={(e) => patchBasic({ seoTitle: e.target.value })}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <AdminTextarea
+              label="Meta Description"
+              value={form.basic.metaDescription}
+              onChange={(e) => patchBasic({ metaDescription: e.target.value })}
+              rows={4}
+            />
+          </div>
           <AdminInput
             label="Focus Keyword"
             value={form.basic.focusKeyword}
@@ -169,12 +171,13 @@ export default function SeoEditorPanel({
             value={form.basic.secondaryKeywords}
             onChange={(e) => patchBasic({ secondaryKeywords: e.target.value })}
           />
-          <AdminInput
-            label="Canonical URL"
-            value={form.basic.canonicalUrl}
-            onChange={(e) => patchBasic({ canonicalUrl: e.target.value })}
-            className="sm:col-span-2"
-          />
+          <div className="sm:col-span-2">
+            <AdminInput
+              label="Canonical URL"
+              value={form.basic.canonicalUrl}
+              onChange={(e) => patchBasic({ canonicalUrl: e.target.value })}
+            />
+          </div>
           <AdminInput
             label="SEO Slug"
             value={form.basic.seoSlug}
@@ -198,11 +201,17 @@ export default function SeoEditorPanel({
     return (
       <SectionCard title="Open Graph">
         <div className="grid gap-4 sm:grid-cols-2">
-          <AdminInput label="OG Title" value={form.openGraph.ogTitle} onChange={(e) => patchOg({ ogTitle: e.target.value })} className="sm:col-span-2" />
-          <AdminTextarea label="OG Description" value={form.openGraph.ogDescription} onChange={(e) => patchOg({ ogDescription: e.target.value })} rows={3} className="sm:col-span-2" />
+          <div className="sm:col-span-2">
+            <AdminInput label="OG Title" value={form.openGraph.ogTitle} onChange={(e) => patchOg({ ogTitle: e.target.value })} />
+          </div>
+          <div className="sm:col-span-2">
+            <AdminTextarea label="OG Description" value={form.openGraph.ogDescription} onChange={(e) => patchOg({ ogDescription: e.target.value })} rows={3} />
+          </div>
           <ImageUploadField label="OG Image" value={form.openGraph.ogImage || null} disabled={saving} onChange={(url) => patchOg({ ogImage: url })} onUpload={uploadOgImage} />
           <AdminInput label="OG Locale" value={form.openGraph.ogLocale} onChange={(e) => patchOg({ ogLocale: e.target.value })} />
-          <AdminInput label="OG URL" value={form.openGraph.ogUrl} onChange={(e) => patchOg({ ogUrl: e.target.value })} className="sm:col-span-2" />
+          <div className="sm:col-span-2">
+            <AdminInput label="OG URL" value={form.openGraph.ogUrl} onChange={(e) => patchOg({ ogUrl: e.target.value })} />
+          </div>
           <AdminInput label="OG Type" value={form.openGraph.ogType} onChange={(e) => patchOg({ ogType: e.target.value })} />
         </div>
       </SectionCard>
@@ -213,8 +222,12 @@ export default function SeoEditorPanel({
     return (
       <SectionCard title="Twitter SEO">
         <div className="grid gap-4 sm:grid-cols-2">
-          <AdminInput label="Twitter Title" value={form.twitter.twitterTitle} onChange={(e) => patchTwitter({ twitterTitle: e.target.value })} className="sm:col-span-2" />
-          <AdminTextarea label="Twitter Description" value={form.twitter.twitterDescription} onChange={(e) => patchTwitter({ twitterDescription: e.target.value })} rows={3} className="sm:col-span-2" />
+          <div className="sm:col-span-2">
+            <AdminInput label="Twitter Title" value={form.twitter.twitterTitle} onChange={(e) => patchTwitter({ twitterTitle: e.target.value })} />
+          </div>
+          <div className="sm:col-span-2">
+            <AdminTextarea label="Twitter Description" value={form.twitter.twitterDescription} onChange={(e) => patchTwitter({ twitterDescription: e.target.value })} rows={3} />
+          </div>
           <ImageUploadField label="Twitter Image" value={form.twitter.twitterImage || null} disabled={saving} onChange={(url) => patchTwitter({ twitterImage: url })} onUpload={uploadOgImage} />
           <AdminSelect
             label="Twitter Card Type"
@@ -351,10 +364,14 @@ export default function SeoEditorPanel({
     return (
       <SectionCard title="Image SEO">
         <div className="grid gap-4 sm:grid-cols-2">
-          <AdminInput label="Default ALT Text" value={form.imageSeo.defaultAltText} onChange={(e) => patchImageSeo({ defaultAltText: e.target.value })} className="sm:col-span-2" />
+          <div className="sm:col-span-2">
+            <AdminInput label="Default ALT Text" value={form.imageSeo.defaultAltText} onChange={(e) => patchImageSeo({ defaultAltText: e.target.value })} />
+          </div>
           <AdminInput label="Image Title" value={form.imageSeo.imageTitle} onChange={(e) => patchImageSeo({ imageTitle: e.target.value })} />
           <AdminInput label="Image Caption" value={form.imageSeo.imageCaption} onChange={(e) => patchImageSeo({ imageCaption: e.target.value })} />
-          <AdminTextarea label="Image Description" value={form.imageSeo.imageDescription} onChange={(e) => patchImageSeo({ imageDescription: e.target.value })} rows={4} className="sm:col-span-2" />
+          <div className="sm:col-span-2">
+            <AdminTextarea label="Image Description" value={form.imageSeo.imageDescription} onChange={(e) => patchImageSeo({ imageDescription: e.target.value })} rows={4} />
+          </div>
         </div>
       </SectionCard>
     );
@@ -367,7 +384,9 @@ export default function SeoEditorPanel({
           <AdminInput label="Business Name" value={form.localSeo.businessName} onChange={(e) => patchLocal({ businessName: e.target.value })} />
           <AdminInput label="Restaurant Name" value={form.localSeo.restaurantName} onChange={(e) => patchLocal({ restaurantName: e.target.value })} />
           <AdminInput label="Cuisine Type" value={form.localSeo.cuisineType} onChange={(e) => patchLocal({ cuisineType: e.target.value })} />
-          <AdminInput label="Address" value={form.localSeo.address} onChange={(e) => patchLocal({ address: e.target.value })} className="sm:col-span-2" />
+          <div className="sm:col-span-2">
+            <AdminInput label="Address" value={form.localSeo.address} onChange={(e) => patchLocal({ address: e.target.value })} />
+          </div>
           <AdminInput label="City" value={form.localSeo.city} onChange={(e) => patchLocal({ city: e.target.value })} />
           <AdminInput label="State" value={form.localSeo.state} onChange={(e) => patchLocal({ state: e.target.value })} />
           <AdminInput label="Zip Code" value={form.localSeo.zipCode} onChange={(e) => patchLocal({ zipCode: e.target.value })} />
@@ -376,9 +395,15 @@ export default function SeoEditorPanel({
           <AdminInput label="Longitude" value={form.localSeo.longitude} onChange={(e) => patchLocal({ longitude: e.target.value })} />
           <AdminInput label="Phone" value={form.localSeo.phone} onChange={(e) => patchLocal({ phone: e.target.value })} />
           <AdminInput label="Email" value={form.localSeo.email} onChange={(e) => patchLocal({ email: e.target.value })} />
-          <AdminInput label="Google Maps URL" value={form.localSeo.googleMapsUrl} onChange={(e) => patchLocal({ googleMapsUrl: e.target.value })} className="sm:col-span-2" />
-          <AdminInput label="Google Business Profile URL" value={form.localSeo.googleBusinessProfileUrl} onChange={(e) => patchLocal({ googleBusinessProfileUrl: e.target.value })} className="sm:col-span-2" />
-          <AdminTextarea label="Opening Hours" value={form.localSeo.openingHours} onChange={(e) => patchLocal({ openingHours: e.target.value })} rows={3} className="sm:col-span-2" />
+          <div className="sm:col-span-2">
+            <AdminInput label="Google Maps URL" value={form.localSeo.googleMapsUrl} onChange={(e) => patchLocal({ googleMapsUrl: e.target.value })} />
+          </div>
+          <div className="sm:col-span-2">
+            <AdminInput label="Google Business Profile URL" value={form.localSeo.googleBusinessProfileUrl} onChange={(e) => patchLocal({ googleBusinessProfileUrl: e.target.value })} />
+          </div>
+          <div className="sm:col-span-2">
+            <AdminTextarea label="Opening Hours" value={form.localSeo.openingHours} onChange={(e) => patchLocal({ openingHours: e.target.value })} rows={3} />
+          </div>
           <AdminToggle checked={form.localSeo.deliveryAvailable} onChange={(checked) => patchLocal({ deliveryAvailable: checked })} label="Delivery Available" />
           <AdminToggle checked={form.localSeo.takeawayAvailable} onChange={(checked) => patchLocal({ takeawayAvailable: checked })} label="Takeaway Available" />
           <AdminToggle checked={form.localSeo.reservationAvailable} onChange={(checked) => patchLocal({ reservationAvailable: checked })} label="Reservation Available" />
@@ -405,7 +430,9 @@ export default function SeoEditorPanel({
             { value: "never", label: "Never" },
           ]}
         />
-        <AdminInput label="Canonical URL" value={form.advanced.canonicalUrl} onChange={(e) => patchAdvanced({ canonicalUrl: e.target.value })} className="sm:col-span-2" />
+        <div className="sm:col-span-2">
+          <AdminInput label="Canonical URL" value={form.advanced.canonicalUrl} onChange={(e) => patchAdvanced({ canonicalUrl: e.target.value })} />
+        </div>
         <AdminInput label="Last Modified" type="date" value={form.advanced.lastModified} onChange={(e) => patchAdvanced({ lastModified: e.target.value })} />
         <AdminToggle checked={form.advanced.includeInSitemap} onChange={(checked) => patchAdvanced({ includeInSitemap: checked })} label="Include in Sitemap" />
         <AdminToggle checked={form.advanced.excludeFromSitemap} onChange={(checked) => patchAdvanced({ excludeFromSitemap: checked })} label="Exclude from Sitemap" />
