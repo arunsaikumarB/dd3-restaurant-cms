@@ -39,6 +39,36 @@ function upsertLink(rel: string, href: string) {
   el.setAttribute("href", href);
 }
 
+function faviconMimeType(url: string): string | null {
+  const clean = url.split(/[?#]/)[0].toLowerCase();
+  if (clean.endsWith(".png")) return "image/png";
+  if (clean.endsWith(".ico")) return "image/x-icon";
+  if (clean.endsWith(".svg")) return "image/svg+xml";
+  if (clean.endsWith(".jpg") || clean.endsWith(".jpeg")) return "image/jpeg";
+  if (clean.endsWith(".webp")) return "image/webp";
+  if (clean.endsWith(".gif")) return "image/gif";
+  return null;
+}
+
+/** Like upsertLink, but also fixes/clears `type` so a stale hint (e.g. the
+ *  static index.html tag says image/png) doesn't make browsers reject an
+ *  uploaded favicon of a different format. */
+function upsertFaviconLink(rel: string, href: string) {
+  let el = document.querySelector(`link[rel="${rel}"]`);
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", rel);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
+  const mime = faviconMimeType(href);
+  if (mime) {
+    el.setAttribute("type", mime);
+  } else {
+    el.removeAttribute("type");
+  }
+}
+
 const JSON_LD_ID = "desi-dhamaka-jsonld";
 
 function relativePath(pathname: string): string {
@@ -135,6 +165,11 @@ export default function PageSEO() {
       removeMeta("robots");
     } else {
       upsertMeta("robots", "noindex, nofollow");
+    }
+
+    if (settings.favicon?.trim()) {
+      upsertFaviconLink("icon", settings.favicon.trim());
+      upsertFaviconLink("apple-touch-icon", settings.favicon.trim());
     }
 
     upsertMeta("og:title", config.ogTitle, "property");
