@@ -9,25 +9,7 @@ import { useHomepageData } from "../../hooks/useHomepageData";
 import { useSeoMetadata } from "../../hooks/useSeoMetadata";
 import { buildRestaurantJsonLd } from "../../services/homepagePublic";
 import { resolveEffectiveJsonLd } from "../../utils/seo/schemaGenerator";
-
-function upsertMeta(
-  key: string,
-  content: string,
-  attr: "name" | "property" = "name",
-) {
-  let el = document.querySelector(`meta[${attr}="${key}"]`);
-  if (!el) {
-    el = document.createElement("meta");
-    el.setAttribute(attr, key);
-    document.head.appendChild(el);
-  }
-  el.setAttribute("content", content);
-}
-
-function removeMeta(key: string, attr: "name" | "property" = "name") {
-  const el = document.querySelector(`meta[${attr}="${key}"]`);
-  el?.remove();
-}
+import { removeMeta, upsertMeta } from "../../utils/seo/domMeta";
 
 function upsertLink(rel: string, href: string) {
   let el = document.querySelector(`link[rel="${rel}"]`);

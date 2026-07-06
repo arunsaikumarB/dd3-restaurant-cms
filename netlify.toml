@@ -17,6 +17,15 @@
 # SUPABASE_SERVICE_ROLE_KEY — server only (Netlify functions + CLI sync; never expose to browser)
 # (Site configuration → Environment variables → Production / Deploy previews)
 
+# netlify/edge-functions/seo-head.ts — server-injects per-page SEO tags (title,
+# meta description, focus keyword, OG, canonical, robots) into the HTML before
+# it's served, so they're visible in View Source / to non-JS crawlers (social
+# share scrapers), not just to browsers running PageSEO.tsx's client JS.
+# Declares its own path/excludedPath via `export const config` in the file —
+# no [[edge_functions]] block needed here. Requires VITE_SUPABASE_URL and
+# VITE_SUPABASE_ANON_KEY to be readable in the Edge Functions scope (Netlify UI
+# → Environment variables — same vars already used by the Vite build).
+
 # SPA fallback — required for React Router (main site + /admin/*)
 [[redirects]]
   from = "/*"

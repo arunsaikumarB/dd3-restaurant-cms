@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LOCATION_IDS,
@@ -8,6 +9,7 @@ import PremiumLocationCard from "../components/location/PremiumLocationCard";
 import { LOGO } from "../constants/logo";
 import { locPath } from "../utils/locationPaths";
 import { useLocationSelection } from "../context/LocationContext";
+import { upsertMeta } from "../utils/seo/domMeta";
 
 /** Full-bleed ambience image behind the picker. */
 const GATE_BACKGROUND = "/hero/hero-poster.webp";
@@ -20,6 +22,24 @@ const LOCATION_IMAGES: Record<LocationId, string> = {
 };
 
 /**
+ * File-level SEO for the location-picker page only — deliberately not driven
+ * by the admin SEO module/database, since this page represents all locations
+ * at once rather than any single one of them.
+ */
+const PAGE_TITLE = "Desi Dhamaka | Authentic Indian Restaurant New Jersey";
+const PAGE_DESCRIPTION =
+  "Desi Dhamaka serves authentic Indian food across 3 New Jersey locations — South Plainfield, Oak Tree Edison & Lawrenceville. Choose your location for menu, offers, and reservations.";
+const PAGE_FOCUS_KEYWORD = "Indian Restaurant New Jersey";
+const PAGE_KEYWORDS = [
+  PAGE_FOCUS_KEYWORD,
+  "Desi Dhamaka",
+  "Authentic Indian Food NJ",
+  "South Plainfield",
+  "Oak Tree Edison",
+  "Lawrenceville",
+].join(", ");
+
+/**
  * Landing page at "/". Always shows the location picker — visiting "/"
  * directly never auto-redirects to a remembered location, so the URL
  * always reflects the chosen location once picked.
@@ -27,6 +47,15 @@ const LOCATION_IMAGES: Record<LocationId, string> = {
 export default function LocationGatePage() {
   const navigate = useNavigate();
   const { setLocation } = useLocationSelection();
+
+  useEffect(() => {
+    document.title = PAGE_TITLE;
+    upsertMeta("description", PAGE_DESCRIPTION);
+    upsertMeta("keywords", PAGE_KEYWORDS);
+    upsertMeta("og:title", PAGE_TITLE, "property");
+    upsertMeta("og:description", PAGE_DESCRIPTION, "property");
+    upsertMeta("og:type", "website", "property");
+  }, []);
 
   const handleSelect = (locationId: LocationId) => {
     setLocation(locationId);
