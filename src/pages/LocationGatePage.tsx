@@ -57,12 +57,9 @@ export default function LocationGatePage() {
             className="h-14 w-auto object-contain sm:h-16"
             decoding="async"
           />
-          <h1 className="mt-6 whitespace-nowrap font-serif text-[clamp(1.5rem,4.5vw,3rem)] font-semibold text-white">
-            Choose Your Nearest Restaurant
+          <h1 className="mt-6 whitespace-nowrap font-serif text-[clamp(1.5rem,4.5vw,2.4rem)] font-medium text-white">
+            Authentic Indian Restaurant in New Jersey. Find your spot
           </h1>
-          <p className="mt-3 whitespace-nowrap text-[clamp(0.7rem,1.8vw,1rem)] leading-relaxed text-white/70">
-            Select a location to explore menus, online ordering, reservations and exclusive offers.
-          </p>
         </header>
 
         <div
