@@ -125,7 +125,7 @@ export function buildDefaultSeoMetadataForm(
       email: location.email,
       googleMapsUrl: location.googleMapsEmbed,
       googleBusinessProfileUrl: "",
-      openingHours: location.openingHours.weekday,
+      openingHours: location.openingHours.map((row) => `${row.days}: ${row.time}`).join(", "),
       deliveryAvailable: true,
       takeawayAvailable: true,
       reservationAvailable: true,

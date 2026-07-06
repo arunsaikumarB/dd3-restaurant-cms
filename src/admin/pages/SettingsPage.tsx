@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
 import AdminBreadcrumbs from "../components/shared/Breadcrumbs";
 import PageHeader from "../components/shared/PageHeader";
 import AdminCard from "../components/ui/Card";
 import AdminInput from "../components/ui/Input";
-import AdminTextarea from "../components/ui/Textarea";
 import AdminButton from "../components/ui/Button";
 import AdminToast from "../components/ui/Toast";
 import ImageUploadField from "../components/settings/ImageUploadField";
@@ -14,6 +14,7 @@ import {
   getOrCreateRestaurantSettings,
   rowToForm,
   updateRestaurantSettings,
+  type OpeningHoursRow,
   type RestaurantSettingsForm,
 } from "../../services/restaurantSettings";
 import { getLocationConfig } from "../../config/locations";
@@ -90,10 +91,49 @@ export default function SettingsPage() {
     setForm((prev) => (prev ? { ...prev, ...patch } : prev));
   };
 
-  const patchHours = (key: keyof RestaurantSettingsForm["opening_hours"], value: string) => {
+  const patchHoursRow = (id: string, patch: Partial<OpeningHoursRow>) => {
     setForm((prev) =>
-      prev ? { ...prev, opening_hours: { ...prev.opening_hours, [key]: value } } : prev,
+      prev
+        ? {
+            ...prev,
+            opening_hours: prev.opening_hours.map((row) =>
+              row.id === id ? { ...row, ...patch } : row,
+            ),
+          }
+        : prev,
     );
+  };
+
+  const addHoursRow = () => {
+    setForm((prev) =>
+      prev
+        ? {
+            ...prev,
+            opening_hours: [
+              ...prev.opening_hours,
+              { id: crypto.randomUUID(), days: "", time: "" },
+            ],
+          }
+        : prev,
+    );
+  };
+
+  const removeHoursRow = (id: string) => {
+    setForm((prev) =>
+      prev ? { ...prev, opening_hours: prev.opening_hours.filter((row) => row.id !== id) } : prev,
+    );
+  };
+
+  const moveHoursRow = (id: string, direction: -1 | 1) => {
+    setForm((prev) => {
+      if (!prev) return prev;
+      const rows = [...prev.opening_hours];
+      const index = rows.findIndex((row) => row.id === id);
+      const target = index + direction;
+      if (index === -1 || target < 0 || target >= rows.length) return prev;
+      [rows[index], rows[target]] = [rows[target], rows[index]];
+      return { ...prev, opening_hours: rows };
+    });
   };
 
   const handleSave = async () => {
@@ -134,7 +174,7 @@ export default function SettingsPage() {
         <AdminBreadcrumbs items={[{ label: "Admin", path: "/admin/dashboard" }, { label: "Settings" }]} />
         <PageHeader
           title="Restaurant Settings"
-          description="Configure your restaurant details, hours, and SEO."
+          description="Configure your restaurant details, hours, and links."
         />
         <SettingsPageSkeleton />
       </div>
@@ -147,7 +187,7 @@ export default function SettingsPage() {
         <AdminBreadcrumbs items={[{ label: "Admin", path: "/admin/dashboard" }, { label: "Settings" }]} />
         <PageHeader
           title="Restaurant Settings"
-          description="Configure your restaurant details, hours, and SEO."
+          description="Configure your restaurant details, hours, and links."
         />
         <AdminCard>
           <p className="text-sm text-admin-muted">
@@ -164,7 +204,7 @@ export default function SettingsPage() {
         <AdminBreadcrumbs items={[{ label: "Admin", path: "/admin/dashboard" }, { label: "Settings" }]} />
         <PageHeader
           title="Restaurant Settings"
-          description="Configure your restaurant details, hours, and SEO."
+          description="Configure your restaurant details, hours, and links."
         />
         <AdminCard>
           <p className="text-sm text-admin-danger">{loadError ?? "Unable to load settings."}</p>
@@ -240,22 +280,63 @@ export default function SettingsPage() {
     {
       title: "Opening Hours",
       fields: (
-        <div className="grid gap-4 sm:grid-cols-3">
-          <AdminInput
-            label="Mon – Thu / Fri – Sat"
-            value={form.opening_hours.weekday}
-            onChange={(e) => patchHours("weekday", e.target.value)}
-          />
-          <AdminInput
-            label="Weekend"
-            value={form.opening_hours.weekend}
-            onChange={(e) => patchHours("weekend", e.target.value)}
-          />
-          <AdminInput
-            label="Sunday"
-            value={form.opening_hours.sunday}
-            onChange={(e) => patchHours("sunday", e.target.value)}
-          />
+        <div className="space-y-3">
+          <p className="text-xs text-admin-muted">
+            Add one row per day-group (e.g. "Mon – Fri", "Monday", "Everyday") with its own hours.
+            Rows display on the site in the order shown below.
+          </p>
+          {form.opening_hours.map((row, index) => (
+            <div key={row.id} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+              <div className="flex-1">
+                <AdminInput
+                  label="Days"
+                  placeholder="e.g. Mon – Fri, Monday, Everyday"
+                  value={row.days}
+                  onChange={(e) => patchHoursRow(row.id, { days: e.target.value })}
+                />
+              </div>
+              <div className="flex-1">
+                <AdminInput
+                  label="Hours"
+                  placeholder="e.g. 11:30 AM - 10:30 PM, Closed"
+                  value={row.time}
+                  onChange={(e) => patchHoursRow(row.id, { time: e.target.value })}
+                />
+              </div>
+              <div className="flex gap-2">
+                <AdminButton
+                  type="button"
+                  variant="outline"
+                  disabled={index === 0}
+                  onClick={() => moveHoursRow(row.id, -1)}
+                  aria-label="Move row up"
+                >
+                  <ChevronUp size={14} />
+                </AdminButton>
+                <AdminButton
+                  type="button"
+                  variant="outline"
+                  disabled={index === form.opening_hours.length - 1}
+                  onClick={() => moveHoursRow(row.id, 1)}
+                  aria-label="Move row down"
+                >
+                  <ChevronDown size={14} />
+                </AdminButton>
+                <AdminButton
+                  type="button"
+                  variant="outline"
+                  className="text-admin-danger"
+                  onClick={() => removeHoursRow(row.id)}
+                  aria-label="Remove row"
+                >
+                  <Trash2 size={14} />
+                </AdminButton>
+              </div>
+            </div>
+          ))}
+          <AdminButton type="button" variant="outline" onClick={addHoursRow}>
+            <Plus size={14} /> Add day group
+          </AdminButton>
         </div>
       ),
     },
@@ -332,28 +413,6 @@ export default function SettingsPage() {
         />
       ),
     },
-    {
-      title: "SEO Settings",
-      fields: (
-        <div className="space-y-4">
-          <AdminInput
-            label="Page Title"
-            value={form.seo_title}
-            onChange={(e) => patchForm({ seo_title: e.target.value })}
-          />
-          <AdminTextarea
-            label="Meta Description"
-            value={form.seo_description}
-            onChange={(e) => patchForm({ seo_description: e.target.value })}
-          />
-          <AdminInput
-            label="Keywords"
-            value={form.seo_keywords}
-            onChange={(e) => patchForm({ seo_keywords: e.target.value })}
-          />
-        </div>
-      ),
-    },
   ];
 
   return (
@@ -361,7 +420,7 @@ export default function SettingsPage() {
       <AdminBreadcrumbs items={[{ label: "Admin", path: "/admin/dashboard" }, { label: "Settings" }]} />
       <PageHeader
         title="Restaurant Settings"
-        description="Configure your restaurant details, hours, and SEO."
+        description="Configure your restaurant details, hours, and links."
       />
 
       <div className="space-y-6">

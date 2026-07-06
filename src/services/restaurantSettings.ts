@@ -1,6 +1,6 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
-import { getLocationConfig, type LocationId } from "../config/locations";
+import { getLocationConfig, type LocationId, type OpeningHoursRow } from "../config/locations";
 import { getOrderUrl } from "../data/chefgaaNameMap";
 import type { RestaurantSettings, RestaurantSettingsInsert } from "../types/database";
 import { LocationScopeError } from "../utils/supabase/locationScope";
@@ -15,11 +15,49 @@ export function getCanonicalOrderUrl(locationId: LocationId): string {
   return getOrderUrl(locationId);
 }
 
-export type OpeningHoursForm = {
-  weekday: string;
-  weekend: string;
-  sunday: string;
-};
+export type { OpeningHoursRow };
+
+/** Ordered list of admin-editable day-group hours, e.g. [{days:"Mon – Fri", time:"11am-10pm"}, ...]. */
+export type OpeningHoursForm = OpeningHoursRow[];
+
+/** Legacy shape stored by older rows, before hours became a flexible list. */
+type LegacyOpeningHours = { weekday?: string; weekend?: string; sunday?: string };
+
+/** Normalizes a raw DB `Json` value into the flexible row list, migrating the old
+ *  {weekday, weekend, sunday} shape transparently. Falls back when empty/invalid. */
+export function normalizeOpeningHours(
+  value: unknown,
+  fallback: OpeningHoursRow[],
+): OpeningHoursRow[] {
+  if (Array.isArray(value)) {
+    const rows = value
+      .map((item, index): OpeningHoursRow | null => {
+        if (!item || typeof item !== "object") return null;
+        const record = item as Record<string, unknown>;
+        const days = typeof record.days === "string" ? record.days.trim() : "";
+        const time = typeof record.time === "string" ? record.time.trim() : "";
+        if (!days && !time) return null;
+        return {
+          id: typeof record.id === "string" && record.id ? record.id : `row-${index}`,
+          days,
+          time,
+        };
+      })
+      .filter((row): row is OpeningHoursRow => row !== null);
+    return rows.length > 0 ? rows : fallback;
+  }
+
+  if (value && typeof value === "object") {
+    const legacy = value as LegacyOpeningHours;
+    const rows: OpeningHoursRow[] = [];
+    if (legacy.weekday?.trim()) rows.push({ id: "weekday", days: "Mon – Thu", time: legacy.weekday.trim() });
+    if (legacy.weekend?.trim()) rows.push({ id: "weekend", days: "Fri – Sat", time: legacy.weekend.trim() });
+    if (legacy.sunday?.trim()) rows.push({ id: "sunday", days: "Sun", time: legacy.sunday.trim() });
+    return rows.length > 0 ? rows : fallback;
+  }
+
+  return fallback;
+}
 
 export type RestaurantSettingsForm = {
   restaurant_name: string;
@@ -52,11 +90,7 @@ export function buildDefaultRestaurantSettings(
     email: location.email,
     address: location.address,
     google_maps: location.googleMapsEmbed,
-    opening_hours: {
-      weekday: location.openingHours.weekday,
-      weekend: location.openingHours.weekend,
-      sunday: location.openingHours.sunday,
-    },
+    opening_hours: location.openingHours,
     facebook: "",
     instagram: "",
     youtube: "",
@@ -71,22 +105,15 @@ export function buildDefaultRestaurantSettings(
 }
 
 export function rowToForm(row: RestaurantSettings): RestaurantSettingsForm {
-  const hours =
-    row.opening_hours && typeof row.opening_hours === "object" && !Array.isArray(row.opening_hours)
-      ? (row.opening_hours as Record<string, string>)
-      : {};
   const phones = parsePhonesFromRow(row.phones, row.phone);
+  const fallbackHours = getLocationConfig(row.location_id as LocationId).openingHours;
   return {
     restaurant_name: row.restaurant_name ?? "",
     phones: phones.length > 0 ? phones : [""],
     email: row.email ?? "",
     address: row.address ?? "",
     google_maps: row.google_maps ?? "",
-    opening_hours: {
-      weekday: hours.weekday ?? "",
-      weekend: hours.weekend ?? "",
-      sunday: hours.sunday ?? "",
-    },
+    opening_hours: normalizeOpeningHours(row.opening_hours, fallbackHours),
     facebook: row.facebook ?? "",
     instagram: row.instagram ?? "",
     youtube: row.youtube ?? "",
@@ -109,11 +136,9 @@ export function formToUpdatePayload(form: RestaurantSettingsForm) {
     email: form.email.trim() || null,
     address: form.address.trim() || null,
     google_maps: form.google_maps.trim() || null,
-    opening_hours: {
-      weekday: form.opening_hours.weekday.trim(),
-      weekend: form.opening_hours.weekend.trim(),
-      sunday: form.opening_hours.sunday.trim(),
-    },
+    opening_hours: form.opening_hours
+      .map((row) => ({ id: row.id, days: row.days.trim(), time: row.time.trim() }))
+      .filter((row) => row.days || row.time),
     facebook: form.facebook.trim() || null,
     instagram: form.instagram.trim() || null,
     youtube: form.youtube.trim() || null,

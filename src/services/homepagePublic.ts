@@ -7,6 +7,7 @@ import { fetchHomepageContentPublic } from "./homepageContent";
 import {
   buildDefaultRestaurantSettings,
   fetchRestaurantSettingsPublic,
+  normalizeOpeningHours,
   type OpeningHoursForm,
 } from "./restaurantSettings";
 import type { RestaurantSettings } from "../types/database";
@@ -95,11 +96,10 @@ export function getHomepageFallbacks(locationId: LocationId = "south-plainfield"
       email: defaults.email ?? SITE.email,
       address: defaults.address ?? SITE.address,
       google_maps: defaults.google_maps ?? SITE.mapEmbed,
-      opening_hours: {
-        weekday: defaultHours.weekday || SITE.hours[0].time,
-        weekend: defaultHours.weekend || SITE.hours[1].time,
-        sunday: defaultHours.sunday || SITE.hours[2].time,
-      },
+      opening_hours:
+        defaultHours.length > 0
+          ? defaultHours
+          : SITE.hours.map((row, index) => ({ id: `site-${index}`, days: row.days, time: row.time })),
       facebook: defaults.facebook ?? SITE.social.facebook,
       instagram: defaults.instagram ?? SITE.social.instagram,
       youtube: defaults.youtube ?? "",
@@ -118,17 +118,7 @@ function parseOpeningHours(
   locationId: LocationId,
 ): OpeningHoursForm {
   const fallbacks = getHomepageFallbacks(locationId).settings.opening_hours;
-
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return fallbacks;
-  }
-
-  const hours = value as Record<string, string>;
-  return {
-    weekday: hours.weekday?.trim() || fallbacks.weekday,
-    weekend: hours.weekend?.trim() || fallbacks.weekend,
-    sunday: hours.sunday?.trim() || fallbacks.sunday,
-  };
+  return normalizeOpeningHours(value, fallbacks);
 }
 
 function mapCta(
@@ -200,17 +190,14 @@ export function splitTitleLines(title: string): string[] {
 }
 
 export function formatWeekdayHoursLabel(hours: OpeningHoursForm): string {
-  return `Mon – Thu · ${hours.weekday}`;
+  const first = hours[0];
+  return first ? `${first.days} · ${first.time}` : "";
 }
 
 export function formatOpeningHoursRows(
   hours: OpeningHoursForm,
 ): { days: string; time: string }[] {
-  return [
-    { days: "Mon – Thu", time: hours.weekday },
-    { days: "Fri – Sat", time: hours.weekend },
-    { days: "Sun", time: hours.sunday },
-  ];
+  return hours.map(({ days, time }) => ({ days, time }));
 }
 
 export function buildPublicSocialLinks(
@@ -307,15 +294,93 @@ function parseHoursRangeToSpecification(
   };
 }
 
+const DAY_ORDER = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+const DAY_NAME_LOOKUP: Record<string, string> = {
+  mon: "Monday",
+  monday: "Monday",
+  tue: "Tuesday",
+  tues: "Tuesday",
+  tuesday: "Tuesday",
+  wed: "Wednesday",
+  weds: "Wednesday",
+  wednesday: "Wednesday",
+  thu: "Thursday",
+  thur: "Thursday",
+  thurs: "Thursday",
+  thursday: "Thursday",
+  fri: "Friday",
+  friday: "Friday",
+  sat: "Saturday",
+  saturday: "Saturday",
+  sun: "Sunday",
+  sunday: "Sunday",
+};
+
+/** Best-effort parse of a free-text day-group label (e.g. "Mon – Fri", "Sunday",
+ *  "Everyday", "Mon, Wed, Fri") into schema.org day names. Returns null when the
+ *  label doesn't resemble any recognizable day pattern. */
+function parseDayGroupLabel(label: string): string[] | null {
+  const normalized = label.trim().toLowerCase();
+  if (!normalized) return null;
+
+  if (/\b(everyday|every day|all days|daily)\b/.test(normalized)) {
+    return [...DAY_ORDER];
+  }
+  if (/\bweekends?\b/.test(normalized)) {
+    return ["Saturday", "Sunday"];
+  }
+  if (/\bweekdays?\b/.test(normalized)) {
+    return DAY_ORDER.slice(0, 5);
+  }
+
+  const tokens = normalized
+    .split(/,|\/|&|\band\b/)
+    .map((token) => token.trim())
+    .filter(Boolean);
+
+  const result = new Set<string>();
+  for (const token of tokens) {
+    const rangeMatch = token.match(/^([a-z]+)\s*(?:–|—|-|to)\s*([a-z]+)$/);
+    if (rangeMatch) {
+      const startDay = DAY_NAME_LOOKUP[rangeMatch[1]];
+      const endDay = DAY_NAME_LOOKUP[rangeMatch[2]];
+      if (startDay && endDay) {
+        const startIndex = DAY_ORDER.indexOf(startDay);
+        const endIndex = DAY_ORDER.indexOf(endDay);
+        if (startIndex <= endIndex) {
+          for (let i = startIndex; i <= endIndex; i++) result.add(DAY_ORDER[i]);
+        } else {
+          for (let i = startIndex; i < DAY_ORDER.length; i++) result.add(DAY_ORDER[i]);
+          for (let i = 0; i <= endIndex; i++) result.add(DAY_ORDER[i]);
+        }
+        continue;
+      }
+    }
+
+    const single = DAY_NAME_LOOKUP[token];
+    if (single) result.add(single);
+  }
+
+  return result.size > 0
+    ? Array.from(result).sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b))
+    : null;
+}
+
 function buildOpeningHoursSpecification(hours: OpeningHoursForm): Record<string, unknown>[] {
-  const specs = [
-    parseHoursRangeToSpecification(
-      ["Monday", "Tuesday", "Wednesday", "Thursday"],
-      hours.weekday,
-    ),
-    parseHoursRangeToSpecification(["Friday", "Saturday"], hours.weekend),
-    parseHoursRangeToSpecification("Sunday", hours.sunday),
-  ];
+  const specs = hours.map((row) => {
+    const days = parseDayGroupLabel(row.days);
+    if (!days) return null;
+    return parseHoursRangeToSpecification(days, row.time);
+  });
 
   return specs.filter((spec): spec is Record<string, unknown> => spec !== null);
 }
