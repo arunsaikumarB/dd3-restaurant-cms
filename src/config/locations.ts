@@ -3,11 +3,14 @@ import type { PublicOffer } from "../services/offersPublic";
 
 export type LocationId = "south-plainfield" | "oak-tree" | "lawrenceville";
 
-export type LocationHours = {
-  weekday: string;
-  weekend: string;
-  sunday: string;
+export type OpeningHoursRow = {
+  id: string;
+  days: string;
+  time: string;
 };
+
+/** Ordered, admin-editable list of day-group hours (e.g. "Mon – Fri", "Sat", "Sun"). */
+export type LocationHours = OpeningHoursRow[];
 
 export type LocationConfig = {
   id: LocationId;
@@ -51,11 +54,11 @@ South Plainfield, NJ 07080`,
     orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka/outlet/70",
     uberEatsLink: "https://www.ubereats.com/store/desi-dhamaka-indian-restaurant/Flzpa94fTZWgImQYROzohQ?srsltid=AfmBOopzRGdQiLLrkwb-Na0COGReThF3Clv1tEtF7tnp5w4Qc3IdWt3d",
     doorDashLink: "https://www.doordash.com/en/store/desi-dhamaka-indian-restaurant-south-plainfield-29592911/?srsltid=AfmBOoqoRUfHZsJzA3wsz-s29_cHH-BbXt4hdCOPTvr9g0Odhg8nNwRP",
-    openingHours: {
-      weekday: "11:30 AM - 10:30 PM",
-      weekend: "11:00 AM - 11:00 PM",
-      sunday: "11:30 AM - 10:00 PM",
-    },
+    openingHours: [
+      { id: "weekday", days: "Mon – Thu", time: "11:30 AM - 10:30 PM" },
+      { id: "weekend", days: "Fri – Sat", time: "11:00 AM - 11:00 PM" },
+      { id: "sunday", days: "Sun", time: "11:30 AM - 10:00 PM" },
+    ],
     menuPriceMultiplier: 1.02,
     hiddenCategorySlugs: ["desserts"],
     hiddenItemKeywords: ["family feast"],
@@ -74,11 +77,11 @@ South Plainfield, NJ 07080`,
     orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka/outlet/71",
     uberEatsLink: "https://www.ubereats.com/store/desi-dhamaka/fJIwsyPVW965vXfss6xr6A?srsltid=AfmBOopIffZpYDcA32x2G2ZAJxcH1SFKWbDDJH_qvmiE7-qEOXbyl8M2",
     doorDashLink: "https://www.doordash.com/store/desi-dhamaka-edison-34765901/72377746/",
-    openingHours: {
-      weekday: "11:30 AM - 10:00 PM",
-      weekend: "11:30 AM - 11:30 PM",
-      sunday: "11:30 AM - 10:00 PM",
-    },
+    openingHours: [
+      { id: "weekday", days: "Mon – Thu", time: "11:30 AM - 10:00 PM" },
+      { id: "weekend", days: "Fri – Sat", time: "11:30 AM - 11:30 PM" },
+      { id: "sunday", days: "Sun", time: "11:30 AM - 10:00 PM" },
+    ],
     menuPriceMultiplier: 1.05,
     hiddenCategorySlugs: ["beverages"],
     hiddenItemKeywords: ["kids"],
@@ -98,11 +101,11 @@ South Plainfield, NJ 07080`,
     uberEatsLink:
       "https://www.ubereats.com/store/desi-dhamaka-lawrence-township/kiykavZIUSO5gjxyTB_BOA?srsltid",
     doorDashLink: "",
-    openingHours: {
-      weekday: "11:00 AM - 10:00 PM",
-      weekend: "11:00 AM - 11:00 PM",
-      sunday: "11:00 AM - 9:30 PM",
-    },
+    openingHours: [
+      { id: "weekday", days: "Mon – Thu", time: "11:00 AM - 10:00 PM" },
+      { id: "weekend", days: "Fri – Sat", time: "11:00 AM - 11:00 PM" },
+      { id: "sunday", days: "Sun", time: "11:00 AM - 9:30 PM" },
+    ],
     menuPriceMultiplier: 1,
     hiddenCategorySlugs: [],
     hiddenItemKeywords: [],

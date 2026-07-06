@@ -17,15 +17,7 @@ function isValidUrl(value: string): boolean {
   }
 }
 
-export type RestaurantSettingsErrors = Partial<
-  Record<
-    | keyof RestaurantSettingsForm
-    | "opening_hours.weekday"
-    | "opening_hours.weekend"
-    | "opening_hours.sunday",
-    string
-  >
-> & {
+export type RestaurantSettingsErrors = Partial<Record<keyof RestaurantSettingsForm, string>> & {
   phoneFields?: Partial<Record<number, string>>;
 };
 
