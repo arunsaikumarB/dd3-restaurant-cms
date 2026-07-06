@@ -47,6 +47,7 @@ export type PublicRestaurantSettings = {
   instagram: string;
   youtube: string;
   logo: string | null;
+  favicon: string | null;
   reservation_url: string;
   order_url: string;
   seo_title: string;
@@ -104,6 +105,7 @@ export function getHomepageFallbacks(locationId: LocationId = "south-plainfield"
       instagram: defaults.instagram ?? SITE.social.instagram,
       youtube: defaults.youtube ?? "",
       logo: defaults.logo,
+      favicon: defaults.favicon,
       reservation_url: defaults.reservation_url ?? "",
       order_url: defaults.order_url ?? getOrderUrl(locationId),
       seo_title: "",
@@ -172,6 +174,7 @@ function mapRestaurantSettings(
     instagram: row?.instagram?.trim() || fallbacks.instagram,
     youtube: row?.youtube?.trim() || fallbacks.youtube,
     logo: row?.logo?.trim() || fallbacks.logo,
+    favicon: row?.favicon?.trim() || fallbacks.favicon,
     reservation_url: row?.reservation_url?.trim() || fallbacks.reservation_url,
     order_url: row?.order_url?.trim() || fallbacks.order_url,
     seo_title: row?.seo_title?.trim() || fallbacks.seo_title,
