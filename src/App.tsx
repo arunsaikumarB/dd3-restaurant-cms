@@ -24,6 +24,7 @@ const AdminDashboardPage = lazy(() => import("./admin/pages/DashboardPage"));
 const AdminInsightsPage = lazy(() => import("./admin/pages/InsightsPage"));
 const AdminHomepagePage = lazy(() => import("./admin/pages/HomepagePage"));
 const AdminPagesPage = lazy(() => import("./admin/pages/PagesPage"));
+const AdminSeoSummaryPage = lazy(() => import("./admin/pages/SeoSummaryPage"));
 const AdminOffersPage = lazy(() => import("./admin/pages/OffersManagementPage"));
 const AdminGalleryPage = lazy(() => import("./admin/pages/GalleryPage"));
 const AdminChefGaaIntegrationPage = lazy(() => import("./admin/pages/ChefGaaIntegrationPage"));
@@ -285,6 +286,7 @@ export default function App() {
           <Route path="insights" element={<AdminInsightsPage />} />
           <Route path="homepage" element={<AdminHomepagePage />} />
           <Route path="pages" element={<AdminPagesPage />} />
+          <Route path="seo-summary" element={<AdminSeoSummaryPage />} />
           <Route path="offers" element={<AdminOffersPage />} />
           <Route path="gallery" element={<AdminGalleryPage />} />
           <Route path="integrations/chefgaa" element={<AdminChefGaaIntegrationPage />} />

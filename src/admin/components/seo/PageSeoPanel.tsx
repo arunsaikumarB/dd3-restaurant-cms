@@ -4,7 +4,11 @@ import AdminCard from "../ui/Card";
 import HomepagePageSkeleton from "../settings/HomepagePageSkeleton";
 import SeoEditorPanel from "./SeoEditorPanel";
 import SeoValidationAlerts from "./SeoValidationAlerts";
-import { SEO_EDITOR_SECTIONS, type SeoEditorSectionKey } from "../../config/seoPages";
+import {
+  SEO_PAGE_TAB_SECTIONS,
+  type SeoEditorSectionKey,
+  type SeoEditorSectionTab,
+} from "../../config/seoPages";
 import { useAdminTheme } from "../../context/AdminThemeContext";
 import { useLocation } from "../../hooks/useLocation";
 import { getLocationConfig } from "../../../config/locations";
@@ -27,12 +31,15 @@ import { resolveEffectiveJsonLd } from "../../../utils/seo/schemaGenerator";
 type PageSeoPanelProps = {
   pageKey: SeoPageKey;
   onToast: (message: string, variant?: "success" | "error") => void;
+  sections?: SeoEditorSectionTab[];
 };
 
-export default function PageSeoPanel({ pageKey, onToast }: PageSeoPanelProps) {
+export default function PageSeoPanel({ pageKey, onToast, sections = SEO_PAGE_TAB_SECTIONS }: PageSeoPanelProps) {
   const { dark } = useAdminTheme();
   const { locationId, isAllLocations, scope } = useLocation();
-  const [activeSection, setActiveSection] = useState<SeoEditorSectionKey>("basic");
+  const [activeSection, setActiveSection] = useState<SeoEditorSectionKey>(
+    sections[0]?.key ?? "basic",
+  );
   const [recordId, setRecordId] = useState<string | null>(null);
   const [form, setForm] = useState<SeoMetadataForm | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,6 +73,12 @@ export default function PageSeoPanel({ pageKey, onToast }: PageSeoPanelProps) {
   useEffect(() => {
     void loadSeo();
   }, [loadSeo, scope]);
+
+  useEffect(() => {
+    if (!sections.some((section) => section.key === activeSection)) {
+      setActiveSection(sections[0]?.key ?? "basic");
+    }
+  }, [activeSection, sections]);
 
   const validationIssues = useMemo(() => {
     if (!form) return [];
@@ -175,7 +188,7 @@ export default function PageSeoPanel({ pageKey, onToast }: PageSeoPanelProps) {
       <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
         <AdminCard padding="sm">
           <nav className="space-y-1">
-            {SEO_EDITOR_SECTIONS.map((section) => (
+            {sections.map((section) => (
               <button
                 key={section.key}
                 type="button"
