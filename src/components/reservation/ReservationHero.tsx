@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { RESERVATION_HERO_FEATURES } from "../../data/reservationPage";
 import { usePageContent } from "../../context/PageContentContext";
@@ -31,10 +31,9 @@ const featureIcons = {
   ),
 };
 
-const HERO_BG = "/reservation/interior/interior-10.webp";
+const HERO_BG = "/reservation/south-plainfield-hero.webp";
 
 export default function ReservationHero() {
-  const sectionRef = useRef<HTMLElement>(null);
   const [loaded, setLoaded] = useState(false);
   const { fetchSection } = usePageContent();
 
@@ -58,7 +57,6 @@ export default function ReservationHero() {
 
   return (
     <section
-      ref={sectionRef}
       className="reservation-hero reservation-hero--premium"
       aria-label="Reserve your table at Desi Dhamaka South Plainfield"
     >
@@ -113,18 +111,7 @@ export default function ReservationHero() {
         <svg viewBox="0 0 1440 80" preserveAspectRatio="none" className="reservation-hero__curve-svg">
           <path d="M0,48 C360,96 1080,0 1440,48 L1440,80 L0,80 Z" fill="#f8f5f0" />
         </svg>
-        <span className="reservation-hero__ornament" />
       </div>
-
-      <button
-        type="button"
-        className="reservation-hero__scroll"
-        onClick={scrollToBooking}
-        aria-label="Scroll to reservation form"
-      >
-        <span className="reservation-hero__scroll-dot" />
-        Scroll
-      </button>
     </section>
   );
 }

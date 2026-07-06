@@ -15,6 +15,9 @@
 
 # VITE_SITE_URL, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY — set in Netlify UI
 # SUPABASE_SERVICE_ROLE_KEY — server only (Netlify functions + CLI sync; never expose to browser)
+# RESEND_API_KEY — server only (contact/catering enquiry email notifications)
+# RESEND_FROM_EMAIL — verified sender in Resend (e.g. enquiries@yourdomain.com)
+# ENQUIRY_NOTIFY_EMAIL — optional fallback inbox when location email is unset
 # (Site configuration → Environment variables → Production / Deploy previews)
 
 # netlify/edge-functions/seo-head.ts — server-injects per-page SEO tags (title,

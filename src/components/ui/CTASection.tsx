@@ -9,6 +9,7 @@ interface CTASectionProps {
   buttonLabel: string;
   buttonTo?: string;
   buttonHref?: string;
+  onButtonClick?: () => void;
   dark?: boolean;
 }
 
@@ -18,6 +19,7 @@ export default function CTASection({
   buttonLabel,
   buttonTo,
   buttonHref,
+  onButtonClick,
   dark = true,
 }: CTASectionProps) {
   const { selectedLocationId } = useLocationSelection();
@@ -74,8 +76,9 @@ export default function CTASection({
           )}
           <div className="mt-9 flex justify-center">
             <Button
-              to={scopedButtonTo}
-              href={buttonHref}
+              to={onButtonClick ? undefined : scopedButtonTo}
+              href={onButtonClick ? undefined : buttonHref}
+              onClick={onButtonClick}
               variant={dark ? "outline" : "primary"}
               className={dark ? "!border-ivory/40 !text-ivory hover:!bg-ivory/10 hover:!border-ivory/70" : ""}
             >

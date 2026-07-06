@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { RESERVATION_LOCATIONS } from "../../data/reservationPage";
 import { usePageContent } from "../../context/PageContentContext";
 import { useReservation } from "../../hooks/useReservation";
+import ReservationDatePicker from "./ReservationDatePicker";
 import { EASE_POWER3, viewportOnce } from "../showcase/motion";
 
 function FieldIcon({ children }: { children: ReactNode }) {
@@ -175,22 +176,18 @@ export default function BookingForm() {
           </div>
 
           <div className="reservation-form__row reservation-form__row--2">
-            <div className="reservation-field">
+            <div className="reservation-field reservation-field--date">
               <label className="reservation-field__label" htmlFor="date">
                 {formCopy.dateLabel}
               </label>
-              <div className="reservation-field__control">
-                <FieldIcon>{icons.calendar}</FieldIcon>
-                <input
-                  id="date"
-                  type="date"
-                  className="reservation-field__input reservation-field__input--date"
-                  value={form.date}
-                  min={today}
-                  onChange={(e) => updateField("date", e.target.value)}
-                  required
-                />
-              </div>
+              <ReservationDatePicker
+                id="date"
+                label={formCopy.dateLabel}
+                value={form.date}
+                min={today}
+                onChange={(nextDate) => updateField("date", nextDate)}
+                icon={icons.calendar}
+              />
             </div>
 
             <div className="reservation-field">

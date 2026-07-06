@@ -11,8 +11,8 @@ import { locPath } from "../utils/locationPaths";
 import { useLocationSelection } from "../context/LocationContext";
 import { upsertMeta } from "../utils/seo/domMeta";
 
-/** Full-bleed ambience image behind the picker. */
-const GATE_BACKGROUND = "/hero/hero-poster.webp";
+/** Full-bleed New Jersey skyline behind the location picker. */
+const GATE_BACKGROUND = "/hero/nj-skyline.png";
 
 /** Per-location storefront imagery (decorative only). */
 const LOCATION_IMAGES: Record<LocationId, string> = {
@@ -63,18 +63,19 @@ export default function LocationGatePage() {
   };
 
   return (
-    <div className="relative flex h-screen flex-col overflow-hidden bg-cocoa">
-      {/* Ambience background */}
+    <div className="relative flex h-screen flex-col overflow-hidden bg-black">
+      {/* Skyline background */}
       <div className="absolute inset-0" aria-hidden>
         <img
           src={GATE_BACKGROUND}
           alt=""
-          className="h-full w-full scale-105 object-cover blur-[3px]"
+          className="h-full w-full object-cover object-center"
           decoding="async"
           fetchPriority="high"
+          loading="eager"
         />
-        <div className="absolute inset-0 bg-cocoa/80" />
-        <div className="absolute inset-0 bg-gradient-to-b from-cocoa/70 via-cocoa/60 to-cocoa/90" />
+        <div className="absolute inset-0 bg-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/65 to-black/85" />
       </div>
 
       {/* Content */}

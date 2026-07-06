@@ -2,9 +2,10 @@ import PageHero from "../components/ui/PageHero";
 import SectionHeading from "../components/ui/SectionHeading";
 import AnimatedContainer from "../components/ui/AnimatedContainer";
 import CTASection from "../components/ui/CTASection";
+import CateringQuoteModal from "../components/catering/CateringQuoteModal";
 import { usePageContent } from "../context/PageContentContext";
 import { useSectionImage } from "../hooks/useGallerySection";
-import { isExternalUrl } from "../utils/locationLinks";
+import { useState } from "react";
 
 const SERVICES = [
   {
@@ -81,6 +82,7 @@ function CateringServiceBlock({
 }
 
 export default function CateringPage() {
+  const [quoteOpen, setQuoteOpen] = useState(false);
   const { fetchSection } = usePageContent();
   const hero = fetchSection("catering", "hero", {
     label: "Events & Catering",
@@ -149,11 +151,12 @@ export default function CateringPage() {
             title={cta.title}
             subtitle={cta.subtitle}
             buttonLabel={cta.cta.label}
-            buttonTo={isExternalUrl(cta.cta.url) ? undefined : cta.cta.url}
-            buttonHref={isExternalUrl(cta.cta.url) ? cta.cta.url : undefined}
+            onButtonClick={() => setQuoteOpen(true)}
           />
         </div>
       </section>
+
+      <CateringQuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} />
     </div>
   );
 }

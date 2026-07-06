@@ -1,9 +1,7 @@
 import ReservationHero from "../components/reservation/ReservationHero";
 import BookingForm from "../components/reservation/BookingForm";
 import ReservationWhyDine from "../components/reservation/ReservationWhyDine";
-import ReservationTimeline from "../components/reservation/ReservationTimeline";
 import ReservationPolicy from "../components/reservation/ReservationPolicy";
-import ReservationPrivateDiningCta from "../components/reservation/ReservationPrivateDiningCta";
 import ContactCards from "../components/reservation/ContactCards";
 import { usePageContent } from "../context/PageContentContext";
 import { useLocationSelection } from "../context/LocationContext";
@@ -54,12 +52,9 @@ export default function ReservationPage() {
             <ReservationWhyDine />
           </div>
         </div>
-
-        <ReservationTimeline />
       </section>
 
       <ReservationPolicy />
-      <ReservationPrivateDiningCta />
       <ContactCards />
 
       <div className="reservation-sticky">
