@@ -188,9 +188,14 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
           <section className="offer-detail-gallery" aria-label="Offer gallery">
             <h2 className="offer-detail-gallery__title">Gallery</h2>
             <div className="offer-detail-gallery__grid">
-              {offer.gallery.map((src) => (
+              {offer.gallery.map((src, index) => (
                 <figure key={src} className="offer-detail-gallery__item">
-                  <img src={src} alt="" loading="lazy" decoding="async" />
+                  <img
+                    src={src}
+                    alt={`${offer.title} — photo ${index + 1}`}
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </figure>
               ))}
             </div>

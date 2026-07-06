@@ -70,6 +70,7 @@ export default function GalleryManagementPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [newTitle, setNewTitle] = useState("");
+  const [newAltText, setNewAltText] = useState("");
   const [newCaption, setNewCaption] = useState("");
   const [newUrl, setNewUrl] = useState("");
   const [applyAllLocations, setApplyAllLocations] = useState(false);
@@ -131,6 +132,7 @@ export default function GalleryManagementPage() {
     setSelectedSection(section);
     localStorage.setItem(SELECTED_SECTION_KEY, section);
     setNewTitle("");
+    setNewAltText("");
     setNewCaption("");
     setNewUrl("");
   };
@@ -203,7 +205,7 @@ export default function GalleryManagementPage() {
       const created = await createGalleryImage({
         image: publicUrl,
         category: "Ambiance",
-        alt_text: newTitle.trim() || sectionDef.label,
+        alt_text: newAltText.trim() || newTitle.trim() || sectionDef.label,
         title: newTitle.trim(),
         caption: newCaption.trim(),
         display_order: sectionImages.length + 1,
@@ -216,6 +218,7 @@ export default function GalleryManagementPage() {
       setAllImages((prev) => sortGalleryRows([...prev, created]));
       invalidateGallerySectionCache();
       setNewTitle("");
+      setNewAltText("");
       setNewCaption("");
       setNewUrl("");
       showToast("Image uploaded successfully.");
@@ -239,7 +242,7 @@ export default function GalleryManagementPage() {
       const created = await createGalleryImage({
         image: newUrl.trim(),
         category: "Ambiance",
-        alt_text: newTitle.trim() || sectionDef.label,
+        alt_text: newAltText.trim() || newTitle.trim() || sectionDef.label,
         title: newTitle.trim(),
         caption: newCaption.trim(),
         display_order: sectionImages.length + 1,
@@ -252,6 +255,7 @@ export default function GalleryManagementPage() {
       setAllImages((prev) => sortGalleryRows([...prev, created]));
       invalidateGallerySectionCache();
       setNewTitle("");
+      setNewAltText("");
       setNewCaption("");
       setNewUrl("");
       showToast("Image added successfully.");
@@ -436,6 +440,19 @@ export default function GalleryManagementPage() {
                           }
                           onBlur={(e) => void handleFieldUpdate(img.id, { title: e.target.value })}
                         />
+                        <AdminInput
+                          label="Alt text"
+                          value={img.alt_text}
+                          disabled={savingId === img.id}
+                          onChange={(e) =>
+                            setAllImages((prev) =>
+                              prev.map((row) =>
+                                row.id === img.id ? { ...row, alt_text: e.target.value } : row,
+                              ),
+                            )
+                          }
+                          onBlur={(e) => void handleFieldUpdate(img.id, { alt_text: e.target.value })}
+                        />
                         <AdminTextarea
                           label="Caption"
                           value={img.caption}
@@ -514,12 +531,18 @@ export default function GalleryManagementPage() {
                         ? "Replace image"
                         : "Add image to this section"}
                   </h3>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
                     <AdminInput
                       label="Title"
                       placeholder={sectionDef.hasTitle ? "e.g. Reception" : "Optional title"}
                       value={newTitle}
                       onChange={(e) => setNewTitle(e.target.value)}
+                    />
+                    <AdminInput
+                      label="Alt text"
+                      placeholder="Describes the image for accessibility & SEO"
+                      value={newAltText}
+                      onChange={(e) => setNewAltText(e.target.value)}
                     />
                     <AdminInput
                       label="Caption"

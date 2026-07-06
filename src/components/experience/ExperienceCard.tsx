@@ -122,7 +122,7 @@ export default function ExperienceCard({
                   <img
                     key={fav.src}
                     src={fav.src}
-                    alt=""
+                    alt={fav.alt}
                     width={52}
                     height={52}
                     loading="lazy"
