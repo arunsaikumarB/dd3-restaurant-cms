@@ -83,6 +83,10 @@
   padding: 0 clamp(1.25rem, 3vw, 2rem) clamp(2.5rem, 5vw, 4rem);
 }
 
+.order-options.page-content-start {
+  padding-top: clamp(6.5rem, 7vw, 10rem);
+}
+
 .order-options__inner {
   position: relative;
   z-index: 1;
@@ -109,162 +113,124 @@
 .order-card {
   --order-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --order-duration: 450ms;
+  --order-accent: #ed3c18;
 
   position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 620px;
-  height: clamp(420px, 70vw, 480px);
-  border-radius: 32px;
+  max-width: 420px;
+  border-radius: 24px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(43, 29, 24, 0.06);
-  box-shadow: 0 28px 64px -28px rgba(43, 29, 24, 0.22);
-  backdrop-filter: blur(12px);
+  background: #fff;
+  border: 1px solid rgba(43, 29, 24, 0.08);
+  box-shadow: 0 20px 48px -28px rgba(43, 29, 24, 0.18);
   transform: translate3d(0, 0, 0);
   transition:
     transform var(--order-duration) var(--order-ease),
-    box-shadow var(--order-duration) var(--order-ease),
-    border-color var(--order-duration) var(--order-ease);
+    box-shadow var(--order-duration) var(--order-ease);
   will-change: transform;
 }
 
+.order-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: var(--order-accent);
+}
+
+.order-card--desi {
+  --order-accent: #ed3c18;
+}
+
+.order-card--uber {
+  --order-accent: #06c167;
+}
+
+.order-card--doordash {
+  --order-accent: #ef2b2d;
+}
+
 .order-card:hover {
-  transform: translate3d(0, -16px, 0) scale(1.03);
-  border-color: #fa9040;
-  box-shadow: 0 40px 80px -24px rgba(43, 29, 24, 0.28);
+  transform: translate3d(0, -10px, 0);
+  box-shadow: 0 28px 64px -24px rgba(43, 29, 24, 0.24);
 }
 
 @media (max-width: 767px) {
   .order-card:hover {
     transform: translate3d(0, 0, 0);
-    border-color: rgba(43, 29, 24, 0.06);
-    box-shadow: 0 28px 64px -28px rgba(43, 29, 24, 0.22);
+    box-shadow: 0 20px 48px -28px rgba(43, 29, 24, 0.18);
   }
 }
 
-.order-card__media {
-  position: relative;
-  flex: 0 0 46%;
-  min-height: 0;
-  overflow: hidden;
+.order-card__logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 116px;
+  padding: 2.25rem 1.75rem 1.5rem;
 }
 
-.order-card__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(1);
-  transition: transform var(--order-duration) var(--order-ease);
-  will-change: transform;
+.order-card__logo {
+  max-width: 100%;
+  max-height: 84px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
-.order-card:hover .order-card__image {
-  transform: scale(1.08);
-}
-
-.order-card__media-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(12, 10, 9, 0.05) 0%,
-    rgba(12, 10, 9, 0.35) 100%
-  );
-  pointer-events: none;
+.order-card__divider {
+  height: 1px;
+  margin: 0 1.75rem;
+  background: rgba(43, 29, 24, 0.08);
 }
 
 .order-card__body {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
   padding: 1.5rem 1.75rem 1.75rem;
-  background: linear-gradient(
-    180deg,
-    rgba(248, 245, 240, 0.92) 0%,
-    rgba(248, 245, 240, 0.98) 100%
-  );
-}
-
-.order-card__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: 0.65rem;
-}
-
-.order-card__title {
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: clamp(1.35rem, 2.5vw, 1.65rem);
-  font-weight: 600;
-  line-height: 1.15;
-  color: #2b1d18;
-}
-
-.order-card__badge {
-  flex-shrink: 0;
-  padding: 0.35rem 0.65rem;
-  border-radius: 9999px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  background: rgba(237, 60, 24, 0.08);
-  color: #ed3c18;
-}
-
-.order-card__badge--uber {
-  background: rgba(250, 144, 64, 0.12);
-  color: #c96a10;
-}
-
-.order-card__badge--doordash {
-  background: rgba(239, 43, 45, 0.12);
-  color: #c81d1f;
 }
 
 .order-card__desc {
-  margin-top: 0.75rem;
   font-size: 0.92rem;
   line-height: 1.6;
   color: rgba(43, 29, 24, 0.58);
 }
 
-.order-card__pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-top: 1rem;
+.order-card__badge {
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: rgba(43, 29, 24, 0.06);
+  color: rgba(43, 29, 24, 0.6);
 }
 
-.order-card__pill {
-  padding: 0.35rem 0.7rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(43, 29, 24, 0.08);
-  background: rgba(255, 255, 255, 0.65);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(43, 29, 24, 0.55);
+.order-card__badge--accent {
+  background: rgba(237, 60, 24, 0.1);
+  color: #ed3c18;
 }
 
 .order-card__cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.65rem;
-  margin-top: auto;
-  padding: 0.9rem 1.35rem;
-  border-radius: 9999px;
-  font-size: 11px;
+  gap: 0.6rem;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 14px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
   color: #fff;
+  background: #ed6a1f;
   transition:
     transform var(--order-duration) var(--order-ease),
     box-shadow var(--order-duration) var(--order-ease);

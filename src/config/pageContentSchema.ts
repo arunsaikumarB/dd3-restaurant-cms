@@ -19,7 +19,7 @@ export type PageContentPageKey =
   | "reservation"
   | "order";
 
-export type PageContentFieldType = "text" | "textarea" | "cta" | "list";
+export type PageContentFieldType = "text" | "textarea" | "cta" | "list" | "image";
 
 export interface PageContentCtaValue {
   label: string;
@@ -32,6 +32,8 @@ export interface PageContentFieldBase {
   type: PageContentFieldType;
   required?: boolean;
   helpText?: string;
+  /** Round-tripped on load/save but not rendered as an input (e.g. an internal id key). */
+  hidden?: boolean;
 }
 
 export interface PageContentTextField extends PageContentFieldBase {
@@ -43,12 +45,17 @@ export interface PageContentCtaField extends PageContentFieldBase {
   type: "cta";
 }
 
+/** Image upload sub-field — currently only supported inside list items (see PageContentListField). */
+export interface PageContentImageField extends PageContentFieldBase {
+  type: "image";
+}
+
 export interface PageContentListField extends PageContentFieldBase {
   type: "list";
   itemLabel: string;
   minItems?: number;
   maxItems?: number;
-  fields: PageContentTextField[];
+  fields: Array<PageContentTextField | PageContentImageField>;
 }
 
 export type PageContentField =
@@ -268,7 +275,8 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
     page: "order",
     section: "order_options",
     label: "Order Option Cards",
-    description: "Order Direct and Uber Eats cards on the Order page (URLs stay in restaurant settings / location config).",
+    description:
+      "Order Direct, Uber Eats, and DoorDash cards on the Order page. Each card's logo, description, badge, and button link are editable here.",
     fields: [
       { key: "srOnlyHeading", label: "Screen reader heading", type: "text", maxLength: 80 },
       {
@@ -279,19 +287,20 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
         minItems: 1,
         maxItems: 4,
         fields: [
-          { key: "id", label: "ID (direct | uber)", type: "text", maxLength: 20 },
+          { key: "id", label: "ID", type: "text", maxLength: 20, hidden: true },
           { key: "brand", label: "Brand", type: "text", maxLength: 40 },
-          { key: "title", label: "Card title", type: "text", maxLength: 60 },
-          { key: "badge", label: "Badge", type: "text", maxLength: 40 },
-          { key: "description", label: "Description", type: "textarea", maxLength: 300 },
+          { key: "image", label: "Logo / Image", type: "image" },
           { key: "imageAlt", label: "Image alt text", type: "text", maxLength: 120 },
-          { key: "pills", label: "Tags (comma-separated)", type: "textarea", maxLength: 200 },
+          { key: "badge", label: "Delivery / pickup badge", type: "text", maxLength: 40 },
+          { key: "description", label: "Description", type: "textarea", maxLength: 300 },
           { key: "buttonText", label: "Button label", type: "text", maxLength: 60 },
           {
-            key: "buttonTextTemplate",
-            label: "Button label with location (use {location})",
+            key: "buttonUrl",
+            label: "Order button URL",
             type: "text",
-            maxLength: 80,
+            maxLength: 300,
+            required: true,
+            helpText: "The link this card's order button opens (in a new tab).",
           },
         ],
       },

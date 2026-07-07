@@ -1,10 +1,9 @@
-import { lazy, Suspense, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ORDER_OPTIONS, type OrderOption } from "../data/orderPage";
 import PageHero from "../components/ui/PageHero";
 import OrderOptionCard from "../components/order/OrderOptionCard";
 import FeatureGrid from "../components/order/FeatureGrid";
-import SectionPlaceholder from "../components/ui/SectionPlaceholder";
 import { LOCATION_OPTIONS, type LocationId } from "../config/locations";
 import { buildLocationOrderMenuUrl } from "../constants/ordering";
 import { useLocationSelection } from "../context/LocationContext";
@@ -13,8 +12,6 @@ import { useHomepageData } from "../hooks/useHomepageData";
 import { resolveOrderUrl } from "../utils/locationLinks";
 import { locPath } from "../utils/locationPaths";
 import "../components/order/order.css";
-
-const ReservationCTA = lazy(() => import("../components/order/ReservationCTA"));
 
 const ORDER_OPTION_META: Record<
   string,
@@ -28,26 +25,14 @@ const ORDER_OPTION_META: Record<
 type OrderOptionCmsItem = {
   id: string;
   brand: string;
-  title: string;
+  title?: string;
   badge: string;
   description: string;
+  image?: string;
   imageAlt: string;
-  pills?: unknown;
   buttonText: string;
-  buttonTextTemplate?: string;
+  buttonUrl?: string;
 };
-
-function normalizePills(pills: unknown, fallback: string[]): string[] {
-  if (Array.isArray(pills)) {
-    const normalized = pills
-      .map((entry) =>
-        typeof entry === "string" ? entry : (entry as { text?: string }).text ?? "",
-      )
-      .filter(Boolean);
-    return normalized.length > 0 ? normalized : fallback;
-  }
-  return fallback;
-}
 
 function parseLocationId(value: string | null): LocationId | null {
   if (!value) return null;
@@ -63,17 +48,14 @@ const ORDER_OPTIONS_FALLBACK = {
     badge: option.badge,
     description: option.description,
     imageAlt: option.imageAlt,
-    pills: option.pills.map((text) => ({ text })),
     buttonText: option.buttonText,
-    ...(option.id === "direct"
-      ? { buttonTextTemplate: "Order Direct - {location}" }
-      : {}),
+    buttonUrl: option.buttonHref,
   })),
 };
 
 export default function OrderPage() {
   const [searchParams] = useSearchParams();
-  const { fetchSection, interpolate } = usePageContent();
+  const { fetchSection } = usePageContent();
   const { selectedLocation, selectedLocationId, setLocation } = useLocationSelection();
   const { bundle, locationId: bundleLocationId } = useHomepageData();
   const orderSectionRef = useRef<HTMLElement>(null);
@@ -115,21 +97,14 @@ export default function OrderPage() {
 
       let badge = cmsItem.badge || fallback.badge;
       let description = cmsItem.description || fallback.description;
-      let buttonText =
-        cmsItem.buttonTextTemplate && !offerCategory
-          ? interpolate(cmsItem.buttonTextTemplate)
-          : cmsItem.buttonText || fallback.buttonText;
+      let buttonText = cmsItem.buttonText || fallback.buttonText;
 
       if (isDirect && offerCategory) {
         badge = offerCategory;
         description = `Continue to order ${offerCategory} from Desi Dhamaka${
           selectedLocation ? ` ${selectedLocation.shortName}` : ""
         }.`;
-        buttonText = cmsItem.buttonTextTemplate
-          ? interpolate(cmsItem.buttonTextTemplate)
-          : `Order Direct${selectedLocation ? ` - ${selectedLocation.shortName}` : ""}`;
-      } else if (isDirect && cmsItem.buttonTextTemplate) {
-        buttonText = interpolate(cmsItem.buttonTextTemplate);
+        buttonText = `Order Direct${selectedLocation ? ` - ${selectedLocation.shortName}` : ""}`;
       }
 
       const platformHref: Record<string, string> = {
@@ -137,6 +112,7 @@ export default function OrderPage() {
         uber: selectedLocation?.uberEatsLink || locPath(selectedLocationId, "/online-ordering"),
         doordash: selectedLocation?.doorDashLink || locPath(selectedLocationId, "/online-ordering"),
       };
+      const defaultHref = platformHref[cmsItem.id] ?? locPath(selectedLocationId, "/online-ordering");
 
       return {
         id: cmsItem.id,
@@ -144,11 +120,10 @@ export default function OrderPage() {
         title: cmsItem.title || fallback.title,
         badge,
         description,
-        image: meta.image,
+        image: cmsItem.image?.trim() || meta.image,
         imageAlt: cmsItem.imageAlt || fallback.imageAlt,
-        pills: normalizePills(cmsItem.pills, fallback.pills),
         buttonText,
-        buttonHref: platformHref[cmsItem.id] ?? locPath(selectedLocationId, "/online-ordering"),
+        buttonHref: cmsItem.buttonUrl?.trim() || defaultHref,
         buttonColor: meta.buttonColor,
         variant: meta.variant,
       };
@@ -160,7 +135,6 @@ export default function OrderPage() {
     bundle.settings,
     bundleLocationId,
     orderOptionsContent.items,
-    interpolate,
   ]);
 
   return (
@@ -205,9 +179,6 @@ export default function OrderPage() {
       </section>
 
       <FeatureGrid />
-      <Suspense fallback={<SectionPlaceholder minHeight="320px" />}>
-        <ReservationCTA />
-      </Suspense>
     </div>
   );
 }

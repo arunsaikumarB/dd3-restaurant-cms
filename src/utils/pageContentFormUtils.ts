@@ -36,7 +36,8 @@ function emptyCtaField(): PageContentCtaValue {
 function emptyListItem(listField: PageContentListField): Record<string, unknown> {
   const item: Record<string, unknown> = {};
   for (const subField of listField.fields) {
-    item[subField.key] = emptyTextField(subField);
+    // All list sub-field types (text/textarea/image) are plain strings.
+    item[subField.key] = "";
   }
   return item;
 }
@@ -243,13 +244,23 @@ export function validateSectionContent(
 ): string | null {
   for (const field of definition.fields) {
     if (field.type !== "list") continue;
-    const items = content[field.key];
-    const count = Array.isArray(items) ? items.length : 0;
-    if (field.minItems != null && count < field.minItems) {
+    const items = getListFieldItems(content, field);
+    if (field.minItems != null && items.length < field.minItems) {
       return `${field.label} requires at least ${field.minItems} item(s).`;
     }
-    if (field.maxItems != null && count > field.maxItems) {
+    if (field.maxItems != null && items.length > field.maxItems) {
       return `${field.label} allows at most ${field.maxItems} item(s).`;
+    }
+
+    for (const subField of field.fields) {
+      if (!subField.required) continue;
+      for (let index = 0; index < items.length; index++) {
+        const raw = items[index][subField.key];
+        const value = typeof raw === "string" ? raw.trim() : "";
+        if (!value) {
+          return `${subField.label} is required for ${field.itemLabel} ${index + 1}.`;
+        }
+      }
     }
   }
   return null;
