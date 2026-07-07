@@ -8,6 +8,7 @@ export const HOME_PAGE_CONTENT_SECTION_ORDER = [
   "about_extended",
   "catering_overlay",
   "signature",
+  "offers_teaser",
   "ambience",
 ] as const;
 
@@ -59,5 +60,6 @@ export const HOME_PAGE_CONTENT_TAB_LABELS: Record<HomePageContentSectionKey, str
   about_extended: "About Section",
   catering_overlay: "Catering Overlay",
   signature: "Signature",
+  offers_teaser: "Offers Teaser",
   ambience: "Ambience",
 };

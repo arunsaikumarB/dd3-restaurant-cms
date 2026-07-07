@@ -111,7 +111,7 @@ export default function ExperienceCards({
         imageAlt: "Guests enjoying Desi Dhamaka",
         buttonText: orderCtaText,
         link: orderCtaLink,
-        rotation: { rotateY: 0, rotateZ: 0, scale: 1.1, translateY: -36 },
+        rotation: { rotateY: 0, rotateZ: 0, scale: 1.1, translateY: -22 },
         scrollDelay: 0,
         isCenter: true,
       },

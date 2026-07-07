@@ -4,7 +4,7 @@
   position: relative;
   overflow-x: hidden;
   overflow-y: visible;
-  padding: clamp(4rem, 8vw, 7rem) 0 clamp(4rem, 7vw, 6rem);
+  padding: 6rem 0;
   background: #0c0a09;
 }
 

@@ -27,6 +27,9 @@ const SignatureCarousel = lazy(
   () => import("../components/signature/SignatureCarousel"),
 );
 const AboutSection = lazy(() => import("../components/about/AboutSection"));
+const HomeOffersSection = lazy(
+  () => import("../components/offers/HomeOffersSection"),
+);
 const CateringImageSequence = lazy(
   () => import("../components/catering-sequence/CateringImageSequence"),
 );
@@ -100,14 +103,6 @@ export default function HomePage() {
         </Suspense>
       </LazyMount>
 
-      <div
-        aria-hidden
-        className="h-[8vh] min-h-[48px] w-full"
-        style={{
-          background: "linear-gradient(180deg, #050505 0%, #0c0a09 100%)",
-        }}
-      />
-
       <LazyMount
         dark
         minHeight="80vh"
@@ -137,6 +132,15 @@ export default function HomePage() {
       >
         <Suspense fallback={<SectionPlaceholder dark minHeight="70vh" />}>
           <SignatureCarousel />
+        </Suspense>
+      </LazyMount>
+
+      <LazyMount
+        minHeight="480px"
+        placeholderLabel="Loading offers"
+      >
+        <Suspense fallback={<SectionPlaceholder minHeight="480px" />}>
+          <HomeOffersSection />
         </Suspense>
       </LazyMount>
 

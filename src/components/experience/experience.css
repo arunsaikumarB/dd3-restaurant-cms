@@ -62,7 +62,7 @@
 }
 
 .experience-section__subtitle {
-  margin: 1.5rem auto 0;
+  margin: 1.5rem auto 4.5rem;
   max-width: 36rem;
   font-size: 17px;
   line-height: 1.65;
@@ -74,13 +74,13 @@
   position: relative;
   z-index: 2;
   margin-top: 3.5rem;
-  padding-bottom: 4rem;
+  padding-bottom: 6rem;
 }
 
 @media (min-width: 768px) {
   .experience-stage-wrap {
-    margin-top: 4.5rem;
-    padding-bottom: 5rem;
+    margin-top: 7rem;
+    padding-bottom: 6rem;
     padding-inline: 1.5rem;
     min-height: 580px;
     display: flex;
@@ -99,7 +99,6 @@
   width: 100%;
   max-width: 1280px;
   margin-inline: auto;
-  transform-style: preserve-3d;
 }
 
 .experience-stage__inner {
@@ -107,7 +106,6 @@
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  transform-style: preserve-3d;
 }
 
 @media (min-width: 768px) {

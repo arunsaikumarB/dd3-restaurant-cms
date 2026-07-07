@@ -26,8 +26,8 @@
   width: 100%;
   max-width: min(1780px, 100%);
   margin-inline: auto;
-  padding: clamp(2.5rem, 5vw, 3.75rem) clamp(1rem, 2.5vw, 1.75rem)
-    clamp(1.5rem, 3vw, 2.25rem);
+  padding: clamp(3.75rem, calc(5vw + 20px), 5rem) clamp(1rem, 2.5vw, 1.75rem)
+    clamp(2.75rem, calc(3vw + 20px), 3.5rem);
   box-sizing: border-box;
 }
 
