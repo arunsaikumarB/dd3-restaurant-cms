@@ -5,7 +5,7 @@
 /* ── Design tokens ─────────────────────────────────────────────────────────── */
 :root {
   /* Layout */
-  --nav-height: 72px;
+  --nav-height: 80px;
   --max-content: 1400px;
   --content-px: clamp(1.5rem, 3vw, 4rem);
 

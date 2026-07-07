@@ -41,7 +41,7 @@ export default function PartiesPage() {
   const cta = fetchSection("parties", "cta", {
     title: "Book Your Private Event",
     subtitle: "Let us create an unforgettable celebration tailored to you.",
-    cta: { label: "Book Now", url: "/contact#parties" },
+    cta: { label: "Book Now", url: "/contact" },
   });
 
   const mergedEvents = eventsContent.items.map((item, index) => ({
