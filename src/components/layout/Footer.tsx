@@ -65,12 +65,12 @@ export default function Footer() {
   const socialLinks = buildPublicSocialLinks(settings);
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
-  const isOrderPage = pathname.includes("/online-ordering");
+  const hidePreCta = pathname.includes("/online-ordering") || pathname.includes("/reservation");
 
   return (
     <footer className="border-t border-cocoa/8 bg-[#FDFBF7]">
-      {/* Pre-footer CTA strip — omitted on the Order page, which already has its own order/reserve CTAs. */}
-      {!isOrderPage && (
+      {/* Pre-footer CTA strip — omitted on Order/Reservation pages, which already have their own order/reserve CTAs. */}
+      {!hidePreCta && (
         <div className="border-b border-cocoa/6 bg-cocoa">
           <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-5 px-6 py-8 md:flex-row md:px-10 lg:px-16">
             <div>

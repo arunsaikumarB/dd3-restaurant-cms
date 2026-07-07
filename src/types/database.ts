@@ -5,6 +5,8 @@
 
 export type ContentStatus = "active" | "inactive" | "draft";
 export type ReservationStatus = "pending" | "confirmed" | "cancelled" | "completed";
+export type EnquirySource = "contact" | "catering";
+export type EnquiryStatus = "new" | "read" | "archived";
 export type UserRole = "admin" | "staff";
 
 export type Json =
@@ -325,6 +327,20 @@ export interface Reservation extends Timestamps {
   status: ReservationStatus;
 }
 
+export interface ContactEnquiry extends Timestamps {
+  id: string;
+  location_id: RestaurantLocationId;
+  source: EnquirySource;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  event_type: string | null;
+  event_date: string | null;
+  guest_count: number | null;
+  status: EnquiryStatus;
+}
+
 export interface Review extends Timestamps {
   id: string;
   customer_name: string;
@@ -397,6 +413,9 @@ export type GalleryImageInsert = Omit<GalleryImage, "id" | "created_at" | "updat
 
 export type ReservationInsert = Omit<Reservation, "id" | "created_at" | "updated_at"> &
   Partial<Pick<Reservation, "id" | "created_at" | "updated_at">>;
+
+export type ContactEnquiryInsert = Omit<ContactEnquiry, "id" | "created_at" | "updated_at"> &
+  Partial<Pick<ContactEnquiry, "id" | "created_at" | "updated_at">>;
 
 export type ReviewInsert = Omit<Review, "id" | "created_at" | "updated_at"> &
   Partial<Pick<Review, "id" | "created_at" | "updated_at">>;
@@ -476,6 +495,12 @@ export interface Database {
         Row: Reservation;
         Insert: ReservationInsert;
         Update: Partial<ReservationInsert>;
+        Relationships: [];
+      };
+      contact_enquiries: {
+        Row: ContactEnquiry;
+        Insert: ContactEnquiryInsert;
+        Update: Partial<ContactEnquiryInsert>;
         Relationships: [];
       };
       reviews: {
@@ -647,6 +672,7 @@ export interface Database {
     };
     Enums: {
       content_status: ContentStatus;
+      enquiry_source: EnquirySource;
       reservation_status: ReservationStatus;
       user_role: UserRole;
     };
