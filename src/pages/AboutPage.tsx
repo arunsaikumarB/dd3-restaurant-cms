@@ -1,12 +1,10 @@
 import PageHero from "../components/ui/PageHero";
 import SectionHeading from "../components/ui/SectionHeading";
 import AnimatedContainer from "../components/ui/AnimatedContainer";
-import CTASection from "../components/ui/CTASection";
 import GalleryGrid from "../components/ui/GalleryGrid";
 import { usePageContent } from "../context/PageContentContext";
 import { useGallerySection, useSectionImage } from "../hooks/useGallerySection";
 import { toGalleryGridImages } from "../services/galleryPublic";
-import { isExternalUrl } from "../utils/locationLinks";
 
 const TIMELINE = [
   { year: "2018", title: "The Beginning", text: "Desi Dhamaka opens its doors with a vision to bring authentic Indian hospitality to the community." },
@@ -59,12 +57,6 @@ export default function AboutPage() {
     subtitle: "Milestones that shaped Desi Dhamaka into the destination it is today.",
     items: TIMELINE.map(({ year, title, text }) => ({ year, title, text })),
   });
-  const cta = fetchSection("about", "cta", {
-    title: "Experience Desi Dhamaka",
-    subtitle: "Reserve your table and taste the tradition.",
-    cta: { label: "Reserve Now", url: "/reservation" },
-  });
-
   const heroBackground = useSectionImage("about_hero", "/showcase/mandi.webp");
   const traditionImages = useGallerySection("about_tradition");
   const flavoursImages = useGallerySection("about_flavours");
@@ -203,15 +195,6 @@ export default function AboutPage() {
 
       <section className="mx-auto max-w-[1400px] px-6 pb-24 md:px-10 lg:px-16">
         <GalleryGrid images={bottomGallery} />
-        <div className="mt-16">
-          <CTASection
-            title={cta.title}
-            subtitle={cta.subtitle}
-            buttonLabel={cta.cta.label}
-            buttonTo={isExternalUrl(cta.cta.url) ? undefined : cta.cta.url}
-            buttonHref={isExternalUrl(cta.cta.url) ? cta.cta.url : undefined}
-          />
-        </div>
       </section>
     </div>
   );

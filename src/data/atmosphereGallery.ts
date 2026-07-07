@@ -72,12 +72,5 @@ export const EXPERIENCE_FEATURES = [
   },
 ];
 
-export const RIBBON_ANNOUNCEMENTS = [
-  "Live Weekend Buffet",
-  "Authentic Hyderabadi Dum Biryani",
-  "Catering Available",
-  "Reserve Your Table",
-];
-
 /** @deprecated use EXPERIENCE_GALLERY */
 export const ATMOSPHERE_GALLERY = EXPERIENCE_GALLERY;

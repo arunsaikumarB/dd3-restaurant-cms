@@ -365,64 +365,7 @@
   color: rgba(43, 29, 24, 0.5);
 }
 
-/* Announcement ribbon */
-.exp-ribbon {
-  overflow: hidden;
-  background: #ed3c18;
-  padding: 0.95rem 0;
-}
-
-.exp-ribbon__track {
-  display: flex;
-  width: max-content;
-  animation: exp-ribbon-scroll 36s linear infinite;
-}
-
-.exp-ribbon:hover .exp-ribbon__track {
-  animation-play-state: paused;
-}
-
-.exp-ribbon__group {
-  display: flex;
-  align-items: center;
-  gap: 2.5rem;
-  padding-right: 2.5rem;
-}
-
-.exp-ribbon__item {
-  display: flex;
-  align-items: center;
-  gap: 2.5rem;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #ffffff;
-  white-space: nowrap;
-}
-
-.exp-ribbon__dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.55);
-  flex-shrink: 0;
-}
-
-@keyframes exp-ribbon-scroll {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .exp-ribbon__track {
-    animation: none;
-  }
-
   .exp-card,
   .exp-card__image {
     transition: none;

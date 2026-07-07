@@ -1,4 +1,3 @@
-import PrimaryOutlineButton from "../showcase/PrimaryOutlineButton";
 import { buildChefGaaMenuUrl } from "../../constants/ordering";
 import { useLocationOrderUrl } from "../../demo/menuExperience";
 import { formatPrice } from "../../utils/menu";
@@ -15,7 +14,7 @@ export default function MenuCard({ item }: MenuCardProps) {
 
   return (
     <article
-      className="group flex h-full flex-col rounded-[20px] border border-transparent bg-white p-6 shadow-[0_8px_32px_-12px_rgba(43,29,24,0.15)] transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:hover:scale-[1.025] md:hover:border-saffron/30 md:hover:shadow-[0_20px_48px_-16px_rgba(43,29,24,0.22)] focus-within:border-saffron/40 focus-within:shadow-[0_20px_48px_-16px_rgba(43,29,24,0.22)]"
+      className="group flex h-full flex-col rounded-[20px] border border-transparent bg-white p-6 shadow-card transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:hover:scale-[1.02] md:hover:border-saffron/30 md:hover:shadow-card-hover focus-within:border-saffron/40 focus-within:shadow-card-hover"
       aria-label={`${item.name}, ${formatPrice(item.price)}`}
     >
       <div className="mb-3 flex items-start justify-between gap-4">
@@ -31,7 +30,7 @@ export default function MenuCard({ item }: MenuCardProps) {
             )}
           </div>
         </div>
-        <p className="shrink-0 rounded-full bg-cocoa/5 px-3 py-1 font-sans text-[0.975rem] font-bold tabular-nums text-cocoa">
+        <p className="shrink-0 rounded-full bg-cocoa/8 px-3 py-1 font-sans text-[0.975rem] font-bold tabular-nums text-cocoa">
           {formatPrice(item.price)}
         </p>
       </div>
@@ -45,9 +44,14 @@ export default function MenuCard({ item }: MenuCardProps) {
       )}
 
       <div className="mt-auto pt-1">
-        <PrimaryOutlineButton href={cartUrl} external className="w-full justify-center px-5 py-3 text-[11px]">
+        <a
+          href={cartUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex w-full items-center justify-center gap-2 rounded-full border border-black bg-transparent px-5 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-black transition-colors duration-300 hover:bg-black hover:text-ivory focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2"
+        >
           Add to Cart
-        </PrimaryOutlineButton>
+        </a>
       </div>
     </article>
   );

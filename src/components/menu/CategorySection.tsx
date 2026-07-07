@@ -61,7 +61,7 @@ export default function CategorySection({ category, index }: CategorySectionProp
         </p>
         <h2
           id={`heading-${category.id}`}
-          className="font-serif text-[clamp(2rem,4vw,3.25rem)] font-semibold tracking-tight text-cocoa"
+          className="font-serif text-[clamp(1.75rem,3.5vw,2.5rem)] font-semibold tracking-tight text-cocoa"
         >
           {category.name}
         </h2>
