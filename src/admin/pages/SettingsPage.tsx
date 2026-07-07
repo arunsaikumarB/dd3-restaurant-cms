@@ -17,6 +17,7 @@ import {
   type OpeningHoursRow,
   type RestaurantSettingsForm,
 } from "../../services/restaurantSettings";
+import { invalidateHomepageCache } from "../../services/homepagePublic";
 import { getLocationConfig } from "../../config/locations";
 import { uploadFile } from "../../services/storage/upload";
 import {
@@ -153,6 +154,7 @@ export default function SettingsPage() {
       setForm(nextForm);
       savedFormRef.current = nextForm;
       setFieldErrors({});
+      invalidateHomepageCache();
       showToast("Settings saved successfully.");
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to save settings.", "error");

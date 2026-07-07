@@ -7,6 +7,7 @@ import { fetchHomepageContentPublic } from "./homepageContent";
 import {
   buildDefaultRestaurantSettings,
   fetchRestaurantSettingsPublic,
+  fetchSiteFaviconPublic,
   normalizeOpeningHours,
   type OpeningHoursForm,
 } from "./restaurantSettings";
@@ -74,6 +75,21 @@ const CACHE_TTL_MS = 60_000;
 let cachedBundleByLocation: Partial<Record<LocationId, HomepageBundle>> = {};
 let cacheExpiresAtByLocation: Partial<Record<LocationId, number>> = {};
 const inflightByLocation: Partial<Record<LocationId, Promise<HomepageBundle>>> = {};
+
+export function invalidateHomepageCache(locationId?: LocationId) {
+  if (locationId) {
+    delete cachedBundleByLocation[locationId];
+    delete cacheExpiresAtByLocation[locationId];
+    delete inflightByLocation[locationId];
+    return;
+  }
+
+  cachedBundleByLocation = {};
+  cacheExpiresAtByLocation = {};
+  for (const key of Object.keys(inflightByLocation) as LocationId[]) {
+    delete inflightByLocation[key];
+  }
+}
 
 export function getHomepageFallbacks(locationId: LocationId = "south-plainfield"): HomepageBundle {
   const defaults = buildDefaultRestaurantSettings(locationId);
@@ -488,14 +504,20 @@ export async function fetchHomepageBundle(
 
   const request = (async () => {
     try {
-      const [homepageRow, settingsRow] = await Promise.all([
+      const [homepageRow, settingsRow, siteFavicon] = await Promise.all([
         fetchHomepageContentPublic(locationId),
         fetchRestaurantSettingsPublic(locationId),
+        fetchSiteFaviconPublic(locationId),
       ]);
+
+      const settings = mapRestaurantSettings(settingsRow, locationId);
+      if (siteFavicon) {
+        settings.favicon = siteFavicon;
+      }
 
       const bundle: HomepageBundle = {
         content: mapHomepageContent(homepageRow, locationId),
-        settings: mapRestaurantSettings(settingsRow, locationId),
+        settings,
       };
 
       cachedBundleByLocation[locationId] = bundle;

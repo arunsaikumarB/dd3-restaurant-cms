@@ -14,7 +14,6 @@
 // Keep them in sync if those files change. (scripts/generate-seo-files.mjs
 // already follows this same self-contained-duplication convention for the
 // same reason — plain build/server tooling outside the Vite module graph.)
-import { HTMLRewriter } from "https://ghuc.cc/worker-tools/html-rewriter/index.ts";
 import type { Context } from "https://edge.netlify.com";
 
 const SUPABASE_URL = Deno.env.get("VITE_SUPABASE_URL")?.trim() ?? "";
@@ -139,7 +138,69 @@ type ResolvedTags = {
   ogTitle: string;
   ogDescription: string;
   ogImage: string;
+  favicon: string | null;
 };
+
+const faviconCache = new Map<string, { url: string | null; expiresAt: number }>();
+
+async function fetchSiteFavicon(preferredLocationId: string | null): Promise<string | null> {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
+
+  const cacheKey = preferredLocationId ?? "any";
+  const cached = faviconCache.get(cacheKey);
+  if (cached && Date.now() < cached.expiresAt) return cached.url;
+
+  try {
+    const url =
+      `${SUPABASE_URL}/rest/v1/restaurant_settings` +
+      `?favicon=not.is.null` +
+      `&select=location_id,favicon`;
+
+    const res = await fetch(url, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    });
+    if (!res.ok) {
+      faviconCache.set(cacheKey, { url: null, expiresAt: Date.now() + CACHE_TTL_MS });
+      return null;
+    }
+
+    const rows = (await res.json()) as { location_id: string; favicon: string | null }[];
+    const withFavicon = rows.filter((row) => row.favicon?.trim());
+    const preferred = preferredLocationId
+      ? withFavicon.find((row) => row.location_id === preferredLocationId)
+      : undefined;
+    const resolved =
+      preferred?.favicon?.trim() ??
+      withFavicon.find((row) => LOCATION_IDS.includes(row.location_id))?.favicon?.trim() ??
+      withFavicon[0]?.favicon?.trim() ??
+      null;
+
+    faviconCache.set(cacheKey, { url: resolved, expiresAt: Date.now() + CACHE_TTL_MS });
+    return resolved;
+  } catch {
+    return null;
+  }
+}
+
+function faviconMimeType(href: string): string | null {
+  const clean = href.split(/[?#]/)[0].toLowerCase();
+  if (clean.endsWith(".png")) return "image/png";
+  if (clean.endsWith(".ico")) return "image/x-icon";
+  if (clean.endsWith(".svg")) return "image/svg+xml";
+  if (clean.endsWith(".jpg") || clean.endsWith(".jpeg")) return "image/jpeg";
+  if (clean.endsWith(".webp")) return "image/webp";
+  if (clean.endsWith(".gif")) return "image/gif";
+  return null;
+}
+
+function buildFaviconMarkup(href: string): string {
+  const mime = faviconMimeType(href);
+  const typeAttr = mime ? ` type="${escapeAttr(mime)}"` : "";
+  return (
+    `<link rel="icon"${typeAttr} href="${escapeAttr(href)}">` +
+    `<link rel="apple-touch-icon"${typeAttr} href="${escapeAttr(href)}">`
+  );
+}
 
 const cache = new Map<string, { row: SeoMetadataRow | null; expiresAt: number }>();
 const CACHE_TTL_MS = 60_000;
@@ -180,6 +241,7 @@ async function resolveTags(url: URL): Promise<ResolvedTags | null> {
   const canonicalFallback = url.toString();
 
   if (segments.length === 0) {
+    const favicon = await fetchSiteFavicon(null);
     return {
       title: GATE.title,
       description: GATE.description,
@@ -189,6 +251,7 @@ async function resolveTags(url: URL): Promise<ResolvedTags | null> {
       ogTitle: GATE.title,
       ogDescription: GATE.description,
       ogImage: "",
+      favicon,
     };
   }
 
@@ -199,7 +262,10 @@ async function resolveTags(url: URL): Promise<ResolvedTags | null> {
   if (!fallback) return null; // unknown segment — let the SPA's 404 handling take over
 
   const pageKey = SEGMENT_TO_PAGE_KEY[segment];
-  const row = pageKey ? await fetchSeoRow(locationId, pageKey) : null;
+  const [row, favicon] = await Promise.all([
+    pageKey ? fetchSeoRow(locationId, pageKey) : Promise.resolve(null),
+    fetchSiteFavicon(locationId),
+  ]);
 
   const title = row?.seo_title?.trim() || fallback.title;
   const description = row?.meta_description?.trim() || fallback.description;
@@ -216,11 +282,50 @@ async function resolveTags(url: URL): Promise<ResolvedTags | null> {
     ogTitle: row?.og_title?.trim() || title,
     ogDescription: row?.og_description?.trim() || description,
     ogImage: row?.og_image?.trim() || "",
+    favicon,
   };
 }
 
 function escapeAttr(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function buildInjectedHead(tags: ResolvedTags): string {
+  return (
+    `<title>${escapeAttr(tags.title)}</title>` +
+    `<meta name="description" content="${escapeAttr(tags.description)}">` +
+    (tags.keywords ? `<meta name="keywords" content="${escapeAttr(tags.keywords)}">` : "") +
+    `<link rel="canonical" href="${escapeAttr(tags.canonical)}">` +
+    (tags.robots ? `<meta name="robots" content="${escapeAttr(tags.robots)}">` : "") +
+    `<meta property="og:title" content="${escapeAttr(tags.ogTitle)}">` +
+    `<meta property="og:description" content="${escapeAttr(tags.ogDescription)}">` +
+    `<meta property="og:url" content="${escapeAttr(tags.canonical)}">` +
+    (tags.ogImage ? `<meta property="og:image" content="${escapeAttr(tags.ogImage)}">` : "") +
+    `<meta name="twitter:title" content="${escapeAttr(tags.ogTitle)}">` +
+    `<meta name="twitter:description" content="${escapeAttr(tags.ogDescription)}">` +
+    (tags.favicon ? buildFaviconMarkup(tags.favicon) : "")
+  );
+}
+
+function stripManagedHeadTags(html: string): string {
+  return html
+    .replace(/<title>[\s\S]*?<\/title>/gi, "")
+    .replace(/<meta\s+name="description"[^>]*>/gi, "")
+    .replace(/<meta\s+name="keywords"[^>]*>/gi, "")
+    .replace(/<meta\s+name="robots"[^>]*>/gi, "")
+    .replace(/<link\s+rel="canonical"[^>]*>/gi, "")
+    .replace(/<link\s+rel="icon"[^>]*>/gi, "")
+    .replace(/<link\s+rel="apple-touch-icon"[^>]*>/gi, "")
+    .replace(/<meta\s+property="og:[^"]*"[^>]*>/gi, "")
+    .replace(/<meta\s+name="twitter:[^"]*"[^>]*>/gi, "");
+}
+
+function injectSeoIntoHtml(html: string, tags: ResolvedTags): string {
+  const cleaned = stripManagedHeadTags(html);
+  const injected = buildInjectedHead(tags);
+  const headClose = cleaned.search(/<\/head>/i);
+  if (headClose === -1) return cleaned;
+  return `${cleaned.slice(0, headClose)}${injected}${cleaned.slice(headClose)}`;
 }
 
 export default async (request: Request, context: Context) => {
@@ -235,33 +340,17 @@ export default async (request: Request, context: Context) => {
   const tags = await resolveTags(url);
   if (!tags) return response;
 
-  const injected =
-    `<title>${escapeAttr(tags.title)}</title>` +
-    `<meta name="description" content="${escapeAttr(tags.description)}">` +
-    (tags.keywords ? `<meta name="keywords" content="${escapeAttr(tags.keywords)}">` : "") +
-    `<link rel="canonical" href="${escapeAttr(tags.canonical)}">` +
-    (tags.robots ? `<meta name="robots" content="${escapeAttr(tags.robots)}">` : "") +
-    `<meta property="og:title" content="${escapeAttr(tags.ogTitle)}">` +
-    `<meta property="og:description" content="${escapeAttr(tags.ogDescription)}">` +
-    `<meta property="og:url" content="${escapeAttr(tags.canonical)}">` +
-    (tags.ogImage ? `<meta property="og:image" content="${escapeAttr(tags.ogImage)}">` : "") +
-    `<meta name="twitter:title" content="${escapeAttr(tags.ogTitle)}">` +
-    `<meta name="twitter:description" content="${escapeAttr(tags.ogDescription)}">`;
+  const html = await response.text();
+  const updated = injectSeoIntoHtml(html, tags);
 
-  return new HTMLRewriter()
-    .on("title", { element(el) { el.remove(); } })
-    .on('meta[name="description"]', { element(el) { el.remove(); } })
-    .on('meta[name="keywords"]', { element(el) { el.remove(); } })
-    .on('meta[name="robots"]', { element(el) { el.remove(); } })
-    .on('link[rel="canonical"]', { element(el) { el.remove(); } })
-    .on('meta[property^="og:"]', { element(el) { el.remove(); } })
-    .on('meta[name^="twitter:"]', { element(el) { el.remove(); } })
-    .on("head", {
-      element(el) {
-        el.append(injected, { html: true });
-      },
-    })
-    .transform(response);
+  const headers = new Headers(response.headers);
+  headers.delete("content-length");
+
+  return new Response(updated, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 };
 
 export const config = {

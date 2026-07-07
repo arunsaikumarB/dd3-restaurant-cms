@@ -48,3 +48,67 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* AI Concierge admin module */
+.ai-concierge-layout {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1100px) {
+  .ai-concierge-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.ai-concierge-layout__nav {
+  position: sticky;
+  top: 5.5rem;
+}
+
+.ai-concierge-nav__list {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+@media (min-width: 1100px) {
+  .ai-concierge-nav__list {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+}
+
+.ai-concierge-nav__link {
+  display: block;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.ai-concierge-nav__link--dark {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ai-concierge-nav__link:hover,
+.ai-concierge-nav__link--active {
+  background: rgba(234, 88, 12, 0.12);
+  color: #ea580c;
+}
+
+.ai-concierge-section {
+  scroll-margin-top: 5rem;
+}
+
+.ai-concierge-layout__content {
+  min-width: 0;
+}

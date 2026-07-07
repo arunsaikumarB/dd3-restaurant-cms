@@ -5,6 +5,7 @@ redirectsOrigin = "config"
 plugins = []
 
 [build]
+edge_functions = "C:\\Users\\LSITC210\\Downloads\\DD3 website AI\\netlify\\edge-functions"
 publish = "C:\\Users\\LSITC210\\Downloads\\DD3 website AI\\dist"
 publishOrigin = "config"
 commandOrigin = "config"
@@ -51,6 +52,12 @@ Cache-Control = "public, max-age=3600"
 
 [[headers]]
 for = "/sitemap.xml"
+
+[headers.values]
+Cache-Control = "public, max-age=3600"
+
+[[headers]]
+for = "/llms.txt"
 
 [headers.values]
 Cache-Control = "public, max-age=3600"

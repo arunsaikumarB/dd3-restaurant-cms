@@ -1,6 +1,6 @@
 import { createClientIfConfigured } from "../lib/supabase/client";
 import { isSupabaseConfigured } from "../lib/supabase/env";
-import { getLocationConfig, type LocationId, type OpeningHoursRow } from "../config/locations";
+import { getLocationConfig, LOCATIONS, type LocationId, type OpeningHoursRow } from "../config/locations";
 import { getOrderUrl } from "../data/chefgaaNameMap";
 import type { RestaurantSettings, RestaurantSettingsInsert } from "../types/database";
 import { LocationScopeError } from "../utils/supabase/locationScope";
@@ -330,4 +330,53 @@ export async function fetchRestaurantSettingsPublic(
   }
 
   return data;
+}
+
+type FaviconRow = { location_id: string; favicon: string | null };
+
+/** CMS favicon for the active location, falling back to any other location's upload. */
+export async function fetchSiteFaviconPublic(
+  locationId: LocationId,
+): Promise<string | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createClientIfConfigured();
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await (
+    supabase.from("restaurant_settings") as unknown as {
+      select(columns: string): {
+        not(column: string, operator: string, value: null): Promise<{
+          data: FaviconRow[] | null;
+          error: SupabaseError | null;
+        }>;
+      };
+    }
+  )
+    .select("location_id, favicon")
+    .not("favicon", "is", null);
+
+  if (error || !data?.length) {
+    return null;
+  }
+
+  const rows = data.filter((row) => row.favicon?.trim());
+  const preferred = rows.find((row) => row.location_id === locationId);
+  if (preferred?.favicon?.trim()) {
+    return preferred.favicon.trim();
+  }
+
+  const locationOrder = Object.keys(LOCATIONS) as LocationId[];
+  for (const id of locationOrder) {
+    const match = rows.find((row) => row.location_id === id);
+    if (match?.favicon?.trim()) {
+      return match.favicon.trim();
+    }
+  }
+
+  return rows[0]?.favicon?.trim() ?? null;
 }

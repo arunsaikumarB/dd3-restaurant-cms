@@ -178,7 +178,7 @@ export default function Navbar() {
               <img
                 src={logoSrc}
                 alt={logoAlt}
-                className="h-11 w-auto object-contain"
+                className="h-14 w-auto object-contain sm:h-[58px] lg:h-16"
                 decoding="async"
                 loading="eager"
                 fetchPriority="high"

@@ -17,6 +17,8 @@ import { PageContentProvider } from "./context/PageContentContext";
 import { usePageTracking } from "./hooks/usePageTracking";
 import { MenuExperienceSwitch } from "./demo/menuExperience";
 import { isLocationId, resolvePublicLocationId } from "./config/locations";
+import { AIProvider } from "./components/ai/AIProvider";
+import Cheffy from "./components/ai/Cheffy";
 
 const AdminLoginPage = lazy(() => import("./admin/pages/LoginPage"));
 const AdminUnauthorizedPage = lazy(() => import("./admin/pages/UnauthorizedPage"));
@@ -28,6 +30,7 @@ const AdminSeoSummaryPage = lazy(() => import("./admin/pages/SeoSummaryPage"));
 const AdminOffersPage = lazy(() => import("./admin/pages/OffersManagementPage"));
 const AdminGalleryPage = lazy(() => import("./admin/pages/GalleryPage"));
 const AdminChefGaaIntegrationPage = lazy(() => import("./admin/pages/ChefGaaIntegrationPage"));
+const AdminAIConciergePage = lazy(() => import("./admin/pages/AIConciergePage"));
 const AdminReviewsPage = lazy(() => import("./admin/pages/ReviewsPage"));
 const AdminSettingsPage = lazy(() => import("./admin/pages/SettingsPage"));
 const AdminProfilePage = lazy(() => import("./admin/pages/ProfilePage"));
@@ -290,6 +293,7 @@ export default function App() {
           <Route path="offers" element={<AdminOffersPage />} />
           <Route path="gallery" element={<AdminGalleryPage />} />
           <Route path="integrations/chefgaa" element={<AdminChefGaaIntegrationPage />} />
+          <Route path="integrations/ai-concierge" element={<AdminAIConciergePage />} />
           <Route path="reviews" element={<AdminReviewsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="profile" element={<AdminProfilePage />} />
@@ -299,6 +303,9 @@ export default function App() {
           path="*"
           element={
             <LocationProvider>
+              <AIProvider>
+                <Cheffy />
+              </AIProvider>
               <Routes>
                 <Route path="/" element={<LocationGatePage />} />
                 <Route path=":locationId/*" element={<LocationSiteShell />} />

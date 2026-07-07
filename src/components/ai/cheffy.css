@@ -1,0 +1,1429 @@
+/* ==========================================================================
+   Cheffy — AI Dining Concierge
+   Mascot = transparent PNG only. No card, frame, panel, or background.
+   ========================================================================== */
+
+/* ----- Anchor (positions chat + mascot; fully transparent) ---------------- */
+.cheffy-anchor {
+  --cheffy-footer-lift: 0px;
+  --cheffy-chat-max-h: min(
+    560px,
+    calc(
+      100dvh - 40px - var(--cheffy-footer-lift) - env(safe-area-inset-top) -
+        env(safe-area-inset-bottom)
+    )
+  );
+  position: fixed;
+  right: max(28px, env(safe-area-inset-right));
+  bottom: calc(24px + var(--cheffy-footer-lift) + env(safe-area-inset-bottom));
+  z-index: 2147483000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 14px;
+  pointer-events: none;
+  background: transparent;
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+  overflow: visible;
+  max-height: calc(100dvh - 16px - env(safe-area-inset-top));
+  transition: bottom 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cheffy-anchor--open {
+  gap: 0;
+}
+
+.cheffy-anchor > * {
+  pointer-events: auto;
+}
+
+/* ----- Floating mascot (WhatsApp-style — image only) -------------------- */
+.cheffy-float {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  cursor: pointer;
+  line-height: 0;
+  position: relative;
+  background: transparent;
+  background-color: transparent;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  transform-origin: bottom center;
+  min-width: 48px;
+  min-height: 48px;
+  transition: filter 0.25s ease;
+}
+
+.cheffy-float--focused {
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.cheffy-float--peek {
+  pointer-events: none;
+}
+
+.cheffy-float--hover .cheffy-mascot-img {
+  filter: brightness(1.06) saturate(1.08);
+}
+
+.cheffy-float--celebrate .cheffy-mascot-fx--shimmer {
+  opacity: 0.85;
+}
+
+.cheffy-mascot-wrap {
+  position: relative;
+  display: block;
+  line-height: 0;
+}
+
+.cheffy-mascot-fx {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.cheffy-mascot-fx--shimmer {
+  inset: 8% 6% 28% 6%;
+  background: radial-gradient(
+    ellipse at 50% 80%,
+    rgba(212, 175, 55, 0.28) 0%,
+    rgba(212, 175, 55, 0) 68%
+  );
+  opacity: 0.45;
+  mix-blend-mode: screen;
+}
+
+.cheffy-mascot-fx--scarf {
+  right: 18%;
+  top: 38%;
+  width: 22%;
+  height: 14%;
+  background: linear-gradient(
+    120deg,
+    rgba(122, 28, 34, 0) 0%,
+    rgba(212, 175, 55, 0.22) 55%,
+    rgba(212, 175, 55, 0) 100%
+  );
+  transform-origin: left center;
+  opacity: 0.55;
+}
+
+.cheffy-mascot-fx--plate {
+  left: 8%;
+  bottom: 6%;
+  width: 28%;
+  height: 10%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 246, 230, 0.35) 0%,
+    rgba(255, 246, 230, 0) 72%
+  );
+  opacity: 0.5;
+}
+
+.cheffy-mascot-status {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  max-width: 220px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 14px 14px 4px 14px;
+  background: rgba(90, 15, 20, 0.92);
+  color: #f5e2c0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.35;
+  box-shadow: 0 8px 24px rgba(58, 12, 16, 0.25);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  animation: cheffy-pop 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.cheffy-anchor--open .cheffy-float--focused {
+  transform: translate3d(0, 4px, 0) scale(0.88);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cheffy-float,
+  .cheffy-mascot-fx,
+  .cheffy-mascot-img,
+  .cheffy-mascot-status {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .cheffy-mascot-fx {
+    display: none;
+  }
+}
+
+
+.cheffy-float--waiting {
+  pointer-events: none;
+  cursor: default;
+}
+
+.cheffy-float:focus-visible {
+  outline: 3px solid #d4af37;
+  outline-offset: 6px;
+  border-radius: 0;
+}
+
+.cheffy-mascot-img {
+  display: block;
+  width: 132px;
+  height: auto;
+  max-width: none;
+  object-fit: contain;
+  object-position: bottom center;
+  user-select: none;
+  pointer-events: none;
+  background: transparent;
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+  vertical-align: bottom;
+}
+
+/* ----- Speech bubble ----------------------------------------------------- */
+.cheffy-bubble {
+  position: relative;
+  max-width: 268px;
+  padding: 14px 18px;
+  border-radius: 20px 20px 6px 20px;
+  background: linear-gradient(135deg, #fffaf0 0%, #fef1dc 100%);
+  color: #4a1418;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  box-shadow: 0 16px 40px rgba(74, 20, 24, 0.22);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  animation: cheffy-pop 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cheffy-bubble__text {
+  margin: 0;
+  font-weight: 500;
+}
+
+.cheffy-bubble__tail {
+  position: absolute;
+  right: 26px;
+  bottom: -9px;
+  width: 18px;
+  height: 18px;
+  background: #fef1dc;
+  border-right: 1px solid rgba(212, 175, 55, 0.5);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.5);
+  transform: rotate(45deg);
+}
+
+.cheffy-bubble__close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: 0;
+  background: transparent;
+  color: #9a6b1f;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@keyframes cheffy-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ----- Chat window (floating card — Intercom / WhatsApp scale) ------------ */
+.cheffy-chat {
+  width: min(400px, calc(100vw - 56px));
+  max-width: 420px;
+  height: var(--cheffy-chat-max-h);
+  max-height: var(--cheffy-chat-max-h);
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  overflow: hidden;
+  background: rgba(255, 250, 240, 0.94);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  box-shadow: 0 24px 64px rgba(58, 12, 16, 0.28);
+  animation: cheffy-chat-in 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  flex-shrink: 0;
+}
+
+@keyframes cheffy-chat-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cheffy-chat__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #5a0f14 0%, #7a1c22 100%);
+  color: #fff6e6;
+  flex-shrink: 0;
+}
+
+.cheffy-chat__header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cheffy-chat__header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cheffy-chat__back {
+  border: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #f5e2c0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.15s ease;
+}
+
+.cheffy-chat__back:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.cheffy-chat__location-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.22);
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  color: #f5e2c0;
+  white-space: nowrap;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cheffy-chat__id {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cheffy-chat__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: rgba(212, 175, 55, 0.2);
+  border: 1.5px solid rgba(212, 175, 55, 0.7);
+}
+
+.cheffy-chat__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: transparent;
+}
+
+.cheffy-chat__titles {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.cheffy-chat__titles strong {
+  font-size: 1rem;
+  letter-spacing: 0.2px;
+}
+
+.cheffy-chat__titles small {
+  font-size: 0.72rem;
+  color: #e9c877;
+}
+
+.cheffy-chat__powered {
+  font-size: 0.62rem;
+  color: rgba(245, 226, 192, 0.75);
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
+
+.cheffy-chat__close {
+  border: 0;
+  background: transparent;
+  color: #f5e2c0;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.cheffy-chat__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 18px 16px;
+  padding-right: 12px;
+  scrollbar-gutter: stable;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
+}
+
+.cheffy-msg {
+  display: flex;
+}
+
+.cheffy-msg--user {
+  justify-content: flex-end;
+}
+
+.cheffy-msg--assistant {
+  justify-content: flex-start;
+}
+
+.cheffy-msg__bubble {
+  max-width: 82%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.cheffy-msg--assistant .cheffy-msg__bubble {
+  background: #ffffff;
+  color: #3a1114;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-bottom-left-radius: 4px;
+}
+
+.cheffy-msg--user .cheffy-msg__bubble {
+  background: linear-gradient(135deg, #5a0f14 0%, #7a1c22 100%);
+  color: #fff6e6;
+  border-bottom-right-radius: 4px;
+}
+
+.cheffy-msg__bubble p {
+  margin: 0 0 6px;
+}
+
+.cheffy-msg__bubble p:last-child {
+  margin-bottom: 0;
+}
+
+.cheffy-msg__bubble ul {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+
+.cheffy-msg__bubble strong {
+  color: #8a1c22;
+}
+
+.cheffy-msg__cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.95em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: #7a1c22;
+  animation: cheffy-cursor-blink 1s step-end infinite;
+}
+
+@keyframes cheffy-cursor-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.cheffy-msg--user .cheffy-msg__bubble strong {
+  color: #f0d488;
+}
+
+.cheffy-msg__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.cheffy-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.cheffy-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  background: linear-gradient(180deg, #fffaf0 0%, #fff3d6 100%);
+  color: #5a0f14;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1.2;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 2px 8px rgba(90, 15, 20, 0.08);
+}
+
+.cheffy-action:hover {
+  background: linear-gradient(180deg, #fff3d6 0%, #ffe8b8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(90, 15, 20, 0.12);
+}
+
+.cheffy-action:focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: 2px;
+}
+
+.cheffy-action--reservation {
+  background: linear-gradient(135deg, #7a1c22 0%, #5a0f14 100%);
+  color: #fff6e6;
+  border-color: rgba(212, 175, 55, 0.65);
+}
+
+.cheffy-action--reservation:hover {
+  background: linear-gradient(135deg, #8a242a 0%, #6a1518 100%);
+}
+
+.cheffy-action--phone {
+  border-color: rgba(34, 120, 72, 0.45);
+  color: #1a5c38;
+}
+
+.cheffy-action--email {
+  border-color: rgba(58, 99, 168, 0.45);
+  color: #2a4f8f;
+}
+
+.cheffy-action--map {
+  border-color: rgba(180, 83, 9, 0.45);
+  color: #8a3f08;
+}
+
+.cheffy-action--link,
+.cheffy-action--external {
+  border-style: dashed;
+}
+
+.cheffy-action--switch_location {
+  border-color: rgba(138, 28, 34, 0.35);
+  background: #fff;
+}
+
+/* Legacy class — kept for any remaining references */
+.cheffy-msg__action-btn {
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  background: #fffaf0;
+  color: #5a0f14;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.cheffy-msg__action-btn:hover {
+  background: #fff3d6;
+  transform: translateY(-1px);
+}
+
+.cheffy-chat__empty {
+  margin: 0;
+  text-align: center;
+  color: rgba(58, 17, 20, 0.55);
+  font-size: 0.88rem;
+  padding: 24px 12px;
+}
+
+.cheffy-home {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 16px 20px;
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+}
+
+.cheffy-home__hero {
+  text-align: center;
+  padding: 8px 8px 20px;
+}
+
+.cheffy-home__avatar {
+  width: 72px;
+  height: auto;
+  margin: 0 auto 12px;
+  display: block;
+  background: transparent;
+}
+
+.cheffy-home__title {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+  color: #5a0f14;
+  font-weight: 700;
+}
+
+.cheffy-home__subtitle {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #3a1114;
+}
+
+.cheffy-home__prompt {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: rgba(58, 17, 20, 0.75);
+}
+
+.cheffy-home__location {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #8a1c22;
+  background: rgba(212, 175, 55, 0.15);
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.cheffy-home__loading {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  color: rgba(58, 17, 20, 0.55);
+}
+
+.cheffy-home__section {
+  margin-bottom: 18px;
+}
+
+.cheffy-home__section-title {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(58, 17, 20, 0.5);
+}
+
+.cheffy-home__preview {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: rgba(58, 17, 20, 0.65);
+  line-height: 1.4;
+}
+
+.cheffy-home__history-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cheffy-home__primary-btn {
+  border: 0;
+  background: linear-gradient(135deg, #5a0f14 0%, #7a1c22 100%);
+  color: #fff6e6;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 11px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.cheffy-home__secondary-btn {
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  background: #fff;
+  color: #5a0f14;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.cheffy-home__text-btn {
+  border: 0;
+  background: transparent;
+  color: rgba(58, 17, 20, 0.55);
+  font-size: 0.8rem;
+  padding: 6px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.cheffy-home__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cheffy-home__chip {
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  background: #fff;
+  color: #5a0f14;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.cheffy-home__chip:hover:not(:disabled) {
+  background: #fff3d6;
+  transform: translateY(-1px);
+}
+
+.cheffy-home__chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.cheffy-home__suggestions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cheffy-home__suggestion {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: #5a0f14;
+  font-size: 0.88rem;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cheffy-home__suggestion:hover:not(:disabled) {
+  background: rgba(212, 175, 55, 0.12);
+}
+
+.cheffy-home__suggestion:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.cheffy-typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+}
+
+.cheffy-typing__label {
+  font-size: 0.8rem;
+  color: #7a1c22;
+  font-weight: 500;
+}
+
+.cheffy-typing__dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.cheffy-typing__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b88a2e;
+  animation: cheffy-bounce 1.2s infinite ease-in-out;
+}
+
+.cheffy-typing__dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.cheffy-typing__dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes cheffy-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+.cheffy-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+
+.cheffy-quick__btn {
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  background: rgba(255, 255, 255, 0.7);
+  color: #5a0f14;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.cheffy-quick__btn:hover:not(:disabled) {
+  background: #fff3d6;
+  transform: translateY(-1px);
+}
+
+.cheffy-quick__btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.cheffy-chat__form {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.cheffy-chat__input {
+  flex: 1;
+  resize: none;
+  max-height: 96px;
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #3a1114;
+  background: #fffdf8;
+  outline: none;
+}
+
+.cheffy-chat__input:focus {
+  border-color: #d4af37;
+}
+
+.cheffy-chat__send {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5a0f14 0%, #7a1c22 100%);
+  color: #f5e2c0;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.cheffy-chat__send:hover:not(:disabled) {
+  transform: scale(1.06);
+}
+
+.cheffy-chat__send:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ----- Message animations & grouping ------------------------------------ */
+.cheffy-msg--animate-in {
+  animation: cheffy-msg-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cheffy-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cheffy-msg-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 92%;
+}
+
+.cheffy-msg-group--complete .cheffy-action-bar,
+.cheffy-msg-group--complete .cheffy-followups__chip,
+.cheffy-msg-group--complete .cheffy-card {
+  animation: cheffy-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cheffy-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ----- Rich cards ------------------------------------------------------- */
+.cheffy-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cheffy-card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cheffy-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fffaf3 100%);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(90, 15, 20, 0.08);
+  animation: cheffy-card-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cheffy-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cheffy-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.cheffy-card__emoji {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.cheffy-card__title {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #5a0f14;
+}
+
+.cheffy-card__badge {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8a1c22;
+  background: rgba(212, 175, 55, 0.2);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.cheffy-card__text {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(58, 17, 20, 0.85);
+}
+
+.cheffy-card__meta {
+  margin: 0 0 4px;
+  font-size: 0.8rem;
+  color: rgba(58, 17, 20, 0.8);
+}
+
+.cheffy-card__hours {
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.78rem;
+}
+
+.cheffy-card__hours li {
+  margin-bottom: 2px;
+}
+
+.cheffy-card__cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cheffy-card__cta {
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  background: #fff;
+  color: #5a0f14;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.cheffy-card__cta:hover {
+  background: #fff3d6;
+  transform: translateY(-1px);
+}
+
+.cheffy-card__cta--primary {
+  background: linear-gradient(135deg, #5a0f14 0%, #7a1c22 100%);
+  color: #fff6e6;
+  border-color: transparent;
+}
+
+.cheffy-card__cta--primary:hover {
+  background: linear-gradient(135deg, #6a1518 0%, #8a242a 100%);
+}
+
+.cheffy-card__cta--full {
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.cheffy-card__recommend-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cheffy-card__recommend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 250, 240, 0.8);
+  animation: cheffy-fade-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cheffy-card__recommend-emoji {
+  font-size: 1.25rem;
+}
+
+.cheffy-card__recommend-item strong {
+  display: block;
+  font-size: 0.82rem;
+  color: #5a0f14;
+}
+
+.cheffy-card__recommend-item small {
+  font-size: 0.72rem;
+  color: rgba(58, 17, 20, 0.6);
+}
+
+.cheffy-action--order {
+  background: linear-gradient(135deg, #5a0f14 0%, #7a1c22 100%);
+  color: #fff6e6;
+  border-color: transparent;
+}
+
+.cheffy-action--menu {
+  border-color: rgba(138, 28, 34, 0.35);
+}
+
+/* ----- Follow-up chips -------------------------------------------------- */
+.cheffy-followups {
+  margin-top: 4px;
+}
+
+.cheffy-followups__lead {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  color: rgba(58, 17, 20, 0.65);
+}
+
+.cheffy-followups__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cheffy-followups__chip {
+  border: 1px dashed rgba(212, 175, 55, 0.55);
+  background: #fff;
+  color: #5a0f14;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  animation: cheffy-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.cheffy-followups__chip:hover:not(:disabled) {
+  background: #fff3d6;
+  transform: translateY(-1px);
+}
+
+/* ----- Input quick chips ------------------------------------------------ */
+.cheffy-input-chips {
+  padding: 8px 12px 0;
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  background: #fffaf0;
+}
+
+.cheffy-input-chips__scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+}
+
+.cheffy-input-chips__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.cheffy-input-chips__chip {
+  flex: 0 0 auto;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  background: #fff;
+  color: #5a0f14;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.cheffy-input-chips__chip:hover:not(:disabled) {
+  background: #fff3d6;
+  transform: translateY(-1px);
+}
+
+/* ----- Conversation empty state ----------------------------------------- */
+.cheffy-empty {
+  text-align: center;
+  padding: 12px 8px 24px;
+}
+
+.cheffy-empty__mascot {
+  width: 64px;
+  height: auto;
+  margin: 0 auto 10px;
+}
+
+.cheffy-empty__title {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  color: #5a0f14;
+}
+
+.cheffy-empty__subtitle,
+.cheffy-empty__lead {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  color: rgba(58, 17, 20, 0.75);
+  line-height: 1.45;
+}
+
+.cheffy-empty__featured {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fffaf0 0%, #fff3d6 100%);
+  text-align: left;
+  cursor: pointer;
+}
+
+.cheffy-empty__featured strong {
+  display: block;
+  color: #5a0f14;
+}
+
+.cheffy-empty__featured small {
+  color: rgba(58, 17, 20, 0.6);
+  font-size: 0.72rem;
+}
+
+.cheffy-empty__section h4 {
+  margin: 12px 0 8px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(58, 17, 20, 0.5);
+}
+
+.cheffy-empty__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.cheffy-empty__chip {
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  background: #fff;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #5a0f14;
+  cursor: pointer;
+}
+
+.cheffy-empty__questions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cheffy-empty__questions button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 8px;
+  font-size: 0.84rem;
+  color: #5a0f14;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.cheffy-empty__questions button:hover {
+  background: rgba(212, 175, 55, 0.12);
+}
+
+.cheffy-empty__tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cheffy-empty__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #5a0f14;
+  cursor: pointer;
+}
+
+/* ----- Dashboard home --------------------------------------------------- */
+.cheffy-home--dashboard .cheffy-home__eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  color: #8a1c22;
+  font-weight: 600;
+}
+
+.cheffy-home__featured-card {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fffaf0 0%, #fff3d6 100%);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cheffy-home__featured-card:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(90, 15, 20, 0.1);
+}
+
+.cheffy-home__featured-label {
+  display: block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(58, 17, 20, 0.55);
+  margin-bottom: 2px;
+}
+
+.cheffy-home__featured-card p {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: rgba(58, 17, 20, 0.7);
+  line-height: 1.4;
+}
+
+.cheffy-home__dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.cheffy-home__dashboard-tile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 14px;
+  background: #fff;
+  color: #5a0f14;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.cheffy-home__dashboard-tile:hover:not(:disabled) {
+  background: #fff3d6;
+  transform: translateY(-1px);
+}
+
+.cheffy-home__dashboard-emoji {
+  font-size: 1.1rem;
+}
+
+.cheffy-home__chip--soft {
+  background: rgba(255, 250, 240, 0.9);
+}
+
+@media (max-width: 640px) {
+  .cheffy-anchor {
+    right: max(16px, env(safe-area-inset-right));
+    bottom: calc(16px + var(--cheffy-footer-lift) + env(safe-area-inset-bottom));
+    gap: 10px;
+  }
+
+  .cheffy-mascot-img {
+    width: 96px;
+  }
+
+  .cheffy-chat {
+    width: min(400px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
+    --cheffy-chat-max-h: min(
+      72dvh,
+      calc(
+        100dvh - 32px - var(--cheffy-footer-lift) - env(safe-area-inset-top) -
+          env(safe-area-inset-bottom)
+      )
+    );
+    height: var(--cheffy-chat-max-h);
+    max-height: var(--cheffy-chat-max-h);
+    min-height: 280px;
+  }
+
+  .cheffy-bubble {
+    max-width: 220px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cheffy-bubble,
+  .cheffy-chat,
+  .cheffy-typing__dot,
+  .cheffy-msg--animate-in,
+  .cheffy-card,
+  .cheffy-followups__chip {
+    animation: none;
+  }
+}

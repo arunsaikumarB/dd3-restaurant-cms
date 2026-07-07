@@ -74,6 +74,20 @@ Run migrations in order in the **Supabase SQL Editor** (or via Supabase CLI):
 4. `004_gallery_columns.sql` — gallery caption, featured, visible
 5. `005_reviews_featured.sql` — reviews featured column
 6. `006_production_hardening.sql` — RLS tightening and safe user provisioning
+7. … *(migrations 007–031 cover menu, offers, ChefGaa, analytics, SEO, etc.)*
+8. `032_ai_management.sql` — **Cheffy AI Concierge admin** (settings, personality, prompts, logs)
+
+### Application code vs SQL migrations
+
+| Run in **Supabase SQL Editor** | Lives in **React / TypeScript** (never paste into SQL) |
+|--------------------------------|--------------------------------------------------------|
+| `supabase/migrations/*.sql` only | `src/services/aiAdmin/repository.ts` — Supabase CRUD |
+| Pure PostgreSQL (`CREATE TABLE`, RLS, `INSERT` seeds) | `src/services/aiAdmin/defaults.ts` — default config values |
+| | `src/types/aiAdmin.ts` — TypeScript interfaces |
+| | `src/admin/pages/AIConciergePage.tsx` — admin UI |
+| | `src/admin/components/aiConcierge/*` — section cards |
+
+**To enable AI Concierge admin persistence**, run **only** `supabase/migrations/032_ai_management.sql` in Supabase (or `supabase db push`). Do not paste any `.ts` / `.tsx` file into the SQL Editor.
 
 ### Tables
 
@@ -88,6 +102,14 @@ Run migrations in order in the **Supabase SQL Editor** (or via Supabase CLI):
 | `gallery` | Image gallery |
 | `reservations` | Table bookings |
 | `reviews` | Customer reviews |
+| `ai_settings` | Cheffy general/knowledge/conversation config (migration 032) |
+| `ai_personality` | Cheffy greetings, tone, emoji level |
+| `ai_provider_settings` | Gemini model params (no API keys) |
+| `ai_prompt_versions` | System prompt versioning |
+| `ai_suggested_questions` | Quick action chips |
+| `ai_followups` | Follow-up suggestions |
+| `ai_conversation_logs` | Conversation analytics (no PII) |
+| `ai_error_logs` | Provider/tool errors |
 
 All tables use UUID primary keys and `created_at` / `updated_at` timestamps.
 

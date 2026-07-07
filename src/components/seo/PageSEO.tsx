@@ -35,19 +35,29 @@ function faviconMimeType(url: string): string | null {
 /** Like upsertLink, but also fixes/clears `type` so a stale hint (e.g. the
  *  static index.html tag says image/png) doesn't make browsers reject an
  *  uploaded favicon of a different format. */
-function upsertFaviconLink(rel: string, href: string) {
-  let el = document.querySelector(`link[rel="${rel}"]`);
-  if (!el) {
-    el = document.createElement("link");
-    el.setAttribute("rel", rel);
-    document.head.appendChild(el);
-  }
-  el.setAttribute("href", href);
-  const mime = faviconMimeType(href);
-  if (mime) {
-    el.setAttribute("type", mime);
-  } else {
-    el.removeAttribute("type");
+function applyFaviconLinks(href: string) {
+  const rels = ["icon", "apple-touch-icon"] as const;
+
+  for (const rel of rels) {
+    const existing = document.querySelectorAll(`link[rel="${rel}"]`);
+    existing.forEach((node, index) => {
+      if (index > 0) node.remove();
+    });
+
+    let el = document.querySelector(`link[rel="${rel}"]`);
+    if (!el) {
+      el = document.createElement("link");
+      el.setAttribute("rel", rel);
+      document.head.appendChild(el);
+    }
+
+    el.setAttribute("href", href);
+    const mime = faviconMimeType(href);
+    if (mime) {
+      el.setAttribute("type", mime);
+    } else {
+      el.removeAttribute("type");
+    }
   }
 }
 
@@ -149,9 +159,9 @@ export default function PageSEO() {
       upsertMeta("robots", "noindex, nofollow");
     }
 
-    if (settings.favicon?.trim()) {
-      upsertFaviconLink("icon", settings.favicon.trim());
-      upsertFaviconLink("apple-touch-icon", settings.favicon.trim());
+    const favicon = settings.favicon?.trim();
+    if (favicon) {
+      applyFaviconLinks(favicon);
     }
 
     upsertMeta("og:title", config.ogTitle, "property");
@@ -198,6 +208,7 @@ export default function PageSEO() {
     pageKey,
     seoForm,
     settings,
+    settings.favicon,
   ]);
 
   return null;

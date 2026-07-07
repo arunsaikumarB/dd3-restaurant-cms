@@ -27,6 +27,7 @@ export interface UserProfile extends Timestamps {
   email: string;
   full_name: string | null;
   role: UserRole;
+  ai_access_level?: "super_admin" | "manager" | "staff" | null;
 }
 
 export interface RestaurantSettings extends Timestamps {
