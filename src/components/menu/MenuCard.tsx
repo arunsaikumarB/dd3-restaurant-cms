@@ -48,7 +48,7 @@ export default function MenuCard({ item }: MenuCardProps) {
           href={cartUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex w-full items-center justify-center gap-2 rounded-full border border-black bg-transparent px-5 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-black transition-colors duration-300 hover:bg-black hover:text-ivory focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2"
+          className="flex w-full items-center justify-center gap-2 rounded-full border border-[#2b1d18] bg-transparent px-5 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-[#2b1d18] transition-colors duration-300 hover:bg-[#2b1d18] hover:text-ivory focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2"
         >
           Add to Cart
         </a>

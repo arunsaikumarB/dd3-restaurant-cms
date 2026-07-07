@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PageHero from "../components/ui/PageHero";
 import OffersGrid from "../components/offers/OffersGrid";
 import OffersLocationPicker from "../components/offers/OffersLocationPicker";
 import { OffersPageSkeleton } from "../components/offers/OffersPageSkeleton";
@@ -56,25 +57,16 @@ export default function OffersPage() {
 
   return (
     <div className="bg-ivory">
-      <section className="offers-hero" aria-labelledby="offers-hero-title">
-        <div className="offers-hero__media" aria-hidden>
-          <img
-            src={offersHeroImage}
-            alt=""
-            className="offers-hero__image"
-            loading="eager"
-            decoding="async"
-          />
-          <div className="offers-hero__overlay" />
-        </div>
-        <div className="offers-hero__inner">
-          <p className="offers-hero__eyebrow">{hero.eyebrow}</p>
-          <h1 id="offers-hero-title" className="offers-hero__title">
-            {hero.title}
-          </h1>
-          <p className="offers-hero__subtitle">{hero.subtitle}</p>
-        </div>
-      </section>
+      <PageHero
+        label={hero.eyebrow}
+        title={hero.title}
+        subtitle={hero.subtitle}
+        backgroundImage={offersHeroImage}
+        breadcrumbItems={[
+          { label: "Home", to: "/" },
+          { label: "Offers" },
+        ]}
+      />
 
       <div className="offers-page__content">
         <OffersLocationPicker

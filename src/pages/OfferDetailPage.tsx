@@ -2,6 +2,7 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import OffersGrid from "../components/offers/OffersGrid";
 import Button from "../components/ui/Button";
+import PageHero from "../components/ui/PageHero";
 import SectionPlaceholder from "../components/ui/SectionPlaceholder";
 import type { LocationId } from "../config/locations";
 import { getLocationConfig } from "../config/locations";
@@ -117,31 +118,17 @@ export default function OfferDetailPage({ forcedLocationId }: OfferDetailPagePro
 
   return (
     <div className="offer-detail bg-ivory">
-      <section className="offer-detail-hero" aria-labelledby="offer-detail-title">
-        <div className="offer-detail-hero__media">
-          <img
-            src={heroImage}
-            alt=""
-            className="offer-detail-hero__image"
-            loading="eager"
-            decoding="async"
-          />
-          <div className="offer-detail-hero__overlay" aria-hidden />
-        </div>
-        <div className="offer-detail-hero__inner">
-          <Link to={scopedOffersPath} className="offer-detail-hero__back">
-            ← Back to Offers
-          </Link>
-          {offer.badge ? (
-            <span className="offer-detail-hero__badge">{offer.badge}</span>
-          ) : null}
-          <h1 id="offer-detail-title" className="offer-detail-hero__title">
-            {offer.title}
-          </h1>
-          <p className="offer-detail-hero__subtitle">{offer.description}</p>
-          <p className="offer-detail-hero__location">{location.name}</p>
-        </div>
-      </section>
+      <PageHero
+        label={offer.badge || "Exclusive Offer"}
+        title={offer.title}
+        subtitle={offer.description}
+        backgroundImage={heroImage}
+        breadcrumbItems={[
+          { label: "Home", to: "/" },
+          { label: "Offers", to: scopedOffersPath },
+          { label: offer.title },
+        ]}
+      />
 
       <div className="offer-detail__content">
         {(offer.price || offer.validUntil) && (

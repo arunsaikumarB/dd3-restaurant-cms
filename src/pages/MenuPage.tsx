@@ -121,7 +121,7 @@ export default function MenuPage() {
       />
 
       <div
-        className="sticky z-40 border-b border-cocoa/8 bg-ivory/96 shadow-[0_2px_16px_-4px_rgba(43,29,24,0.06)] backdrop-blur-xl"
+        className="sticky z-40 mt-8 border-b border-cocoa/8 bg-ivory/96 shadow-[0_2px_16px_-4px_rgba(43,29,24,0.06)] backdrop-blur-xl md:mt-10"
         style={{ top: NAV_BAR_HEIGHT }}
       >
         <div className="mx-auto max-w-[1400px] space-y-4 px-6 py-4 md:px-10 lg:px-16">
