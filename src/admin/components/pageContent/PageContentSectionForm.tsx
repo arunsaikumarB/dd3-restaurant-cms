@@ -1,10 +1,12 @@
 import AdminInput from "../ui/Input";
 import AdminTextarea from "../ui/Textarea";
 import AdminButton from "../ui/Button";
+import ImageUploadField from "../settings/ImageUploadField";
 import { useAdminTheme } from "../../context/AdminThemeContext";
 import type {
   PageContentCtaValue,
   PageContentField,
+  PageContentImageField,
   PageContentListField,
   PageContentSectionDefinition,
   PageContentTextField,
@@ -19,7 +21,19 @@ import {
   updateListItemField,
   updateScalarField,
 } from "../../../utils/pageContentFormUtils";
+import { uploadFile } from "../../../services/storage/upload";
 import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
+
+async function uploadListItemImage(file: File): Promise<string> {
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const { publicUrl } = await uploadFile({
+    bucket: "restaurant-assets",
+    file,
+    path: `page-content/${crypto.randomUUID()}.${ext}`,
+    upsert: true,
+  });
+  return publicUrl;
+}
 
 type PageContentSectionFormProps = {
   definition: PageContentSectionDefinition;
@@ -47,12 +61,13 @@ function renderScalarField(
   onChange: (value: string) => void,
 ) {
   const hint = getTemplatePlaceholderHint(field.label, field.helpText);
+  const label = field.required ? `${field.label} *` : field.label;
 
   if (field.type === "textarea") {
     return (
       <div key={field.key}>
         <AdminTextarea
-          label={field.label}
+          label={label}
           value={value}
           disabled={disabled}
           maxLength={field.maxLength}
@@ -66,13 +81,32 @@ function renderScalarField(
   return (
     <div key={field.key}>
       <AdminInput
-        label={field.label}
+        label={label}
         value={value}
         disabled={disabled}
         maxLength={field.maxLength}
         onChange={(event) => onChange(event.target.value)}
       />
       {hint ? <p className="mt-1 text-xs text-admin-muted">{hint}</p> : null}
+    </div>
+  );
+}
+
+function renderImageListField(
+  field: PageContentImageField,
+  value: string,
+  disabled: boolean,
+  onChange: (value: string) => void,
+) {
+  return (
+    <div key={field.key}>
+      <ImageUploadField
+        label={field.label}
+        value={value || null}
+        disabled={disabled}
+        onChange={onChange}
+        onUpload={uploadListItemImage}
+      />
     </div>
   );
 }
@@ -182,16 +216,20 @@ function renderListField(
             </div>
 
             <div className="space-y-3">
-              {field.fields.map((subField) => {
-                const raw = item[subField.key];
-                const subValue = typeof raw === "string" ? raw : String(raw ?? "");
-                return renderScalarField(
-                  subField,
-                  subValue,
-                  disabled,
-                  (value) => onChange(updateListItemField(content, field, index, subField.key, value)),
-                );
-              })}
+              {field.fields
+                .filter((subField) => !subField.hidden)
+                .map((subField) => {
+                  const raw = item[subField.key];
+                  const subValue = typeof raw === "string" ? raw : String(raw ?? "");
+                  const setSubValue = (value: string) =>
+                    onChange(updateListItemField(content, field, index, subField.key, value));
+
+                  if (subField.type === "image") {
+                    return renderImageListField(subField, subValue, disabled, setSubValue);
+                  }
+
+                  return renderScalarField(subField, subValue, disabled, setSubValue);
+                })}
             </div>
           </div>
         ))}

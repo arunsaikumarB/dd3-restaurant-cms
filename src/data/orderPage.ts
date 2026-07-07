@@ -14,7 +14,6 @@ export interface OrderOption {
   description: string;
   image: string;
   imageAlt: string;
-  pills: string[];
   buttonText: string;
   buttonHref: string;
   buttonColor: "#ED3C18" | "#FA9040" | "#EF2B2D";
@@ -31,7 +30,6 @@ export const ORDER_OPTIONS: OrderOption[] = [
       "Order directly from us for the freshest experience and the best service.",
     image: "/showcase/biryani.webp",
     imageAlt: "Fresh biryani from Desi Dhamaka",
-    pills: ["Fresh Daily", "Best Value", "Personal Service"],
     buttonText: "Order Direct",
     buttonHref: ORDER_DIRECT_URL,
     buttonColor: "#ED3C18",
@@ -45,7 +43,6 @@ export const ORDER_OPTIONS: OrderOption[] = [
     description: "Enjoy fast delivery or pickup through Uber Eats.",
     image: "/showcase/tandoori.webp",
     imageAlt: "Tandoori platter available on Uber Eats",
-    pills: ["Fast Delivery", "Live Tracking", "Easy Pickup"],
     buttonText: "Order with Uber Eats",
     buttonHref: UBER_EATS_URL,
     buttonColor: "#FA9040",
@@ -59,7 +56,6 @@ export const ORDER_OPTIONS: OrderOption[] = [
     description: "Enjoy fast delivery or pickup through DoorDash.",
     image: "/showcase/biryani.webp",
     imageAlt: "Biryani available on DoorDash",
-    pills: ["Fast Delivery", "Live Tracking", "Easy Pickup"],
     buttonText: "Order with DoorDash",
     buttonHref: DOORDASH_URL,
     buttonColor: "#EF2B2D",

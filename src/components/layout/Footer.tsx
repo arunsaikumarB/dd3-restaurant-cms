@@ -65,38 +65,41 @@ export default function Footer() {
   const socialLinks = buildPublicSocialLinks(settings);
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
   const logoAlt = `${settings.restaurant_name} Indian Restaurant`;
+  const isOrderPage = pathname.includes("/online-ordering");
 
   return (
     <footer className="border-t border-cocoa/8 bg-[#FDFBF7]">
-      {/* Pre-footer CTA strip */}
-      <div className="border-b border-cocoa/6 bg-cocoa">
-        <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-5 px-6 py-8 md:flex-row md:px-10 lg:px-16">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-saffron">
-              {preCta.eyebrow}
-            </p>
-            <p className="mt-1 font-serif text-[clamp(1.1rem,2.5vw,1.5rem)] text-ivory">
-              {preCta.title}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              to={orderPagePath}
-              onClick={() => trackOrderClick(pathname, selectedLocationId)}
-              className="inline-flex h-[42px] items-center justify-center gap-2 rounded-full bg-brand-primary px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ivory shadow-[0_4px_16px_-4px_rgba(237,60,24,0.5)] transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:shadow-[0_8px_24px_-6px_rgba(237,60,24,0.55)] focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-cocoa"
-            >
-              {preCta.orderCta.label}
-            </Link>
-            <Link
-              to={reserveUrl}
-              onClick={() => trackReservationClick(pathname, selectedLocationId)}
-              className="inline-flex h-[42px] items-center justify-center gap-2 rounded-full border-2 border-ivory/30 px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ivory transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-ivory/60 hover:bg-ivory/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-cocoa"
-            >
-              {preCta.reserveCta.label}
-            </Link>
+      {/* Pre-footer CTA strip — omitted on the Order page, which already has its own order/reserve CTAs. */}
+      {!isOrderPage && (
+        <div className="border-b border-cocoa/6 bg-cocoa">
+          <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-5 px-6 py-8 md:flex-row md:px-10 lg:px-16">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-saffron">
+                {preCta.eyebrow}
+              </p>
+              <p className="mt-1 font-serif text-[clamp(1.1rem,2.5vw,1.5rem)] text-ivory">
+                {preCta.title}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                to={orderPagePath}
+                onClick={() => trackOrderClick(pathname, selectedLocationId)}
+                className="inline-flex h-[42px] items-center justify-center gap-2 rounded-full bg-brand-primary px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ivory shadow-[0_4px_16px_-4px_rgba(237,60,24,0.5)] transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:shadow-[0_8px_24px_-6px_rgba(237,60,24,0.55)] focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-cocoa"
+              >
+                {preCta.orderCta.label}
+              </Link>
+              <Link
+                to={reserveUrl}
+                onClick={() => trackReservationClick(pathname, selectedLocationId)}
+                className="inline-flex h-[42px] items-center justify-center gap-2 rounded-full border-2 border-ivory/30 px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ivory transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:border-ivory/60 hover:bg-ivory/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-cocoa"
+              >
+                {preCta.reserveCta.label}
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main footer body */}
       <div className="mx-auto max-w-[1400px] px-6 py-12 md:px-10 lg:px-16">

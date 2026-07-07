@@ -10,7 +10,7 @@ export interface OrderOptionCardProps {
 export default function OrderOptionCard({ option, index = 0 }: OrderOptionCardProps) {
   return (
     <motion.article
-      className="order-card"
+      className={`order-card order-card--${option.variant}`}
       initial={{ opacity: 0, y: 48 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={viewportOnce}
@@ -20,47 +20,35 @@ export default function OrderOptionCard({ option, index = 0 }: OrderOptionCardPr
         ease: EASE_POWER3,
       }}
     >
-      <div className="order-card__media">
+      <div className="order-card__logo-wrap">
         <img
           src={option.image}
           alt={option.imageAlt}
-          className="order-card__image"
+          className="order-card__logo"
           loading="lazy"
           decoding="async"
         />
-        <div className="order-card__media-overlay" aria-hidden />
       </div>
 
-      <div className="order-card__body">
-        <div className="order-card__head">
-          <h2 className="order-card__title">{option.title}</h2>
-          <span
-            className={
-              option.variant === "uber"
-                ? "order-card__badge order-card__badge--uber"
-                : option.variant === "doordash"
-                  ? "order-card__badge order-card__badge--doordash"
-                  : "order-card__badge"
-            }
-          >
-            {option.badge}
-          </span>
-        </div>
+      <div className="order-card__divider" aria-hidden />
 
+      <div className="order-card__body">
+        <h2 className="sr-only">{option.title}</h2>
         <p className="order-card__desc">{option.description}</p>
 
-        <div className="order-card__pills">
-          {option.pills.map((pill) => (
-            <span key={pill} className="order-card__pill">
-              {pill}
-            </span>
-          ))}
-        </div>
+        <span
+          className={
+            option.variant === "desi"
+              ? "order-card__badge order-card__badge--accent"
+              : "order-card__badge"
+          }
+        >
+          {option.badge}
+        </span>
 
         <a
           href={option.buttonHref}
           className="order-card__cta"
-          style={{ backgroundColor: option.buttonColor }}
           target="_blank"
           rel="noopener noreferrer"
         >
