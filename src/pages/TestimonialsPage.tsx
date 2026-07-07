@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import PageHero from "../components/ui/PageHero";
 import SectionHeading from "../components/ui/SectionHeading";
 import AnimatedContainer from "../components/ui/AnimatedContainer";
-import CTASection from "../components/ui/CTASection";
 import {
   FeaturedReviewSkeleton,
   ReviewsGridSkeleton,
@@ -12,7 +11,6 @@ import { usePageContent } from "../context/PageContentContext";
 import { useReviewsData } from "../hooks/useReviewsData";
 import { useSectionImage } from "../hooks/useGallerySection";
 import { EASE_POWER3, prefersReducedMotion } from "../components/showcase/motion";
-import { isExternalUrl } from "../utils/locationLinks";
 
 function AnimatedRating({ value }: { value: number }) {
   const [display, setDisplay] = useState(0);
@@ -75,12 +73,6 @@ export default function TestimonialsPage() {
     gridTitle: "No reviews yet",
     gridBody: "Be the first to share your experience with us.",
   });
-  const cta = fetchSection("testimonials", "cta", {
-    title: "Join Our Community of Happy Guests",
-    subtitle: "Reserve your table and create your own memorable experience.",
-    cta: { label: "Reserve Now", url: "/reservation" },
-  });
-
   const ratingValue = Number.parseFloat(ratingStats.ratingValue) || 4.9;
 
   useEffect(() => {
@@ -263,16 +255,6 @@ export default function TestimonialsPage() {
             </div>
           )}
         </div>
-      </section>
-
-      <section className="mx-auto max-w-[1400px] px-6 py-24 md:px-10 lg:px-16">
-        <CTASection
-          title={cta.title}
-          subtitle={cta.subtitle}
-          buttonLabel={cta.cta.label}
-          buttonTo={isExternalUrl(cta.cta.url) ? undefined : cta.cta.url}
-          buttonHref={isExternalUrl(cta.cta.url) ? cta.cta.url : undefined}
-        />
       </section>
     </div>
   );

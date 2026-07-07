@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ImageSequenceScroll from "../ImageSequenceScroll";
 import SectionPlaceholder from "../ui/SectionPlaceholder";
+import CateringQuoteModal from "../catering/CateringQuoteModal";
 import { usePageContent } from "../../context/PageContentContext";
 import { fetchFrameManifest, type FrameManifest } from "../../utils/frameManifest";
 import {
@@ -23,6 +24,7 @@ export default function CateringImageSequence() {
   const overlay = fetchSection("home", "catering_overlay", CATERING_OVERLAY_FALLBACK);
   const [manifest, setManifest] = useState<FrameManifest | null>(null);
   const [error, setError] = useState(false);
+  const [quoteOpen, setQuoteOpen] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
 
@@ -98,26 +100,37 @@ export default function CateringImageSequence() {
           <p className="catering-seq-content__desc">
             {overlay.description}
           </p>
-          <Link to={overlay.cta.url} className="catering-seq-content__btn">
-            {overlay.cta.label}
-            <span className="catering-seq-content__btn-arrow" aria-hidden>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M5 12h14M13 6l6 6-6 6"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-          </Link>
+          <div className="catering-seq-content__actions">
+            <Link to={overlay.cta.url} className="catering-seq-content__btn">
+              {overlay.cta.label}
+              <span className="catering-seq-content__btn-arrow" aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M5 12h14M13 6l6 6-6 6"
+                    stroke="currentColor"
+                    strokeWidth="1.75"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </Link>
+            <button
+              type="button"
+              className="catering-seq-content__btn catering-seq-content__btn--outline"
+              onClick={() => setQuoteOpen(true)}
+            >
+              Request a Quote
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="catering-sequence-progress">
         <div className="catering-sequence-progress__bar" ref={progressBarRef} />
       </div>
+
+      <CateringQuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} />
     </ImageSequenceScroll>
   );
 }

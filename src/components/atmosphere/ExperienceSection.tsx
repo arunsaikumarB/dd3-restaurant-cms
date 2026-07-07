@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion } from "framer-motion";
-import { EXPERIENCE_GALLERY, EXPERIENCE_FEATURES, RIBBON_ANNOUNCEMENTS, type ExperienceGalleryItem } from "../../data/atmosphereGallery";
+import { EXPERIENCE_GALLERY, EXPERIENCE_FEATURES, type ExperienceGalleryItem } from "../../data/atmosphereGallery";
 import type { PublicGalleryItem } from "../../data/publicGallery";
 import { usePageContent } from "../../context/PageContentContext";
 import { useGallerySection } from "../../hooks/useGallerySection";
 import { EASE_POWER3 } from "../showcase/motion";
 import ExperienceCard from "./ExperienceCard";
 import FeatureRow from "./FeatureRow";
-import AnnouncementRibbon from "./AnnouncementRibbon";
 import "./atmosphere.css";
 
 export interface ExperienceSectionProps {
@@ -34,7 +33,6 @@ const AMBIENCE_FALLBACK = {
   subtitleTemplate:
     "Every corner of {name} is designed to bring together authentic Indian hospitality, warm interiors, and unforgettable dining moments.",
   features: EXPERIENCE_FEATURES.map(({ title, description }) => ({ title, description })),
-  ribbonItems: RIBBON_ANNOUNCEMENTS.map((text) => ({ text })),
 };
 
 export default function ExperienceSection({
@@ -158,7 +156,6 @@ export default function ExperienceSection({
       </div>
 
       <FeatureRow visible={visible} features={ambience.features} />
-      <AnnouncementRibbon items={ambience.ribbonItems.map((item) => item.text)} />
     </section>
   );
 }

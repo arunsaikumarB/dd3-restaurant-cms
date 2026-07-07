@@ -3,7 +3,6 @@ import PageHero from "../components/ui/PageHero";
 import CategorySection from "../components/menu/CategorySection";
 import CategoryTabs from "../components/menu/CategoryTabs";
 import FilterDropdown from "../components/menu/FilterDropdown";
-import CTASection from "../components/ui/CTASection";
 import {
   CategoryTabsSkeleton,
   MenuGridSkeleton,
@@ -22,7 +21,6 @@ import { useMenuData } from "../hooks/useMenuData";
 import { filterMenuData, flattenItems } from "../utils/menu";
 import { useLocationSelection } from "../context/LocationContext";
 import { useSectionImage } from "../hooks/useGallerySection";
-import { isExternalUrl } from "../utils/locationLinks";
 
 export default function MenuPage() {
   const { fetchSection, interpolate } = usePageContent();
@@ -51,12 +49,6 @@ export default function MenuPage() {
     noResultsTitle: "No dishes found",
     noResultsBody: "Try a different search term or category filter.",
   });
-  const cta = fetchSection("menu", "cta", {
-    title: "Ready to Experience Desi Dhamaka?",
-    subtitle: "Reserve Your Table Today",
-    cta: { label: "Reserve Now", url: "/reservation" },
-  });
-
   const heroSubtitle = interpolate(hero.subtitleTemplate);
 
   const filteredCategories = useMemo(() => {
@@ -203,18 +195,6 @@ export default function MenuPage() {
                 index={index}
               />
             ))}
-          </div>
-        )}
-
-        {!loading && !error && data && filteredCategories.length > 0 && (
-          <div className="mt-20 md:mt-28">
-            <CTASection
-              title={cta.title}
-              subtitle={cta.subtitle}
-              buttonLabel={cta.cta.label}
-              buttonTo={isExternalUrl(cta.cta.url) ? undefined : cta.cta.url}
-              buttonHref={isExternalUrl(cta.cta.url) ? cta.cta.url : undefined}
-            />
           </div>
         )}
       </section>
