@@ -3,12 +3,14 @@
 .about-section {
   position: relative;
   overflow: hidden;
-  padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 3vw, 2rem);
+  padding-top: 5rem;
+  padding-bottom: 6rem;
+  padding-inline: clamp(1.25rem, 3vw, 2rem);
   background: #f8f5f0;
   color: #1f1f1f;
 }
 
-.about-section::before {
+/* .about-section::before {
   content: "";
   position: absolute;
   top: 0;
@@ -17,7 +19,7 @@
   height: clamp(3rem, 8vw, 5rem);
   background: linear-gradient(180deg, #0c0a09 0%, #f8f5f0 100%);
   pointer-events: none;
-}
+} */
 
 .about-section__texture {
   position: absolute;

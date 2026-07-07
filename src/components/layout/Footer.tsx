@@ -84,7 +84,7 @@ export default function Footer() {
       {/* Pre-footer CTA strip — omitted on Order/Reservation pages, which already have their own order/reserve CTAs. */}
       {!hidePreCta && (
         <div className="border-b border-cocoa/6 bg-cocoa">
-          <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-5 px-6 py-8 md:flex-row md:px-10 lg:px-16">
+          <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-5 px-6 py-[52px] md:flex-row md:px-10 lg:px-16">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-saffron">
                 {preCta.eyebrow}

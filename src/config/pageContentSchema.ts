@@ -241,6 +241,18 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
   },
   {
     page: "home",
+    section: "offers_teaser",
+    label: "Exclusive Offers Teaser",
+    description: "Section header and CTA for the homepage offers preview (offers themselves are managed on the Offers page).",
+    fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text", maxLength: 60 },
+      { key: "title", label: "Title", type: "text", maxLength: 80 },
+      { key: "subtitle", label: "Subtitle", type: "textarea", maxLength: 300 },
+      { key: "viewAllCta", label: "View All Offers CTA", type: "cta" },
+    ],
+  },
+  {
+    page: "home",
     section: "ambience",
     label: "Experience the Ambience",
     description: "Section header and feature row.",
