@@ -20,6 +20,8 @@ export type LocationConfig = {
   phone: string;
   email: string;
   googleMapsEmbed: string;
+  /** Google Maps Place ID — used by netlify/functions/google-reviews-sync.mts. */
+  googlePlaceId: string;
   /** In-site reservation route, typically `/reservation`. */
   reservationLink: string;
   /** OpenTable or other external booking URL when reservations are handled off-site. */
@@ -53,6 +55,7 @@ South Plainfield, NJ 07080`,
     email: "southplainfield@desidhamaka.com",
     googleMapsEmbed:
       "https://www.google.com/maps?q=4941+Stelton+Rd+South+Plainfield+NJ+07080&output=embed",
+    googlePlaceId: "ChIJZQk4Wcm5w4kRxRCQ7xaGfKY",
     reservationLink: "/reservation",
     openTableUrl: "https://www.opentable.com/r/desi-dhamaka-south-plainfield",
     orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka/outlet/70",
@@ -77,6 +80,7 @@ South Plainfield, NJ 07080`,
     email: "oaktree@desidhamaka.com",
     googleMapsEmbed:
       "https://www.google.com/maps?q=1676+Oak+Tree+Rd+Edison+NJ+08820&output=embed",
+    googlePlaceId: "ChIJ3TBVUjW3w4kRCYYkbFtFV48",
     reservationLink: "/reservation",
     openTableUrl: "https://www.opentable.com/r/desi-dhamaka-oak-tree",
     orderDirectLink: "https://order.chefgaa.com/store/desi-dhamaka/outlet/71",
@@ -101,6 +105,7 @@ South Plainfield, NJ 07080`,
     email: "lawrenceville@desidhamaka.com",
     googleMapsEmbed:
       "https://www.google.com/maps?q=Lawrence+Township+NJ&output=embed",
+    googlePlaceId: "ChIJ4SeEOQDhw4kR5NSPO7qwiZo",
     reservationLink: "/reservation",
     orderDirectLink: "https://orders.chefgaa.com/store/desi-dhamaka/menu",
     uberEatsLink:

@@ -217,27 +217,27 @@ export default function Footer() {
                   )}
                 </span>
               </p>
-              <p className="flex items-center gap-2.5">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden
-                  className="shrink-0 text-saffron"
-                >
-                  <path
-                    d="M6.5 4h3l1.5 4-2 1.5c1 2.5 2.8 4.3 5.3 5.3L16 13l4 1.5v3c0 .8-.7 1.5-1.5 1.5C9.8 19 5 14.2 5 7.5 5 6.7 5.7 6 6.5 6V4z"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <PhoneLinks
-                  phones={settings.phones}
-                  linkClassName="text-[14px] text-cocoa/65 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
-                />
-              </p>
+              <PhoneLinks
+                phones={settings.phones}
+                linkClassName="text-[14px] text-cocoa/65 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+                icon={
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden
+                    className="shrink-0 text-saffron"
+                  >
+                    <path
+                      d="M6.5 4h3l1.5 4-2 1.5c1 2.5 2.8 4.3 5.3 5.3L16 13l4 1.5v3c0 .8-.7 1.5-1.5 1.5C9.8 19 5 14.2 5 7.5 5 6.7 5.7 6 6.5 6V4z"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                }
+              />
             </address>
 
             <div className="mt-6">

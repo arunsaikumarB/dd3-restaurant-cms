@@ -15,6 +15,7 @@
     "sync:chefgaa": "npx tsx scripts/sync-chefgaa.ts",
     "sync:chefgaa:all": "npx tsx scripts/sync-chefgaa.ts --all",
     "sync:chefgaa:scheduler": "npx tsx scripts/chefgaa-scheduler.ts",
+    "sync:google-reviews": "npx tsx scripts/sync-google-reviews.ts",
     "audit:menu": "node scripts/audit-menu-integrity.mjs",
     "preview": "vite preview",
     "deploy": "npx netlify deploy --prod --build"

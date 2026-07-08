@@ -13,6 +13,11 @@
 # GA4_PROPERTY_ID, GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY
 # (Site configuration → Environment variables). Never expose to the browser.
 
+# SERPER_API_KEY — server only (Netlify functions). Used by
+# netlify/functions/google-reviews-sync.mts (runs weekly, Mondays 8am UTC)
+# to sync 5-star Google reviews with text, per location, into Supabase
+# google_reviews. Free Serper.dev plan: 100 searches/month.
+
 # VITE_SITE_URL, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY — set in Netlify UI
 # SUPABASE_SERVICE_ROLE_KEY — server only (Netlify functions + CLI sync; never expose to browser)
 # RESEND_API_KEY — server only (contact/catering enquiry email notifications)

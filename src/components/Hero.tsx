@@ -6,7 +6,6 @@ import {
   type Variants,
 } from "framer-motion";
 import { EASE_POWER3 } from "./showcase/motion";
-import Logo from "./ui/Logo";
 
 const HERO_VIDEO = "/media/hero.mp4";
 const HERO_POSTER = "/hero/hero-poster.webp";
@@ -19,8 +18,6 @@ export interface HeroProps {
   subtitle?: string;
   videoSrc?: string;
   posterSrc?: string;
-  logoSrc?: string | null;
-  logoAlt?: string;
   scrollHint?: string;
 }
 
@@ -38,15 +35,6 @@ const overlayVariants: Variants = {
   visible: {
     opacity: 1,
     transition: { duration: 1, ease: EASE_POWER3 },
-  },
-};
-
-const logoVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.9, ease: EASE_POWER3, delay: 0.15 },
   },
 };
 
@@ -93,8 +81,6 @@ export default function Hero({
   subtitle = DEFAULT_SUBTITLE,
   videoSrc = HERO_VIDEO,
   posterSrc = HERO_POSTER,
-  logoSrc = null,
-  logoAlt,
   scrollHint = "Scroll",
 }: HeroProps) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -187,15 +173,6 @@ export default function Hero({
 
       <motion.div className="hero__stage" style={{ opacity: stageOpacity }}>
         <div className="hero__content">
-          <motion.div
-            className="hero__logo-wrap"
-            variants={logoVariants}
-            initial="hidden"
-            animate={ready ? "visible" : "hidden"}
-          >
-            <Logo size="hero" background="dark" priority src={logoSrc} alt={logoAlt} />
-          </motion.div>
-
           <h1 className="hero__title">
             {titleLines.map((line, i) => (
               <motion.span

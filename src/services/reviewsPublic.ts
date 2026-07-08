@@ -1,20 +1,35 @@
+import { createClientIfConfigured } from "../lib/supabase/client";
+import type { LocationId } from "../config/locations";
 import { PUBLIC_REVIEWS_FALLBACK, type PublicReview } from "../data/publicReviews";
-import type { Review } from "../types/database";
+import type { GoogleReview, Review } from "../types/database";
 import { fetchPublicReviews } from "./reviews";
 
 export type { PublicReview };
 
 const CACHE_TTL_MS = 60_000;
 const DEFAULT_SOURCE = "Google Review";
+const GOOGLE_REVIEWS_LIMIT = 20;
 
-let cachedReviews: PublicReview[] | null = null;
-let cacheExpiresAt = 0;
-let inflightRequest: Promise<PublicReview[]> | null = null;
+const cachedReviewsByLocation = new Map<LocationId, PublicReview[]>();
+const cacheExpiresAtByLocation = new Map<LocationId, number>();
+const inflightRequestByLocation = new Map<LocationId, Promise<PublicReview[]>>();
 
 function formatReviewDate(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value.slice(0, 10);
   return date.toISOString().slice(0, 10);
+}
+
+function mapGoogleReview(row: GoogleReview): PublicReview {
+  return {
+    id: row.id,
+    name: row.author_name,
+    text: row.review_text,
+    rating: row.rating,
+    source: row.source || DEFAULT_SOURCE,
+    featured: false,
+    created_at: row.review_time,
+  };
 }
 
 function mapPublicReview(row: Review): PublicReview {
@@ -42,6 +57,25 @@ export function getPublicReviewsFallback(): PublicReview[] {
   return sortPublicReviews(PUBLIC_REVIEWS_FALLBACK);
 }
 
+/** Real 5-star Google reviews with text, synced per location by google-reviews-sync.mts. */
+async function fetchGoogleReviews(locationId: LocationId): Promise<PublicReview[] | null> {
+  const supabase = createClientIfConfigured();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("google_reviews")
+    .select("*")
+    .eq("location_id", locationId)
+    .eq("rating", 5)
+    .order("review_time", { ascending: false })
+    .limit(GOOGLE_REVIEWS_LIMIT);
+
+  if (error) return null;
+  return ((data ?? []) as GoogleReview[])
+    .filter((row) => row.review_text.trim().length > 0)
+    .map(mapGoogleReview);
+}
+
 async function fetchSupabasePublicReviews(): Promise<PublicReview[] | null> {
   const rows = await fetchPublicReviews();
   if (!rows) {
@@ -55,40 +89,49 @@ async function fetchSupabasePublicReviews(): Promise<PublicReview[] | null> {
   return sortPublicReviews(approved);
 }
 
-export async function fetchPublicReviewsData(): Promise<PublicReview[]> {
+export async function fetchPublicReviewsData(locationId: LocationId): Promise<PublicReview[]> {
   const now = Date.now();
-  if (cachedReviews && now < cacheExpiresAt) {
-    return cachedReviews;
+  const cached = cachedReviewsByLocation.get(locationId);
+  const expiresAt = cacheExpiresAtByLocation.get(locationId) ?? 0;
+  if (cached && now < expiresAt) {
+    return cached;
   }
 
-  if (inflightRequest) {
-    return inflightRequest;
+  const inflight = inflightRequestByLocation.get(locationId);
+  if (inflight) {
+    return inflight;
   }
 
-  inflightRequest = (async () => {
+  const request = (async () => {
     try {
-      const supabaseReviews = await fetchSupabasePublicReviews();
-      if (supabaseReviews !== null && supabaseReviews.length > 0) {
-        cachedReviews = supabaseReviews;
-        cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-        return supabaseReviews;
+      const googleReviews = await fetchGoogleReviews(locationId);
+      if (googleReviews !== null && googleReviews.length > 0) {
+        cachedReviewsByLocation.set(locationId, googleReviews);
+        cacheExpiresAtByLocation.set(locationId, Date.now() + CACHE_TTL_MS);
+        return googleReviews;
       }
 
-      const fallback = getPublicReviewsFallback();
-      cachedReviews = fallback;
-      cacheExpiresAt = Date.now() + CACHE_TTL_MS;
-      return fallback;
+      const manualReviews = await fetchSupabasePublicReviews();
+      const result =
+        manualReviews !== null && manualReviews.length > 0
+          ? manualReviews
+          : getPublicReviewsFallback();
+
+      cachedReviewsByLocation.set(locationId, result);
+      cacheExpiresAtByLocation.set(locationId, Date.now() + CACHE_TTL_MS);
+      return result;
     } catch {
       const fallback = getPublicReviewsFallback();
-      cachedReviews = fallback;
-      cacheExpiresAt = Date.now() + CACHE_TTL_MS;
+      cachedReviewsByLocation.set(locationId, fallback);
+      cacheExpiresAtByLocation.set(locationId, Date.now() + CACHE_TTL_MS);
       return fallback;
     } finally {
-      inflightRequest = null;
+      inflightRequestByLocation.delete(locationId);
     }
   })();
 
-  return inflightRequest;
+  inflightRequestByLocation.set(locationId, request);
+  return request;
 }
 
 export type PublicReviewsResult = {
@@ -96,9 +139,9 @@ export type PublicReviewsResult = {
   error: string | null;
 };
 
-export async function loadPublicReviewsData(): Promise<PublicReviewsResult> {
+export async function loadPublicReviewsData(locationId: LocationId): Promise<PublicReviewsResult> {
   try {
-    const reviews = await fetchPublicReviewsData();
+    const reviews = await fetchPublicReviewsData(locationId);
     return { reviews, error: null };
   } catch (err) {
     return {
