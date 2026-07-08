@@ -180,7 +180,7 @@ export async function buildCMSKnowledge(locationId: LocationId): Promise<CMSKnow
     fetchHomepageBundle(locationId),
     fetchPublicOffersData(locationId),
     fetchPublicGalleryData(),
-    fetchPublicReviewsData(),
+    fetchPublicReviewsData(locationId),
     getSeoMetadataMap(locationId),
   ]);
 
