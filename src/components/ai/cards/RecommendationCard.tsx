@@ -42,7 +42,7 @@ export const RecommendationCard = memo(function RecommendationCard({
         className="cheffy-card__cta cheffy-card__cta--primary cheffy-card__cta--full"
         onClick={() => onNavigate(card.menuPath)}
       >
-        🍽️ View Menu
+        🍽️ View Live Menu
       </button>
     </CardShell>
   );

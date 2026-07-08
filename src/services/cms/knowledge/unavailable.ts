@@ -19,8 +19,14 @@ export function unavailableForModule(
 }
 
 export function unavailableMenu(knowledge: CMSKnowledge): string {
-  const menuPath = knowledge.navigation.menu;
-  return `${unavailableForModule(knowledge, "menu", "Menu details are not connected to Cheffy yet.")}\n\n[BUTTON:View Menu|${menuPath}]`;
+  const restaurant = knowledge.modules.restaurantSettings.data;
+  const location = knowledge.modules.locationSettings.data;
+  const orderUrl =
+    restaurant?.orderUrl?.trim() ||
+    location?.orderDirectLink?.trim() ||
+    knowledge.navigation.menu;
+
+  return `Our full **live menu** with current items and prices is available through **ChefGaa online ordering** for **${knowledge.locationName}**.\n\n[BUTTON:View Live Menu|${orderUrl}]`;
 }
 
 export function unavailableGeneric(knowledge: CMSKnowledge): string {

@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import SignatureCard from "./SignatureCard";
 import NavigationArrows from "./NavigationArrows";
 import FeatureRow from "./FeatureRow";
 import { useLocationSelection } from "../../context/LocationContext";
 import { usePageContent } from "../../context/PageContentContext";
 import { useHomepageData } from "../../hooks/useHomepageData";
+import { useMenuOrderAction } from "../../hooks/useMenuOrderAction";
 import { useSignatureDishes } from "../../hooks/useSignatureDishes";
 import { resolveOrderUrl } from "../../utils/locationLinks";
 import { SIGNATURE_FEATURES } from "../../data/signatureDishes";
@@ -21,7 +21,7 @@ const SIGNATURE_FALLBACK = {
   title: "Signature Special Dishes",
   subtitle:
     "Discover our chef's most celebrated creations, prepared with authentic Indian flavours, premium ingredients, and unforgettable presentation.",
-  viewMenuCta: { label: "View Full Menu", url: "/menu" },
+  viewMenuCta: { label: "View Live Menu", url: "/menu" },
   features: SIGNATURE_FEATURES.map(({ title, description }) => ({ title, description })),
 };
 
@@ -31,6 +31,7 @@ export default function SignatureCarousel() {
   const [sectionVisible, setSectionVisible] = useState(false);
 
   const { selectedLocationId } = useLocationSelection();
+  const { menuHref, goToLiveMenu } = useMenuOrderAction();
   const { fetchSection } = usePageContent();
   const signature = fetchSection("home", "signature", SIGNATURE_FALLBACK);
   const { bundle, locationId: bundleLocationId } = useHomepageData();
@@ -161,12 +162,13 @@ export default function SignatureCarousel() {
           animate={sectionVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.65, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
-          <Link
-            to={signature.viewMenuCta.url}
+          <a
+            href={menuHref}
+            onClick={goToLiveMenu}
             className="inline-flex items-center justify-center rounded-md border border-saffron/70 bg-transparent px-8 py-3 text-[11px] font-bold uppercase tracking-[0.18em] text-saffron transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-saffron hover:bg-saffron/10 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c0a09]"
           >
             {signature.viewMenuCta.label}
-          </Link>
+          </a>
         </motion.div>
         <span className="signature-section__cta-line" aria-hidden />
       </div>

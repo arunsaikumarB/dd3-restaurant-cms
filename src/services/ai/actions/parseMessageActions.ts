@@ -28,7 +28,7 @@ function defaultLabel(type: CheffyActionType, value: string): string {
     case "order":
       return "Order Online";
     case "menu":
-      return "View Menu";
+      return "View Live Menu";
     case "switch_location":
       return "Switch Location";
     default:

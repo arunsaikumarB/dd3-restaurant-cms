@@ -14,7 +14,7 @@ const BASE_CHIPS: CheffyActionItem[] = [
 const TOPIC_CHIPS: Record<string, CheffyActionItem[]> = {
   offers: [
     { label: "🛵 Order Online", prompt: "I want to order online." },
-    { label: "🍛 View Menu", prompt: "Show me the menu." },
+    { label: "🍛 View Live Menu", prompt: "Show me the menu." },
   ],
   location: [
     { label: "🕒 Hours", prompt: "What are your hours?" },

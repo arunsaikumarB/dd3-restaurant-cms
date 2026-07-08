@@ -48,7 +48,7 @@ export function useConversation({ onEmotion }: UseConversationArgs = {}) {
   const navigateTo = useCallback(
     (path: string) => {
       if (path.startsWith("http")) {
-        window.open(path, "_blank", "noopener,noreferrer");
+        window.location.assign(path);
         return;
       }
       navigate(path.startsWith("/") ? path : `/${path}`);

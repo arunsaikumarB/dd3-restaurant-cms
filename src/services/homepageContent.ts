@@ -39,8 +39,8 @@ export function buildDefaultHomepageContent(
     hero_video: "/media/hero.mp4",
     primary_cta_label: "Order Now",
     primary_cta_url: getOrderUrl(locationId),
-    secondary_cta_label: "View Menu",
-    secondary_cta_url: "/menu",
+    secondary_cta_label: "View Live Menu",
+    secondary_cta_url: getOrderUrl(locationId),
     about_title: fieldValue("featured", "heading", "Signature Special Dishes"),
     about_description: fieldValue(
       "featured",

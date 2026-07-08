@@ -133,7 +133,7 @@ export function inferPresentationCards(
     cards.push({
       kind: "recommendation",
       items: items.slice(0, 3),
-      menuPath: nav.menu,
+      menuPath: settings?.orderUrl || location?.orderDirectLink || nav.menu,
     });
   }
 

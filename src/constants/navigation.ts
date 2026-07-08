@@ -28,14 +28,10 @@ export const RESERVE_URL = "/reservation";
 /** Fixed header height — keep sticky offsets in sync (matches h-20). */
 export const NAV_BAR_HEIGHT = 80;
 
-/** Menu category anchor offset (nav + sticky toolbar). */
-export const MENU_SCROLL_MARGIN = NAV_BAR_HEIGHT + 168;
-
 /** Routes where the navbar starts transparent over a dark hero. */
 export const TRANSPARENT_NAV_ROUTES = [
   "/",
   "/about",
-  "/menu",
   "/catering",
   "/parties",
   "/testimonials",

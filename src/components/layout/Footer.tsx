@@ -5,6 +5,7 @@ import { DEFAULT_PUBLIC_LOCATION_ID, getLocationConfig } from "../../config/loca
 import { useHomepageData } from "../../hooks/useHomepageData";
 import { usePageContent } from "../../context/PageContentContext";
 import { useLocationSelection } from "../../context/LocationContext";
+import { useMenuOrderAction } from "../../hooks/useMenuOrderAction";
 import {
   resolveGoogleMapsDirectionsUrl,
 } from "../../utils/locationLinks";
@@ -67,6 +68,7 @@ export default function Footer() {
     getDirections: "Get Directions",
   });
   const { selectedLocationId } = useLocationSelection();
+  const { menuHref, goToLiveMenu } = useMenuOrderAction();
   const { settings } = bundle;
   const directionsUrl = resolveGoogleMapsDirectionsUrl(settings, selectedLocationId);
   const orderPagePath = locPath(selectedLocationId, ORDER_URL);
@@ -154,13 +156,24 @@ export default function Footer() {
             <ul className="space-y-1.5">
               {FOOTER_QUICK_LINKS.map((link) => (
                 <li key={link.path}>
-                  <Link
-                    to={locPath(selectedLocationId, link.path)}
-                    className="group inline-flex items-center gap-2.5 text-[14px] text-cocoa/65 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
-                  >
-                    <span className="block h-px w-3 bg-cocoa/20 transition-all duration-300 group-hover:w-4 group-hover:bg-saffron" />
-                    {link.label}
-                  </Link>
+                  {link.path === "/menu" ? (
+                    <a
+                      href={menuHref}
+                      onClick={goToLiveMenu}
+                      className="group inline-flex items-center gap-2.5 text-[14px] text-cocoa/65 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+                    >
+                      <span className="block h-px w-3 bg-cocoa/20 transition-all duration-300 group-hover:w-4 group-hover:bg-saffron" />
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={locPath(selectedLocationId, link.path)}
+                      className="group inline-flex items-center gap-2.5 text-[14px] text-cocoa/65 transition-colors duration-300 hover:text-saffron focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron"
+                    >
+                      <span className="block h-px w-3 bg-cocoa/20 transition-all duration-300 group-hover:w-4 group-hover:bg-saffron" />
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

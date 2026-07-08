@@ -17,7 +17,7 @@ export const INPUT_QUICK_CHIPS: CheffyActionItem[] = [
 ];
 
 export const DASHBOARD_TILES: Array<CheffyActionItem & { emoji: string }> = [
-  { emoji: "🍛", label: "Browse Menu", prompt: "Show me the menu." },
+  { emoji: "🍛", label: "View Live Menu", prompt: "Show me the menu." },
   { emoji: "🎉", label: "Today's Offers", prompt: "What offers are available today?" },
   { emoji: "🛵", label: "Order Online", prompt: "I want to order online." },
   { emoji: "📍", label: "Directions", prompt: "How do I get directions?" },

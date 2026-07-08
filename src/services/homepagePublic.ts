@@ -4,6 +4,8 @@ import { getSiteUrl } from "../config/env";
 import type { LocationId } from "../config/locations";
 import type { HomepageContent } from "../types/database";
 import { fetchHomepageContentPublic } from "./homepageContent";
+import { resolveOrderUrl } from "../utils/locationLinks";
+import { resolveMenuCtaUrl } from "../utils/menuOrder";
 import {
   buildDefaultRestaurantSettings,
   fetchRestaurantSettingsPublic,
@@ -102,7 +104,7 @@ export function getHomepageFallbacks(locationId: LocationId = "south-plainfield"
       hero_image: HERO_IMAGE_FALLBACK,
       hero_video: HERO_VIDEO_FALLBACK,
       primary_cta: { label: "Order Now", url: defaults.order_url || getOrderUrl(locationId) },
-      secondary_cta: { label: "View Menu", url: "/menu" },
+      secondary_cta: { label: "View Live Menu", url: defaults.order_url || getOrderUrl(locationId) },
       about_title: ABOUT_TITLE_FALLBACK,
       about_description: ABOUT_DESCRIPTION_FALLBACK,
     },
@@ -487,6 +489,20 @@ export function buildRestaurantJsonLd(
   ];
 }
 
+function applyLiveMenuUrls(bundle: HomepageBundle, locationId: LocationId): HomepageBundle {
+  const orderUrl = resolveOrderUrl(bundle.settings, locationId, locationId);
+  return {
+    ...bundle,
+    content: {
+      ...bundle.content,
+      secondary_cta: {
+        label: bundle.content.secondary_cta.label || "View Live Menu",
+        url: resolveMenuCtaUrl(bundle.content.secondary_cta.url, orderUrl, locationId),
+      },
+    },
+  };
+}
+
 export async function fetchHomepageBundle(
   locationId: LocationId = "lawrenceville",
 ): Promise<HomepageBundle> {
@@ -515,16 +531,19 @@ export async function fetchHomepageBundle(
         settings.favicon = siteFavicon;
       }
 
-      const bundle: HomepageBundle = {
-        content: mapHomepageContent(homepageRow, locationId),
-        settings,
-      };
+      const bundle = applyLiveMenuUrls(
+        {
+          content: mapHomepageContent(homepageRow, locationId),
+          settings,
+        },
+        locationId,
+      );
 
       cachedBundleByLocation[locationId] = bundle;
       cacheExpiresAtByLocation[locationId] = Date.now() + CACHE_TTL_MS;
       return bundle;
     } catch {
-      const fallback = getHomepageFallbacks(locationId);
+      const fallback = applyLiveMenuUrls(getHomepageFallbacks(locationId), locationId);
       cachedBundleByLocation[locationId] = fallback;
       cacheExpiresAtByLocation[locationId] = Date.now() + CACHE_TTL_MS;
       return fallback;

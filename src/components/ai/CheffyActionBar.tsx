@@ -65,7 +65,11 @@ export function CheffyActionBar({
         onSwitchLocation?.(target.locationId);
         return;
       case "external":
-        window.open(target.href, "_blank", "noopener,noreferrer");
+        if (action.type === "menu" || action.type === "order") {
+          window.location.assign(target.href);
+        } else {
+          window.open(target.href, "_blank", "noopener,noreferrer");
+        }
         return;
       case "phone":
       case "email":

@@ -15,7 +15,6 @@ import UnauthorizedRoute from "./admin/components/UnauthorizedRoute";
 import { LocationProvider, useLocationSelection } from "./context/LocationContext";
 import { PageContentProvider } from "./context/PageContentContext";
 import { usePageTracking } from "./hooks/usePageTracking";
-import { MenuExperienceSwitch } from "./demo/menuExperience";
 import { isLocationId, resolvePublicLocationId } from "./config/locations";
 import { AIProvider } from "./components/ai/AIProvider";
 import Cheffy from "./components/ai/Cheffy";
@@ -39,7 +38,7 @@ const AdminProfilePage = lazy(() => import("./admin/pages/ProfilePage"));
 const LocationGatePage = lazy(() => import("./pages/LocationGatePage"));
 const HomePage = lazy(() => import("./pages/HomePage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
-const MenuPage = lazy(() => import("./pages/MenuPage"));
+const MenuRedirectPage = lazy(() => import("./pages/MenuRedirectPage"));
 const CateringPage = lazy(() => import("./pages/CateringPage"));
 const PartiesPage = lazy(() => import("./pages/PartiesPage"));
 const TestimonialsPage = lazy(() => import("./pages/TestimonialsPage"));
@@ -90,14 +89,7 @@ function LocationPageRoutes() {
             </PageTransition>
           }
         />
-        <Route
-          path="menu"
-          element={
-            <PageTransition>
-              <MenuPage />
-            </PageTransition>
-          }
-        />
+        <Route path="menu" element={<MenuRedirectPage />} />
         <Route
           path="catering"
           element={
@@ -220,7 +212,6 @@ function PublicSiteChrome() {
         <LocationPageRoutes />
       </main>
       <Footer />
-      <MenuExperienceSwitch />
     </>
   );
 }

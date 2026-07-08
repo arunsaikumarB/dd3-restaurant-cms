@@ -7,6 +7,8 @@ import { SITE } from "../../constants/site";
 import { usePageContent } from "../../context/PageContentContext";
 import { useSectionImage } from "../../hooks/useGallerySection";
 import { useLocationSelection } from "../../context/LocationContext";
+import { useLocationOrderUrl } from "../../hooks/useLocationOrderUrl";
+import { resolveMenuCtaUrl } from "../../utils/menuOrder";
 import { trackOrderClick, trackReservationClick } from "../../services/analytics";
 import ExperienceCard from "./ExperienceCard";
 import "./experience.css";
@@ -27,7 +29,7 @@ const EXPERIENCE_FALLBACK = {
   menuCardLabel: "The Menu",
   menuCardHeadline: "{name} — a feast made with love",
   menuCardSubtitle: "Explore our full collection of biryanis, curries, tandoori and desserts.",
-  menuCardCta: { label: "Explore Menu", url: "/menu" },
+  menuCardCta: { label: "View Live Menu", url: "/menu" },
   orderCardLabel: "The Kitchen",
   orderCardHeadline: "In the heart of every flavour",
   orderCardSubtitle: "Fresh, bold and delivered with the same passion as our dining room.",
@@ -67,6 +69,7 @@ export default function ExperienceCards({
 }: ExperienceCardsProps) {
   const { pathname } = useLocation();
   const { selectedLocationId } = useLocationSelection();
+  const orderUrl = useLocationOrderUrl();
   const { fetchSection, interpolate } = usePageContent();
   const experience = fetchSection("home", "experience", EXPERIENCE_FALLBACK);
   const menuImage = useSectionImage("choose_experience_menu", "/showcase/biryani.webp");
@@ -93,7 +96,7 @@ export default function ExperienceCards({
         image: menuImage,
         imageAlt: "Premium biryani from Desi Dhamaka",
         buttonText: experience.menuCardCta.label,
-        link: experience.menuCardCta.url,
+        link: resolveMenuCtaUrl(experience.menuCardCta.url, orderUrl, selectedLocationId),
         favourites: [
           { src: "/showcase/biryani.webp", alt: "Biryani" },
           { src: "/showcase/butter-chicken.webp", alt: "Butter chicken" },
@@ -128,7 +131,7 @@ export default function ExperienceCards({
         scrollDelay: 400,
       },
     ];
-  }, [restaurantName, hoursLabel, phone, email, address, facebook, instagram, youtube, mapsUrl, orderCtaText, orderCtaLink, menuImage, orderImage, visitImage, experience, interpolate]);
+  }, [restaurantName, hoursLabel, phone, email, address, facebook, instagram, youtube, mapsUrl, orderCtaText, orderCtaLink, menuImage, orderImage, visitImage, experience, interpolate, orderUrl, selectedLocationId]);
 
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);

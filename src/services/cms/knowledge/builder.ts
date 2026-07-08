@@ -1,4 +1,5 @@
 import { getLocationConfig, LOCATIONS, type LocationId } from "../../../config/locations";
+import { getOrderUrl } from "../../../data/chefgaaNameMap";
 import { locPath } from "../../../utils/locationPaths";
 import {
   fetchHomepageBundle,
@@ -156,11 +157,15 @@ function loadLocationSettings(locationId: LocationId): CMSLocationSettings {
   };
 }
 
-function buildNavigation(locationId: LocationId): Record<string, string> {
+function buildNavigation(
+  locationId: LocationId,
+  settings: CMSRestaurantSettings | null,
+): Record<string, string> {
+  const orderUrl = settings?.orderUrl?.trim() || getOrderUrl(locationId);
   return {
     home: locPath(locationId, "/"),
     about: locPath(locationId, "/about"),
-    menu: locPath(locationId, "/menu"),
+    menu: orderUrl,
     catering: locPath(locationId, "/catering"),
     parties: locPath(locationId, "/parties"),
     reservation: locPath(locationId, "/reservation"),
@@ -196,7 +201,7 @@ export async function buildCMSKnowledge(locationId: LocationId): Promise<CMSKnow
     locationId,
     locationName: config.name,
     generatedAt: new Date().toISOString(),
-    navigation: buildNavigation(locationId),
+    navigation: buildNavigation(locationId, restaurantData),
     modules: {
       restaurantSettings: slice("restaurantSettings", restaurantData),
       homepage: slice("homepage", homepageData),

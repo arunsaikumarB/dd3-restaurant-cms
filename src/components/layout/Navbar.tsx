@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import type { MouseEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -16,14 +15,9 @@ import { usePageContent } from "../../context/PageContentContext";
 import { EASE_POWER3 } from "../showcase/motion";
 import LocationSwitcher from "../location/LocationSwitcher";
 import { useLocationSelection } from "../../context/LocationContext";
+import { useMenuOrderAction } from "../../hooks/useMenuOrderAction";
 import { locPath } from "../../utils/locationPaths";
 import { trackOrderClick, trackReservationClick } from "../../services/analytics";
-import {
-  isDirectOrderingMode,
-  redirectToChefGaaOrder,
-  useLocationOrderUrl,
-  useMenuExperience,
-} from "../../demo/menuExperience";
 import "./navbar.css";
 
 type NavLinkItem = { label: string; path: string };
@@ -43,9 +37,7 @@ export default function Navbar() {
     reserveLabel: "Reserve a Table",
   });
   const { selectedLocationId } = useLocationSelection();
-  const { mode: menuExperienceMode } = useMenuExperience();
-  const chefGaaOrderUrl = useLocationOrderUrl();
-  const directMenuOrdering = isDirectOrderingMode(menuExperienceMode);
+  const { menuHref, goToLiveMenu } = useMenuOrderAction();
   const orderPagePath = locPath(selectedLocationId, ORDER_URL);
   const reserveUrl = locPath(selectedLocationId, RESERVE_URL);
   const logoAlt = `${bundle.settings.restaurant_name} home`;
@@ -133,21 +125,16 @@ export default function Navbar() {
     "site-header__nav-link text-[12px] font-semibold whitespace-nowrap px-0.5 uppercase tracking-wide text-white/80 hover:text-white 2xl:text-sm 2xl:tracking-wider" +
     (active ? " site-header__nav-link--active" : "");
 
-  const handleDirectMenuNav = (event: MouseEvent<HTMLElement>) => {
-    event.preventDefault();
-    redirectToChefGaaOrder(chefGaaOrderUrl);
-  };
-
   const renderNavLink = (link: NavLinkItem) => {
     const active = isActive(link.path);
 
-    if (link.path === "/menu" && directMenuOrdering) {
+    if (link.path === "/menu") {
       return (
         <a
           key={link.path}
-          href={chefGaaOrderUrl}
+          href={menuHref}
           className={navLinkClass(active)}
-          onClick={handleDirectMenuNav}
+          onClick={goToLiveMenu}
         >
           {link.label}
         </a>
@@ -261,7 +248,6 @@ export default function Navbar() {
             <nav className="flex w-full max-w-sm flex-col items-center gap-2" aria-label="Mobile">
               {NAV_LINKS.map((link, index) => {
                 const active = isActive(link.path);
-                const isDirectMenu = link.path === "/menu" && directMenuOrdering;
                 return (
                   <motion.div
                     key={link.path}
@@ -270,10 +256,10 @@ export default function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.04 + index * 0.03, ease: EASE_POWER3 }}
                   >
-                    {isDirectMenu ? (
+                    {link.path === "/menu" ? (
                       <a
-                        href={chefGaaOrderUrl}
-                        onClick={handleDirectMenuNav}
+                        href={menuHref}
+                        onClick={goToLiveMenu}
                         className={
                           "block py-2 text-2xl font-semibold transition-colors" +
                           (active ? " text-brand-secondary" : " text-white hover:text-brand-secondary")
