@@ -59,12 +59,6 @@
   align-items: center;
 }
 
-.hero__logo-wrap {
-  margin-bottom: 24px;
-  background: transparent;
-  line-height: 0;
-}
-
 .hero__title-line {
   display: inline-block;
 }
@@ -93,7 +87,7 @@
   max-width: 620px;
   font-size: clamp(16px, 2vw, 21px);
   line-height: 1.5;
-  color: var(--muted);
+  color: #ffffff;
 }
 
 .hero__actions {

@@ -351,6 +351,28 @@ export interface Review extends Timestamps {
   featured: boolean;
 }
 
+/** Synced from Google Maps by netlify/functions/google-reviews-sync.mts */
+export interface GoogleReview extends Timestamps {
+  id: string;
+  location_id: RestaurantLocationId;
+  google_review_id: string;
+  author_name: string;
+  rating: number;
+  review_text: string;
+  review_time: string;
+  source: string;
+  synced_at: string;
+}
+
+/** Aggregate Google rating + review count per location, synced alongside GoogleReview rows. */
+export interface GoogleRatingStats {
+  location_id: RestaurantLocationId;
+  rating: number;
+  rating_count: number;
+  synced_at: string;
+  updated_at: string;
+}
+
 /** Insert / update helpers (omit generated fields) */
 export type UserProfileInsert = Omit<UserProfile, "created_at" | "updated_at"> &
   Partial<Pick<UserProfile, "created_at" | "updated_at">>;
@@ -420,6 +442,12 @@ export type ContactEnquiryInsert = Omit<ContactEnquiry, "id" | "created_at" | "u
 
 export type ReviewInsert = Omit<Review, "id" | "created_at" | "updated_at"> &
   Partial<Pick<Review, "id" | "created_at" | "updated_at">>;
+
+export type GoogleReviewInsert = Omit<GoogleReview, "id" | "created_at" | "updated_at" | "synced_at"> &
+  Partial<Pick<GoogleReview, "id" | "created_at" | "updated_at" | "synced_at">>;
+
+export type GoogleRatingStatsInsert = Omit<GoogleRatingStats, "synced_at" | "updated_at"> &
+  Partial<Pick<GoogleRatingStats, "synced_at" | "updated_at">>;
 
 /** Supabase Database generic — used by createClient<Database>() */
 export interface Database {
@@ -508,6 +536,18 @@ export interface Database {
         Row: Review;
         Insert: ReviewInsert;
         Update: Partial<ReviewInsert>;
+        Relationships: [];
+      };
+      google_reviews: {
+        Row: GoogleReview;
+        Insert: GoogleReviewInsert;
+        Update: Partial<GoogleReviewInsert>;
+        Relationships: [];
+      };
+      google_rating_stats: {
+        Row: GoogleRatingStats;
+        Insert: GoogleRatingStatsInsert;
+        Update: Partial<GoogleRatingStatsInsert>;
         Relationships: [];
       };
       chefgaa_location_config: {

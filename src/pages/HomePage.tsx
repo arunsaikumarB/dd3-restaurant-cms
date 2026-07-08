@@ -74,8 +74,6 @@ export default function HomePage() {
         subtitle={content.hero_subtitle}
         videoSrc={content.hero_video}
         posterSrc={posterSrc}
-        logoSrc={settings.logo}
-        logoAlt={logoAlt}
         scrollHint={heroUi.scrollHint}
       />
 

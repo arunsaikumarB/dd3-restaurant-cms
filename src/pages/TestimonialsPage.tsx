@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import PageHero from "../components/ui/PageHero";
 import SectionHeading from "../components/ui/SectionHeading";
 import AnimatedContainer from "../components/ui/AnimatedContainer";
-import {
-  FeaturedReviewSkeleton,
-  ReviewsGridSkeleton,
-} from "../components/testimonials/TestimonialsPageSkeleton";
+import Button from "../components/ui/Button";
+import { ReviewsGridSkeleton } from "../components/testimonials/TestimonialsPageSkeleton";
 import { usePageContent } from "../context/PageContentContext";
+import { useLocationSelection } from "../context/LocationContext";
+import { getLocationConfig, resolvePublicLocationId } from "../config/locations";
 import { useReviewsData } from "../hooks/useReviewsData";
+import { useGoogleRatingStats } from "../hooks/useGoogleRatingStats";
 import { useSectionImage } from "../hooks/useGallerySection";
-import { EASE_POWER3, prefersReducedMotion } from "../components/showcase/motion";
 
 function AnimatedRating({ value }: { value: number }) {
   const [display, setDisplay] = useState(0);
@@ -38,7 +37,7 @@ function AnimatedRating({ value }: { value: number }) {
   }, [value]);
 
   return (
-    <span className="font-serif text-[clamp(3.5rem,9vw,5.5rem)] font-semibold leading-none text-saffron">
+    <span className="font-serif text-[clamp(2.25rem,8vw,3.5rem)] font-semibold leading-none text-saffron">
       {display.toFixed(1)}
     </span>
   );
@@ -47,8 +46,11 @@ function AnimatedRating({ value }: { value: number }) {
 export default function TestimonialsPage() {
   const { fetchSection } = usePageContent();
   const { reviews, loading } = useReviewsData();
+  const googleRating = useGoogleRatingStats();
+  const { selectedLocationId } = useLocationSelection();
   const heroBackground = useSectionImage("testimonials_hero", "/showcase/butter-chicken.webp");
-  const [index, setIndex] = useState(0);
+
+  const location = getLocationConfig(resolvePublicLocationId(selectedLocationId));
 
   const hero = fetchSection("testimonials", "hero", {
     label: "Guest Reviews",
@@ -62,34 +64,21 @@ export default function TestimonialsPage() {
     reviewCountText: "Based on 500+ Google Reviews",
     verifiedBadge: "Google Verified",
     reviewSourceLabel: "Google Reviews",
+    viewAllLabel: "View All Google Reviews",
+    leaveReviewLabel: "Leave Us a Review",
   });
   const reviewsGrid = fetchSection("testimonials", "reviews_grid", {
     eyebrow: "All Reviews",
     title: "What our guests say",
   });
   const emptyStates = fetchSection("testimonials", "empty_states", {
-    featuredTitle: "Reviews coming soon",
-    featuredBody: "Guest testimonials will appear here once published.",
     gridTitle: "No reviews yet",
     gridBody: "Be the first to share your experience with us.",
   });
-  const ratingValue = Number.parseFloat(ratingStats.ratingValue) || 4.9;
-
-  useEffect(() => {
-    if (reviews.length === 0) return;
-    setIndex((current) => (current >= reviews.length ? 0 : current));
-  }, [reviews]);
-
-  useEffect(() => {
-    if (reviews.length === 0) return;
-    if (prefersReducedMotion()) return;
-    const timer = window.setInterval(() => {
-      setIndex((i) => (i + 1) % reviews.length);
-    }, 6000);
-    return () => window.clearInterval(timer);
-  }, [reviews.length]);
-
-  const activeReview = reviews[index];
+  const ratingValue = googleRating?.rating ?? (Number.parseFloat(ratingStats.ratingValue) || 4.9);
+  const reviewCountText = googleRating
+    ? `Based on ${googleRating.rating_count.toLocaleString()} Google Reviews`
+    : ratingStats.reviewCountText;
 
   return (
     <div className="bg-ivory">
@@ -104,115 +93,49 @@ export default function TestimonialsPage() {
         ]}
       />
 
-      <section className="page-content-start mx-auto max-w-[1400px] px-6 pb-24 md:px-10 lg:px-16">
-        <div className="grid gap-12 lg:grid-cols-[1fr_2.5fr] lg:gap-20">
-          <AnimatedContainer>
-            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-saffron">
-              {ratingStats.averageLabel}
-            </p>
-            <div className="mt-3 flex items-end gap-2">
-              <AnimatedRating value={ratingValue} />
-              <span className="mb-2 font-serif text-[1.5rem] text-cocoa/30">/5</span>
-            </div>
-            <div
-              className="mt-2 flex gap-0.5 text-[1.2rem] text-saffron"
-              aria-label={`${ratingValue} out of 5 stars`}
-            >
-              {"★★★★★"}
-            </div>
-            <p className="mt-4 text-[14px] leading-relaxed text-cocoa/55">
-              {ratingStats.reviewCountText}
-            </p>
-            <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-saffron/10 px-4 py-2">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                aria-hidden
-                fill="currentColor"
-                className="text-saffron"
-              >
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-saffron">
-                {ratingStats.verifiedBadge}
-              </span>
-            </div>
-          </AnimatedContainer>
-
-          <div className="relative" aria-live="polite" aria-atomic="true">
-            {loading ? (
-              <FeaturedReviewSkeleton />
-            ) : activeReview ? (
-              <>
-                <AnimatePresence mode="wait">
-                  <motion.blockquote
-                    key={activeReview.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.5, ease: EASE_POWER3 }}
-                    className="rounded-[28px] bg-[#FDFBF7] p-8 shadow-[0_24px_64px_-24px_rgba(43,29,24,0.18)] md:p-12"
-                  >
-                    <p className="font-serif text-[clamp(1.2rem,2.5vw,1.65rem)] leading-[1.6] text-cocoa">
-                      &ldquo;{activeReview.text}&rdquo;
-                    </p>
-                    <footer className="mt-8 flex items-center justify-between gap-4 border-t border-cocoa/8 pt-6">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-saffron/12 font-serif text-lg font-semibold text-saffron">
-                          {activeReview.name[0]}
-                        </div>
-                        <div>
-                          <cite className="not-italic block font-semibold text-cocoa">
-                            {activeReview.name}
-                          </cite>
-                          <p className="text-[12px] text-cocoa/45">
-                            {activeReview.source || ratingStats.reviewSourceLabel}
-                          </p>
-                        </div>
-                      </div>
-                      <span
-                        className="text-[1.1rem] tracking-wide text-saffron"
-                        aria-label={`${activeReview.rating} stars`}
-                      >
-                        {"★".repeat(activeReview.rating)}
-                      </span>
-                    </footer>
-                  </motion.blockquote>
-                </AnimatePresence>
-
-                <div className="mt-6 flex items-center gap-2.5">
-                  {reviews.map((review, i) => (
-                    <button
-                      key={review.id}
-                      type="button"
-                      aria-label={`Go to review ${i + 1}`}
-                      onClick={() => setIndex(i)}
-                      className={
-                        "h-1.5 rounded-full transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron " +
-                        (i === index ? "w-10 bg-saffron" : "w-1.5 bg-cocoa/15 hover:bg-cocoa/35")
-                      }
-                    />
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="rounded-[28px] border border-cocoa/10 bg-white/60 p-12 text-center">
-                <p className="font-serif text-2xl text-cocoa">{emptyStates.featuredTitle}</p>
-                <p className="mt-3 text-cocoa/60">{emptyStates.featuredBody}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#FDFBF7] py-24">
+      <section className="page-content-start bg-[#FDFBF7] py-24">
         <div className="mx-auto max-w-[1400px] px-6 md:px-10 lg:px-16">
-          <SectionHeading
-            eyebrow={reviewsGrid.eyebrow}
-            title={reviewsGrid.title}
-            align="center"
-          />
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <SectionHeading
+              eyebrow={reviewsGrid.eyebrow}
+              title={reviewsGrid.title}
+              align="left"
+            />
+
+            <AnimatedContainer className="text-left lg:text-right">
+              <div className="flex items-baseline gap-2 lg:justify-end">
+                <AnimatedRating value={ratingValue} />
+                <span className="font-serif text-[clamp(2.25rem,8vw,3.5rem)] leading-none text-cocoa/30">
+                  /5
+                </span>
+              </div>
+              <div
+                className="mt-2 flex gap-0.5 text-[1.2rem] text-saffron lg:justify-end"
+                aria-label={`${ratingValue} out of 5 stars`}
+              >
+                {"★★★★★"}
+              </div>
+              <p className="mt-4 text-[14px] leading-relaxed text-cocoa/55">
+                {reviewCountText}
+              </p>
+              <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-saffron/10 px-4 py-2">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                  fill="currentColor"
+                  className="text-saffron"
+                >
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-saffron">
+                  {ratingStats.verifiedBadge}
+                </span>
+              </div>
+            </AnimatedContainer>
+          </div>
+
           {loading ? (
             <ReviewsGridSkeleton />
           ) : reviews.length === 0 ? (
@@ -221,39 +144,77 @@ export default function TestimonialsPage() {
               <p className="mt-3 text-cocoa/60">{emptyStates.gridBody}</p>
             </div>
           ) : (
-            <div className="mt-14 grid gap-5 md:grid-cols-2">
+            <div className="mt-14 columns-1 gap-5 sm:columns-2 lg:columns-3">
               {reviews.map((item, i) => (
                 <AnimatedContainer
                   key={item.id}
-                  delay={i * 0.07}
-                  className="group rounded-[24px] bg-ivory p-7 shadow-[0_8px_32px_-12px_rgba(43,29,24,0.12)] transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_24px_56px_-18px_rgba(43,29,24,0.18)]"
+                  delay={Math.min(i * 0.05, 0.4)}
+                  className="mb-5 inline-block w-full break-inside-avoid"
                 >
-                  <div className="mb-5 flex items-center gap-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-saffron/12 font-serif text-lg font-semibold text-saffron">
-                      {item.name[0]}
+                  <div className="group relative rounded-[20px] border border-cocoa/8 bg-white p-6 shadow-[0_2px_12px_-4px_rgba(43,29,24,0.08)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_20px_44px_-16px_rgba(43,29,24,0.18)]">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-saffron/12 font-serif text-base font-semibold text-saffron">
+                          {item.name[0]}
+                        </div>
+                        <div>
+                          <p className="font-semibold leading-tight text-cocoa">{item.name}</p>
+                          <div className="mt-0.5 flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" className="h-3 w-3 shrink-0" aria-hidden>
+                              <path
+                                fill="#4285F4"
+                                d="M23.52 12.27c0-.85-.07-1.66-.2-2.45H12v4.63h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.89c2.28-2.1 3.56-5.2 3.56-8.81Z"
+                              />
+                              <path
+                                fill="#34A853"
+                                d="M12 24c3.24 0 5.96-1.07 7.95-2.92l-3.89-3c-1.08.73-2.46 1.15-4.06 1.15-3.13 0-5.78-2.11-6.73-4.95H1.26v3.1A12 12 0 0 0 12 24Z"
+                              />
+                              <path
+                                fill="#FBBC05"
+                                d="M5.27 14.28a7.2 7.2 0 0 1 0-4.56v-3.1H1.26a12 12 0 0 0 0 10.76l4.01-3.1Z"
+                              />
+                              <path
+                                fill="#EA4335"
+                                d="M12 4.77c1.76 0 3.34.6 4.58 1.79l3.44-3.44A11.98 11.98 0 0 0 12 0 12 12 0 0 0 1.26 6.62l4.01 3.1C6.22 6.88 8.87 4.77 12 4.77Z"
+                              />
+                            </svg>
+                            <p className="text-[11.5px] text-cocoa/45">
+                              {item.source || ratingStats.reviewSourceLabel}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <span
+                        className="shrink-0 text-[0.85rem] tracking-tight text-saffron"
+                        aria-label={`${item.rating} stars`}
+                      >
+                        {"★".repeat(item.rating)}
+                      </span>
                     </div>
-                    <div>
-                      <p className="font-semibold text-cocoa">{item.name}</p>
-                      <p className="text-[12px] text-cocoa/45">
-                        {item.source || ratingStats.reviewSourceLabel}
-                      </p>
-                    </div>
-                    <span
-                      className="ml-auto shrink-0 text-[0.95rem] text-saffron"
-                      aria-label={`${item.rating} stars`}
-                    >
-                      {"★".repeat(item.rating)}
-                    </span>
+
+                    <p className="mt-4 line-clamp-6 text-[14px] leading-[1.7] text-cocoa/68">
+                      {item.text}
+                    </p>
                   </div>
-                  <span
-                    className="mb-4 block h-px w-8 rounded-full bg-saffron/30 transition-all duration-300 group-hover:w-16 group-hover:bg-saffron/50"
-                    aria-hidden
-                  />
-                  <p className="text-[14.5px] leading-[1.75] text-cocoa/62">{item.text}</p>
                 </AnimatedContainer>
               ))}
             </div>
           )}
+
+          <div className="mt-14 flex flex-wrap items-center justify-center gap-4">
+            <Button
+              href={`https://search.google.com/local/reviews?placeid=${location.googlePlaceId}`}
+              variant="outline"
+            >
+              {ratingStats.viewAllLabel}
+            </Button>
+            <Button
+              href={`https://search.google.com/local/writereview?placeid=${location.googlePlaceId}`}
+              variant="primary"
+            >
+              {ratingStats.leaveReviewLabel}
+            </Button>
+          </div>
         </div>
       </section>
     </div>
