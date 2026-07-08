@@ -18,6 +18,10 @@ export type CheffyEmotion = MascotPhase | "happy" | "waving" | "typing" | "confu
 
 export const SESSION_INTRO_KEY = "cheffy_has_entered";
 
+/** Fully off-screen to the right — used for CSS first paint and GSAP intro start. */
+export const MASCOT_HIDDEN_X = "100%";
+export const MASCOT_HIDDEN_TRANSFORM = "translate3d(100%, 0, 0)";
+
 export const INTRO_DELAY_MS = 2000;
 export const INTRO_BUBBLE_MS = 3500;
 export const INTRO_BUBBLE_TEXT =

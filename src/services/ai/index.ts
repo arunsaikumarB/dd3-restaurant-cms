@@ -24,6 +24,10 @@ export {
   enrichAIRequest,
 } from "./context";
 export {
+  orchestrateAIRequest,
+  enrichAIRequestWithOrchestrator,
+} from "./orchestrator";
+export {
   AIProviderError,
   CHEFFY_KITCHEN_ERROR,
   isAbortError,

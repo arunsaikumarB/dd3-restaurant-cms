@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+} from "react";
 import { useLocation } from "react-router-dom";
 import { LOCATION_IDS, type LocationId } from "../../../config/locations";
 import { useLocationSelection } from "../../../context/LocationContext";
@@ -13,6 +20,7 @@ import {
   INTRO_BUBBLE_TEXT,
   INTRO_DELAY_MS,
   locationWelcomeMessage,
+  MASCOT_HIDDEN_TRANSFORM,
   normalizeEmotion,
   pickThinkingMessage,
   SESSION_INTRO_KEY,
@@ -52,9 +60,10 @@ export function useCheffy({
   const introTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevLocationRef = useRef<LocationId | null>(null);
 
-  const [phase, setPhase] = useState<MascotPhase>("hidden");
-  const [isReady, setIsReady] = useState(false);
-  const [entranceDone, setEntranceDone] = useState(() => readSessionFlag(SESSION_INTRO_KEY));
+  const sessionIntroDone = readSessionFlag(SESSION_INTRO_KEY);
+  const [phase, setPhase] = useState<MascotPhase>(sessionIntroDone ? "idle" : "hidden");
+  const [isReady, setIsReady] = useState(sessionIntroDone);
+  const [entranceDone, setEntranceDone] = useState(sessionIntroDone);
   const [thinkingLabel, setThinkingLabel] = useState<string | null>(null);
 
   const onLocationSite =
@@ -80,12 +89,11 @@ export function useCheffy({
     startedRef.current = true;
 
     const { CheffyAnimator } = await loadAnimator();
-    const animator = new CheffyAnimator(anchorRef.current);
+    const introDone = readSessionFlag(SESSION_INTRO_KEY);
+    const animator = new CheffyAnimator(anchorRef.current, { startHidden: !introDone });
     animatorRef.current = animator;
 
-    const sessionIntroDone = readSessionFlag(SESSION_INTRO_KEY);
-
-    if (sessionIntroDone) {
+    if (introDone) {
       animator.placeHome();
       setPhase("idle");
       setEntranceDone(true);
@@ -104,6 +112,10 @@ export function useCheffy({
     }, INTRO_DELAY_MS);
   }, [finishIntro, loadAnimator, onLocationSite, onShowBubble]);
 
+  const applyHiddenTransform = useCallback((node: HTMLButtonElement) => {
+    node.style.transform = MASCOT_HIDDEN_TRANSFORM;
+  }, []);
+
   const setAnchorRef = useCallback(
     (node: HTMLButtonElement | null) => {
       anchorRef.current = node;
@@ -114,10 +126,21 @@ export function useCheffy({
         startedRef.current = false;
         return;
       }
+      if (!readSessionFlag(SESSION_INTRO_KEY)) {
+        applyHiddenTransform(node);
+      }
       if (onLocationSite) void startAnimator();
     },
-    [onLocationSite, startAnimator],
+    [applyHiddenTransform, onLocationSite, startAnimator],
   );
+
+  useLayoutEffect(() => {
+    const node = anchorRef.current;
+    if (!node || !onLocationSite || readSessionFlag(SESSION_INTRO_KEY)) return;
+    if (phase === "hidden" && !animatorRef.current) {
+      applyHiddenTransform(node);
+    }
+  }, [applyHiddenTransform, onLocationSite, phase]);
 
   useEffect(() => {
     if (!onLocationSite) {

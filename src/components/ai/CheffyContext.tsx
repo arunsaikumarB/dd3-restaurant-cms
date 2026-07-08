@@ -13,11 +13,11 @@ import {
 import { DEFAULT_PUBLIC_LOCATION_ID, type LocationId } from "../../config/locations";
 import { useLocationSelection } from "../../context/LocationContext";
 import {
-  enrichAIRequest,
   isAbortError,
   streamResponse,
   CHEFFY_KITCHEN_ERROR,
 } from "../../services/ai";
+import { enrichAIRequestWithOrchestrator } from "../../services/ai/orchestrator";
 import {
   getOrCreateConversationId,
   readSessionPreferences,
@@ -225,7 +225,7 @@ export function AIProvider({ children }: { children: ReactNode }) {
         sessionPrefsRef.current = updateGuestProfileFromMessage(trimmed, sessionPrefsRef.current);
         writeSessionPreferences(sessionPrefsRef.current);
 
-        const aiRequest = enrichAIRequest(
+        const aiRequest = await enrichAIRequestWithOrchestrator(
           {
             message: trimmed,
             history: historyForAI,

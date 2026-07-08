@@ -62,7 +62,6 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   will-change: transform;
-  transform: translate3d(0, 0, 0);
   transform-origin: bottom center;
   min-width: 48px;
   min-height: 48px;
@@ -76,6 +75,13 @@
 
 .cheffy-float--peek {
   pointer-events: none;
+}
+
+/* First paint: fully off-screen before GSAP loads — no idle-position flash */
+.cheffy-anchor[data-phase="hidden"] .cheffy-float {
+  transform: translate3d(100%, 0, 0);
+  pointer-events: none;
+  cursor: default;
 }
 
 .cheffy-float--hover .cheffy-mascot-img {

@@ -1,8 +1,8 @@
 import { gsap } from "gsap";
-import type { MascotPhase } from "./CheffyMascotState";
+import { MASCOT_HIDDEN_X, type MascotPhase } from "./CheffyMascotState";
 
 const PEEK_X = "38%";
-const HIDDEN_X = "88%";
+const HIDDEN_X = MASCOT_HIDDEN_X;
 
 function prefersReducedMotion(): boolean {
   return (
@@ -28,10 +28,15 @@ export class CheffyAnimator {
   private paused = false;
   private phase: MascotPhase = "hidden";
 
-  constructor(anchor: HTMLElement) {
+  constructor(anchor: HTMLElement, options?: { startHidden?: boolean }) {
     this.anchor = anchor;
     this.img = anchor.querySelector(".cheffy-mascot-img");
     this.fxLayers = Array.from(anchor.querySelectorAll(".cheffy-mascot-fx"));
+
+    if (options?.startHidden && !prefersReducedMotion()) {
+      gsap.set(this.anchor, { x: HIDDEN_X, y: 0, rotation: 0, scale: 1, force3D: true });
+      this.setPhase("hidden");
+    }
   }
 
   getPhase(): MascotPhase {

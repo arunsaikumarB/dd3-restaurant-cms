@@ -491,11 +491,11 @@ export async function runAISandbox(input: {
   const conversationId = `sandbox-${crypto.randomUUID()}`;
 
   const { buildCMSKnowledge } = await import("../cms/knowledge");
-  const { enrichAIRequest } = await import("../ai/context");
+  const { enrichAIRequestWithOrchestrator } = await import("../ai/orchestrator");
   const { CONCIERGE_API_PATH } = await import("../ai/providers/providerTypes");
 
   const knowledge = await buildCMSKnowledge(input.locationId as never);
-  const request = enrichAIRequest(
+  const request = await enrichAIRequestWithOrchestrator(
     { message: input.message, history: [], conversationId },
     knowledge,
   );

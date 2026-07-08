@@ -12,6 +12,7 @@ import {
   LogIn,
   PlugZap,
   Bot,
+  BookOpen,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -49,6 +50,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     items: [
       { label: "ChefGaa Integration", path: "/admin/integrations/chefgaa", icon: PlugZap },
       { label: "AI Concierge", path: "/admin/integrations/ai-concierge", icon: Bot },
+      { label: "Knowledge Base", path: "/admin/integrations/knowledge-base", icon: BookOpen },
     ],
   },
   {
