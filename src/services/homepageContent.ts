@@ -216,17 +216,6 @@ export async function fetchHomepageContentPublic(
   return data;
 }
 
-const LOCAL_SECTION_IDS = new Set(["testimonials", "gallery", "footer"]);
-
-export function getLocalHomepageSections(): HomepageSection[] {
-  return HOMEPAGE_SECTIONS.filter((section) => LOCAL_SECTION_IDS.has(section.id)).map(
-    (section) => ({
-      ...section,
-      fields: section.fields.map((field) => ({ ...field })),
-    }),
-  );
-}
-
 export function buildSectionsFromForm(form: HomepageContentForm): HomepageSection[] {
   const heroTemplate = HOMEPAGE_SECTIONS.find((section) => section.id === "hero");
   const featuredTemplate = HOMEPAGE_SECTIONS.find((section) => section.id === "featured");

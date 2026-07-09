@@ -21,10 +21,8 @@ import {
 import { useAdminTheme } from "../context/AdminThemeContext";
 import { useLocation } from "../hooks/useLocation";
 import { HOMEPAGE_SECTIONS } from "../data/mock";
-import type { HomepageSection } from "../types";
 import {
   buildSectionsFromForm,
-  getLocalHomepageSections,
   getOrCreateHomepageContent,
   patchFormFromField,
   rowToForm,
@@ -121,7 +119,6 @@ export default function HomepageManagementPage() {
   const { dark } = useAdminTheme();
   const { locationId, isAllLocations, scope } = useLocation();
   const [form, setForm] = useState<HomepageContentForm | null>(null);
-  const [localSections, setLocalSections] = useState<HomepageSection[]>(getLocalHomepageSections);
   const [activeId, setActiveId] = useState<string>("hero");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -134,33 +131,38 @@ export default function HomepageManagementPage() {
   });
 
   const savedFormRef = useRef<HomepageContentForm | null>(null);
-  const savedLocalSectionsRef = useRef<HomepageSection[]>(getLocalHomepageSections());
 
   const showToast = useCallback((message: string, variant: "success" | "error" = "success") => {
     setToast({ open: true, message, variant });
   }, []);
 
+  // Interleaved to match the homepage's actual visual section order — the
+  // legacy "featured" (About heading/lead) tab sits between Offers Teaser
+  // and About — Story & Features, since both control the same on-page section.
   const sidebarTabs = useMemo<SidebarTab[]>(() => {
     const heroTab: SidebarTab = { id: "hero", label: "Hero Banner", kind: "legacy" };
-    const pageContentTabs: SidebarTab[] = HOME_PAGE_CONTENT_SECTION_ORDER.map((section) => ({
-      id: buildPageContentTabId(section),
-      label: HOME_PAGE_CONTENT_TAB_LABELS[section],
-      kind: "page_content",
-    }));
-    const featuredTab: SidebarTab = { id: "featured", label: "Featured Dishes", kind: "legacy" };
-    const localTabs: SidebarTab[] = localSections.map((section) => ({
-      id: section.id,
-      label: section.label,
-      kind: "legacy",
-    }));
+    const featuredTab: SidebarTab = { id: "featured", label: "About — Heading & Lead", kind: "legacy" };
     const seoTab: SidebarTab = { id: SEO_TAB_ID, label: "SEO", kind: "seo" };
-    return [heroTab, ...pageContentTabs, featuredTab, ...localTabs, seoTab];
-  }, [localSections]);
+
+    const tabs: SidebarTab[] = [heroTab];
+    for (const section of HOME_PAGE_CONTENT_SECTION_ORDER) {
+      tabs.push({
+        id: buildPageContentTabId(section),
+        label: HOME_PAGE_CONTENT_TAB_LABELS[section],
+        kind: "page_content",
+      });
+      if (section === "offers_teaser") {
+        tabs.push(featuredTab);
+      }
+    }
+    tabs.push(seoTab);
+    return tabs;
+  }, []);
 
   const legacySections = useMemo(() => {
     if (!form) return HOMEPAGE_SECTIONS;
-    return [...buildSectionsFromForm(form), ...localSections];
-  }, [form, localSections]);
+    return buildSectionsFromForm(form);
+  }, [form]);
 
   const activeLegacy = legacySections.find((section) => section.id === activeId);
   const activePageContentSection = isPageContentTabId(activeId)
@@ -195,23 +197,7 @@ export default function HomepageManagementPage() {
   }, [loadContent, scope]);
 
   const updateField = (sectionId: string, key: string, value: string) => {
-    if (sectionId === "hero" || sectionId === "featured") {
-      setForm((prev) => (prev ? patchFormFromField(prev, sectionId, key, value) : prev));
-      return;
-    }
-
-    setLocalSections((prev) =>
-      prev.map((section) =>
-        section.id === sectionId
-          ? {
-              ...section,
-              fields: section.fields.map((field) =>
-                field.key === key ? { ...field, value } : field,
-              ),
-            }
-          : section,
-      ),
-    );
+    setForm((prev) => (prev ? patchFormFromField(prev, sectionId, key, value) : prev));
   };
 
   const uploadMedia = async (file: File, folder: "hero-image" | "hero-video") => {
@@ -242,10 +228,6 @@ export default function HomepageManagementPage() {
       const nextForm = rowToForm(updated);
       setForm(nextForm);
       savedFormRef.current = nextForm;
-      savedLocalSectionsRef.current = localSections.map((section) => ({
-        ...section,
-        fields: section.fields.map((field) => ({ ...field })),
-      }));
       setFieldErrors({});
       showToast("Homepage content saved successfully.");
     } catch (err) {
@@ -259,12 +241,6 @@ export default function HomepageManagementPage() {
     if (savedFormRef.current) {
       setForm({ ...savedFormRef.current });
     }
-    setLocalSections(
-      savedLocalSectionsRef.current.map((section) => ({
-        ...section,
-        fields: section.fields.map((field) => ({ ...field })),
-      })),
-    );
     setFieldErrors({});
   };
 
@@ -276,7 +252,7 @@ export default function HomepageManagementPage() {
         />
         <PageHeader
           title="Homepage Management"
-          description="Edit hero, featured sections, and footer content."
+          description="Edit the hero, page sections, and SEO for the homepage."
         />
         <HomepagePageSkeleton />
       </div>
@@ -291,7 +267,7 @@ export default function HomepageManagementPage() {
         />
         <PageHeader
           title="Homepage Management"
-          description="Edit hero, featured sections, and footer content."
+          description="Edit the hero, page sections, and SEO for the homepage."
         />
         <AdminCard>
           <p className="text-sm text-admin-muted">
@@ -310,7 +286,7 @@ export default function HomepageManagementPage() {
         />
         <PageHeader
           title="Homepage Management"
-          description="Edit hero, featured sections, and footer content."
+          description="Edit the hero, page sections, and SEO for the homepage."
         />
         <AdminCard>
           <p className="text-sm text-admin-danger">{loadError ?? "Unable to load homepage content."}</p>
@@ -334,7 +310,7 @@ export default function HomepageManagementPage() {
       />
       <PageHeader
         title="Homepage Management"
-        description="Edit hero, featured sections, and footer content."
+        description="Edit the hero, page sections, and SEO for the homepage."
       />
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">

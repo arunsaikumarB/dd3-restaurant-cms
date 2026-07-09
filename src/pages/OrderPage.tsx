@@ -9,6 +9,7 @@ import { buildLocationOrderMenuUrl } from "../constants/ordering";
 import { useLocationSelection } from "../context/LocationContext";
 import { usePageContent } from "../context/PageContentContext";
 import { useHomepageData } from "../hooks/useHomepageData";
+import { useSectionImage } from "../hooks/useGallerySection";
 import { resolveOrderUrl } from "../utils/locationLinks";
 import { locPath } from "../utils/locationPaths";
 import "../components/order/order.css";
@@ -55,14 +56,21 @@ const ORDER_OPTIONS_FALLBACK = {
 
 export default function OrderPage() {
   const [searchParams] = useSearchParams();
-  const { fetchSection } = usePageContent();
+  const { fetchSection, interpolate } = usePageContent();
   const { selectedLocation, selectedLocationId, setLocation } = useLocationSelection();
   const { bundle, locationId: bundleLocationId } = useHomepageData();
   const orderSectionRef = useRef<HTMLElement>(null);
+  const heroBackground = useSectionImage("order_hero", "/showcase/biryani.webp");
 
   const queryLocationId = parseLocationId(searchParams.get("location"));
   const offerCategory = searchParams.get("category")?.trim() ?? "";
 
+  const hero = fetchSection("order", "hero", {
+    label: "Order Online",
+    title: "Order Online",
+    subtitleTemplate:
+      "Order authentic Indian food from Desi Dhamaka {location}. Choose pickup or delivery — freshly prepared, delivered your way.",
+  });
   const orderOptionsContent = fetchSection("order", "order_options", ORDER_OPTIONS_FALLBACK);
 
   useEffect(() => {
@@ -140,10 +148,10 @@ export default function OrderPage() {
   return (
     <div className="order-page">
       <PageHero
-        label="Order Online"
-        title="Order Online"
-        subtitle={`Order authentic Indian food from Desi Dhamaka${selectedLocation ? ` ${selectedLocation.shortName}` : ""}. Choose pickup or delivery — freshly prepared, delivered your way.`}
-        backgroundImage="/showcase/biryani.webp"
+        label={hero.label}
+        title={hero.title}
+        subtitle={interpolate(hero.subtitleTemplate)}
+        backgroundImage={heroBackground}
         backgroundVideo="/media/hero.mp4"
         breadcrumbItems={[
           { label: "Home", to: locPath(selectedLocationId, "/") },

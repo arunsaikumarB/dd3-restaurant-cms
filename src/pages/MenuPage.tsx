@@ -9,6 +9,7 @@ import {
   MenuToolbarSkeleton,
 } from "../components/menu/MenuSkeleton";
 import SearchBar from "../components/menu/SearchBar";
+import CTASection from "../components/ui/CTASection";
 import { NAV_BAR_HEIGHT } from "../constants/navigation";
 import {
   isDirectOrderingMode,
@@ -21,6 +22,7 @@ import { useMenuData } from "../hooks/useMenuData";
 import { filterMenuData, flattenItems } from "../utils/menu";
 import { useLocationSelection } from "../context/LocationContext";
 import { useSectionImage } from "../hooks/useGallerySection";
+import { isExternalUrl } from "../utils/locationLinks";
 
 export default function MenuPage() {
   const { fetchSection, interpolate } = usePageContent();
@@ -50,6 +52,11 @@ export default function MenuPage() {
     noResultsBody: "Try a different search term or category filter.",
   });
   const heroSubtitle = interpolate(hero.subtitleTemplate);
+  const cta = fetchSection("menu", "cta", {
+    title: "Ready to Experience Desi Dhamaka?",
+    subtitle: "Reserve Your Table Today",
+    cta: { label: "Reserve Now", url: "/reservation" },
+  });
 
   const filteredCategories = useMemo(() => {
     if (!data) return [];
@@ -197,6 +204,16 @@ export default function MenuPage() {
             ))}
           </div>
         )}
+      </section>
+
+      <section className="mx-auto max-w-[1400px] px-6 pb-24 md:px-10 lg:px-16">
+        <CTASection
+          title={cta.title}
+          subtitle={cta.subtitle}
+          buttonLabel={cta.cta.label}
+          buttonTo={isExternalUrl(cta.cta.url) ? undefined : cta.cta.url}
+          buttonHref={isExternalUrl(cta.cta.url) ? cta.cta.url : undefined}
+        />
       </section>
     </div>
   );

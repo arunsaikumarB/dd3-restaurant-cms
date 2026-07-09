@@ -1,14 +1,15 @@
 import type { PageContentPageKey } from "../../config/pageContentSchema";
 import type { SeoPageKey } from "../../types/seoMetadata";
 
+/** Matches the actual visual order sections appear in on the homepage. */
 export const HOME_PAGE_CONTENT_SECTION_ORDER = [
   "hero_ui",
   "entrance",
   "experience",
-  "about_extended",
-  "catering_overlay",
   "signature",
   "offers_teaser",
+  "about_extended",
+  "catering_overlay",
   "ambience",
 ] as const;
 
@@ -57,11 +58,11 @@ export function buildPageContentTabId(section: string): string {
 
 export const HOME_PAGE_CONTENT_TAB_LABELS: Record<HomePageContentSectionKey, string> = {
   hero_ui: "Hero UI",
-  entrance: "Entrance",
+  entrance: "Entrance (currently unused — see note)",
   experience: "Experience Cards",
-  about_extended: "About Section",
-  catering_overlay: "Catering Overlay",
-  signature: "Signature",
+  signature: "Signature Dishes",
   offers_teaser: "Offers Teaser",
+  about_extended: "About — Story & Features",
+  catering_overlay: "Catering Overlay",
   ambience: "Ambience",
 };

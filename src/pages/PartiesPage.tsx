@@ -32,7 +32,7 @@ export default function PartiesPage() {
       "From intimate dinners to grand celebrations, our private party experience combines exceptional cuisine with impeccable service.",
   });
   const eventsContent = fetchSection("parties", "events", {
-    items: EVENTS.map(({ title, text }) => ({ title, text })),
+    items: EVENTS.map(({ title, text, icon }) => ({ title, text, icon })),
   });
   const galleryHeading = fetchSection("parties", "gallery_heading", {
     eyebrow: "Gallery",
@@ -44,9 +44,9 @@ export default function PartiesPage() {
     cta: { label: "Book Now", url: "/contact" },
   });
 
-  const mergedEvents = eventsContent.items.map((item, index) => ({
+  const mergedEvents = eventsContent.items.map((item) => ({
     ...item,
-    icon: EVENTS[index]?.icon ?? "◈",
+    icon: item.icon || "◈",
   }));
 
   const heroBackground = useSectionImage("parties_hero", "/showcase/desserts-falooda.webp");
