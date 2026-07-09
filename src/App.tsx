@@ -28,7 +28,6 @@ const AdminSeoSummaryPage = lazy(() => import("./admin/pages/SeoSummaryPage"));
 const AdminOffersPage = lazy(() => import("./admin/pages/OffersManagementPage"));
 const AdminGalleryPage = lazy(() => import("./admin/pages/GalleryPage"));
 const AdminChefGaaIntegrationPage = lazy(() => import("./admin/pages/ChefGaaIntegrationPage"));
-const AdminReviewsPage = lazy(() => import("./admin/pages/ReviewsPage"));
 const AdminSettingsPage = lazy(() => import("./admin/pages/SettingsPage"));
 const AdminProfilePage = lazy(() => import("./admin/pages/ProfilePage"));
 
@@ -290,7 +289,6 @@ export default function App() {
           <Route path="offers" element={<AdminOffersPage />} />
           <Route path="gallery" element={<AdminGalleryPage />} />
           <Route path="integrations/chefgaa" element={<AdminChefGaaIntegrationPage />} />
-          <Route path="reviews" element={<AdminReviewsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="profile" element={<AdminProfilePage />} />
         </Route>
