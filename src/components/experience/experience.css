@@ -246,9 +246,10 @@
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.82) 0%,
-    rgba(0, 0, 0, 0.45) 38%,
-    rgba(0, 0, 0, 0.08) 62%,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.72) 32%,
+    rgba(0, 0, 0, 0.42) 55%,
+    rgba(0, 0, 0, 0.12) 75%,
     transparent 100%
   );
   pointer-events: none;
@@ -283,10 +284,11 @@
 
 .experience-card__label {
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(201, 122, 43, 0.9);
+  color: #f0b673;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85), 0 1px 12px rgba(0, 0, 0, 0.5);
 }
 
 .experience-card__headline {
@@ -297,6 +299,7 @@
   letter-spacing: -0.01em;
   color: #f8f5f0;
   text-wrap: balance;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 1px 16px rgba(0, 0, 0, 0.5);
 }
 
 .experience-card__title {
@@ -307,51 +310,15 @@
   color: #f8f5f0;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 1px 16px rgba(0, 0, 0, 0.5);
 }
 
 .experience-card__subtitle {
   font-size: 13px;
   line-height: 1.55;
-  color: rgba(248, 245, 240, 0.6);
+  color: rgba(248, 245, 240, 0.85);
   max-width: 95%;
-}
-
-.experience-card__meta {
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: rgba(248, 245, 240, 0.45);
-  margin-top: 0.25rem;
-}
-
-/* Favourites row (left card) */
-.experience-card__favourites {
-  margin-top: 0.75rem;
-  width: 100%;
-}
-
-.experience-card__fav-label {
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(248, 245, 240, 0.45);
-  margin-bottom: 0.5rem;
-}
-
-.experience-card__fav-row {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.experience-card__fav-row img {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  pointer-events: none;
-  user-select: none;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75), 0 1px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* Buttons — visual only; entire card is the link */

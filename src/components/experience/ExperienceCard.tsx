@@ -12,8 +12,6 @@ export interface ExperienceCardProps {
   buttonText: string;
   link: string;
   external?: boolean;
-  favourites?: { src: string; alt: string }[];
-  meta?: string;
   rotation: {
     rotateY: number;
     rotateZ: number;
@@ -40,8 +38,6 @@ export default function ExperienceCard({
   buttonText,
   link,
   external = false,
-  favourites,
-  meta,
   rotation,
   isCenter = false,
   scrollDelay = 0,
@@ -112,27 +108,6 @@ export default function ExperienceCard({
             <h3 className="experience-card__title">{title}</h3>
           )}
           {subtitle && <p className="experience-card__subtitle">{subtitle}</p>}
-          {meta && <p className="experience-card__meta">{meta}</p>}
-
-          {favourites && favourites.length > 0 && (
-            <div className="experience-card__favourites">
-              <p className="experience-card__fav-label">Our Favourites</p>
-              <div className="experience-card__fav-row">
-                {favourites.map((fav) => (
-                  <img
-                    key={fav.src}
-                    src={fav.src}
-                    alt={fav.alt}
-                    width={52}
-                    height={52}
-                    loading="lazy"
-                    decoding="async"
-                    draggable={false}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         <span className="experience-card__btn experience-card__btn--solid">

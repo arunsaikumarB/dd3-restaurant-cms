@@ -40,28 +40,14 @@ const EXPERIENCE_FALLBACK = {
 
 export interface ExperienceCardsProps {
   restaurantName?: string;
-  hoursLabel?: string;
-  phone?: string;
-  email?: string;
   address?: string;
-  facebook?: string;
-  instagram?: string;
-  youtube?: string;
-  mapsUrl?: string;
   orderCtaText?: string;
   orderCtaLink?: string;
 }
 
 export default function ExperienceCards({
   restaurantName = SITE.name,
-  hoursLabel = `${SITE.hours[0].days} · ${SITE.hours[0].time}`,
-  phone,
-  email,
   address,
-  facebook,
-  instagram,
-  youtube,
-  mapsUrl,
   orderCtaText = "Order Now",
   orderCtaLink = ORDER_URL,
 }: ExperienceCardsProps) {
@@ -74,17 +60,6 @@ export default function ExperienceCards({
   const visitImage = useSectionImage("choose_experience_visit", "/frames/frame_0060.webp");
 
   const cards = useMemo(() => {
-    const socialMeta = [
-      instagram ? "Instagram" : null,
-      facebook ? "Facebook" : null,
-      youtube ? "YouTube" : null,
-    ]
-      .filter(Boolean)
-      .join(" · ");
-    const reservationMeta = [hoursLabel, phone, email, socialMeta, mapsUrl ? "Google Maps" : null]
-      .filter(Boolean)
-      .join(" · ");
-
     return [
       {
         label: experience.menuCardLabel,
@@ -94,11 +69,6 @@ export default function ExperienceCards({
         imageAlt: "Premium biryani from Desi Dhamaka",
         buttonText: experience.menuCardCta.label,
         link: experience.menuCardCta.url,
-        favourites: [
-          { src: "/showcase/biryani.webp", alt: "Biryani" },
-          { src: "/showcase/butter-chicken.webp", alt: "Butter chicken" },
-          { src: "/showcase/desserts-falooda.webp", alt: "Desserts" },
-        ],
         rotation: { rotateY: -14, rotateZ: -3, translateY: 12 },
         scrollDelay: 200,
       },
@@ -119,7 +89,6 @@ export default function ExperienceCards({
         label: experience.reservationCardLabel,
         headline: experience.reservationCardHeadline,
         subtitle: address || experience.reservationCardSubtitleFallback,
-        meta: reservationMeta,
         image: visitImage,
         imageAlt: "Desi Dhamaka restaurant interior",
         buttonText: experience.reservationCardCta.label,
@@ -128,7 +97,7 @@ export default function ExperienceCards({
         scrollDelay: 400,
       },
     ];
-  }, [restaurantName, hoursLabel, phone, email, address, facebook, instagram, youtube, mapsUrl, orderCtaText, orderCtaLink, menuImage, orderImage, visitImage, experience, interpolate]);
+  }, [restaurantName, address, orderCtaText, orderCtaLink, menuImage, orderImage, visitImage, experience, interpolate]);
 
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
@@ -198,11 +167,9 @@ export default function ExperienceCards({
                 title={card.title ?? card.headline ?? ""}
                 headline={card.headline}
                 subtitle={card.subtitle}
-                meta={card.meta}
                 image={card.image}
                 buttonText={card.buttonText}
                 link={card.link}
-                favourites={card.favourites}
                 rotation={card.rotation}
                 isCenter={card.isCenter}
                 scrollDelay={card.scrollDelay}
