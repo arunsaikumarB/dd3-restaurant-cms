@@ -29,7 +29,7 @@ functions = "C:\\Users\\LSITC210\\Downloads\\DD3 website AI\\netlify\\functions"
 [functions]
 
 [functions."*"]
-external_node_modules = ["@google-analytics/data"]
+external_node_modules = ["@google-analytics/data", "pdf-parse", "mammoth"]
 node_bundler = "esbuild"
 
 [[headers]]
