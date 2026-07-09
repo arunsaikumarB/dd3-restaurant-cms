@@ -24,6 +24,8 @@ export const ADMIN_PAGES_TAB_ORDER: Array<{ key: PageContentPageKey; label: stri
   { key: "contact", label: "Contact" },
   { key: "reservation", label: "Reservation" },
   { key: "order", label: "Order" },
+  { key: "privacy_policy", label: "Privacy Policy" },
+  { key: "terms_conditions", label: "Terms & Conditions" },
   { key: "global", label: "Global" },
 ];
 

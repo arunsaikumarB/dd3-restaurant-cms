@@ -17,7 +17,9 @@ export type PageContentPageKey =
   | "testimonials"
   | "contact"
   | "reservation"
-  | "order";
+  | "order"
+  | "privacy_policy"
+  | "terms_conditions";
 
 export type PageContentFieldType = "text" | "textarea" | "cta" | "list" | "image";
 
@@ -911,6 +913,72 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
     fields: [
       { key: "reserveTableLabel", label: "Reserve My Table", type: "text", maxLength: 30 },
       { key: "reserveOnlineLabel", label: "Reserve Online", type: "text", maxLength: 30 },
+    ],
+  },
+  {
+    page: "privacy_policy",
+    section: "hero",
+    label: "Privacy Policy Hero",
+    description: "Page hero (use {name} and {location} in the subtitle template).",
+    fields: [
+      { key: "label", label: "Label", type: "text", maxLength: 40 },
+      { key: "title", label: "Title", type: "text", maxLength: 60 },
+      { key: "subtitleTemplate", label: "Subtitle template", type: "textarea", maxLength: 300 },
+    ],
+  },
+  {
+    page: "privacy_policy",
+    section: "content",
+    label: "Policy Content",
+    description:
+      "Intro paragraph and body sections (use {name}, {location}, {address}, {year}, {email}, {phone}).",
+    fields: [
+      { key: "introTemplate", label: "Intro paragraph", type: "textarea", maxLength: 600 },
+      {
+        key: "sections",
+        label: "Sections",
+        type: "list",
+        itemLabel: "Section",
+        minItems: 1,
+        maxItems: 12,
+        fields: [
+          { key: "title", label: "Heading", type: "text", maxLength: 80 },
+          { key: "textTemplate", label: "Body text", type: "textarea", maxLength: 800 },
+        ],
+      },
+    ],
+  },
+  {
+    page: "terms_conditions",
+    section: "hero",
+    label: "Terms & Conditions Hero",
+    description: "Page hero (use {name} and {location} in the subtitle template).",
+    fields: [
+      { key: "label", label: "Label", type: "text", maxLength: 40 },
+      { key: "title", label: "Title", type: "text", maxLength: 60 },
+      { key: "subtitleTemplate", label: "Subtitle template", type: "textarea", maxLength: 300 },
+    ],
+  },
+  {
+    page: "terms_conditions",
+    section: "content",
+    label: "Terms Content",
+    description:
+      "Intro paragraph and body sections (use {name}, {location}, {year}, {email}, {phone}).",
+    fields: [
+      { key: "introTemplate", label: "Intro paragraph", type: "textarea", maxLength: 600 },
+      {
+        key: "sections",
+        label: "Sections",
+        type: "list",
+        itemLabel: "Section",
+        minItems: 1,
+        maxItems: 12,
+        fields: [
+          { key: "title", label: "Heading", type: "text", maxLength: 80 },
+          { key: "textTemplate", label: "Body text", type: "textarea", maxLength: 800 },
+        ],
+      },
     ],
   },
 ];
