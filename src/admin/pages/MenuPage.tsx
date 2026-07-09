@@ -421,9 +421,14 @@ export default function MenuManagementPage() {
       key: "badges",
       label: "Badges",
       render: (row: MenuItemTableRow) => (
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {row.popular && <AdminBadge variant="info">Popular</AdminBadge>}
           {row.chefSpecial && <AdminBadge variant="warning">Chef&apos;s Special</AdminBadge>}
+          {row.importedFromChefGaa && (
+            <AdminBadge variant={row.manualOverride ? "outline" : "success"}>
+              {row.manualOverride ? "🔒 Locked" : "ChefGaa Synced"}
+            </AdminBadge>
+          )}
         </div>
       ),
     },
@@ -771,6 +776,18 @@ function MenuForm({ form, fieldErrors, categoryOptions, disabled, onPatch, onUpl
           onChange={(checked) => patch({ chef_special: checked })}
           label="Chef's Special"
         />
+      </div>
+      <div>
+        <AdminToggle
+          checked={form.manual_override}
+          onChange={(checked) => patch({ manual_override: checked })}
+          label="Lock this item"
+        />
+        <p className="mt-1.5 text-xs text-admin-muted">
+          For items imported from ChefGaa: locking prevents the next automatic sync from
+          overwriting anything you edit here (name, price, image, Popular, Chef&apos;s Special,
+          etc.). Unlock to let ChefGaa resume controlling this item.
+        </p>
       </div>
     </div>
   );

@@ -7,9 +7,9 @@ import FeatureRow from "./FeatureRow";
 import { useLocationSelection } from "../../context/LocationContext";
 import { usePageContent } from "../../context/PageContentContext";
 import { useHomepageData } from "../../hooks/useHomepageData";
-import { useSignatureDishes } from "../../hooks/useSignatureDishes";
 import { resolveOrderUrl } from "../../utils/locationLinks";
-import { SIGNATURE_FEATURES } from "../../data/signatureDishes";
+import { SIGNATURE_DISHES, SIGNATURE_FEATURES } from "../../data/signatureDishes";
+import type { SignatureDish } from "../../data/signatureDishes";
 import "./signature.css";
 
 const CARD_WIDTH = 280;
@@ -22,8 +22,32 @@ const SIGNATURE_FALLBACK = {
   subtitle:
     "Discover our chef's most celebrated creations, prepared with authentic Indian flavours, premium ingredients, and unforgettable presentation.",
   viewMenuCta: { label: "View Full Menu", url: "/menu" },
+  dishes: SIGNATURE_DISHES.map(({ name, category, price, image, badge, category_name, item_name }) => ({
+    image,
+    name,
+    category,
+    price: String(price),
+    badge: badge ?? "",
+    category_name,
+    item_name,
+  })),
   features: SIGNATURE_FEATURES.map(({ title, description }) => ({ title, description })),
 };
+
+function toSignatureDishes(
+  items: (typeof SIGNATURE_FALLBACK)["dishes"],
+): SignatureDish[] {
+  return items.map((item, index) => ({
+    id: `${item.name}-${index}`,
+    name: item.name,
+    category: item.category,
+    category_name: item.category_name || "",
+    item_name: item.item_name || "",
+    price: Number.parseFloat(item.price) || 0,
+    image: item.image,
+    badge: item.badge || undefined,
+  }));
+}
 
 export default function SignatureCarousel() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -34,7 +58,7 @@ export default function SignatureCarousel() {
   const { fetchSection } = usePageContent();
   const signature = fetchSection("home", "signature", SIGNATURE_FALLBACK);
   const { bundle, locationId: bundleLocationId } = useHomepageData();
-  const { dishes } = useSignatureDishes(selectedLocationId);
+  const dishes = useMemo(() => toSignatureDishes(signature.dishes), [signature.dishes]);
   const orderBaseUrl = useMemo(
     () =>
       resolveOrderUrl(bundle.settings, selectedLocationId, bundleLocationId),

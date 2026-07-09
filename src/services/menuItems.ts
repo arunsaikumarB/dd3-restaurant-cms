@@ -17,6 +17,8 @@ export type MenuItemForm = {
   spice_level: number | null;
   status: ContentStatus;
   display_order: number;
+  /** When true, the ChefGaa sync leaves this item untouched entirely (all fields). */
+  manual_override: boolean;
 };
 
 export type MenuItemTableRow = {
@@ -37,6 +39,8 @@ export type MenuItemTableRow = {
   created_at: string;
   location_id?: LocationId;
   locationName?: string;
+  importedFromChefGaa: boolean;
+  manualOverride: boolean;
 };
 
 type MenuItemJoinRow = MenuItem & {
@@ -55,6 +59,7 @@ export const EMPTY_MENU_ITEM_FORM: MenuItemForm = {
   spice_level: null,
   status: "active",
   display_order: 0,
+  manual_override: false,
 };
 
 export function rowToForm(row: MenuItemTableRow): MenuItemForm {
@@ -70,6 +75,7 @@ export function rowToForm(row: MenuItemTableRow): MenuItemForm {
     spice_level: row.spice_level,
     status: row.status === "draft" ? "inactive" : row.status,
     display_order: row.display_order,
+    manual_override: row.manualOverride,
   };
 }
 
@@ -86,6 +92,7 @@ function formToUpdatePayload(form: MenuItemForm) {
     spice_level: form.spice_level,
     status: form.status === "draft" ? "inactive" : form.status,
     display_order: Math.round(form.display_order),
+    manual_override: form.manual_override,
   };
 }
 
@@ -115,6 +122,8 @@ function mapJoinRow(row: MenuItemJoinRow, locationId?: LocationId): MenuItemTabl
     created_at: row.created_at,
     location_id: row.location_id ?? locationId,
     locationName: locationId ? getLocationConfig(locationId).shortName : undefined,
+    importedFromChefGaa: row.imported_from_chefgaa ?? false,
+    manualOverride: row.manual_override ?? false,
   };
 }
 
