@@ -235,26 +235,10 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
         minItems: 1,
         maxItems: 10,
         fields: [
-          { key: "image", label: "Photo", type: "image" },
-          { key: "name", label: "Dish name", type: "text", maxLength: 60 },
-          { key: "category", label: "Category label", type: "text", maxLength: 40 },
-          { key: "price", label: "Price (e.g. 16.99)", type: "text", maxLength: 12 },
-          { key: "badge", label: "Badge (optional, e.g. Chef's Special)", type: "text", maxLength: 30 },
-          {
-            key: "category_name",
-            label: "Order link category (optional)",
-            type: "text",
-            maxLength: 80,
-            helpText:
-              "Exact category name as it appears in your online ordering menu, so this card links straight to the dish. Leave blank to link to the general order page instead.",
-          },
-          {
-            key: "item_name",
-            label: "Order link item (optional)",
-            type: "text",
-            maxLength: 80,
-            helpText: "Exact item name as it appears in your online ordering menu.",
-          },
+          { key: "image", label: "Photo", type: "image", required: true },
+          { key: "name", label: "Dish name", type: "text", maxLength: 60, required: true },
+          { key: "category", label: "Category", type: "text", maxLength: 40, required: true },
+          { key: "price", label: "Price (e.g. 16.99)", type: "text", maxLength: 12, required: true },
         ],
       },
       {

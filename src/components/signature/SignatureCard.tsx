@@ -1,10 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type { SignatureDish } from "../../data/signatureDishes";
-import {
-  buildChefGaaMenuUrl,
-  EXTERNAL_ORDER_LINK_PROPS,
-} from "../../constants/ordering";
+import { EXTERNAL_ORDER_LINK_PROPS } from "../../constants/ordering";
 import {
   DEFAULT_SHOWCASE_IMAGE,
   pickSignatureImage,
@@ -81,14 +78,6 @@ function SignatureCardComponent({
     setImageSrc(pickSignatureImage(dish.image, dish.category, dish.name));
   }, [dish.id, dish.image, dish.category, dish.name]);
 
-  const orderUrl = useMemo(
-    () =>
-      buildChefGaaMenuUrl(dish.category_name, dish.item_name, {
-        baseUrl: orderBaseUrl,
-      }),
-    [dish.category_name, dish.item_name, orderBaseUrl],
-  );
-
   const handleImageError = useCallback(() => {
     setImageSrc((current) =>
       current === fallbackSrc ? DEFAULT_SHOWCASE_IMAGE : fallbackSrc,
@@ -106,9 +95,9 @@ function SignatureCardComponent({
       }}
     >
       <a
-        href={orderUrl}
+        href={orderBaseUrl}
         className="signature-card"
-        aria-label={`Order ${dish.item_name} online`}
+        aria-label={`Order ${dish.name} online`}
         {...EXTERNAL_ORDER_LINK_PROPS}
       >
         <div className="signature-card__border" aria-hidden />
@@ -130,9 +119,6 @@ function SignatureCardComponent({
             <span className="text-saffron" aria-hidden>
               <DishIcon category={dish.category} />
             </span>
-            {dish.badge && (
-              <span className="signature-card__badge">{dish.badge}</span>
-            )}
           </div>
           <h3 className="signature-card__name">{dish.name}</h3>
           <p className="signature-card__category">{dish.category}</p>

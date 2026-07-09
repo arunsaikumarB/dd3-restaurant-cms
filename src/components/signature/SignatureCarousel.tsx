@@ -22,14 +22,11 @@ const SIGNATURE_FALLBACK = {
   subtitle:
     "Discover our chef's most celebrated creations, prepared with authentic Indian flavours, premium ingredients, and unforgettable presentation.",
   viewMenuCta: { label: "View Full Menu", url: "/menu" },
-  dishes: SIGNATURE_DISHES.map(({ name, category, price, image, badge, category_name, item_name }) => ({
+  dishes: SIGNATURE_DISHES.map(({ name, category, price, image }) => ({
     image,
     name,
     category,
     price: String(price),
-    badge: badge ?? "",
-    category_name,
-    item_name,
   })),
   features: SIGNATURE_FEATURES.map(({ title, description }) => ({ title, description })),
 };
@@ -41,11 +38,8 @@ function toSignatureDishes(
     id: `${item.name}-${index}`,
     name: item.name,
     category: item.category,
-    category_name: item.category_name || "",
-    item_name: item.item_name || "",
     price: Number.parseFloat(item.price) || 0,
     image: item.image,
-    badge: item.badge || undefined,
   }));
 }
 
