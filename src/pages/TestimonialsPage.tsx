@@ -3,6 +3,7 @@ import PageHero from "../components/ui/PageHero";
 import SectionHeading from "../components/ui/SectionHeading";
 import AnimatedContainer from "../components/ui/AnimatedContainer";
 import Button from "../components/ui/Button";
+import CTASection from "../components/ui/CTASection";
 import { ReviewsGridSkeleton } from "../components/testimonials/TestimonialsPageSkeleton";
 import { usePageContent } from "../context/PageContentContext";
 import { useLocationSelection } from "../context/LocationContext";
@@ -10,6 +11,7 @@ import { getLocationConfig, resolvePublicLocationId } from "../config/locations"
 import { useReviewsData } from "../hooks/useReviewsData";
 import { useGoogleRatingStats } from "../hooks/useGoogleRatingStats";
 import { useSectionImage } from "../hooks/useGallerySection";
+import { isExternalUrl } from "../utils/locationLinks";
 
 function AnimatedRating({ value }: { value: number }) {
   const [display, setDisplay] = useState(0);
@@ -59,7 +61,6 @@ export default function TestimonialsPage() {
       "Stories from guests who have experienced the warmth, flavour and hospitality of Desi Dhamaka.",
   });
   const ratingStats = fetchSection("testimonials", "rating_stats", {
-    averageLabel: "Average Rating",
     ratingValue: "4.9",
     reviewCountText: "Based on 500+ Google Reviews",
     verifiedBadge: "Google Verified",
@@ -74,6 +75,11 @@ export default function TestimonialsPage() {
   const emptyStates = fetchSection("testimonials", "empty_states", {
     gridTitle: "No reviews yet",
     gridBody: "Be the first to share your experience with us.",
+  });
+  const cta = fetchSection("testimonials", "cta", {
+    title: "Join Our Community of Happy Guests",
+    subtitle: "Reserve your table and create your own memorable experience.",
+    cta: { label: "Reserve Now", url: "/reservation" },
   });
   const ratingValue = googleRating?.rating ?? (Number.parseFloat(ratingStats.ratingValue) || 4.9);
   const reviewCountText = googleRating
@@ -216,6 +222,16 @@ export default function TestimonialsPage() {
             </Button>
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto max-w-[1400px] px-6 pb-24 md:px-10 lg:px-16">
+        <CTASection
+          title={cta.title}
+          subtitle={cta.subtitle}
+          buttonLabel={cta.cta.label}
+          buttonTo={isExternalUrl(cta.cta.url) ? undefined : cta.cta.url}
+          buttonHref={isExternalUrl(cta.cta.url) ? cta.cta.url : undefined}
+        />
       </section>
     </div>
   );

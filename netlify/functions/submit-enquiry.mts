@@ -1,5 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
+import nodemailer from "nodemailer";
 import { DEFAULT_PUBLIC_LOCATION_ID, getLocationConfig, isLocationId } from "../../src/config/locations";
+import { buildEnquiryRecipients } from "../../src/config/enquiryRecipients";
 import type { Database } from "../../src/types/database";
 
 type HttpEvent = {
@@ -105,20 +107,25 @@ async function insertEnquiry(data: ReturnType<typeof validateBody> & { ok: true 
 }
 
 async function sendEnquiryEmail(data: ReturnType<typeof validateBody> & { ok: true }) {
-  const apiKey = readEnv("RESEND_API_KEY");
-  if (!apiKey) return;
+  const smtpHost = readEnv("SMTP_HOST");
+  const smtpUser = readEnv("SMTP_USER");
+  const smtpPassword = readEnv("SMTP_PASSWORD");
+  if (!smtpHost || !smtpUser || !smtpPassword) return;
 
-  const fromEmail = readEnv("RESEND_FROM_EMAIL") || "onboarding@resend.dev";
-  const fallbackNotify = readEnv("ENQUIRY_NOTIFY_EMAIL") || "desidhamaka3marketing@gmail.com";
-  const location = getLocationConfig(
-    isLocationId(data.data.location_id!) ? data.data.location_id! : DEFAULT_PUBLIC_LOCATION_ID,
-  );
-  const toEmail = location.email || fallbackNotify;
+  const smtpPort = Number(readEnv("SMTP_PORT")) || 587;
+  const fromEmail = readEnv("SMTP_FROM") || smtpUser;
+  const testEmail = readEnv("ENQUIRY_NOTIFY_EMAIL") || smtpUser;
+  const locationId = isLocationId(data.data.location_id!)
+    ? data.data.location_id!
+    : DEFAULT_PUBLIC_LOCATION_ID;
+  const location = getLocationConfig(locationId);
+  const recipients = buildEnquiryRecipients(testEmail);
+  const toEmail = recipients[locationId][data.data.source!];
 
   const isCatering = data.data.source === "catering";
   const subject = isCatering
-    ? `Catering enquiry — ${location.shortName} — ${data.data.name}`
-    : `Contact enquiry — ${location.shortName} — ${data.data.name}`;
+    ? `New Catering Quote Request — ${location.shortName}`
+    : `New Contact Enquiry — ${location.shortName}`;
 
   const detailLines = [
     `Location: ${location.name}`,
@@ -134,24 +141,23 @@ async function sendEnquiryEmail(data: ReturnType<typeof validateBody> & { ok: tr
 
   detailLines.push("", "Message:", data.data.message);
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: fromEmail,
-      to: [toEmail],
-      reply_to: data.data.email,
-      subject,
-      text: detailLines.join("\n"),
-    }),
+  const transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465,
+    auth: { user: smtpUser, pass: smtpPassword },
   });
 
-  if (!response.ok) {
-    const text = await response.text().catch(() => "");
-    console.error("Resend email failed:", text);
+  try {
+    await transporter.sendMail({
+      from: fromEmail,
+      to: toEmail,
+      replyTo: data.data.email,
+      subject,
+      text: detailLines.join("\n"),
+    });
+  } catch (err) {
+    console.error("SMTP email failed:", err instanceof Error ? err.message : err);
   }
 }
 

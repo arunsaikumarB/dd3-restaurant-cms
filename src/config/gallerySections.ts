@@ -6,7 +6,8 @@ export type GalleryPageKey =
   | "catering"
   | "parties"
   | "testimonials"
-  | "contact";
+  | "contact"
+  | "order";
 
 export type GallerySectionKey =
   | "hero_background"
@@ -33,6 +34,7 @@ export type GallerySectionKey =
   | "parties_gallery"
   | "testimonials_hero"
   | "contact_hero"
+  | "order_hero"
   | "general";
 
 export interface GallerySectionDefinition {
@@ -199,6 +201,13 @@ export const GALLERY_PAGE_SECTIONS: GalleryPageDefinition[] = [
     label: "Contact",
     sections: [
       { key: "contact_hero", label: "Hero Background", description: "Contact page hero", maxImages: 1 },
+    ],
+  },
+  {
+    page: "order",
+    label: "Order",
+    sections: [
+      { key: "order_hero", label: "Hero Background", description: "Order Online page hero", maxImages: 1 },
     ],
   },
 ];

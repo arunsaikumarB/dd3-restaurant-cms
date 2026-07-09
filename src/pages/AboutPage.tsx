@@ -1,10 +1,12 @@
 import PageHero from "../components/ui/PageHero";
 import SectionHeading from "../components/ui/SectionHeading";
 import AnimatedContainer from "../components/ui/AnimatedContainer";
+import CTASection from "../components/ui/CTASection";
 import GalleryGrid from "../components/ui/GalleryGrid";
 import { usePageContent } from "../context/PageContentContext";
 import { useGallerySection, useSectionImage } from "../hooks/useGallerySection";
 import { toGalleryGridImages } from "../services/galleryPublic";
+import { isExternalUrl } from "../utils/locationLinks";
 
 const TIMELINE = [
   { year: "2018", title: "The Beginning", text: "Desi Dhamaka opens its doors with a vision to bring authentic Indian hospitality to the community." },
@@ -37,7 +39,7 @@ export default function AboutPage() {
     title: "Crafted with intention",
     subtitle:
       "We honour time-tested techniques — dum cooking, tandoor firing and slow simmering — while embracing the precision and presentation of modern fine dining.",
-    pillars: PILLARS.map(({ title, text }) => ({ title, text })),
+    pillars: PILLARS.map(({ title, text, icon }) => ({ title, text, icon })),
   });
   const cuisine = fetchSection("about", "cuisine", {
     eyebrow: "Authentic Indian Cuisine",
@@ -56,6 +58,11 @@ export default function AboutPage() {
     title: "Our journey",
     subtitle: "Milestones that shaped Desi Dhamaka into the destination it is today.",
     items: TIMELINE.map(({ year, title, text }) => ({ year, title, text })),
+  });
+  const cta = fetchSection("about", "cta", {
+    title: "Experience Desi Dhamaka",
+    subtitle: "Reserve your table and taste the tradition.",
+    cta: { label: "Reserve Now", url: "/reservation" },
   });
   const heroBackground = useSectionImage("about_hero", "/showcase/mandi.webp");
   const traditionImages = useGallerySection("about_tradition");
@@ -119,7 +126,7 @@ export default function AboutPage() {
                 className="group rounded-[24px] bg-ivory p-8 shadow-[0_8px_32px_-12px_rgba(43,29,24,0.12)] transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_20px_48px_-16px_rgba(43,29,24,0.18)]"
               >
                 <span className="mb-4 block text-2xl text-saffron" aria-hidden>
-                  {PILLARS[i]?.icon ?? "✦"}
+                  {item.icon || "✦"}
                 </span>
                 <h3 className="font-serif text-[1.5rem] text-cocoa">{item.title}</h3>
                 <p className="mt-3 text-[15px] leading-[1.7] text-cocoa/58">{item.text}</p>
@@ -195,6 +202,16 @@ export default function AboutPage() {
 
       <section className="mx-auto max-w-[1400px] px-6 pb-24 md:px-10 lg:px-16">
         <GalleryGrid images={bottomGallery} />
+      </section>
+
+      <section className="mx-auto max-w-[1400px] px-6 pb-24 md:px-10 lg:px-16">
+        <CTASection
+          title={cta.title}
+          subtitle={cta.subtitle}
+          buttonLabel={cta.cta.label}
+          buttonTo={isExternalUrl(cta.cta.url) ? undefined : cta.cta.url}
+          buttonHref={isExternalUrl(cta.cta.url) ? cta.cta.url : undefined}
+        />
       </section>
     </div>
   );

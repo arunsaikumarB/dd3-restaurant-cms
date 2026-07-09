@@ -17,7 +17,9 @@ export type PageContentPageKey =
   | "testimonials"
   | "contact"
   | "reservation"
-  | "order";
+  | "order"
+  | "privacy_policy"
+  | "terms_conditions";
 
 export type PageContentFieldType = "text" | "textarea" | "cta" | "list" | "image";
 
@@ -276,6 +278,46 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
   },
   {
     page: "order",
+    section: "hero",
+    label: "Order Hero",
+    description: "Page hero (use {location} in the subtitle template).",
+    fields: [
+      { key: "label", label: "Label", type: "text", maxLength: 40 },
+      { key: "title", label: "Title", type: "text", maxLength: 60 },
+      { key: "subtitleTemplate", label: "Subtitle template", type: "textarea", maxLength: 300 },
+    ],
+  },
+  {
+    page: "order",
+    section: "features",
+    label: "Why Order Direct",
+    description: "Section heading and the 4 feature cards below the order options.",
+    fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text", maxLength: 40 },
+      { key: "title", label: "Title", type: "text", maxLength: 80 },
+      {
+        key: "items",
+        label: "Features",
+        type: "list",
+        itemLabel: "Feature",
+        minItems: 4,
+        maxItems: 4,
+        fields: [
+          {
+            key: "icon",
+            label: "Icon",
+            type: "text",
+            maxLength: 20,
+            helpText: "One of: fresh, pricing, pickup, offers",
+          },
+          { key: "title", label: "Title", type: "text", maxLength: 60 },
+          { key: "description", label: "Description", type: "textarea", maxLength: 150 },
+        ],
+      },
+    ],
+  },
+  {
+    page: "order",
     section: "order_options",
     label: "Order Option Cards",
     description:
@@ -348,6 +390,7 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
         minItems: 1,
         maxItems: 6,
         fields: [
+          { key: "icon", label: "Icon (emoji)", type: "text", maxLength: 4 },
           { key: "title", label: "Title", type: "text", maxLength: 60 },
           { key: "text", label: "Text", type: "textarea", maxLength: 300 },
         ],
@@ -546,15 +589,16 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
     page: "catering",
     section: "services",
     label: "Catering Services",
-    description: "Service blocks (images from gallery).",
+    description:
+      "Service blocks (images from Gallery). Exactly 5 blocks — each pairs with one of the 5 pre-set gallery image slots (Corporate/Wedding/Birthday/Live/Custom), so items beyond the 5th won't appear on the page.",
     fields: [
       {
         key: "items",
         label: "Services",
         type: "list",
         itemLabel: "Service",
-        minItems: 1,
-        maxItems: 8,
+        minItems: 5,
+        maxItems: 5,
         fields: [
           { key: "tag", label: "Tag", type: "text", maxLength: 40 },
           { key: "title", label: "Title", type: "text", maxLength: 80 },
@@ -610,6 +654,7 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
         minItems: 1,
         maxItems: 12,
         fields: [
+          { key: "icon", label: "Icon (symbol)", type: "text", maxLength: 4 },
           { key: "title", label: "Title", type: "text", maxLength: 60 },
           { key: "text", label: "Description", type: "textarea", maxLength: 300 },
         ],
@@ -652,13 +697,15 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
     page: "testimonials",
     section: "rating_stats",
     label: "Aggregate Rating",
-    description: "Displayed rating summary.",
+    description:
+      "Displayed rating summary. Rating value and review count are overridden automatically by live Google data once synced (see Reviews) — these are the fallback shown until then.",
     fields: [
-      { key: "averageLabel", label: "Average rating label", type: "text", maxLength: 40 },
-      { key: "ratingValue", label: "Rating value", type: "text", maxLength: 8 },
-      { key: "reviewCountText", label: "Review count text", type: "text", maxLength: 80 },
+      { key: "ratingValue", label: "Rating value (fallback)", type: "text", maxLength: 8 },
+      { key: "reviewCountText", label: "Review count text (fallback)", type: "text", maxLength: 80 },
       { key: "verifiedBadge", label: "Verified badge", type: "text", maxLength: 40 },
       { key: "reviewSourceLabel", label: "Review source label", type: "text", maxLength: 40 },
+      { key: "viewAllLabel", label: "\"View All Reviews\" button label", type: "text", maxLength: 40 },
+      { key: "leaveReviewLabel", label: "\"Leave a Review\" button label", type: "text", maxLength: 40 },
     ],
   },
   {
@@ -675,12 +722,10 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
     page: "testimonials",
     section: "empty_states",
     label: "Empty States",
-    description: "Messages when no reviews are published.",
+    description: "Message shown when no reviews are published.",
     fields: [
-      { key: "featuredTitle", label: "Featured empty title", type: "text", maxLength: 80 },
-      { key: "featuredBody", label: "Featured empty body", type: "textarea", maxLength: 200 },
-      { key: "gridTitle", label: "Grid empty title", type: "text", maxLength: 80 },
-      { key: "gridBody", label: "Grid empty body", type: "textarea", maxLength: 200 },
+      { key: "gridTitle", label: "Empty title", type: "text", maxLength: 80 },
+      { key: "gridBody", label: "Empty body", type: "textarea", maxLength: 200 },
     ],
   },
   {
@@ -911,6 +956,72 @@ export const PAGE_CONTENT_SECTIONS: PageContentSectionDefinition[] = [
     fields: [
       { key: "reserveTableLabel", label: "Reserve My Table", type: "text", maxLength: 30 },
       { key: "reserveOnlineLabel", label: "Reserve Online", type: "text", maxLength: 30 },
+    ],
+  },
+  {
+    page: "privacy_policy",
+    section: "hero",
+    label: "Privacy Policy Hero",
+    description: "Page hero (use {name} and {location} in the subtitle template).",
+    fields: [
+      { key: "label", label: "Label", type: "text", maxLength: 40 },
+      { key: "title", label: "Title", type: "text", maxLength: 60 },
+      { key: "subtitleTemplate", label: "Subtitle template", type: "textarea", maxLength: 300 },
+    ],
+  },
+  {
+    page: "privacy_policy",
+    section: "content",
+    label: "Policy Content",
+    description:
+      "Intro paragraph and body sections (use {name}, {location}, {address}, {year}, {email}, {phone}).",
+    fields: [
+      { key: "introTemplate", label: "Intro paragraph", type: "textarea", maxLength: 600 },
+      {
+        key: "sections",
+        label: "Sections",
+        type: "list",
+        itemLabel: "Section",
+        minItems: 1,
+        maxItems: 12,
+        fields: [
+          { key: "title", label: "Heading", type: "text", maxLength: 80 },
+          { key: "textTemplate", label: "Body text", type: "textarea", maxLength: 800 },
+        ],
+      },
+    ],
+  },
+  {
+    page: "terms_conditions",
+    section: "hero",
+    label: "Terms & Conditions Hero",
+    description: "Page hero (use {name} and {location} in the subtitle template).",
+    fields: [
+      { key: "label", label: "Label", type: "text", maxLength: 40 },
+      { key: "title", label: "Title", type: "text", maxLength: 60 },
+      { key: "subtitleTemplate", label: "Subtitle template", type: "textarea", maxLength: 300 },
+    ],
+  },
+  {
+    page: "terms_conditions",
+    section: "content",
+    label: "Terms Content",
+    description:
+      "Intro paragraph and body sections (use {name}, {location}, {year}, {email}, {phone}).",
+    fields: [
+      { key: "introTemplate", label: "Intro paragraph", type: "textarea", maxLength: 600 },
+      {
+        key: "sections",
+        label: "Sections",
+        type: "list",
+        itemLabel: "Section",
+        minItems: 1,
+        maxItems: 12,
+        fields: [
+          { key: "title", label: "Heading", type: "text", maxLength: 80 },
+          { key: "textTemplate", label: "Body text", type: "textarea", maxLength: 800 },
+        ],
+      },
     ],
   },
 ];

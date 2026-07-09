@@ -6,8 +6,9 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
   # GA4 SDK uses gRPC/protobuf dynamic requires that don't survive esbuild
-  # bundling — ship it from node_modules instead.
-  external_node_modules = ["@google-analytics/data", "pdf-parse", "mammoth"]
+  # bundling — ship it from node_modules instead. nodemailer is included as
+  # a precaution for the same class of dynamic-require issue.
+  external_node_modules = ["@google-analytics/data", "pdf-parse", "mammoth", "nodemailer"]
 
 # GA4 service-account credentials — server only (Netlify functions).
 # GA4_PROPERTY_ID, GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY
@@ -20,9 +21,12 @@
 
 # VITE_SITE_URL, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY — set in Netlify UI
 # SUPABASE_SERVICE_ROLE_KEY — server only (Netlify functions + CLI sync; never expose to browser)
-# RESEND_API_KEY — server only (contact/catering enquiry email notifications)
-# RESEND_FROM_EMAIL — verified sender in Resend (e.g. enquiries@yourdomain.com)
-# ENQUIRY_NOTIFY_EMAIL — optional fallback inbox when location email is unset
+# SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD — server only (contact/catering
+# enquiry email notifications, via netlify/functions/submit-enquiry.mts + nodemailer)
+# SMTP_FROM — the "from" address (defaults to SMTP_USER if unset)
+# ENQUIRY_NOTIFY_EMAIL — TEMPORARY shared test inbox for all 6 enquiry forms
+# (3 locations x contact/catering). See src/config/enquiryRecipients.ts to
+# swap in each form's real recipient when ready.
 # (Site configuration → Environment variables → Production / Deploy previews)
 
 # netlify/edge-functions/seo-head.ts — server-injects per-page SEO tags (title,

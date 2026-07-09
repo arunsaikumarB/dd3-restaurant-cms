@@ -2,18 +2,24 @@ import PageHero from "../components/ui/PageHero";
 import SectionHeading from "../components/ui/SectionHeading";
 import AnimatedContainer from "../components/ui/AnimatedContainer";
 import Button from "../components/ui/Button";
+import CTASection from "../components/ui/CTASection";
 import { usePageContent } from "../context/PageContentContext";
 import { useHomepageData } from "../hooks/useHomepageData";
+import { useLocationSelection } from "../context/LocationContext";
 import { formatOpeningHoursRows } from "../services/homepagePublic";
 import { useContactForm } from "../hooks/useContactForm";
 import { useSectionImage } from "../hooks/useGallerySection";
 import PhoneLinks from "../components/ui/PhoneLinks";
+import { resolveReservationUrl, isExternalUrl } from "../utils/locationLinks";
 
 export default function ContactPage() {
   const { fetchSection, interpolate } = usePageContent();
   const { bundle } = useHomepageData();
+  const { selectedLocationId } = useLocationSelection();
   const { settings } = bundle;
   const hoursRows = formatOpeningHoursRows(settings.opening_hours);
+  const reservationLink = resolveReservationUrl(settings, selectedLocationId);
+  const reservationIsExternal = isExternalUrl(reservationLink);
   const {
     form,
     submitting,
@@ -57,6 +63,12 @@ export default function ContactPage() {
     sendAnotherLabel: "Send another message",
   });
   const heroSubtitle = interpolate(hero.subtitleTemplate);
+  const bottomCta = fetchSection("contact", "bottom_cta", {
+    title: "Ready to Experience Desi Dhamaka?",
+    subtitle: "Reserve Your Table Today",
+    reserveNowLabel: "Reserve Now",
+    reserveOnlineLabel: "Reserve Online",
+  });
 
   return (
     <div className="bg-ivory">
@@ -251,6 +263,16 @@ export default function ContactPage() {
             />
           </div>
         </AnimatedContainer>
+      </section>
+
+      <section className="mx-auto max-w-[1400px] px-6 pb-24 md:px-10 lg:px-16">
+        <CTASection
+          title={bottomCta.title}
+          subtitle={bottomCta.subtitle}
+          buttonLabel={reservationIsExternal ? bottomCta.reserveOnlineLabel : bottomCta.reserveNowLabel}
+          buttonTo={reservationIsExternal ? undefined : reservationLink}
+          buttonHref={reservationIsExternal ? reservationLink : undefined}
+        />
       </section>
     </div>
   );

@@ -108,7 +108,7 @@ export default function ExperienceCards({
       {
         title: "Order Online",
         label: experience.orderCardLabel,
-        headline: experience.orderCardHeadline,
+        headline: interpolate(experience.orderCardHeadline, { name: restaurantName }),
         subtitle: experience.orderCardSubtitle,
         image: orderImage,
         imageAlt: "Guests enjoying Desi Dhamaka",

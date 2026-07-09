@@ -94,38 +94,11 @@ export const HOMEPAGE_SECTIONS: HomepageSection[] = [
   },
   {
     id: "featured",
-    label: "Featured Dishes",
-    description: "Signature dishes showcased on the homepage carousel.",
+    label: "About — Heading & Lead",
+    description: "Title and lead paragraph for the homepage About / Our Story section.",
     fields: [
-      { key: "heading", label: "Section Heading", value: "Signature Special Dishes", type: "text" },
-      { key: "subheading", label: "Section Subheading", value: "Discover our chef's most celebrated creations", type: "textarea" },
-    ],
-  },
-  {
-    id: "testimonials",
-    label: "Testimonials",
-    description: "Customer reviews displayed on the homepage.",
-    fields: [
-      { key: "heading", label: "Section Heading", value: "What Our Guests Say", type: "text" },
-      { key: "count", label: "Reviews to Show", value: "3", type: "text" },
-    ],
-  },
-  {
-    id: "gallery",
-    label: "Gallery Preview",
-    description: "Preview images linking to the full gallery.",
-    fields: [
-      { key: "heading", label: "Section Heading", value: "A Taste of Desi Dhamaka", type: "text" },
-      { key: "count", label: "Images to Show", value: "6", type: "text" },
-    ],
-  },
-  {
-    id: "footer",
-    label: "Footer Content",
-    description: "Footer tagline and contact summary.",
-    fields: [
-      { key: "tagline", label: "Footer Tagline", value: "Where every meal is a celebration", type: "text" },
-      { key: "hours", label: "Hours Summary", value: "Open Daily — 11 AM to 10 PM", type: "text" },
+      { key: "heading", label: "Section Heading", value: "Authentic Flavours, Warm Hospitality", type: "text" },
+      { key: "subheading", label: "Lead Paragraph", value: "Experience authentic Indian cuisine crafted with passion and served with genuine hospitality.", type: "textarea" },
     ],
   },
 ];

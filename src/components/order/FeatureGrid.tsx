@@ -1,7 +1,14 @@
 import type { ReactElement } from "react";
 import { motion } from "framer-motion";
 import { ORDER_FEATURES } from "../../data/orderPage";
+import { usePageContent } from "../../context/PageContentContext";
 import { EASE_POWER3, viewportOnce } from "../showcase/motion";
+
+const FEATURES_FALLBACK = {
+  eyebrow: "Why Order Direct",
+  title: "The Desi Dhamaka Difference",
+  items: ORDER_FEATURES.map(({ icon, title, description }) => ({ icon, title, description })),
+};
 
 const ICONS: Record<(typeof ORDER_FEATURES)[number]["icon"], ReactElement> = {
   fresh: (
@@ -44,6 +51,9 @@ const ICONS: Record<(typeof ORDER_FEATURES)[number]["icon"], ReactElement> = {
 };
 
 export default function FeatureGrid() {
+  const { fetchSection } = usePageContent();
+  const features = fetchSection("order", "features", FEATURES_FALLBACK);
+
   return (
     <section className="order-features" aria-labelledby="order-features-title">
       <div className="order-page__texture" aria-hidden />
@@ -55,14 +65,14 @@ export default function FeatureGrid() {
           viewport={viewportOnce}
           transition={{ duration: 0.85, ease: EASE_POWER3 }}
         >
-          <p className="order-features__eyebrow">Why Order Direct</p>
+          <p className="order-features__eyebrow">{features.eyebrow}</p>
           <h2 id="order-features-title" className="order-features__title">
-            The Desi Dhamaka Difference
+            {features.title}
           </h2>
         </motion.header>
 
         <div className="order-features__grid">
-          {ORDER_FEATURES.map((feature, index) => (
+          {features.items.map((feature, index) => (
             <motion.div
               key={feature.title}
               className="order-feature"
@@ -75,7 +85,9 @@ export default function FeatureGrid() {
                 ease: EASE_POWER3,
               }}
             >
-              <div className="order-feature__icon">{ICONS[feature.icon]}</div>
+              <div className="order-feature__icon">
+                {ICONS[feature.icon as keyof typeof ICONS] ?? ICONS.fresh}
+              </div>
               <h3 className="order-feature__title">{feature.title}</h3>
               <p className="order-feature__desc">{feature.description}</p>
             </motion.div>
