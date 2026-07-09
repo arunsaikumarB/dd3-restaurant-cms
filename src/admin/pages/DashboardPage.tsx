@@ -46,7 +46,7 @@ const healthEmoji: Record<ChefGaaSyncHealthStatus, string> = {
   never_synced: "⚪",
 };
 
-const CONTENT_STAT_ORDER = ["offers", "gallery", "reviews"] as const;
+const CONTENT_STAT_ORDER = ["offers", "gallery"] as const;
 const OPERATIONS_STAT_ORDER = [
   "locations",
   "connected",

@@ -153,10 +153,9 @@ async function fetchScopeStats(scope: AdminLocationScope): Promise<DashboardStat
   const locationLabel =
     scope === "all" ? "All Locations" : getLocationConfig(scope).name;
 
-  const [activeOffers, galleryImages, approvedReviews, chefGaaBundle, insightStats] = await Promise.all([
+  const [activeOffers, galleryImages, chefGaaBundle, insightStats] = await Promise.all([
     sumAcrossLocations("offers", locationIds, [{ column: "active", value: true }]),
     countGalleryImages(scope),
-    countRows("reviews", [{ column: "approved", value: true }]),
     fetchChefGaaLiveBundle(scope, { force: true }),
     fetchInsightStats(scope),
   ]);
@@ -229,14 +228,6 @@ async function fetchScopeStats(scope: AdminLocationScope): Promise<DashboardStat
       change: scope === "all" ? "Across all branches" : "For selected location",
       trend: "neutral",
       icon: "image",
-    },
-    {
-      id: "reviews",
-      label: "Approved Reviews",
-      value: approvedReviews,
-      change: "Published on site",
-      trend: "neutral",
-      icon: "star",
     },
   ];
 

@@ -7,8 +7,6 @@ import { useHomepageData } from "../hooks/useHomepageData";
 import { usePageContent } from "../context/PageContentContext";
 import { useLocationSelection } from "../context/LocationContext";
 import { useGallerySection } from "../hooks/useGallerySection";
-import { formatWeekdayHoursLabel } from "../services/homepagePublic";
-import { formatPhonesInline } from "../utils/restaurantPhones";
 import "../App.css";
 
 const EntranceImageSequence = lazy(
@@ -109,14 +107,7 @@ export default function HomePage() {
         <Suspense fallback={<SectionPlaceholder dark minHeight="80vh" />}>
           <ExperienceCards
             restaurantName={settings.restaurant_name}
-            hoursLabel={formatWeekdayHoursLabel(settings.opening_hours)}
-            phone={formatPhonesInline(settings.phones)}
-            email={settings.email}
             address={settings.address}
-            facebook={settings.facebook}
-            instagram={settings.instagram}
-            youtube={settings.youtube}
-            mapsUrl={settings.google_maps}
             orderCtaText={content.primary_cta.label}
             orderCtaLink={content.primary_cta.url}
           />

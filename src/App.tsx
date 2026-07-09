@@ -31,7 +31,6 @@ const AdminGalleryPage = lazy(() => import("./admin/pages/GalleryPage"));
 const AdminChefGaaIntegrationPage = lazy(() => import("./admin/pages/ChefGaaIntegrationPage"));
 const AdminAIConciergePage = lazy(() => import("./admin/pages/AIConciergePage"));
 const AdminKnowledgeBasePage = lazy(() => import("./admin/pages/KnowledgeBasePage"));
-const AdminReviewsPage = lazy(() => import("./admin/pages/ReviewsPage"));
 const AdminSettingsPage = lazy(() => import("./admin/pages/SettingsPage"));
 const AdminProfilePage = lazy(() => import("./admin/pages/ProfilePage"));
 
@@ -287,7 +286,6 @@ export default function App() {
           <Route path="integrations/chefgaa" element={<AdminChefGaaIntegrationPage />} />
           <Route path="integrations/ai-concierge" element={<AdminAIConciergePage />} />
           <Route path="integrations/knowledge-base" element={<AdminKnowledgeBasePage />} />
-          <Route path="reviews" element={<AdminReviewsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="profile" element={<AdminProfilePage />} />
         </Route>

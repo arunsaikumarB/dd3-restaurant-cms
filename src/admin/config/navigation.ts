@@ -5,7 +5,6 @@ import {
   FileText,
   Tag,
   Images,
-  Star,
   Settings,
   Search,
   User,
@@ -41,7 +40,6 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     items: [
       { label: "Offers", path: "/admin/offers", icon: Tag },
       { label: "Gallery", path: "/admin/gallery", icon: Images },
-      { label: "Reviews", path: "/admin/reviews", icon: Star },
       { label: "Settings", path: "/admin/settings", icon: Settings },
     ],
   },
