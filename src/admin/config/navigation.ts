@@ -14,6 +14,7 @@ import {
   BookOpen,
   UtensilsCrossed,
   Users,
+  PartyPopper,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -43,6 +44,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     items: [
       { label: "Operations Center", path: "/admin/operations", icon: UtensilsCrossed },
       { label: "Customer CRM", path: "/admin/operations/crm", icon: Users },
+      { label: "Catering & Events", path: "/admin/operations/events", icon: PartyPopper },
     ],
   },
   {

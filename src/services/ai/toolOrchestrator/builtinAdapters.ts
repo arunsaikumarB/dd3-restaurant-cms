@@ -12,6 +12,7 @@ import type { LocationId } from "../../../config/locations";
 import { registerOrchestratorTool } from "./toolRegistry";
 import type { ToolAdapter, ToolAdapterContext } from "./types";
 import { registerReservationEngineTool } from "../../restaurantOperations/reservations/reservationTool";
+import { registerCateringEngineTool } from "../../restaurantOperations/events/cateringTool";
 
 function knowledgeOf(ctx: ToolAdapterContext): CMSKnowledge {
   return ctx.knowledge as CMSKnowledge;
@@ -71,9 +72,11 @@ export function ensureBuiltinAdaptersRegistered(): void {
   );
   registerReservationEngineTool();
   registerOrchestratorTool(wrapCmsTools("menu", "menu", ["navigateToPage"], false));
+  // Catering — register CMS fallback then overwrite with Event Engine tool.
   registerOrchestratorTool(
     wrapCmsTools("catering", "catering", ["getHomepageContent", "getSEO", "navigateToPage"], true),
   );
+  registerCateringEngineTool();
   registerOrchestratorTool({
     id: "future",
     source: "future_apis",

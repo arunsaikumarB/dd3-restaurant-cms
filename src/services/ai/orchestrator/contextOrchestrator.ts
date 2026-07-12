@@ -11,6 +11,7 @@ import { runToolOrchestrator } from "../toolOrchestrator";
 import { attachCrmToContextPackage } from "../toolOrchestrator/contextAggregator";
 import type { ToolOrchestratorResult } from "../toolOrchestrator";
 import { resolveCrmContext, syncCrmAfterReservation } from "../../restaurantOperations/crm";
+import { syncCrmAfterCatering } from "../../restaurantOperations/events";
 
 /**
  * Context Orchestrator — extends (does not replace) enrichAIRequest.
@@ -83,6 +84,32 @@ export async function orchestrateAIRequest(
         dietary: (reservation.dietaryRestrictions as string[]) ?? [],
         tableId: (reservation.tableId as string | null) ?? null,
         status: String(reservation.status ?? "pending"),
+      });
+    }
+
+    // Soft-link catering outcomes into CRM without modifying Event Engine / CRM internals
+    const cateringTool = toolOrchestration.toolResults.find((r) => String(r.toolId) === "catering");
+    const cateringEngine = (
+      cateringTool?.result as {
+        engine?: {
+          ok?: boolean;
+          lead?: { phone?: string | null; customerName?: string; email?: string | null };
+          event?: { id?: string; eventType?: string; guestCount?: number | null; workflowStage?: string };
+        };
+      } | undefined
+    )?.engine;
+    const cateringLead = cateringEngine?.lead;
+    const cateringEvent = cateringEngine?.event;
+    if (cateringEngine?.ok && cateringLead?.phone && cateringLead.customerName) {
+      void syncCrmAfterCatering({
+        locationId: knowledge.locationId,
+        customerName: cateringLead.customerName,
+        phone: cateringLead.phone,
+        email: cateringLead.email ?? null,
+        eventId: cateringEvent?.id ?? null,
+        eventType: cateringEvent?.eventType ?? null,
+        guestCount: cateringEvent?.guestCount ?? null,
+        stage: cateringEvent?.workflowStage ?? null,
       });
     }
   } catch {
