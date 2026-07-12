@@ -157,6 +157,7 @@ export const AI_SECTIONS = [
   { id: "knowledge", label: "Knowledge" },
   { id: "knowledge-debugger", label: "Knowledge Debugger" },
   { id: "reflection", label: "Reflection" },
+  { id: "agent-analytics", label: "Agent Analytics" },
   { id: "search-lab", label: "Search Lab" },
   { id: "feedback", label: "AI Feedback" },
   { id: "relationships", label: "Relationships" },

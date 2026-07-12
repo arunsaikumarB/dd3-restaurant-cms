@@ -23,6 +23,10 @@ import {
   runReflection,
 } from "../../services/ai/reflection";
 import {
+  buildTimelineFromRun,
+  persistWorkflow,
+} from "../../services/ai/analytics";
+import {
   getOrCreateConversationId,
   readSessionPreferences,
   writeSessionPreferences,
@@ -229,6 +233,7 @@ export function AIProvider({ children }: { children: ReactNode }) {
         sessionPrefsRef.current = updateGuestProfileFromMessage(trimmed, sessionPrefsRef.current);
         writeSessionPreferences(sessionPrefsRef.current);
 
+        const totalStarted = performance.now();
         const orchestrated = await orchestrateAIRequest(
           {
             message: trimmed,
@@ -239,11 +244,19 @@ export function AIProvider({ children }: { children: ReactNode }) {
           cmsKnowledge,
           sessionPrefsRef.current,
         );
+        const orchestrateMs = Math.round(performance.now() - totalStarted);
         const aiRequest = orchestrated.request;
+        const toolMs = orchestrated.toolOrchestration?.durationMs ?? Math.round(orchestrateMs * 0.7);
+        const plannerMs = Math.max(0, orchestrateMs - toolMs);
+        const ragTool = orchestrated.toolOrchestration?.toolResults.find(
+          (r) => String(r.toolId) === "semantic_rag",
+        );
+        const retrievalMs = ragTool?.executionTimeMs ?? 0;
 
         let replyText = "";
 
         try {
+          const geminiStarted = performance.now();
           const result = await streamResponse(aiRequest, {
               signal: controller.signal,
               onChunk: (chunk) => {
@@ -262,6 +275,7 @@ export function AIProvider({ children }: { children: ReactNode }) {
             },
           );
           replyText = result.content;
+          const geminiMs = Math.round(performance.now() - geminiStarted);
 
           // Reflection Layer — evaluate only; never rewrite Gemini. Additive suffix only.
           const clarificationCount = historyForAI.filter(
@@ -282,6 +296,7 @@ export function AIProvider({ children }: { children: ReactNode }) {
           } catch {
             reflectionConfig = undefined;
           }
+          const reflectionStarted = performance.now();
           const reflection = runReflection({
             message: trimmed,
             geminiResponse: replyText,
@@ -293,7 +308,64 @@ export function AIProvider({ children }: { children: ReactNode }) {
             clarificationCount,
             config: reflectionConfig,
           });
+          const reflectionMs = Math.round(performance.now() - reflectionStarted);
           const reflected = applyReflectionToResponse(replyText, reflection);
+          const totalMs = Math.round(performance.now() - totalStarted);
+
+          // AI Operations Center — cross-stage workflow log (does not modify core engines)
+          const toolResults = orchestrated.toolOrchestration?.toolResults ?? [];
+          void persistWorkflow({
+            conversationId: conversationIdRef.current,
+            locationId,
+            planId: orchestrated.executionPlan?.planId ?? null,
+            packageId: orchestrated.toolOrchestration?.packageId ?? null,
+            reflectionId: reflection.reflectionId,
+            message: trimmed,
+            intent: orchestrated.executionPlan?.intent,
+            goal: orchestrated.executionPlan?.goal,
+            complexity: orchestrated.executionPlan?.complexity,
+            status: reflection.needsEscalation || reflection.needsFollowUp ? "partial" : "completed",
+            success: true,
+            timings: {
+              totalMs,
+              plannerMs,
+              toolMs,
+              retrievalMs,
+              aggregationMs: Math.max(0, toolMs - retrievalMs),
+              geminiMs,
+              reflectionMs,
+            },
+            confidence: reflection.confidence,
+            confidenceBand: reflection.confidenceBand,
+            nextAction: reflection.nextAction,
+            needsFollowUp: reflection.needsFollowUp,
+            needsEscalation: reflection.needsEscalation,
+            toolSuccessCount: toolResults.filter((r) => r.status === "success").length,
+            toolFailureCount: toolResults.filter((r) => r.status !== "success" && r.status !== "skipped").length,
+            timeline: buildTimelineFromRun({
+              message: trimmed,
+              planIntent: orchestrated.executionPlan?.intent,
+              planGoal: orchestrated.executionPlan?.goal,
+              toolMs,
+              geminiMs,
+              reflectionMs,
+              toolResults: toolResults.map((r) => ({
+                toolId: String(r.toolId),
+                status: r.status,
+                executionTimeMs: r.executionTimeMs,
+              })),
+              needsFollowUp: reflection.needsFollowUp,
+              needsEscalation: reflection.needsEscalation,
+              escalationReason: reflection.escalation.reason,
+              followUpQuestion: reflection.followUpQuestion,
+            }),
+            geminiPreview: replyText,
+            finalPreview: reflected,
+            raw: {
+              contextPackage: orchestrated.toolOrchestration?.contextPackage ?? null,
+              evaluation: reflection.evaluation,
+            },
+          });
 
           const { text, uiActions } = parseActions(reflected);
           setMessages((prev) =>

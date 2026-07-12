@@ -51,6 +51,17 @@ export type {
   ReflectionNextAction,
 } from "./reflection";
 export {
+  persistWorkflow,
+  listWorkflows,
+  getOpsOverview,
+  getPlannerAnalytics,
+  getToolAnalytics,
+  getReflectionOpsAnalytics,
+  getHealthDashboard,
+  getRealtimeSnapshot,
+  exportOpsReport,
+} from "./analytics";
+export {
   AIProviderError,
   CHEFFY_KITCHEN_ERROR,
   isAbortError,

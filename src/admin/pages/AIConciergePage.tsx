@@ -34,6 +34,7 @@ import {
   SearchLabSection,
   ValidatorSection,
 } from "../components/aiConcierge/KnowledgeIntelligenceSections";
+import { AgentAnalyticsSection } from "../components/aiConcierge/AgentAnalyticsSections";
 import { useLocation } from "../hooks/useLocation";
 import { useAIConciergeAdmin } from "../hooks/useAIConciergeAdmin";
 import { useAuth } from "../../hooks/useAuth";
@@ -144,6 +145,7 @@ export default function AIConciergePage() {
           <KnowledgeSection settings={settings} setSettings={setSettings} permissions={permissions} disabled={readOnly} onRefresh={() => void reload()} />
           <KnowledgeDebuggerSection locationId={testLocationId} permissions={permissions} disabled={readOnly} />
           <ReflectionDashboardSection />
+          <AgentAnalyticsSection />
           <SearchLabSection locationId={testLocationId} permissions={permissions} disabled={readOnly} />
           <FeedbackIntelligenceSection />
           <RelationshipsSection locationId={testLocationId} permissions={permissions} disabled={readOnly} />
