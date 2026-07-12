@@ -6,3 +6,5 @@ export * as eventOps from "./events";
 export * as workflowOps from "./automation";
 /** Customer Journey — import from `./journey` or `journeyOps`. */
 export * as journeyOps from "./journey";
+/** Operations Center / Mission Control — import from `./operationsCenter` or `opsCenter`. */
+export * as opsCenter from "./operationsCenter";

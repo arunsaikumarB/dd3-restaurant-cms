@@ -218,7 +218,7 @@ export default function CustomerJourneyPage() {
     <div className="ai-concierge-page">
       <AdminBreadcrumbs
         items={[
-          { label: "Restaurant Operations", path: "/admin/operations" },
+          { label: "Mission Control", path: "/admin/operations" },
           { label: "Customer Journey" },
         ]}
       />

@@ -188,7 +188,8 @@ export default function RestaurantOperationsPage() {
     <div className="ai-concierge-page">
       <AdminBreadcrumbs
         items={[
-          { label: "Restaurant Operations", path: "/admin/operations" },
+          { label: "Mission Control", path: "/admin/operations" },
+          { label: "Reservations", path: "/admin/operations/reservations" },
           { label: TABS.find((t) => t.id === tab)?.label ?? "Dashboard" },
         ]}
       />

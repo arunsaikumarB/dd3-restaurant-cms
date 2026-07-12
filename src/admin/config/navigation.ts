@@ -12,6 +12,7 @@ import {
   PlugZap,
   Bot,
   BookOpen,
+  Gauge,
   UtensilsCrossed,
   Users,
   PartyPopper,
@@ -44,7 +45,8 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   {
     title: "Restaurant Operations",
     items: [
-      { label: "Operations Center", path: "/admin/operations", icon: UtensilsCrossed },
+      { label: "Mission Control", path: "/admin/operations", icon: Gauge },
+      { label: "Reservations", path: "/admin/operations/reservations", icon: UtensilsCrossed },
       { label: "Customer CRM", path: "/admin/operations/crm", icon: Users },
       { label: "Catering & Events", path: "/admin/operations/events", icon: PartyPopper },
       { label: "Workflow Automation", path: "/admin/operations/workflows", icon: Workflow },
