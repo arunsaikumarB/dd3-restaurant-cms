@@ -29,6 +29,7 @@ import {
   KnowledgeAuditSection,
   KnowledgeDebuggerSection,
   QualityAnalyticsSection,
+  ReflectionDashboardSection,
   RelationshipsSection,
   SearchLabSection,
   ValidatorSection,
@@ -142,6 +143,7 @@ export default function AIConciergePage() {
           <LocationOverridesSection personality={personality} setPersonality={setPersonality} permissions={permissions} disabled={readOnly} />
           <KnowledgeSection settings={settings} setSettings={setSettings} permissions={permissions} disabled={readOnly} onRefresh={() => void reload()} />
           <KnowledgeDebuggerSection locationId={testLocationId} permissions={permissions} disabled={readOnly} />
+          <ReflectionDashboardSection />
           <SearchLabSection locationId={testLocationId} permissions={permissions} disabled={readOnly} />
           <FeedbackIntelligenceSection />
           <RelationshipsSection locationId={testLocationId} permissions={permissions} disabled={readOnly} />

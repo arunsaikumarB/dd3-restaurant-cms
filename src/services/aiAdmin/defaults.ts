@@ -65,6 +65,11 @@ export const DEFAULT_ADVANCED_SETTINGS: AIAdvancedSettings = {
   streaming_buffer_ms: 50,
   provider_failover: false,
   experimental_features: false,
+  reflection_high_confidence_min: 0.85,
+  reflection_medium_confidence_min: 0.55,
+  reflection_escalate_below: 0.4,
+  reflection_max_clarifications: 3,
+  reflection_max_retrieval_attempts: 2,
 };
 
 export function createDefaultSettingsRow(locationId: string | null = null): AISettingsRow {
@@ -151,6 +156,7 @@ export const AI_SECTIONS = [
   { id: "personality", label: "Personality" },
   { id: "knowledge", label: "Knowledge" },
   { id: "knowledge-debugger", label: "Knowledge Debugger" },
+  { id: "reflection", label: "Reflection" },
   { id: "search-lab", label: "Search Lab" },
   { id: "feedback", label: "AI Feedback" },
   { id: "relationships", label: "Relationships" },

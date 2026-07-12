@@ -34,6 +34,8 @@ import type { KnowledgeDebugReport } from "../../../types/knowledgeIntelligence"
 import type { KnowledgeRelationshipType } from "../../../types/knowledgeIntelligence";
 import type { AgentExecutionPlan } from "../../../services/ai/planner/types";
 import type { ToolOrchestratorResult } from "../../../services/ai/toolOrchestrator";
+import type { ReflectionResult } from "../../../services/ai/reflection";
+import { getReflectionDashboard } from "../../../services/ai/reflection";
 import type { AIConciergePermissions } from "../../../services/aiAdmin/permissions";
 
 type Props = { locationId: LocationId; permissions: AIConciergePermissions; disabled?: boolean };
@@ -251,6 +253,128 @@ function ToolOrchestratorPanel({ result }: { result: ToolOrchestratorResult }) {
   );
 }
 
+function ReflectionPanel({ reflection }: { reflection: ReflectionResult }) {
+  const w = reflection.breakdown.weights;
+  return (
+    <div className="space-y-3">
+      <div className="kb-metric-grid">
+        <Metric label="Confidence" value={`${reflection.confidence} (${reflection.confidenceBand})`} />
+        <Metric label="Reflection Score" value={reflection.evaluation.reflectionScore} />
+        <Metric label="Next Action" value={reflection.nextAction} />
+        <Metric label="Goal Progress" value={`${reflection.goalProgress.progressPercent}%`} />
+        <Metric label="Escalate?" value={reflection.needsEscalation ? "Recommended" : "No"} />
+        <Metric label="Follow-up?" value={reflection.needsFollowUp ? "Yes" : "No"} />
+      </div>
+      <AdminCard padding="sm">
+        <strong className="text-sm">Confidence Contribution</strong>
+        <ul className="mt-2 space-y-1 text-xs">
+          <li>Planner {(w.planner * 100).toFixed(0)}% → score {reflection.breakdown.planner.toFixed(2)}</li>
+          <li>RAG {(w.rag * 100).toFixed(0)}% → score {reflection.breakdown.rag.toFixed(2)}</li>
+          <li>Tools {(w.tools * 100).toFixed(0)}% → score {reflection.breakdown.tools.toFixed(2)}</li>
+          <li>Business Rules {(w.businessRules * 100).toFixed(0)}% → score {reflection.breakdown.businessRules.toFixed(2)}</li>
+          <li>History {(w.history * 100).toFixed(0)}% → score {reflection.breakdown.history.toFixed(2)}</li>
+          <li>Freshness {(w.freshness * 100).toFixed(0)}% → score {reflection.breakdown.freshness.toFixed(2)}</li>
+        </ul>
+      </AdminCard>
+      <div className="grid gap-3 lg:grid-cols-2">
+        <AdminCard padding="sm">
+          <strong className="text-sm">Goal</strong>
+          <p className="mt-1 text-sm">{reflection.goalProgress.goal}</p>
+          <p className="mt-1 text-xs text-admin-muted">
+            Done: {reflection.goalProgress.completedFields.join(", ") || "—"}
+          </p>
+          <p className="text-xs text-admin-muted">
+            Missing: {reflection.goalProgress.missingFields.join(", ") || "—"}
+          </p>
+        </AdminCard>
+        <AdminCard padding="sm">
+          <strong className="text-sm">Escalation</strong>
+          <p className="mt-1 text-sm">
+            {reflection.escalation.recommended
+              ? `${reflection.escalation.priority} → ${reflection.escalation.suggestedDepartment}`
+              : "Not recommended"}
+          </p>
+          <p className="mt-1 text-xs text-admin-muted">{reflection.escalation.reason || reflection.reason}</p>
+        </AdminCard>
+      </div>
+      {reflection.followUpQuestion && (
+        <AdminCard padding="sm">
+          <strong className="text-sm">Clarification Question</strong>
+          <p className="mt-1 text-sm">{reflection.followUpQuestion}</p>
+        </AdminCard>
+      )}
+      <p className="text-xs text-admin-muted">
+        Reflection evaluates only — Gemini text is never rewritten. Reasoning is admin-only.
+      </p>
+    </div>
+  );
+}
+
+export function ReflectionDashboardSection() {
+  const [loading, setLoading] = useState(true);
+  const [dash, setDash] = useState<Awaited<ReturnType<typeof getReflectionDashboard>> | null>(null);
+
+  useEffect(() => {
+    void getReflectionDashboard()
+      .then(setDash)
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <AdminCard id="ai-section-reflection" className="ai-concierge-section">
+      <SectionHeader
+        title="Reflection Dashboard"
+        description="Self-evaluation metrics — confidence, clarifications, escalations, and goal completion. Never shown to guests."
+      />
+      {loading && <p className="text-sm text-admin-muted">Loading reflection metrics…</p>}
+      {dash && (
+        <div className="space-y-4">
+          <div className="kb-metric-grid">
+            <Metric label="Avg Confidence" value={dash.averageConfidence} />
+            <Metric label="Reflection Score" value={dash.averageReflectionScore} />
+            <Metric label="Escalation Rate" value={`${dash.escalationRate}%`} />
+            <Metric label="Clarification Rate" value={`${dash.clarificationRate}%`} />
+            <Metric label="Goal Completion" value={`${dash.goalCompletionRate}%`} />
+            <Metric label="Incomplete Goals" value={dash.incompleteConversations} />
+          </div>
+          <AdminCard padding="sm">
+            <strong className="text-sm">Confidence Distribution</strong>
+            <p className="mt-2 text-sm">
+              High {dash.confidenceDistribution.high} · Medium {dash.confidenceDistribution.medium} · Low{" "}
+              {dash.confidenceDistribution.low}
+            </p>
+          </AdminCard>
+          <div className="grid gap-3 lg:grid-cols-2">
+            <AdminCard padding="sm">
+              <strong className="text-sm">Low Confidence Questions</strong>
+              <ul className="mt-2 list-disc pl-5 text-xs space-y-1">
+                {dash.lowConfidenceQuestions.length
+                  ? dash.lowConfidenceQuestions.map((q) => <li key={q}>{q}</li>)
+                  : <li>None yet — run guest chats after migration 042.</li>}
+              </ul>
+            </AdminCard>
+            <AdminCard padding="sm">
+              <strong className="text-sm">Most Escalated Topics</strong>
+              <ul className="mt-2 list-disc pl-5 text-xs space-y-1">
+                {dash.mostEscalatedTopics.length
+                  ? dash.mostEscalatedTopics.map((t) => (
+                      <li key={t.topic}>
+                        {t.topic} ({t.count})
+                      </li>
+                    ))
+                  : <li>None yet</li>}
+              </ul>
+            </AdminCard>
+          </div>
+          <AdminButton variant="secondary" onClick={() => void getReflectionDashboard().then(setDash)}>
+            Refresh
+          </AdminButton>
+        </div>
+      )}
+    </AdminCard>
+  );
+}
+
 export function KnowledgeDebuggerSection({ locationId, permissions, disabled }: Props) {
   const [question, setQuestion] = useState("Can I bring outside cake?");
   const [running, setRunning] = useState(false);
@@ -320,14 +444,24 @@ export function KnowledgeDebuggerSection({ locationId, permissions, disabled }: 
               <ToolOrchestratorPanel result={report.toolOrchestration as ToolOrchestratorResult} />
             </AdminCard>
           ) : null}
+          {report.reflection != null ? (
+            <AdminCard>
+              <h3 className="mb-3 text-sm font-semibold">Reflection Layer</h3>
+              <ReflectionPanel reflection={report.reflection as ReflectionResult} />
+            </AdminCard>
+          ) : null}
           <StagePipeline report={report} />
           <div>
             <h3 className="mb-2 text-sm font-semibold">Top Retrieved Chunks</h3>
             <ChunkTable report={report} />
           </div>
           <AdminCard>
-            <strong>Final Cheffy Response</strong>
+            <strong>Gemini Response (unchanged)</strong>
             <p className="mt-2 whitespace-pre-wrap text-sm">{report.response || "—"}</p>
+          </AdminCard>
+          <AdminCard>
+            <strong>Final Cheffy Response</strong>
+            <p className="mt-2 whitespace-pre-wrap text-sm">{report.finalResponse || report.response || "—"}</p>
           </AdminCard>
         </div>
       )}

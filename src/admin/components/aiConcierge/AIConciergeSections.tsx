@@ -578,11 +578,16 @@ export function AdvancedSection({
 
   return (
     <AdminCard id="ai-section-advanced" className="ai-concierge-section">
-      <SectionHeader title="Advanced" description="Cache, retries, failover, and experimental features." />
+      <SectionHeader title="Advanced" description="Cache, retries, failover, reflection thresholds, and experimental features." />
       <div className="grid gap-4 md:grid-cols-2">
         <AdminInput label="Cache Duration (seconds)" type="number" value={settings.advanced.cache_duration_seconds ?? 60} onChange={(e) => patch({ cache_duration_seconds: Number(e.target.value) })} disabled={ro} />
         <AdminInput label="Retry Attempts" type="number" value={settings.advanced.retry_attempts ?? 1} onChange={(e) => patch({ retry_attempts: Number(e.target.value) })} disabled={ro} />
         <AdminInput label="Streaming Buffer (ms)" type="number" value={settings.advanced.streaming_buffer_ms ?? 50} onChange={(e) => patch({ streaming_buffer_ms: Number(e.target.value) })} disabled={ro} />
+        <AdminInput label="High Confidence Min" type="number" step="0.01" value={settings.advanced.reflection_high_confidence_min ?? 0.85} onChange={(e) => patch({ reflection_high_confidence_min: Number(e.target.value) })} disabled={ro} />
+        <AdminInput label="Medium Confidence Min" type="number" step="0.01" value={settings.advanced.reflection_medium_confidence_min ?? 0.55} onChange={(e) => patch({ reflection_medium_confidence_min: Number(e.target.value) })} disabled={ro} />
+        <AdminInput label="Escalate Below" type="number" step="0.01" value={settings.advanced.reflection_escalate_below ?? 0.4} onChange={(e) => patch({ reflection_escalate_below: Number(e.target.value) })} disabled={ro} />
+        <AdminInput label="Max Clarifications" type="number" value={settings.advanced.reflection_max_clarifications ?? 3} onChange={(e) => patch({ reflection_max_clarifications: Number(e.target.value) })} disabled={ro} />
+        <AdminInput label="Max Retrieval Attempts" type="number" value={settings.advanced.reflection_max_retrieval_attempts ?? 2} onChange={(e) => patch({ reflection_max_retrieval_attempts: Number(e.target.value) })} disabled={ro} />
       </div>
       <div className="mt-4 grid gap-1">
         <ToggleRow label="Provider Failover (future)" checked={!!settings.advanced.provider_failover} onChange={(v) => patch({ provider_failover: v })} disabled={ro} />

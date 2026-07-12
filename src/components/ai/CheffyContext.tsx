@@ -17,7 +17,11 @@ import {
   streamResponse,
   CHEFFY_KITCHEN_ERROR,
 } from "../../services/ai";
-import { enrichAIRequestWithOrchestrator } from "../../services/ai/orchestrator";
+import { orchestrateAIRequest } from "../../services/ai/orchestrator";
+import {
+  applyReflectionToResponse,
+  runReflection,
+} from "../../services/ai/reflection";
 import {
   getOrCreateConversationId,
   readSessionPreferences,
@@ -225,7 +229,7 @@ export function AIProvider({ children }: { children: ReactNode }) {
         sessionPrefsRef.current = updateGuestProfileFromMessage(trimmed, sessionPrefsRef.current);
         writeSessionPreferences(sessionPrefsRef.current);
 
-        const aiRequest = await enrichAIRequestWithOrchestrator(
+        const orchestrated = await orchestrateAIRequest(
           {
             message: trimmed,
             history: historyForAI,
@@ -235,6 +239,7 @@ export function AIProvider({ children }: { children: ReactNode }) {
           cmsKnowledge,
           sessionPrefsRef.current,
         );
+        const aiRequest = orchestrated.request;
 
         let replyText = "";
 
@@ -257,7 +262,40 @@ export function AIProvider({ children }: { children: ReactNode }) {
             },
           );
           replyText = result.content;
-          const { text, uiActions } = parseActions(replyText);
+
+          // Reflection Layer — evaluate only; never rewrite Gemini. Additive suffix only.
+          const clarificationCount = historyForAI.filter(
+            (m) => m.role === "assistant" && /\?/.test(m.content),
+          ).length;
+          let reflectionConfig: Parameters<typeof runReflection>[0]["config"];
+          try {
+            const { fetchAISettings } = await import("../../services/aiAdmin/repository");
+            const settings = await fetchAISettings(locationId);
+            const adv = settings.advanced;
+            reflectionConfig = {
+              highConfidenceMin: adv.reflection_high_confidence_min,
+              mediumConfidenceMin: adv.reflection_medium_confidence_min,
+              escalateBelow: adv.reflection_escalate_below,
+              maxClarifications: adv.reflection_max_clarifications,
+              maxRetrievalAttempts: adv.reflection_max_retrieval_attempts,
+            };
+          } catch {
+            reflectionConfig = undefined;
+          }
+          const reflection = runReflection({
+            message: trimmed,
+            geminiResponse: replyText,
+            history: historyForAI,
+            plan: orchestrated.executionPlan,
+            toolOrchestration: orchestrated.toolOrchestration,
+            conversationId: conversationIdRef.current,
+            locationId,
+            clarificationCount,
+            config: reflectionConfig,
+          });
+          const reflected = applyReflectionToResponse(replyText, reflection);
+
+          const { text, uiActions } = parseActions(reflected);
           setMessages((prev) =>
             updateMessage(prev, assistant.id, {
               content: text,

@@ -9,6 +9,7 @@ import { detectIntent } from "../ai/emotionEngine";
 import { planContextSources } from "../ai/orchestrator/sourcePlanner";
 import { enrichAIRequestWithOrchestrator, orchestrateAIRequest } from "../ai/orchestrator/contextOrchestrator";
 import { createExecutionPlan, summarizePlan } from "../ai/planner";
+import { applyReflectionToResponse, runReflection } from "../ai/reflection";
 import { buildCMSKnowledge } from "../cms/knowledge";
 import { CONCIERGE_API_PATH } from "../ai/providers/providerTypes";
 import { fetchActivePrompt } from "../aiAdmin/repository";
@@ -373,14 +374,75 @@ export async function runKnowledgeDebug(input: {
     });
   }
 
+  // Reflection Layer — after Gemini; evaluate only (never rewrite Gemini body)
+  let reflection: ReturnType<typeof runReflection> | null = null;
+  let finalResponse = response;
+  if (response) {
+    const tRefl = performance.now();
+    reflection = runReflection({
+      message: question,
+      geminiResponse: response,
+      history: [],
+      plan: orchestrated.executionPlan ?? agentPlan,
+      toolOrchestration: toolOrch ?? null,
+      conversationId: `debug-${crypto.randomUUID()}`,
+      locationId: input.locationId,
+      clarificationCount: 0,
+    });
+    finalResponse = applyReflectionToResponse(response, reflection);
+    const reflMs = Math.round(performance.now() - tRefl);
+    push({
+      id: "reflection",
+      label: "Reflection Result",
+      status: reflection.confidenceBand === "low" ? "warn" : "ok",
+      durationMs: reflMs,
+      summary: `confidence ${reflection.confidence} (${reflection.confidenceBand}) · ${reflection.nextAction} · ${reflection.reason}`,
+      data: reflection,
+    });
+    push({
+      id: "confidence",
+      label: "Confidence Breakdown",
+      status: "ok",
+      durationMs: 0,
+      summary: `planner ${(reflection.breakdown.weights.planner * 100).toFixed(0)}% · rag ${(reflection.breakdown.weights.rag * 100).toFixed(0)}% · tools ${(reflection.breakdown.weights.tools * 100).toFixed(0)}%`,
+      data: reflection.breakdown,
+    });
+    push({
+      id: "goal_progress",
+      label: "Goal Progress",
+      status: reflection.goalProgress.status === "completed" ? "ok" : "warn",
+      durationMs: 0,
+      summary: `${reflection.goalProgress.goal} · ${reflection.goalProgress.progressPercent}% · ${reflection.goalProgress.status}`,
+      data: reflection.goalProgress,
+    });
+    push({
+      id: "escalation",
+      label: "Escalation Decision",
+      status: reflection.needsEscalation ? "warn" : "ok",
+      durationMs: 0,
+      summary: reflection.needsEscalation
+        ? `Recommended → ${reflection.escalation.suggestedDepartment} (${reflection.escalation.priority})`
+        : "No escalation recommended",
+      data: reflection.escalation,
+    });
+  } else {
+    push({
+      id: "reflection",
+      label: "Reflection Result",
+      status: "skip",
+      durationMs: 0,
+      summary: "Skipped (no Gemini response)",
+    });
+  }
+
   const totalMs = Math.round(performance.now() - started);
   push({
     id: "final",
     label: "Final Cheffy Response",
-    status: response ? "ok" : options.runLlm ? "warn" : "skip",
+    status: finalResponse ? "ok" : options.runLlm ? "warn" : "skip",
     durationMs: totalMs,
-    summary: response ? response.slice(0, 180) : "No response",
-    data: { response },
+    summary: finalResponse ? finalResponse.slice(0, 180) : "No response",
+    data: { geminiResponse: response, finalResponse, additiveSuffix: reflection?.additiveSuffix ?? null },
   });
 
   const report: KnowledgeDebugReport = {
@@ -405,8 +467,10 @@ export async function runKnowledgeDebug(input: {
     sourcePlan: plan,
     toolCalls,
     memory: request.session,
-    executionPlan: agentPlan,
+    executionPlan: orchestrated.executionPlan ?? agentPlan,
     toolOrchestration: toolOrch ?? null,
+    reflection,
+    finalResponse,
   };
 
   try {

@@ -36,6 +36,21 @@ export type { AgentExecutionPlan, PlannerInput, PlannerIntent } from "./planner"
 export { runToolOrchestrator, registerOrchestratorTool } from "./toolOrchestrator";
 export type { ToolOrchestratorResult, UnifiedContextPackage } from "./toolOrchestrator";
 export {
+  runReflection,
+  applyReflectionToResponse,
+  getReflectionDashboard,
+  DEFAULT_REFLECTION_CONFIG,
+} from "./reflection";
+export type {
+  ReflectionResult,
+  ReflectionInput,
+  ReflectionConfig,
+  ConfidenceBreakdown,
+  EscalationRecommendation,
+  GoalProgressSnapshot,
+  ReflectionNextAction,
+} from "./reflection";
+export {
   AIProviderError,
   CHEFFY_KITCHEN_ERROR,
   isAbortError,

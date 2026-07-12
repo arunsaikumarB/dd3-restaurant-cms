@@ -209,6 +209,10 @@ export type KnowledgeDebugReport = {
   executionPlan?: unknown;
   /** Tool orchestrator timeline + package — admin only */
   toolOrchestration?: unknown;
+  /** Reflection Layer — evaluate Gemini only; admin only */
+  reflection?: unknown;
+  /** Guest-visible final text (Gemini + optional additive suffix) */
+  finalResponse?: string;
 };
 
 export type SearchLabOptions = {

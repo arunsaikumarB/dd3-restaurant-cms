@@ -69,6 +69,12 @@ export type AIAdvancedSettings = {
   streaming_buffer_ms?: number;
   provider_failover?: boolean;
   experimental_features?: boolean;
+  /** Reflection / confidence thresholds (additive) */
+  reflection_high_confidence_min?: number;
+  reflection_medium_confidence_min?: number;
+  reflection_escalate_below?: number;
+  reflection_max_clarifications?: number;
+  reflection_max_retrieval_attempts?: number;
 };
 
 export interface AISettingsRow extends Timestamps {
