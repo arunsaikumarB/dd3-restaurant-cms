@@ -49,7 +49,7 @@ export function runCateringSmoke(): void {
 
   // Custom dietary
   const jain = extractEventRequirements("Jain vegetarian private dining for 15 guests", "oak-tree");
-  assert(jain.dietary?.includes("jain") || jain.dietary?.includes("veg"), "dietary");
+  assert(Boolean(jain.dietary?.includes("jain") || jain.dietary?.includes("veg")), "dietary");
 
   console.log("[catering.smoke] all assertions passed");
 }
