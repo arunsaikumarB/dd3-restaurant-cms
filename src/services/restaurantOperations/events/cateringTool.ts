@@ -9,6 +9,7 @@ import { registerOrchestratorTool } from "../../ai/toolOrchestrator/toolRegistry
 import type { ToolAdapter } from "../../ai/toolOrchestrator/types";
 import type { CMSKnowledge } from "../../cms/knowledge";
 import { detectCateringAction, runEventEngine } from "./eventEngine";
+import { publishCateringDomainEvents } from "../automation/publishers";
 
 function knowledgeOf(ctx: { knowledge: unknown }): CMSKnowledge {
   return ctx.knowledge as CMSKnowledge;
@@ -28,6 +29,17 @@ export function createCateringToolAdapter(): ToolAdapter {
         action,
         locationId: knowledge.locationId,
         message: ctx.message,
+        conversationId: ctx.conversationId,
+      });
+
+      // Domain event → Workflow Engine (does not alter Event Engine internals)
+      publishCateringDomainEvents({
+        locationId: knowledge.locationId,
+        action: engine.action,
+        ok: engine.ok,
+        lead: engine.lead,
+        event: engine.event,
+        quote: engine.quote,
         conversationId: ctx.conversationId,
       });
 

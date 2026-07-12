@@ -9,6 +9,7 @@ import { registerOrchestratorTool } from "../../ai/toolOrchestrator/toolRegistry
 import type { ToolAdapter } from "../../ai/toolOrchestrator/types";
 import type { CMSKnowledge } from "../../cms/knowledge";
 import { runReservationEngine, detectActionFromMessage } from "./reservationEngine";
+import { publishReservationDomainEvents } from "../automation/publishers";
 
 function knowledgeOf(ctx: { knowledge: unknown }): CMSKnowledge {
   return ctx.knowledge as CMSKnowledge;
@@ -28,6 +29,15 @@ export function createReservationToolAdapter(): ToolAdapter {
         action,
         locationId: knowledge.locationId,
         message: ctx.message,
+        conversationId: ctx.conversationId,
+      });
+
+      // Domain event → Workflow Engine (does not alter Reservation Engine internals)
+      publishReservationDomainEvents({
+        locationId: knowledge.locationId,
+        action: engine.action,
+        ok: engine.ok,
+        reservation: engine.reservation,
         conversationId: ctx.conversationId,
       });
 

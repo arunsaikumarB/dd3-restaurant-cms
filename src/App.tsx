@@ -34,6 +34,7 @@ const AdminKnowledgeBasePage = lazy(() => import("./admin/pages/KnowledgeBasePag
 const AdminRestaurantOperationsPage = lazy(() => import("./admin/pages/RestaurantOperationsPage"));
 const AdminCustomerCrmPage = lazy(() => import("./admin/pages/CustomerCrmPage"));
 const AdminCateringEventsPage = lazy(() => import("./admin/pages/CateringEventsPage"));
+const AdminWorkflowAutomationPage = lazy(() => import("./admin/pages/WorkflowAutomationPage"));
 const AdminSettingsPage = lazy(() => import("./admin/pages/SettingsPage"));
 const AdminProfilePage = lazy(() => import("./admin/pages/ProfilePage"));
 
@@ -292,6 +293,7 @@ export default function App() {
           <Route path="operations" element={<AdminRestaurantOperationsPage />} />
           <Route path="operations/crm" element={<AdminCustomerCrmPage />} />
           <Route path="operations/events" element={<AdminCateringEventsPage />} />
+          <Route path="operations/workflows" element={<AdminWorkflowAutomationPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="profile" element={<AdminProfilePage />} />
         </Route>
