@@ -1,4 +1,12 @@
 export type * from "./types";
+export type {
+  CallSummary,
+  HospitalityProfile,
+  PersonalityProfile,
+  SilenceRules,
+  ReceptionistTurnResult,
+  VoiceMemory,
+} from "./receptionist";
 export { voiceTable, newConversationId } from "./client";
 export {
   getVoiceSettings,
@@ -36,6 +44,28 @@ export {
   getSessionTranscriptBundle,
   getRecordingsForLocation,
 } from "./recording/recording";
+
+export * as receptionist from "./receptionist";
+export {
+  startReceptionistCall,
+  processReceptionistTurn,
+  handleReceptionistSilence,
+  interruptReceptionist,
+  endReceptionistCall,
+  getReceptionistLiveState,
+  buildGreeting,
+  getPersonality,
+  upsertPersonality,
+  getHospitality,
+  upsertHospitality,
+  getSilenceRules,
+  upsertSilenceRules,
+  listGreetingTemplates,
+  upsertGreetingTemplate,
+  listCallSummaries,
+  getCallSummaryForSession,
+  listEnabledLanguages,
+} from "./receptionist";
 
 import { ensureSttProvidersRegistered as ensureStt } from "./stt/providers";
 import { ensureTtsProvidersRegistered as ensureTts } from "./tts/providers";

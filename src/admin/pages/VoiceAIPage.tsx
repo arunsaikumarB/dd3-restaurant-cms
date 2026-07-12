@@ -11,6 +11,12 @@ import {
   FileAudio,
   FlaskConical,
   SlidersHorizontal,
+  HeartHandshake,
+  MessageCircle,
+  Sparkles,
+  Timer,
+  ClipboardList,
+  BookOpen,
 } from "lucide-react";
 import AdminBreadcrumbs from "../components/shared/Breadcrumbs";
 import PageHeader from "../components/shared/PageHeader";
@@ -26,25 +32,40 @@ import { useLocation } from "../hooks/useLocation";
 import { DEFAULT_PUBLIC_LOCATION_ID, type LocationId } from "../../config/locations";
 import {
   bootstrapVoiceLayer,
-  endVoiceSession,
   ensureSttProvidersRegistered,
   ensureTtsProvidersRegistered,
+  getHospitality,
+  getPersonality,
   getRecordingsForLocation,
   getSessionTranscriptBundle,
+  getSilenceRules,
   getVoiceAnalytics,
   getVoiceSettings,
+  handleReceptionistSilence,
+  interruptReceptionist,
+  listCallSummaries,
   listEvents,
+  listGreetingTemplates,
   listSttProviders,
   listTtsProviders,
   listVoiceSessions,
-  processVoiceTurn,
-  startVoiceSession,
-  stopTtsForSession,
+  processReceptionistTurn,
+  startReceptionistCall,
+  endReceptionistCall,
+  upsertGreetingTemplate,
+  upsertHospitality,
+  upsertPersonality,
+  upsertSilenceRules,
   upsertVoiceSettings,
+  type CallSummary,
+  type HospitalityProfile,
+  type PersonalityProfile,
+  type SilenceRules,
   type VoiceAnalyticsSnapshot,
   type VoiceSession,
   type VoiceSettings,
 } from "../../services/voice";
+import type { ReceptionistTurnResult } from "../../services/voice";
 import "../admin.css";
 
 type TabId =
@@ -57,10 +78,28 @@ type TabId =
   | "sessions"
   | "recordings"
   | "testing"
+  | "receptionist"
+  | "greetings"
+  | "conversation"
+  | "hospitality"
+  | "personality"
+  | "silence"
+  | "interruptions"
+  | "summaries"
+  | "faq"
   | "advanced";
 
 const TABS: Array<{ id: TabId; label: string; icon: typeof Mic }> = [
   { id: "general", label: "General", icon: Settings2 },
+  { id: "receptionist", label: "Receptionist", icon: HeartHandshake },
+  { id: "greetings", label: "Greetings", icon: MessageCircle },
+  { id: "conversation", label: "Conversation", icon: Radio },
+  { id: "hospitality", label: "Hospitality", icon: Sparkles },
+  { id: "personality", label: "Voice Personality", icon: Mic },
+  { id: "silence", label: "Silence Rules", icon: Timer },
+  { id: "interruptions", label: "Interruptions", icon: Phone },
+  { id: "summaries", label: "Call Summary", icon: ClipboardList },
+  { id: "faq", label: "FAQ Testing", icon: BookOpen },
   { id: "providers", label: "Providers", icon: PlugZap },
   { id: "voice", label: "Voice Settings", icon: Mic },
   { id: "languages", label: "Languages", icon: Languages },
@@ -109,6 +148,16 @@ export default function VoiceAIPage() {
   const [testInput, setTestInput] = useState("What are your hours today?");
   const [testReply, setTestReply] = useState("");
   const [testBusy, setTestBusy] = useState(false);
+  const [lastTurn, setLastTurn] = useState<ReceptionistTurnResult | null>(null);
+  const [timeline, setTimeline] = useState<string[]>([]);
+  const [confidence, setConfidence] = useState("0.92");
+  const [silenceMs, setSilenceMs] = useState("5000");
+  const [personality, setPersonality] = useState<PersonalityProfile | null>(null);
+  const [hospitality, setHospitality] = useState<HospitalityProfile | null>(null);
+  const [silenceRules, setSilenceRules] = useState<SilenceRules | null>(null);
+  const [greetings, setGreetings] = useState<Array<Record<string, unknown>>>([]);
+  const [greetingDraft, setGreetingDraft] = useState("");
+  const [summaries, setSummaries] = useState<CallSummary[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState("");
   const [sessionEvents, setSessionEvents] = useState<Awaited<ReturnType<typeof listEvents>>>([]);
   const [transcriptText, setTranscriptText] = useState("");
@@ -117,16 +166,28 @@ export default function VoiceAIPage() {
     bootstrapVoiceLayer();
     ensureSttProvidersRegistered();
     ensureTtsProvidersRegistered();
-    const [s, a, sess, rec] = await Promise.all([
+    const [s, a, sess, rec, p, h, sr, g, sums] = await Promise.all([
       getVoiceSettings(outlet),
       getVoiceAnalytics(outlet),
       listVoiceSessions(outlet, 50),
       getRecordingsForLocation(outlet),
+      getPersonality(outlet),
+      getHospitality(outlet),
+      getSilenceRules(outlet),
+      listGreetingTemplates(outlet),
+      listCallSummaries(outlet, 30),
     ]);
     setSettings(s);
     setAnalytics(a);
     setSessions(sess);
     setRecordings(rec);
+    setPersonality(p);
+    setHospitality(h);
+    setSilenceRules(sr);
+    setGreetings((g as Array<Record<string, unknown>>) ?? []);
+    setSummaries(sums);
+    const first = g?.[0] as { template?: string } | undefined;
+    if (first?.template) setGreetingDraft(first.template);
   }, [outlet]);
 
   useEffect(() => {
@@ -141,14 +202,19 @@ export default function VoiceAIPage() {
 
   const startTest = async (channel: "web" | "phone") => {
     try {
-      const { session } = await startVoiceSession({
+      if (!settings?.enabled) await upsertVoiceSettings(outlet, { enabled: true });
+      if (channel === "phone") await upsertVoiceSettings(outlet, { enabled: true, channelPhone: true });
+      const { session, greeting } = await startReceptionistCall({
         locationId: outlet,
         channel,
         language: settings?.language === "auto" ? "en" : settings?.language,
+        speakGreeting: true,
       });
       setTestSession(session);
-      setTestReply(settings?.greeting ?? "");
-      showToast(`${channel} session started`);
+      setTestReply(greeting.text);
+      setLastTurn(null);
+      setTimeline([`GREETING · ${greeting.text}`]);
+      showToast(`${channel} receptionist call started`);
       void refresh();
     } catch (e) {
       showToast(e instanceof Error ? e.message : "Failed to start session", "error");
@@ -157,27 +223,33 @@ export default function VoiceAIPage() {
 
   const runTurn = async () => {
     if (!testSession) {
-      showToast("Start a test session first", "error");
+      showToast("Start a receptionist call first", "error");
       return;
     }
     setTestBusy(true);
     try {
-      const result = await processVoiceTurn({
+      const result = await processReceptionistTurn({
         sessionId: testSession.id,
         transcript: testInput,
+        confidence: Number(confidence) || 0.9,
         speak: true,
       });
+      setLastTurn(result);
       setTestReply(
         [
-          result.assistantText,
+          result.spokenText,
           "",
-          `Latency total ${result.latency.totalMs}ms · STT ${result.latency.sttMs} · Planner ${result.latency.plannerMs} · Tools ${result.latency.toolMs} · Gemini ${result.latency.geminiMs} · TTS ${result.latency.ttsMs}`,
-          result.intent ? `Intent: ${result.intent}` : "",
-          result.planId ? `Plan: ${result.planId}` : "",
+          `Intent: ${result.intent ?? "—"} · Goal: ${result.plannerGoal ?? "—"} · Lang: ${result.language}`,
+          result.latency
+            ? `Latency ${result.latency.totalMs}ms (STT ${result.latency.sttMs} · Planner ${result.latency.plannerMs} · Tools ${result.latency.toolMs} · Gemini ${result.latency.geminiMs} · TTS ${result.latency.ttsMs})`
+            : "Handled by receptionist conversation controls",
+          `Confidence: ${result.confidence}`,
         ]
           .filter(Boolean)
           .join("\n"),
       );
+      setTimeline((prev) => [...prev, `USER · ${result.userText}`, `ASSISTANT · ${result.spokenText}`]);
+      if (result.control === "end_call") setTestSession(null);
       void refresh();
     } catch (e) {
       showToast(e instanceof Error ? e.message : "Turn failed", "error");
@@ -200,7 +272,7 @@ export default function VoiceAIPage() {
       />
       <PageHeader
         title="Voice AI"
-        description="Real-time voice transport layer — Web & Phone channels reuse Planner, Tools, and Gemini."
+        description="Voice Receptionist + transport layer — greets callers, manages conversation, reuses Planner, RAG, and Tools."
       >
         <AdminBadge variant="info">{outlet}</AdminBadge>
         <AdminButton variant="outline" onClick={() => void refresh()}>
@@ -538,68 +610,364 @@ export default function VoiceAIPage() {
       )}
 
       {tab === "testing" && (
-        <AdminCard>
-          <h3 className="mb-3 text-sm font-semibold">Testing</h3>
-          <p className="mb-3 text-sm opacity-70">
-            Runs a voice turn through the real Planner → Tool Orchestrator → Gemini path. Browser TTS speaks the reply.
-          </p>
-          <div className="mb-3 flex flex-wrap gap-2">
-            <AdminButton
-              onClick={() => {
-                if (!settings?.enabled) {
-                  void patchSettings({ enabled: true }).then(() => void startTest("web"));
-                } else void startTest("web");
-              }}
-            >
-              Start Web Voice session
-            </AdminButton>
-            <AdminButton
-              variant="outline"
-              onClick={() => {
-                if (!settings?.enabled || !settings.channelPhone) {
-                  void patchSettings({ enabled: true, channelPhone: true }).then(() => void startTest("phone"));
-                } else void startTest("phone");
-              }}
-            >
-              Simulate Phone ingress
-            </AdminButton>
-            {testSession && (
-              <>
-                <AdminButton
-                  variant="outline"
-                  onClick={() => void stopTtsForSession(testSession.id).then(() => showToast("Interrupted"))}
-                >
-                  Interrupt TTS
-                </AdminButton>
-                <AdminButton
-                  variant="danger"
-                  onClick={async () => {
-                    await endVoiceSession(testSession.id, "completed");
-                    setTestSession(null);
-                    showToast("Session ended");
-                    void refresh();
-                  }}
-                >
-                  End session
-                </AdminButton>
-              </>
-            )}
-          </div>
-          {testSession && (
-            <p className="mb-2 text-xs opacity-70">
-              Session {testSession.id.slice(0, 8)} · {testSession.channel} · {testSession.callState} ·{" "}
-              {testSession.conversationId}
+        <div className="grid gap-4 lg:grid-cols-2">
+          <AdminCard>
+            <h3 className="mb-3 text-sm font-semibold">Receptionist Testing</h3>
+            <p className="mb-3 text-sm opacity-70">
+              Full call lifecycle: greeting → listen → Planner/RAG → speak. Reservation booking is deferred.
             </p>
-          )}
-          <AdminTextarea value={testInput} onChange={(e) => setTestInput(e.target.value)} rows={2} />
-          <AdminButton className="mt-2" disabled={testBusy || !testSession} onClick={() => void runTurn()}>
-            {testBusy ? "Thinking…" : "Send final transcript → AI → TTS"}
+            <div className="mb-3 flex flex-wrap gap-2">
+              <AdminButton onClick={() => void startTest("web")}>Start Web Call</AdminButton>
+              <AdminButton variant="outline" onClick={() => void startTest("phone")}>
+                Simulate Phone Call
+              </AdminButton>
+              {testSession && (
+                <>
+                  <AdminButton
+                    variant="outline"
+                    onClick={() => void interruptReceptionist(testSession.id).then(() => showToast("Interrupted"))}
+                  >
+                    Interrupt
+                  </AdminButton>
+                  <AdminButton
+                    variant="outline"
+                    onClick={async () => {
+                      const r = await handleReceptionistSilence(testSession.id, Number(silenceMs) || 5000, true);
+                      showToast(r.prompt || `Silence stage: ${r.stage}`);
+                      if (r.ended) setTestSession(null);
+                      if (r.prompt) setTimeline((prev) => [...prev, `SILENCE · ${r.prompt}`]);
+                    }}
+                  >
+                    Simulate Silence
+                  </AdminButton>
+                  <AdminButton
+                    variant="danger"
+                    onClick={async () => {
+                      const { summary } = await endReceptionistCall(testSession.id, "completed");
+                      setTestSession(null);
+                      showToast(summary ? "Call ended · summary saved" : "Call ended");
+                      void refresh();
+                    }}
+                  >
+                    End Call
+                  </AdminButton>
+                </>
+              )}
+            </div>
+            {testSession && (
+              <div className="mb-3 flex flex-wrap gap-2 text-xs">
+                <AdminBadge variant="success">{lastTurn?.callState || testSession.callState}</AdminBadge>
+                <AdminBadge variant="info">
+                  {(lastTurn?.callState || testSession.callState) === "listening" ? "Listening" : "Busy"}
+                </AdminBadge>
+                {(lastTurn?.callState || testSession.callState) === "speaking" ||
+                (lastTurn?.callState || testSession.callState) === "greeting" ? (
+                  <AdminBadge variant="warning">Speaking</AdminBadge>
+                ) : null}
+                <AdminBadge variant="outline">Intent {lastTurn?.intent ?? "—"}</AdminBadge>
+                <AdminBadge variant="outline">Conf {lastTurn?.confidence ?? confidence}</AdminBadge>
+              </div>
+            )}
+            <div className="mb-2 grid gap-2 sm:grid-cols-2">
+              <AdminInput label="STT confidence" value={confidence} onChange={(e) => setConfidence(e.target.value)} />
+              <AdminInput label="Silence ms" value={silenceMs} onChange={(e) => setSilenceMs(e.target.value)} />
+            </div>
+            <AdminTextarea value={testInput} onChange={(e) => setTestInput(e.target.value)} rows={2} />
+            <div className="mt-2 flex flex-wrap gap-2">
+              <AdminButton disabled={testBusy || !testSession} onClick={() => void runTurn()}>
+                {testBusy ? "Thinking…" : "Guest speaks → Receptionist"}
+              </AdminButton>
+              {[
+                "What are your hours?",
+                "Do you have vegetarian options?",
+                "Can we continue in Telugu?",
+                "I'd like to reserve a table",
+                "Please repeat that",
+                "Goodbye",
+              ].map((q) => (
+                <AdminButton key={q} size="sm" variant="outline" onClick={() => setTestInput(q)}>
+                  {q}
+                </AdminButton>
+              ))}
+            </div>
+            {testReply && (
+              <pre className="mt-4 whitespace-pre-wrap rounded-xl bg-black/5 p-3 text-sm dark:bg-white/5">
+                {testReply}
+              </pre>
+            )}
+          </AdminCard>
+          <AdminCard>
+            <h3 className="mb-3 text-sm font-semibold">Live transcript / timeline</h3>
+            <ul className="max-h-96 space-y-2 overflow-auto text-sm">
+              {timeline.map((line, i) => (
+                <li key={`${i}-${line.slice(0, 24)}`} className="border-b border-admin-border/30 pb-2">
+                  {line}
+                </li>
+              ))}
+              {!timeline.length && <li className="opacity-60">Start a call to see the conversation timeline.</li>}
+            </ul>
+            {lastTurn?.latency && (
+              <p className="mt-3 text-xs opacity-70">
+                Roundtrip {lastTurn.latency.totalMs}ms · turns {lastTurn.memory.turns} · interruptions{" "}
+                {lastTurn.memory.interruptions}
+              </p>
+            )}
+          </AdminCard>
+        </div>
+      )}
+
+      {tab === "receptionist" && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">Receptionist</h3>
+          <p className="text-sm opacity-80">
+            Cheffy answers calls as a trained front-desk host: greets naturally, classifies intent via Planner, answers
+            FAQs via Semantic RAG, handles silence/interruptions, and stores call summaries. Reservation execution is
+            Phase 3.
+          </p>
+          <AdminButton className="mt-3" onClick={() => setTab("testing")}>
+            Open live testing
           </AdminButton>
-          {testReply && (
-            <pre className="mt-4 whitespace-pre-wrap rounded-xl bg-black/5 p-3 text-sm dark:bg-white/5">
-              {testReply}
-            </pre>
-          )}
+        </AdminCard>
+      )}
+
+      {tab === "greetings" && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">Greetings</h3>
+          <AdminTextarea label="Default greeting template" value={greetingDraft} onChange={(e) => setGreetingDraft(e.target.value)} rows={4} />
+          <p className="mt-1 text-xs opacity-60">Tokens: {"{{location}} {{restaurant}} {{assistant}} {{name}} {{timeOfDay}}"}</p>
+          <AdminButton
+            className="mt-2"
+            onClick={async () => {
+              await upsertGreetingTemplate({
+                locationId: outlet,
+                code: "default",
+                language: "en",
+                template: greetingDraft,
+              });
+              showToast("Greeting saved");
+              void refresh();
+            }}
+          >
+            Save greeting
+          </AdminButton>
+          <ul className="mt-4 space-y-1 text-sm">
+            {greetings.map((g) => (
+              <li key={String(g.id)}>
+                {String(g.code)} · {String(g.language)} · {String(g.template).slice(0, 80)}…
+              </li>
+            ))}
+          </ul>
+        </AdminCard>
+      )}
+
+      {tab === "conversation" && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">Conversation</h3>
+          <p className="text-sm">
+            Turn-taking, repeat, restart, mute/resume, language switch, and misunderstanding recovery are handled by the
+            receptionist layer before/around Planner turns.
+          </p>
+        </AdminCard>
+      )}
+
+      {tab === "hospitality" && hospitality && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">Hospitality</h3>
+          <div className="grid gap-3">
+            <AdminInput
+              label="Brand"
+              value={hospitality.restaurantBrand}
+              onChange={(e) => setHospitality({ ...hospitality, restaurantBrand: e.target.value })}
+            />
+            <AdminInput
+              label="Assistant name"
+              value={hospitality.assistantName}
+              onChange={(e) => setHospitality({ ...hospitality, assistantName: e.target.value })}
+            />
+            <AdminTextarea
+              label="Reservation deferral message"
+              value={hospitality.reservationDeferralMessage}
+              onChange={(e) => setHospitality({ ...hospitality, reservationDeferralMessage: e.target.value })}
+              rows={3}
+            />
+            <AdminTextarea
+              label="Closing message"
+              value={hospitality.closingMessage}
+              onChange={(e) => setHospitality({ ...hospitality, closingMessage: e.target.value })}
+              rows={3}
+            />
+          </div>
+          <AdminButton
+            className="mt-3"
+            onClick={async () => {
+              await upsertHospitality(outlet, hospitality);
+              showToast("Hospitality saved");
+              void refresh();
+            }}
+          >
+            Save hospitality
+          </AdminButton>
+        </AdminCard>
+      )}
+
+      {tab === "personality" && personality && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">Voice Personality</h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <AdminInput
+              label="Speaking speed"
+              type="number"
+              step="0.1"
+              value={String(personality.speakingSpeed)}
+              onChange={(e) => setPersonality({ ...personality, speakingSpeed: Number(e.target.value) || 1 })}
+            />
+            <AdminInput
+              label="Pause duration (ms)"
+              type="number"
+              value={String(personality.pauseDurationMs)}
+              onChange={(e) => setPersonality({ ...personality, pauseDurationMs: Number(e.target.value) || 350 })}
+            />
+            <AdminSelect
+              label="Greeting style"
+              value={personality.greetingStyle}
+              onChange={(v) => setPersonality({ ...personality, greetingStyle: v })}
+              options={[
+                { value: "warm", label: "Warm" },
+                { value: "formal", label: "Formal" },
+                { value: "festive", label: "Festive" },
+              ]}
+            />
+            <AdminSelect
+              label="Energy"
+              value={personality.energyLevel}
+              onChange={(v) => setPersonality({ ...personality, energyLevel: v })}
+              options={[
+                { value: "calm", label: "Calm" },
+                { value: "balanced", label: "Balanced" },
+                { value: "upbeat", label: "Upbeat" },
+              ]}
+            />
+          </div>
+          <AdminButton
+            className="mt-3"
+            onClick={async () => {
+              await upsertPersonality(outlet, personality);
+              showToast("Personality saved");
+              void refresh();
+            }}
+          >
+            Save personality
+          </AdminButton>
+        </AdminCard>
+      )}
+
+      {tab === "silence" && silenceRules && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">Silence Rules</h3>
+          <div className="grid gap-3">
+            <AdminInput
+              label="Soft prompt (ms)"
+              type="number"
+              value={String(silenceRules.softPromptMs)}
+              onChange={(e) => setSilenceRules({ ...silenceRules, softPromptMs: Number(e.target.value) || 5000 })}
+            />
+            <AdminTextarea
+              label="5s prompt"
+              value={silenceRules.prompt5s}
+              onChange={(e) => setSilenceRules({ ...silenceRules, prompt5s: e.target.value })}
+              rows={2}
+            />
+            <AdminTextarea
+              label="10s prompt"
+              value={silenceRules.prompt10s}
+              onChange={(e) => setSilenceRules({ ...silenceRules, prompt10s: e.target.value })}
+              rows={2}
+            />
+            <AdminTextarea
+              label="20s end prompt"
+              value={silenceRules.prompt20s}
+              onChange={(e) => setSilenceRules({ ...silenceRules, prompt20s: e.target.value })}
+              rows={2}
+            />
+          </div>
+          <AdminButton
+            className="mt-3"
+            onClick={async () => {
+              await upsertSilenceRules(outlet, silenceRules);
+              showToast("Silence rules saved");
+              void refresh();
+            }}
+          >
+            Save silence rules
+          </AdminButton>
+        </AdminCard>
+      )}
+
+      {tab === "interruptions" && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">Interruptions</h3>
+          <p className="text-sm">
+            When a guest speaks over Cheffy, TTS stops immediately and listening resumes. Use Interrupt in Testing to
+            verify.
+          </p>
+          <label className="mt-3 flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={settings?.allowInterruptions ?? true}
+              onChange={(e) => void patchSettings({ allowInterruptions: e.target.checked })}
+            />
+            Allow interruptions
+          </label>
+        </AdminCard>
+      )}
+
+      {tab === "summaries" && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">Call Summaries</h3>
+          <ul className="space-y-3 text-sm">
+            {summaries.map((s) => (
+              <li key={s.id} className="border-b border-admin-border/30 pb-2">
+                <strong>{new Date(s.createdAt).toLocaleString()}</strong> · {s.sentiment ?? "—"} ·{" "}
+                {Math.round(s.durationMs / 1000)}s
+                <p className="mt-1 opacity-80">{s.summary}</p>
+                <p className="text-xs opacity-60">
+                  Topics: {s.topics.join(", ") || "—"} · Intents: {s.detectedIntents.join(", ") || "—"}
+                  {s.escalationRecommendation ? ` · ${s.escalationRecommendation}` : ""}
+                </p>
+              </li>
+            ))}
+            {!summaries.length && <li>No summaries yet — end a receptionist test call.</li>}
+          </ul>
+        </AdminCard>
+      )}
+
+      {tab === "faq" && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">FAQ Testing</h3>
+          <p className="mb-3 text-sm opacity-80">
+            FAQ answers come from Semantic RAG + CMS knowledge through the existing AI platform — never duplicated here.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              "What are your business hours?",
+              "Where are you located?",
+              "Is there parking?",
+              "What are today's offers?",
+              "Tell me about popular dishes",
+            ].map((q) => (
+              <AdminButton
+                key={q}
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setTestInput(q);
+                  setTab("testing");
+                }}
+              >
+                {q}
+              </AdminButton>
+            ))}
+          </div>
         </AdminCard>
       )}
 

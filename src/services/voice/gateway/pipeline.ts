@@ -26,9 +26,13 @@ export type ProcessVoiceTurnInput = {
   sessionId: string;
   /** Final transcript text (from STT or typed test harness). */
   transcript: string;
+  /** Optional AI-only context (not stored as guest transcript). */
+  contextHint?: string;
   speak?: boolean;
   history?: Array<{ role: "user" | "assistant"; content: string }>;
   signal?: AbortSignal;
+  /** Override STT confidence when provided by upstream. */
+  confidence?: number;
 };
 
 function stripForSpeech(text: string): string {
@@ -92,7 +96,7 @@ export async function processVoiceTurn(input: ProcessVoiceTurnInput): Promise<Vo
     text: stt.text,
     isFinal: true,
     language: stt.language,
-    confidence: stt.confidence,
+    confidence: input.confidence ?? stt.confidence,
     sttProvider: stt.provider,
   });
   await insertEvent(session.id, "transcript_final", { role: "user", text: stt.text });
@@ -107,10 +111,12 @@ export async function processVoiceTurn(input: ProcessVoiceTurnInput): Promise<Vo
         content: t.text,
       }));
 
+  const aiMessage = input.contextHint ? `${stt.text}\n\n[${input.contextHint}]` : stt.text;
+
   const orchStarted = performance.now();
   const orchestrated = await orchestrateAIRequest(
     {
-      message: stt.text,
+      message: aiMessage,
       conversationId: session.conversationId,
       history: history.filter((h) => h.content && h.content !== stt.text).slice(-12),
       signal: input.signal,
