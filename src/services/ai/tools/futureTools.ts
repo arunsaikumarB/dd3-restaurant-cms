@@ -11,7 +11,7 @@ export interface MenuTool {
 
 export interface ReservationTool {
   readonly kind: "reservation";
-  /** @future checkAvailability / createHold */
+  /** Implemented by restaurantOperations Reservation Engine via orchestrator adapter. */
   execute(_locationId: string): Promise<never>;
 }
 

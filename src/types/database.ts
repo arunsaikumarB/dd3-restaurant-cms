@@ -326,6 +326,24 @@ export interface Reservation extends Timestamps {
   guests: number;
   special_request: string | null;
   status: ReservationStatus;
+  /** Additive reservation platform fields (migration 044) */
+  confirmation_code?: string | null;
+  source?: string | null;
+  occasion?: string | null;
+  seating_preference?: string | null;
+  accessibility_needs?: string | null;
+  high_chair?: boolean | null;
+  outdoor_requested?: boolean | null;
+  booth_requested?: boolean | null;
+  window_requested?: boolean | null;
+  dietary_restrictions?: string[] | null;
+  children_count?: number | null;
+  guest_id?: string | null;
+  table_id?: string | null;
+  party_notes?: string | null;
+  duration_minutes?: number | null;
+  no_show?: boolean | null;
+  conversation_id?: string | null;
 }
 
 export interface ContactEnquiry extends Timestamps {

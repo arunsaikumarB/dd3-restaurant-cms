@@ -11,6 +11,7 @@ import { retrieveForIntent } from "../../rag/retriever";
 import type { LocationId } from "../../../config/locations";
 import { registerOrchestratorTool } from "./toolRegistry";
 import type { ToolAdapter, ToolAdapterContext } from "./types";
+import { registerReservationEngineTool } from "../../restaurantOperations/reservations/reservationTool";
 
 function knowledgeOf(ctx: ToolAdapterContext): CMSKnowledge {
   return ctx.knowledge as CMSKnowledge;
@@ -64,10 +65,11 @@ export function ensureBuiltinAdaptersRegistered(): void {
   registerOrchestratorTool(wrapCmsTools("review", "reviews", ["getReviews"], true));
   registerOrchestratorTool(wrapCmsTools("reviews", "reviews", ["getReviews"], true));
   registerOrchestratorTool(wrapCmsTools("gallery", "gallery", ["getGallery"], true));
-  // Reservation / menu / catering — navigate + info only (no booking/payments APIs yet). Never long-cache reservation.
+  // Reservation — register CMS fallback then overwrite with Reservation Engine tool.
   registerOrchestratorTool(
     wrapCmsTools("reservation", "reservation", ["getRestaurantInfo", "navigateToPage"], false),
   );
+  registerReservationEngineTool();
   registerOrchestratorTool(wrapCmsTools("menu", "menu", ["navigateToPage"], false));
   registerOrchestratorTool(
     wrapCmsTools("catering", "catering", ["getHomepageContent", "getSEO", "navigateToPage"], true),

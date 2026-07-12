@@ -12,6 +12,7 @@ import {
   PlugZap,
   Bot,
   BookOpen,
+  UtensilsCrossed,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -34,6 +35,12 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       { label: "Homepage", path: "/admin/homepage", icon: Home },
       { label: "Pages", path: "/admin/pages", icon: FileText },
       { label: "SEO Summary", path: "/admin/seo-summary", icon: Search },
+    ],
+  },
+  {
+    title: "Restaurant Operations",
+    items: [
+      { label: "Operations Center", path: "/admin/operations", icon: UtensilsCrossed },
     ],
   },
   {
