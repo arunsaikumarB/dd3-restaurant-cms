@@ -207,6 +207,8 @@ export type KnowledgeDebugReport = {
   memory?: unknown;
   /** Agentic planner output — admin only */
   executionPlan?: unknown;
+  /** Tool orchestrator timeline + package — admin only */
+  toolOrchestration?: unknown;
 };
 
 export type SearchLabOptions = {

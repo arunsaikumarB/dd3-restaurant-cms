@@ -1,0 +1,137 @@
+import type { AgentExecutionPlan } from "../planner/types";
+import type { ExecutionMode, OrchestratorToolResult, UnifiedContextPackage } from "./types";
+
+export function aggregateContext(input: {
+  plan: AgentExecutionPlan;
+  toolResults: OrchestratorToolResult[];
+  memory: Record<string, unknown>;
+  personality?: Record<string, unknown>;
+  mode: ExecutionMode;
+  durationMs: number;
+}): UnifiedContextPackage {
+  const byId = Object.fromEntries(input.toolResults.map((r) => [String(r.toolId), r]));
+
+  const cms = pickResult(byId, ["cms", "restaurant_settings"]);
+  const rag = pickResult(byId, ["semantic_rag"]);
+  const offers = pickResult(byId, ["offers", "offer"]);
+  const reviews = pickResult(byId, ["reviews", "review"]);
+  const gallery = pickResult(byId, ["gallery"]);
+  const restaurant = pickResult(byId, ["hours", "contact", "location", "restaurant_settings"]);
+  const rules = pickResult(byId, ["business_rules"]);
+
+  const toolsBag: Record<string, unknown> = {};
+  for (const r of input.toolResults) {
+    toolsBag[String(r.toolId)] = {
+      status: r.status,
+      executionTimeMs: r.executionTimeMs,
+      confidence: r.confidence,
+      source: r.source,
+      cached: r.cached,
+      errors: r.errors,
+      data: r.result,
+      metadata: r.metadata,
+    };
+  }
+
+  const successCount = input.toolResults.filter((r) => r.status === "success").length;
+  const failureCount = input.toolResults.filter((r) =>
+    ["failed", "timeout", "circuit_open", "unknown_tool"].includes(r.status),
+  ).length;
+  const cacheHits = input.toolResults.filter((r) => r.cached).length;
+  const cacheMisses = input.toolResults.filter((r) => !r.cached && r.status === "success").length;
+
+  return {
+    planner: {
+      planId: input.plan.planId,
+      intent: input.plan.intent,
+      goal: input.plan.goal,
+      complexity: input.plan.complexity,
+      confidence: input.plan.confidence,
+      knowledgeSources: input.plan.knowledgeSources,
+      requiredTools: input.plan.requiredTools,
+      clarification: input.plan.clarification,
+      humanEscalation: input.plan.humanEscalation,
+      workflow: input.plan.workflow,
+    },
+    cms: asObject(cms),
+    rag: asObject(rag),
+    memory: input.memory,
+    tools: toolsBag,
+    rules: asObject(rules),
+    personality: input.personality ?? {},
+    restaurant: asObject(restaurant),
+    location: {
+      ...(typeof restaurant === "object" && restaurant ? restaurant : {}),
+      ...(offers ? { offers } : {}),
+      ...(reviews ? { reviews } : {}),
+      ...(gallery ? { gallery } : {}),
+    },
+    meta: {
+      packageId: crypto.randomUUID(),
+      planId: input.plan.planId,
+      totalDurationMs: input.durationMs,
+      toolCount: input.toolResults.length,
+      successCount,
+      failureCount,
+      cacheHits,
+      cacheMisses,
+      mode: input.mode,
+    },
+  };
+}
+
+function pickResult(
+  byId: Record<string, OrchestratorToolResult>,
+  ids: string[],
+): unknown {
+  for (const id of ids) {
+    const hit = byId[id];
+    if (hit?.status === "success" && hit.result != null) return hit.result;
+  }
+  return {};
+}
+
+function asObject(value: unknown): Record<string, unknown> {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  return { value };
+}
+
+/** Map orchestrator results into Gemini-compatible toolResults array. */
+export function toAIToolResults(
+  toolResults: OrchestratorToolResult[],
+): Array<{ tool: string; available: boolean; data: unknown }> {
+  return toolResults
+    .filter((r) => !["cms", "semantic_rag", "business_rules", "conversation_memory"].includes(String(r.toolId)))
+    .map((r) => ({
+      tool: mapToLegacyToolName(String(r.toolId)),
+      available: r.status === "success" && r.result != null,
+      data: r.result,
+    }));
+}
+
+function mapToLegacyToolName(id: string): string {
+  switch (id) {
+    case "offer":
+    case "offers":
+      return "getOffers";
+    case "review":
+    case "reviews":
+      return "getReviews";
+    case "gallery":
+      return "getGallery";
+    case "hours":
+    case "contact":
+    case "restaurant_settings":
+      return "getRestaurantInfo";
+    case "location":
+      return "getCurrentLocation";
+    case "reservation":
+    case "menu":
+    case "catering":
+      return "navigateToPage";
+    default:
+      return id;
+  }
+}

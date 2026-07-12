@@ -7,20 +7,23 @@ import { planContextSources } from "./sourcePlanner";
 import type { OrchestratedContext } from "./types";
 import { SEMANTIC_TOOL_NAME } from "./types";
 import { createAndLogExecutionPlan } from "../planner";
+import { runToolOrchestrator } from "../toolOrchestrator";
+import type { ToolOrchestratorResult } from "../toolOrchestrator";
 
 /**
  * Context Orchestrator — extends (does not replace) enrichAIRequest.
- * Combines CMS, semantic RAG, tools, session, personality, outlet, and business rules.
  *
- * Agentic layer (additive): runs the Planner first to produce an execution plan.
- * The planner does not call Gemini, execute tools, or retrieve knowledge.
+ * Flow:
+ * Planner → Tool Orchestrator → (optional RAG) → unified context → Gemini-ready request
+ *
+ * Does not redesign Planner, Semantic RAG internals, Gemini, or existing tool handlers.
  */
 export async function orchestrateAIRequest(
   request: AIRequest,
   knowledge: CMSKnowledge,
   preferences?: AISessionContext["preferences"],
 ): Promise<OrchestratedContext> {
-  // 1) Planner — think before acting (deterministic execution plan only)
+  // 1) Planner — think before acting
   const executionPlan = await createAndLogExecutionPlan({
     message: request.message,
     conversationId: request.conversationId,
@@ -28,12 +31,37 @@ export async function orchestrateAIRequest(
     history: request.history,
   });
 
-  // 2) Existing source plan + enrichment (unchanged Semantic RAG / tools path)
-  const plan = planContextSources(request.message);
-  const base = enrichAIRequest(request, knowledge, preferences);
+  // 2) Tool Orchestrator — execute the plan (sources + tools), never stop on single failure
+  const toolOrchestration = await runToolOrchestrator({
+    plan: executionPlan,
+    knowledge,
+    message: request.message,
+    conversationId: request.conversationId,
+    history: request.history,
+    personality: preferences ? { preferences } : undefined,
+    signal: request.signal,
+  });
 
+  // 3) Existing source plan (kept for backward-compatible meta)
+  const plan = planContextSources(request.message);
+
+  // 4) Base enrichment for CMS/session shape — toolResults replaced by orchestrator
+  const base = enrichAIRequest(request, knowledge, preferences);
+  const enriched: AIRequest = {
+    ...base,
+    toolResults: toolOrchestration.aiToolResults.length
+      ? toolOrchestration.aiToolResults
+      : base.toolResults,
+  };
+
+  // Prefer RAG from orchestrator package when present; else fall back to existing path
   let semantic = undefined;
-  if (plan.useSemanticRag) {
+  const ragFromOrch = toolOrchestration.toolResults.find(
+    (r) => String(r.toolId) === "semantic_rag" && r.status === "success",
+  );
+  if (ragFromOrch?.result && typeof ragFromOrch.result === "object") {
+    semantic = ragFromOrch.result as Awaited<ReturnType<typeof retrieveForIntent>>;
+  } else if (plan.useSemanticRag && executionPlan.knowledgeSources.includes("semantic_rag")) {
     semantic = await retrieveForIntent({
       query: request.message,
       locationId: knowledge.locationId,
@@ -41,14 +69,13 @@ export async function orchestrateAIRequest(
       signal: request.signal,
       matchCount: plan.maxRagChunks + 2,
     });
-    // Additive relationship boost — does not change Semantic RAG internals.
     if (semantic?.chunks?.length) {
       try {
         const { boostRelatedChunks } = await import("../../knowledgeIntelligence/relationships");
         const boosted = await boostRelatedChunks(semantic.chunks, 3);
         semantic = { ...semantic, chunks: boosted };
       } catch {
-        /* relationships table may be absent until migration 039 */
+        /* optional */
       }
     }
   }
@@ -58,14 +85,16 @@ export async function orchestrateAIRequest(
     : [];
 
   const hasSemantic = trimmedChunks.length > 0;
-  const enriched = { ...base };
 
-  // Attach planner output for observability / future executor phases (not customer-facing)
+  // Attach planner + unified context package (structured — not string concat)
   if (enriched.cmsContext) {
+    const cmsFromOrch = toolOrchestration.contextPackage.cms;
     enriched.cmsContext = {
       ...enriched.cmsContext,
       context: {
-        ...enriched.cmsContext.context,
+        locationId: knowledge.locationId,
+        locationName: knowledge.locationName,
+        ...(Object.keys(cmsFromOrch).length ? { orchestratorCms: cmsFromOrch } : {}),
         agentExecutionPlan: {
           planId: executionPlan.planId,
           intent: executionPlan.intent,
@@ -78,6 +107,14 @@ export async function orchestrateAIRequest(
           humanEscalation: executionPlan.humanEscalation,
           workflow: executionPlan.workflow,
         },
+        agentContextPackage: toolOrchestration.contextPackage,
+        agentOrchestratorMeta: {
+          packageId: toolOrchestration.packageId,
+          mode: toolOrchestration.schedule.mode,
+          durationMs: toolOrchestration.durationMs,
+          successCount: toolOrchestration.contextPackage.meta.successCount,
+          failureCount: toolOrchestration.contextPackage.meta.failureCount,
+        },
       },
     };
   }
@@ -88,30 +125,15 @@ export async function orchestrateAIRequest(
       available: true,
       data: buildSemanticToolPayload(trimmedChunks, request.message),
     };
-
     const existingTools = enriched.toolResults ?? [];
-    if (existingTools.length > 0) {
-      enriched.toolResults = [...existingTools, semanticTool];
-    } else {
-      enriched.cmsContext = {
-        ...enriched.cmsContext!,
-        context: {
-          ...enriched.cmsContext?.context,
-          semanticKnowledge: buildSemanticToolPayload(trimmedChunks, request.message),
-          orchestratorRules: [
-            "Use semantic knowledge excerpts below when relevant to the guest question.",
-            "Combine with CMS data — never contradict live CMS/tool facts.",
-            "If excerpts lack the answer, say so politely.",
-          ],
-        },
-      };
-    }
+    enriched.toolResults = [...existingTools, semanticTool];
   }
 
   return {
     request: enriched,
     plan,
     executionPlan,
+    toolOrchestration,
     semantic: semantic
       ? {
           ...semantic,
@@ -137,3 +159,5 @@ export async function enrichAIRequestWithOrchestrator(
   const result = await orchestrateAIRequest(request, knowledge, preferences);
   return result.request;
 }
+
+export type { ToolOrchestratorResult };

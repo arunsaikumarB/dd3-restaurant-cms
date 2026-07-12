@@ -33,6 +33,8 @@ export {
   summarizePlan,
 } from "./planner";
 export type { AgentExecutionPlan, PlannerInput, PlannerIntent } from "./planner";
+export { runToolOrchestrator, registerOrchestratorTool } from "./toolOrchestrator";
+export type { ToolOrchestratorResult, UnifiedContextPackage } from "./toolOrchestrator";
 export {
   AIProviderError,
   CHEFFY_KITCHEN_ERROR,

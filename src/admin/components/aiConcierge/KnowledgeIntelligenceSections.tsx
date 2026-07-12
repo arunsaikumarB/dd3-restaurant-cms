@@ -33,6 +33,7 @@ import { listSemanticDocuments, queueSemanticIndex } from "../../../services/rag
 import type { KnowledgeDebugReport } from "../../../types/knowledgeIntelligence";
 import type { KnowledgeRelationshipType } from "../../../types/knowledgeIntelligence";
 import type { AgentExecutionPlan } from "../../../services/ai/planner/types";
+import type { ToolOrchestratorResult } from "../../../services/ai/toolOrchestrator";
 import type { AIConciergePermissions } from "../../../services/aiAdmin/permissions";
 
 type Props = { locationId: LocationId; permissions: AIConciergePermissions; disabled?: boolean };
@@ -191,6 +192,65 @@ function PlannerPanel({ plan }: { plan: AgentExecutionPlan }) {
   );
 }
 
+function ToolOrchestratorPanel({ result }: { result: ToolOrchestratorResult }) {
+  return (
+    <div className="space-y-3">
+      <div className="kb-metric-grid">
+        <Metric label="Mode" value={result.schedule.mode} />
+        <Metric label="Duration" value={`${result.durationMs}ms`} />
+        <Metric label="Tools" value={result.toolResults.length} />
+        <Metric label="Success" value={result.contextPackage.meta.successCount} />
+        <Metric label="Failures" value={result.contextPackage.meta.failureCount} />
+        <Metric label="Cache Hits" value={result.contextPackage.meta.cacheHits} />
+      </div>
+      <AdminCard padding="sm">
+        <strong className="text-sm">Execution Order / Groups</strong>
+        <ul className="mt-2 space-y-1 text-sm">
+          {result.schedule.groups.map((g) => (
+            <li key={g.id}>
+              <AdminBadge variant="outline">{g.mode}</AdminBadge> {g.id}: {g.toolIds.join(", ")}
+              {g.dependsOn.length ? ` ← depends ${g.dependsOn.join(",")}` : ""}
+            </li>
+          ))}
+        </ul>
+      </AdminCard>
+      <AdminCard padding="sm">
+        <strong className="text-sm">Tool Results</strong>
+        <ul className="mt-2 space-y-1 text-sm">
+          {result.toolResults.map((r) => (
+            <li key={String(r.toolId)} className="flex flex-wrap gap-2 items-center">
+              <AdminBadge
+                variant={
+                  r.status === "success" ? "success" : r.status === "unknown_tool" ? "default" : "danger"
+                }
+              >
+                {r.status}
+              </AdminBadge>
+              <span>
+                {String(r.toolId)} · {r.executionTimeMs}ms
+                {r.cached ? " · cache" : ""}
+                {r.retries ? ` · retries ${r.retries}` : ""}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </AdminCard>
+      <details>
+        <summary className="cursor-pointer text-sm font-medium">Execution Timeline</summary>
+        <pre className="mt-2 max-h-48 overflow-auto text-xs whitespace-pre-wrap">
+          {JSON.stringify(result.timeline, null, 2)}
+        </pre>
+      </details>
+      <details>
+        <summary className="cursor-pointer text-sm font-medium">Merged Context Package</summary>
+        <pre className="mt-2 max-h-64 overflow-auto text-xs whitespace-pre-wrap">
+          {JSON.stringify(result.contextPackage, null, 2)}
+        </pre>
+      </details>
+    </div>
+  );
+}
+
 export function KnowledgeDebuggerSection({ locationId, permissions, disabled }: Props) {
   const [question, setQuestion] = useState("Can I bring outside cake?");
   const [running, setRunning] = useState(false);
@@ -252,6 +312,12 @@ export function KnowledgeDebuggerSection({ locationId, permissions, disabled }: 
             <AdminCard>
               <h3 className="mb-3 text-sm font-semibold">AI Planner Output</h3>
               <PlannerPanel plan={report.executionPlan as AgentExecutionPlan} />
+            </AdminCard>
+          ) : null}
+          {report.toolOrchestration != null ? (
+            <AdminCard>
+              <h3 className="mb-3 text-sm font-semibold">Tool Orchestrator</h3>
+              <ToolOrchestratorPanel result={report.toolOrchestration as ToolOrchestratorResult} />
             </AdminCard>
           ) : null}
           <StagePipeline report={report} />

@@ -152,6 +152,31 @@ export async function runKnowledgeDebug(input: {
   embeddingMs = plan.useSemanticRag ? Math.round(orchMs * 0.45) : 0;
   vectorSearchMs = plan.useSemanticRag ? Math.round(orchMs * 0.45) : 0;
 
+  const toolOrch = orchestrated.toolOrchestration;
+  push({
+    id: "tool_orchestrator",
+    label: "Tool Orchestrator",
+    status: toolOrch ? "ok" : "warn",
+    durationMs: toolOrch?.durationMs ?? 0,
+    summary: toolOrch
+      ? `${toolOrch.schedule.mode} · ${toolOrch.toolResults.length} tools · ${toolOrch.contextPackage.meta.successCount} ok / ${toolOrch.contextPackage.meta.failureCount} failed`
+      : "No tool orchestration payload",
+    data: toolOrch
+      ? {
+          schedule: toolOrch.schedule,
+          timeline: toolOrch.timeline,
+          results: toolOrch.toolResults.map((r) => ({
+            toolId: r.toolId,
+            status: r.status,
+            ms: r.executionTimeMs,
+            cached: r.cached,
+            errors: r.errors,
+          })),
+          contextMeta: toolOrch.contextPackage.meta,
+        }
+      : null,
+  });
+
   let chunks = orchestrated.semantic?.chunks ?? [];
   if (options.includeRelationships && chunks.length) {
     chunks = await boostRelatedChunks(chunks, 4);
@@ -381,6 +406,7 @@ export async function runKnowledgeDebug(input: {
     toolCalls,
     memory: request.session,
     executionPlan: agentPlan,
+    toolOrchestration: toolOrch ?? null,
   };
 
   try {

@@ -26,6 +26,8 @@ export type OrchestratedContext = {
   plan: SourcePlan;
   /** Agentic execution plan — produced before retrieval; never answers the guest. */
   executionPlan?: AgentExecutionPlan;
+  /** Tool Orchestrator run — sources/tools executed from the plan */
+  toolOrchestration?: import("../toolOrchestrator").ToolOrchestratorResult;
   semantic?: SemanticRetrievalResult;
   meta: {
     ragChunkCount: number;
