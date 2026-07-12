@@ -8,6 +8,7 @@ import type {
 import { detectIntent } from "../ai/emotionEngine";
 import { planContextSources } from "../ai/orchestrator/sourcePlanner";
 import { enrichAIRequestWithOrchestrator, orchestrateAIRequest } from "../ai/orchestrator/contextOrchestrator";
+import { createExecutionPlan, summarizePlan } from "../ai/planner";
 import { buildCMSKnowledge } from "../cms/knowledge";
 import { CONCIERGE_API_PATH } from "../ai/providers/providerTypes";
 import { fetchActivePrompt } from "../aiAdmin/repository";
@@ -75,19 +76,33 @@ export async function runKnowledgeDebug(input: {
     data: { question },
   });
 
-  // 2. Intent
+  // 2. Intent + Agentic Planner (no Gemini, no tools, no retrieval)
   const tIntent = performance.now();
   const intent = detectIntent(question);
+  const agentPlan = createExecutionPlan({
+    message: question,
+    locationId: input.locationId,
+  });
   push({
     id: "intent",
     label: "Intent Detection",
     status: "ok",
     durationMs: Math.round(performance.now() - tIntent),
-    summary: String(intent),
-    data: { intent },
+    summary: `${agentPlan.intent} (legacy:${intent}) · goal ${agentPlan.goal}`,
+    data: { legacyIntent: intent, plannerIntent: agentPlan.intent, secondary: agentPlan.secondaryIntents },
   });
 
-  // 3. Source planner
+  const tPlanner = performance.now();
+  push({
+    id: "planner",
+    label: "AI Planner / Execution Plan",
+    status: "ok",
+    durationMs: Math.round(performance.now() - tPlanner),
+    summary: summarizePlan(agentPlan),
+    data: agentPlan,
+  });
+
+  // 3. Source planner (existing)
   const tPlan = performance.now();
   const plan = planContextSources(question);
   push({
@@ -365,6 +380,7 @@ export async function runKnowledgeDebug(input: {
     sourcePlan: plan,
     toolCalls,
     memory: request.session,
+    executionPlan: agentPlan,
   };
 
   try {

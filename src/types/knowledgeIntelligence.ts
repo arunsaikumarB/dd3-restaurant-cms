@@ -205,6 +205,8 @@ export type KnowledgeDebugReport = {
   sourcePlan?: unknown;
   toolCalls?: unknown[];
   memory?: unknown;
+  /** Agentic planner output — admin only */
+  executionPlan?: unknown;
 };
 
 export type SearchLabOptions = {

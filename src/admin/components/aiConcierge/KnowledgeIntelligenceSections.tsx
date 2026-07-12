@@ -32,6 +32,7 @@ import {
 import { listSemanticDocuments, queueSemanticIndex } from "../../../services/rag";
 import type { KnowledgeDebugReport } from "../../../types/knowledgeIntelligence";
 import type { KnowledgeRelationshipType } from "../../../types/knowledgeIntelligence";
+import type { AgentExecutionPlan } from "../../../services/ai/planner/types";
 import type { AIConciergePermissions } from "../../../services/aiAdmin/permissions";
 
 type Props = { locationId: LocationId; permissions: AIConciergePermissions; disabled?: boolean };
@@ -132,6 +133,64 @@ function ChunkTable({ report }: { report: KnowledgeDebugReport }) {
   );
 }
 
+function PlannerPanel({ plan }: { plan: AgentExecutionPlan }) {
+  return (
+    <div className="space-y-3">
+      <div className="kb-metric-grid">
+        <Metric label="Intent" value={plan.intent} />
+        <Metric label="Goal" value={plan.goal} />
+        <Metric label="Complexity" value={plan.complexity} />
+        <Metric label="Confidence" value={`${plan.confidence} (${plan.confidenceBand})`} />
+        <Metric label="Escalate?" value={plan.humanEscalation ? "Recommended" : "No"} />
+        <Metric label="Clarify?" value={plan.clarification.required ? "Yes" : "No"} />
+      </div>
+      <div className="grid gap-3 lg:grid-cols-2">
+        <AdminCard padding="sm">
+          <strong className="text-sm">Knowledge Sources</strong>
+          <p className="mt-1 text-sm">{plan.knowledgeSources.join(", ") || "—"}</p>
+        </AdminCard>
+        <AdminCard padding="sm">
+          <strong className="text-sm">Required Tools</strong>
+          <p className="mt-1 text-sm">{plan.requiredTools.join(", ") || "none"}</p>
+        </AdminCard>
+        <AdminCard padding="sm">
+          <strong className="text-sm">Clarifications</strong>
+          <p className="mt-1 text-sm">
+            {plan.clarification.required ? plan.clarification.fields.join(", ") : "None required"}
+          </p>
+        </AdminCard>
+        <AdminCard padding="sm">
+          <strong className="text-sm">Workflow</strong>
+          <p className="mt-1 text-sm">{plan.workflow.join(" → ")}</p>
+        </AdminCard>
+      </div>
+      <AdminCard padding="sm">
+        <strong className="text-sm">Reasoning (admin only)</strong>
+        <ul className="mt-2 list-disc pl-5 text-xs space-y-1">
+          {plan.reasoning.whyKnowledgeSelected.map((r) => (
+            <li key={r}>Knowledge: {r}</li>
+          ))}
+          {plan.reasoning.whyToolsSelected.map((r) => (
+            <li key={r}>Tools: {r}</li>
+          ))}
+          {plan.reasoning.clarificationReasons.map((r) => (
+            <li key={r}>Clarify: {r}</li>
+          ))}
+          {plan.reasoning.escalationReasons.map((r) => (
+            <li key={r}>Escalate: {r}</li>
+          ))}
+        </ul>
+      </AdminCard>
+      <details>
+        <summary className="cursor-pointer text-sm font-medium">Execution Plan JSON</summary>
+        <pre className="mt-2 max-h-64 overflow-auto text-xs whitespace-pre-wrap">
+          {JSON.stringify(plan, null, 2)}
+        </pre>
+      </details>
+    </div>
+  );
+}
+
 export function KnowledgeDebuggerSection({ locationId, permissions, disabled }: Props) {
   const [question, setQuestion] = useState("Can I bring outside cake?");
   const [running, setRunning] = useState(false);
@@ -189,6 +248,12 @@ export function KnowledgeDebuggerSection({ locationId, permissions, disabled }: 
             <Metric label="LLM Time" value={`${report.timings.llmMs}ms`} />
             <Metric label="Total" value={`${report.timings.totalMs}ms`} />
           </div>
+          {report.executionPlan != null ? (
+            <AdminCard>
+              <h3 className="mb-3 text-sm font-semibold">AI Planner Output</h3>
+              <PlannerPanel plan={report.executionPlan as AgentExecutionPlan} />
+            </AdminCard>
+          ) : null}
           <StagePipeline report={report} />
           <div>
             <h3 className="mb-2 text-sm font-semibold">Top Retrieved Chunks</h3>

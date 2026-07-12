@@ -28,6 +28,12 @@ export {
   enrichAIRequestWithOrchestrator,
 } from "./orchestrator";
 export {
+  createExecutionPlan,
+  createAndLogExecutionPlan,
+  summarizePlan,
+} from "./planner";
+export type { AgentExecutionPlan, PlannerInput, PlannerIntent } from "./planner";
+export {
   AIProviderError,
   CHEFFY_KITCHEN_ERROR,
   isAbortError,
