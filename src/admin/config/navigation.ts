@@ -12,6 +12,7 @@ import {
   PlugZap,
   Bot,
   BookOpen,
+  Mic,
   Gauge,
   UtensilsCrossed,
   Users,
@@ -65,6 +66,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     items: [
       { label: "ChefGaa Integration", path: "/admin/integrations/chefgaa", icon: PlugZap },
       { label: "AI Concierge", path: "/admin/integrations/ai-concierge", icon: Bot },
+      { label: "Voice AI", path: "/admin/integrations/voice", icon: Mic },
       { label: "Knowledge Base", path: "/admin/integrations/knowledge-base", icon: BookOpen },
     ],
   },

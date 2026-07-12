@@ -31,6 +31,7 @@ const AdminGalleryPage = lazy(() => import("./admin/pages/GalleryPage"));
 const AdminChefGaaIntegrationPage = lazy(() => import("./admin/pages/ChefGaaIntegrationPage"));
 const AdminAIConciergePage = lazy(() => import("./admin/pages/AIConciergePage"));
 const AdminKnowledgeBasePage = lazy(() => import("./admin/pages/KnowledgeBasePage"));
+const AdminVoiceAIPage = lazy(() => import("./admin/pages/VoiceAIPage"));
 const AdminOperationsCenterPage = lazy(() => import("./admin/pages/OperationsCenterPage"));
 const AdminRestaurantOperationsPage = lazy(() => import("./admin/pages/RestaurantOperationsPage"));
 const AdminCustomerCrmPage = lazy(() => import("./admin/pages/CustomerCrmPage"));
@@ -292,6 +293,7 @@ export default function App() {
           <Route path="integrations/chefgaa" element={<AdminChefGaaIntegrationPage />} />
           <Route path="integrations/ai-concierge" element={<AdminAIConciergePage />} />
           <Route path="integrations/knowledge-base" element={<AdminKnowledgeBasePage />} />
+          <Route path="integrations/voice" element={<AdminVoiceAIPage />} />
           <Route path="operations" element={<AdminOperationsCenterPage />} />
           <Route path="operations/reservations" element={<AdminRestaurantOperationsPage />} />
           <Route path="operations/crm" element={<AdminCustomerCrmPage />} />
