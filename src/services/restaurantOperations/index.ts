@@ -4,3 +4,5 @@ export * from "./crm";
 export * as eventOps from "./events";
 /** Workflow automation — import from `./automation` or `workflowOps`. */
 export * as workflowOps from "./automation";
+/** Customer Journey — import from `./journey` or `journeyOps`. */
+export * as journeyOps from "./journey";

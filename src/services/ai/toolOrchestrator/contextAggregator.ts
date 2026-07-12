@@ -67,6 +67,7 @@ export function aggregateContext(input: {
       ...(gallery ? { gallery } : {}),
     },
     crm: {},
+    journey: {},
     meta: {
       packageId: crypto.randomUUID(),
       planId: input.plan.planId,
@@ -111,6 +112,40 @@ export function attachCrmToContextPackage(
         segments: crm.segments,
         birthdaySoon: crm.birthdaySoon,
         anniversarySoon: crm.anniversarySoon,
+      },
+    },
+  };
+}
+
+/**
+ * Attach Customer Journey intelligence into the unified package.
+ * Planner never queries Journey DB — Context Aggregator enrichment only.
+ */
+export function attachJourneyToContextPackage(
+  pkg: UnifiedContextPackage,
+  journey: Record<string, unknown> | null | undefined,
+): UnifiedContextPackage {
+  if (!journey || !Object.keys(journey).length || !journey.customerId) return pkg;
+  return {
+    ...pkg,
+    journey,
+    memory: {
+      ...pkg.memory,
+      journeyStage: journey.stage ?? null,
+      journeySummary: journey.summary ?? null,
+      nextBestAction: journey.nextBestAction ?? null,
+    },
+    personality: {
+      ...pkg.personality,
+      journey: {
+        stage: journey.stage,
+        stageName: journey.stageName,
+        relationshipScore: journey.relationshipScore,
+        churnRisk: journey.churnRisk,
+        nextBestAction: journey.nextBestAction,
+        recommendedOffers: journey.recommendedOffers,
+        milestones: journey.milestones,
+        upcomingMilestones: journey.upcomingMilestones,
       },
     },
   };

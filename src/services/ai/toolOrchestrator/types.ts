@@ -49,6 +49,8 @@ export type UnifiedContextPackage = {
   location: Record<string, unknown>;
   /** Restaurant CRM personalization — attached by Context Aggregator enrichment */
   crm?: Record<string, unknown>;
+  /** Customer Journey lifecycle intelligence — Context Aggregator only */
+  journey?: Record<string, unknown>;
   meta: {
     packageId: string;
     planId: string;

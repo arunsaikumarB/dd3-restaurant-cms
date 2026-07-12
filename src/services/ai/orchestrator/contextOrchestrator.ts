@@ -8,10 +8,11 @@ import type { OrchestratedContext } from "./types";
 import { SEMANTIC_TOOL_NAME } from "./types";
 import { createAndLogExecutionPlan } from "../planner";
 import { runToolOrchestrator } from "../toolOrchestrator";
-import { attachCrmToContextPackage } from "../toolOrchestrator/contextAggregator";
+import { attachCrmToContextPackage, attachJourneyToContextPackage } from "../toolOrchestrator/contextAggregator";
 import type { ToolOrchestratorResult } from "../toolOrchestrator";
 import { resolveCrmContext, syncCrmAfterReservation } from "../../restaurantOperations/crm";
 import { syncCrmAfterCatering } from "../../restaurantOperations/events";
+import { resolveJourneyContext } from "../../restaurantOperations/journey";
 
 /**
  * Context Orchestrator — extends (does not replace) enrichAIRequest.
@@ -53,12 +54,23 @@ export async function orchestrateAIRequest(
       message: request.message,
       conversationId: request.conversationId,
     });
+    let enrichedPkg = attachCrmToContextPackage(
+      toolOrchestrationBase.contextPackage,
+      crm as unknown as Record<string, unknown>,
+    );
+    // Journey Engine — Context Aggregator only (does not modify Planner / CRM / Workflow)
+    const journey = await resolveJourneyContext({
+      locationId: knowledge.locationId,
+      message: request.message,
+      customerId: (crm.customerId as string | null) ?? null,
+    });
+    enrichedPkg = attachJourneyToContextPackage(
+      enrichedPkg,
+      journey as unknown as Record<string, unknown>,
+    );
     toolOrchestration = {
       ...toolOrchestrationBase,
-      contextPackage: attachCrmToContextPackage(
-        toolOrchestrationBase.contextPackage,
-        crm as unknown as Record<string, unknown>,
-      ),
+      contextPackage: enrichedPkg,
     };
 
     // Soft-link reservation outcomes into CRM without modifying Reservation Engine
