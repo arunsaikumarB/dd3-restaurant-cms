@@ -15,6 +15,8 @@ type MessageBubbleProps = {
   onSwitchLocation?: (locationId: string) => void;
   onFollowUp?: (prompt: string) => void;
   isBusy?: boolean;
+  conversationId?: string;
+  locationId?: string;
 };
 
 function renderMarkdown(raw: string): string {
@@ -58,6 +60,8 @@ export function MessageBubble({
   onSwitchLocation,
   onFollowUp,
   isBusy,
+  conversationId,
+  locationId,
 }: MessageBubbleProps) {
   const userHtml = useMemo(() => renderMarkdown(content), [content]);
 
@@ -74,6 +78,8 @@ export function MessageBubble({
           onSwitchLocation={onSwitchLocation}
           onFollowUp={onFollowUp}
           isBusy={isBusy}
+          conversationId={conversationId}
+          locationId={locationId}
         />
       </div>
     );

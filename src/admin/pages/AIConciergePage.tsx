@@ -22,6 +22,17 @@ import {
   SuggestionsSection,
   TestingSection,
 } from "../components/aiConcierge/AIConciergeSections";
+import {
+  CostAnalyticsSection,
+  FeedbackIntelligenceSection,
+  ImprovementsSection,
+  KnowledgeAuditSection,
+  KnowledgeDebuggerSection,
+  QualityAnalyticsSection,
+  RelationshipsSection,
+  SearchLabSection,
+  ValidatorSection,
+} from "../components/aiConcierge/KnowledgeIntelligenceSections";
 import { useLocation } from "../hooks/useLocation";
 import { useAIConciergeAdmin } from "../hooks/useAIConciergeAdmin";
 import { useAuth } from "../../hooks/useAuth";
@@ -130,6 +141,15 @@ export default function AIConciergePage() {
           <PersonalitySection personality={personality} setPersonality={setPersonality} permissions={permissions} disabled={readOnly} />
           <LocationOverridesSection personality={personality} setPersonality={setPersonality} permissions={permissions} disabled={readOnly} />
           <KnowledgeSection settings={settings} setSettings={setSettings} permissions={permissions} disabled={readOnly} onRefresh={() => void reload()} />
+          <KnowledgeDebuggerSection locationId={testLocationId} permissions={permissions} disabled={readOnly} />
+          <SearchLabSection locationId={testLocationId} permissions={permissions} disabled={readOnly} />
+          <FeedbackIntelligenceSection />
+          <RelationshipsSection locationId={testLocationId} permissions={permissions} disabled={readOnly} />
+          <ValidatorSection locationId={testLocationId} permissions={permissions} disabled={readOnly} />
+          <CostAnalyticsSection />
+          <QualityAnalyticsSection />
+          <ImprovementsSection locationId={testLocationId} permissions={permissions} disabled={readOnly} />
+          <KnowledgeAuditSection />
           <ProviderSection provider={provider} setProvider={setProvider} permissions={permissions} disabled={readOnly} />
           <PromptSection activePrompt={activePrompt} defaultPrompt={defaultPrompt} onSave={handleSavePrompt} permissions={permissions} disabled={readOnly} />
           <ConversationSection settings={settings} setSettings={setSettings} permissions={permissions} disabled={readOnly} />

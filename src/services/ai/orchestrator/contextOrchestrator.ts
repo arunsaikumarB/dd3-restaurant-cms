@@ -28,6 +28,16 @@ export async function orchestrateAIRequest(
       signal: request.signal,
       matchCount: plan.maxRagChunks + 2,
     });
+    // Additive relationship boost — does not change Semantic RAG internals.
+    if (semantic?.chunks?.length) {
+      try {
+        const { boostRelatedChunks } = await import("../../knowledgeIntelligence/relationships");
+        const boosted = await boostRelatedChunks(semantic.chunks, 3);
+        semantic = { ...semantic, chunks: boosted };
+      } catch {
+        /* relationships table may be absent until migration 039 */
+      }
+    }
   }
 
   const trimmedChunks = semantic?.chunks?.length
