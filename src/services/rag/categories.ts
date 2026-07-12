@@ -42,7 +42,9 @@ export function labelForCategory(category: SemanticDocumentCategory): string {
   return CATEGORY_BY_ID[category]?.label ?? category;
 }
 
-export function detectFileType(fileName: string): "pdf" | "docx" | "txt" | "markdown" | "html" | "csv" | null {
+export function detectFileType(
+  fileName: string,
+): "pdf" | "docx" | "txt" | "markdown" | "html" | "csv" | "jpeg" | "png" | "webp" | null {
   const lower = fileName.toLowerCase();
   if (lower.endsWith(".pdf")) return "pdf";
   if (lower.endsWith(".docx")) return "docx";
@@ -50,7 +52,11 @@ export function detectFileType(fileName: string): "pdf" | "docx" | "txt" | "mark
   if (lower.endsWith(".md") || lower.endsWith(".markdown")) return "markdown";
   if (lower.endsWith(".html") || lower.endsWith(".htm")) return "html";
   if (lower.endsWith(".csv")) return "csv";
+  if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "jpeg";
+  if (lower.endsWith(".png")) return "png";
+  if (lower.endsWith(".webp")) return "webp";
   return null;
 }
 
-export const ACCEPTED_FILE_EXTENSIONS = ".pdf,.docx,.txt,.md,.markdown,.html,.htm,.csv";
+export const ACCEPTED_FILE_EXTENSIONS =
+  ".pdf,.docx,.txt,.md,.markdown,.html,.htm,.csv,.jpg,.jpeg,.png,.webp";

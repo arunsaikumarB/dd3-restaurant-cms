@@ -112,3 +112,225 @@
 .ai-concierge-layout__content {
   min-width: 0;
 }
+
+/* Knowledge Base enterprise module */
+.kb-admin {
+  min-width: 0;
+}
+
+.kb-metric-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+
+.kb-metric {
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  background: linear-gradient(160deg, rgba(234, 88, 12, 0.06), rgba(15, 23, 42, 0.03));
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.kb-metric__label {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.kb-metric__value {
+  margin: 0.25rem 0 0;
+  font-size: 1.25rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: #111827;
+}
+
+.kb-metric__hint {
+  margin: 0.15rem 0 0;
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.kb-health-hero {
+  display: grid;
+  gap: 1rem;
+}
+
+.kb-health-score {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(234, 88, 12, 0.16), transparent 55%),
+    linear-gradient(145deg, #fff7ed, #ffffff);
+  border: 1px solid rgba(234, 88, 12, 0.12);
+}
+
+.kb-health-score__value {
+  margin: 0.1rem 0 0;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #ea580c;
+}
+
+.kb-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.kb-bars__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(80px, 2fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.kb-bars__label {
+  font-size: 0.75rem;
+  color: #4b5563;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kb-bars__track {
+  height: 0.45rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.kb-bars__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #fb923c, #ea580c);
+}
+
+.kb-bars__value {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #111827;
+  min-width: 1.5rem;
+  text-align: right;
+}
+
+.kb-queue-item {
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.kb-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.kb-timeline__item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.kb-timeline__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.55rem;
+  background: rgba(234, 88, 12, 0.1);
+  color: #ea580c;
+  flex-shrink: 0;
+}
+
+.kb-lang-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 550;
+  color: #374151;
+}
+
+.kb-search-input {
+  min-width: 220px;
+  flex: 1;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  padding: 0.55rem 0.85rem;
+  font-size: 0.875rem;
+  background: #fff;
+}
+
+.kb-inline-select {
+  max-width: 7.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  padding: 0.25rem 0.4rem;
+  font-size: 0.75rem;
+  background: #fff;
+}
+
+.kb-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.kb-modal {
+  width: min(480px, 100%);
+  border-radius: 1rem;
+  background: #fff;
+  padding: 1.35rem 1.5rem;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22);
+}
+
+[data-admin-theme="dark"] .kb-metric,
+.dark .kb-metric {
+  background: linear-gradient(160deg, rgba(234, 88, 12, 0.12), rgba(255, 255, 255, 0.03));
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-admin-theme="dark"] .kb-metric__value,
+.dark .kb-metric__value,
+[data-admin-theme="dark"] .kb-bars__value,
+.dark .kb-bars__value {
+  color: #f9fafb;
+}
+
+[data-admin-theme="dark"] .kb-health-score,
+.dark .kb-health-score {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(234, 88, 12, 0.22), transparent 55%),
+    linear-gradient(145deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 20, 0.95));
+  border-color: rgba(234, 88, 12, 0.2);
+}
+
+[data-admin-theme="dark"] .kb-queue-item,
+.dark .kb-queue-item,
+[data-admin-theme="dark"] .kb-modal,
+.dark .kb-modal,
+[data-admin-theme="dark"] .kb-search-input,
+.dark .kb-search-input {
+  background: rgba(24, 24, 27, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f4f4f5;
+}

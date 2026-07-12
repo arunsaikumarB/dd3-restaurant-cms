@@ -1,0 +1,21 @@
+---
+description: After finishing work, always commit, push, and deploy without waiting to be asked.
+alwaysApply: true
+---
+
+# Ship finished work automatically
+
+When a task is complete and there are meaningful code changes:
+
+1. **Commit** — follow the repo git commit protocol (status/diff/log, staged relevant files, HEREDOC/here-string message, no secrets).
+2. **Push** — push the current branch to `origin` (`git push -u` if needed).
+3. **Deploy** — run production deploy via `npm run deploy` (Netlify prod build).
+
+Do this by default after finished implementation work. Do not wait for the user to say "commit, push, and deploy" each time.
+
+Exceptions:
+
+- User explicitly says not to commit/push/deploy for that task.
+- Only exploratory/read-only work with no code changes.
+- Commit would include secrets (`.env`, credentials) — warn and skip those files.
+- Deploy fails due to auth/network — report the failure and leave push/commit intact.

@@ -82,6 +82,45 @@ export default async function handler(event: HttpEvent) {
     }));
 
     const tokenEstimate = chunks.reduce((n, c) => n + Math.ceil(c.content.length / 4), 0);
+    const avgSimilarity =
+      chunks.length > 0 ? chunks.reduce((n, c) => n + c.similarity, 0) / chunks.length : 0;
+
+    // Best-effort retrieval analytics (published docs only).
+    const docIds = [...new Set(chunks.map((c) => c.documentId))];
+    for (const id of docIds) {
+      try {
+        const { data: doc } = await supabase
+          .from("semantic_documents")
+          .select("retrieval_count")
+          .eq("id", id)
+          .maybeSingle();
+        const count = ((doc as { retrieval_count?: number } | null)?.retrieval_count ?? 0) + 1;
+        await supabase
+          .from("semantic_documents")
+          .update({
+            retrieval_count: count,
+            last_retrieval_at: new Date().toISOString(),
+          })
+          .eq("id", id);
+      } catch {
+        /* ignore analytics failures */
+      }
+    }
+
+    try {
+      await supabase.from("knowledge_metrics").insert({
+        metric_key: "retrieval_avg_similarity",
+        metric_value: Number(avgSimilarity.toFixed(4)),
+        dimensions: { query: query.slice(0, 120), hits: chunks.length },
+      });
+      await supabase.from("knowledge_activity").insert({
+        event_type: "search",
+        summary: `Semantic search: “${query.slice(0, 80)}” → ${chunks.length} chunks`,
+        metadata: { locationId: body.locationId ?? null, hits: chunks.length },
+      });
+    } catch {
+      /* ignore */
+    }
 
     return jsonResponse(200, {
       available: chunks.length > 0,

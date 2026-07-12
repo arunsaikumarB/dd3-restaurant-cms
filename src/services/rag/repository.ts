@@ -1,5 +1,6 @@
 import type { LocationId } from "../../config/locations";
 import type {
+  DuplicateCheckResult,
   SemanticChunkRow,
   SemanticDocumentCategory,
   SemanticDocumentRow,
@@ -11,6 +12,8 @@ import type {
 import { SEMANTIC_API, SEMANTIC_STORAGE_BUCKET } from "../../types/semanticKnowledge";
 import { createClientIfConfigured } from "../../lib/supabase/client";
 import { detectFileType } from "./categories";
+import { sha256Hex } from "./hashing";
+import { findDocumentByFileHash, logKnowledgeActivity } from "./governance";
 
 function supabase() {
   const client = createClientIfConfigured();
@@ -19,7 +22,9 @@ function supabase() {
 }
 
 function semanticTable(name: string) {
-  return (supabase() as unknown as { from: (table: string) => ReturnType<ReturnType<typeof supabase>["from"]> }).from(name);
+  return (supabase() as unknown as { from: (table: string) => ReturnType<ReturnType<typeof supabase>["from"]> }).from(
+    name,
+  );
 }
 
 function storagePath(documentId: string, version: number, fileName: string): string {
@@ -58,7 +63,9 @@ export async function listDocumentChunks(
   version?: number,
 ): Promise<SemanticChunkRow[]> {
   let query = semanticTable("semantic_chunks")
-    .select("id, document_id, version_number, location_id, category, visibility, chunk_index, content, token_estimate, metadata, created_at")
+    .select(
+      "id, document_id, version_number, location_id, category, visibility, chunk_index, content, token_estimate, metadata, created_at",
+    )
     .eq("document_id", documentId)
     .order("chunk_index", { ascending: true })
     .limit(200);
@@ -79,9 +86,42 @@ export async function listIndexJobs(documentId?: string): Promise<SemanticIndexJ
   return (data ?? []) as SemanticIndexJobRow[];
 }
 
+export async function checkDuplicateFile(file: File): Promise<DuplicateCheckResult> {
+  const fileHash = await sha256Hex(file);
+  const existing = await findDocumentByFileHash(fileHash);
+  if (!existing) {
+    return { isDuplicate: false };
+  }
+  return {
+    isDuplicate: true,
+    matchDocumentId: existing.id,
+    matchTitle: existing.title,
+    duplicateType: "file_hash",
+    message: `This document already exists: “${existing.title}”.`,
+  };
+}
+
 export async function uploadSemanticDocument(input: SemanticUploadInput): Promise<SemanticDocumentRow> {
   const fileType = detectFileType(input.file.name);
-  if (!fileType) throw new Error("Unsupported file type. Use PDF, DOCX, TXT, Markdown, HTML, or CSV.");
+  if (!fileType) {
+    throw new Error("Unsupported file type. Use PDF, DOCX, TXT, Markdown, HTML, CSV, JPEG, PNG, or WEBP.");
+  }
+
+  const fileHash = await sha256Hex(input.file);
+  const duplicate = await findDocumentByFileHash(fileHash);
+
+  if (duplicate && input.duplicateAction !== "upload_anyway" && input.duplicateAction !== "replace") {
+    const err = new Error(
+      `DUPLICATE:${duplicate.id}:${duplicate.title}`,
+    ) as Error & { duplicateId?: string; duplicateTitle?: string };
+    err.duplicateId = duplicate.id;
+    err.duplicateTitle = duplicate.title;
+    throw err;
+  }
+
+  if (duplicate && input.duplicateAction === "replace") {
+    return replaceSemanticDocumentVersion(duplicate.id, input, fileHash, fileType);
+  }
 
   const client = supabase();
   const { data: userData } = await client.auth.getUser();
@@ -99,6 +139,13 @@ export async function uploadSemanticDocument(input: SemanticUploadInput): Promis
       storage_path: "pending",
       file_size_bytes: input.file.size,
       index_status: "pending",
+      workflow_status: "pending_review",
+      file_hash: fileHash,
+      language: input.language ?? "en",
+      language_source: input.languageSource ?? (input.language ? "manual" : "auto"),
+      ocr_status: ["jpeg", "png", "webp"].includes(fileType) ? "pending" : "not_needed",
+      is_duplicate: Boolean(duplicate && input.duplicateAction === "upload_anyway"),
+      duplicate_of: duplicate && input.duplicateAction === "upload_anyway" ? duplicate.id : null,
       created_by: userId,
     })
     .select("*")
@@ -135,11 +182,110 @@ export async function uploadSemanticDocument(input: SemanticUploadInput): Promis
     created_by: userId,
   });
 
-  await queueSemanticIndex(docRow.id, 1);
+  if (duplicate && input.duplicateAction === "upload_anyway") {
+    await semanticTable("knowledge_duplicates").insert({
+      document_id: docRow.id,
+      match_document_id: duplicate.id,
+      duplicate_type: "file_hash",
+      similarity: 1,
+      details: { action: "upload_anyway" },
+    });
+  }
+
+  await logKnowledgeActivity({
+    documentId: docRow.id,
+    eventType: "upload",
+    summary: `Uploaded “${input.title.trim()}” — pending manager review`,
+    metadata: { fileType, fileHash },
+  });
+
+  await semanticTable("knowledge_reviews").insert({
+    document_id: docRow.id,
+    action: "submit",
+    from_status: "draft",
+    to_status: "pending_review",
+    reviewer_id: userId,
+    comments: "Uploaded and queued for review",
+  });
+
+  // Do NOT index until approved — governance gate.
   return updated as SemanticDocumentRow;
 }
 
-export async function queueSemanticIndex(documentId: string, versionNumber?: number): Promise<void> {
+async function replaceSemanticDocumentVersion(
+  documentId: string,
+  input: SemanticUploadInput,
+  fileHash: string,
+  fileType: NonNullable<ReturnType<typeof detectFileType>>,
+): Promise<SemanticDocumentRow> {
+  const client = supabase();
+  const existing = await getSemanticDocument(documentId);
+  if (!existing) throw new Error("Document to replace was not found.");
+
+  const { data: userData } = await client.auth.getUser();
+  const userId = userData.user?.id ?? null;
+  const nextVersion = existing.current_version + 1;
+  const path = storagePath(documentId, nextVersion, input.file.name);
+
+  const { error: uploadError } = await client.storage
+    .from(SEMANTIC_STORAGE_BUCKET)
+    .upload(path, input.file, { upsert: true, contentType: input.file.type || undefined });
+  if (uploadError) throw uploadError;
+
+  await semanticTable("semantic_document_versions").insert({
+    document_id: documentId,
+    version_number: nextVersion,
+    storage_path: path,
+    file_name: input.file.name,
+    file_type: fileType,
+    change_notes: input.changeNotes ?? `Replaced via duplicate resolution (v${nextVersion})`,
+    created_by: userId,
+  });
+
+  const { data: updated, error } = await semanticTable("semantic_documents")
+    .update({
+      title: input.title.trim() || existing.title,
+      description: input.description?.trim() || existing.description,
+      category: input.category,
+      location_id: input.locationId ?? existing.location_id,
+      visibility: input.visibility ?? existing.visibility,
+      file_name: input.file.name,
+      file_type: fileType,
+      storage_path: path,
+      file_size_bytes: input.file.size,
+      current_version: nextVersion,
+      file_hash: fileHash,
+      index_status: "pending",
+      workflow_status: "pending_review",
+      is_duplicate: false,
+      duplicate_of: null,
+      ocr_status: ["jpeg", "png", "webp"].includes(fileType) ? "pending" : "not_needed",
+    })
+    .eq("id", documentId)
+    .select("*")
+    .single();
+
+  if (error || !updated) throw error ?? new Error("Failed to replace document.");
+
+  await semanticTable("knowledge_duplicates")
+    .update({ status: "resolved", resolved_at: new Date().toISOString() })
+    .eq("document_id", documentId)
+    .eq("status", "open");
+
+  await logKnowledgeActivity({
+    documentId,
+    eventType: "replaced_version",
+    summary: `Replaced with version ${nextVersion} — pending review`,
+  });
+
+  return updated as SemanticDocumentRow;
+}
+
+export async function queueSemanticIndex(
+  documentId: string,
+  versionNumber?: number,
+  options?: { forceOcr?: boolean; skipWorkflowGate?: boolean },
+): Promise<void> {
   const doc = await getSemanticDocument(documentId);
   if (!doc) throw new Error("Document not found.");
 
@@ -156,11 +302,33 @@ export async function queueSemanticIndex(documentId: string, versionNumber?: num
   });
   if (error) throw error;
 
+  await semanticTable("knowledge_jobs").insert({
+    document_id: documentId,
+    job_type: options?.forceOcr ? "ocr" : "reindex",
+    status: "queued",
+    progress: 0,
+  });
+
   void fetch(SEMANTIC_API.index, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ documentId, versionNumber: version }),
+    body: JSON.stringify({
+      documentId,
+      versionNumber: version,
+      forceOcr: options?.forceOcr ?? false,
+      skipWorkflowGate: options?.skipWorkflowGate ?? false,
+    }),
   }).catch(() => undefined);
+
+  await logKnowledgeActivity({
+    documentId,
+    eventType: options?.forceOcr ? "ocr_retry" : "reindex_queued",
+    summary: options?.forceOcr ? "OCR retry queued" : "Re-index queued",
+  });
+}
+
+export async function retryOcr(documentId: string): Promise<void> {
+  await queueSemanticIndex(documentId, undefined, { forceOcr: true, skipWorkflowGate: true });
 }
 
 export async function deleteSemanticDocument(documentId: string): Promise<void> {
@@ -176,6 +344,13 @@ export async function deleteSemanticDocument(documentId: string): Promise<void> 
 
   const { error } = await semanticTable("semantic_documents").delete().eq("id", documentId);
   if (error) throw error;
+
+  await logKnowledgeActivity({
+    documentId: null,
+    eventType: "deleted",
+    summary: `Deleted document ${doc.title}`,
+    metadata: { documentId },
+  });
 }
 
 export async function previewSemanticSearch(input: {
@@ -241,7 +416,9 @@ export async function retrieveSemanticKnowledge(input: {
 export async function isSemanticRagEnabled(): Promise<boolean> {
   const client = createClientIfConfigured();
   if (!client) return false;
-  const { data } = await (client as unknown as { from: (t: string) => ReturnType<ReturnType<typeof supabase>["from"]> })
+  const { data } = await (
+    client as unknown as { from: (t: string) => ReturnType<ReturnType<typeof supabase>["from"]> }
+  )
     .from("ai_feature_flags")
     .select("enabled")
     .eq("key", "semantic_rag")

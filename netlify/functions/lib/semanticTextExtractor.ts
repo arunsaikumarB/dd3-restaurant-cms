@@ -26,7 +26,8 @@ export async function extractTextFromBuffer(
       const result = await pdfParse(Buffer.from(bytes));
       return (result.text ?? "").trim();
     } catch {
-      throw new Error("PDF extraction failed. Ensure pdf-parse is available.");
+      // Scanned/corrupt PDFs fall through to OCR in the index pipeline.
+      return "";
     }
   }
 
@@ -38,6 +39,19 @@ export async function extractTextFromBuffer(
     } catch {
       throw new Error("DOCX extraction failed. Ensure mammoth is available.");
     }
+  }
+
+  // Images have no selectable text — OCR pipeline handles them.
+  if (
+    fileType === "jpeg" ||
+    fileType === "png" ||
+    fileType === "webp" ||
+    lower.endsWith(".jpg") ||
+    lower.endsWith(".jpeg") ||
+    lower.endsWith(".png") ||
+    lower.endsWith(".webp")
+  ) {
+    return "";
   }
 
   throw new Error(`Unsupported file type for extraction: ${fileType}`);
