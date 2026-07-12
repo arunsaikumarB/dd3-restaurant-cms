@@ -13,6 +13,7 @@ import {
   Bot,
   BookOpen,
   UtensilsCrossed,
+  Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -41,6 +42,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     title: "Restaurant Operations",
     items: [
       { label: "Operations Center", path: "/admin/operations", icon: UtensilsCrossed },
+      { label: "Customer CRM", path: "/admin/operations/crm", icon: Users },
     ],
   },
   {

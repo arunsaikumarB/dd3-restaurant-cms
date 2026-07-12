@@ -66,6 +66,7 @@ export function aggregateContext(input: {
       ...(reviews ? { reviews } : {}),
       ...(gallery ? { gallery } : {}),
     },
+    crm: {},
     meta: {
       packageId: crypto.randomUUID(),
       planId: input.plan.planId,
@@ -76,6 +77,41 @@ export function aggregateContext(input: {
       cacheHits,
       cacheMisses,
       mode: input.mode,
+    },
+  };
+}
+
+/**
+ * Attach CRM personalization into the unified package.
+ * Does not modify Planner / Tool Orchestrator execution / Reservation Engine.
+ */
+export function attachCrmToContextPackage(
+  pkg: UnifiedContextPackage,
+  crm: Record<string, unknown> | null | undefined,
+): UnifiedContextPackage {
+  if (!crm || !Object.keys(crm).length) return pkg;
+  const knownFields = Array.isArray(crm.knownFields) ? (crm.knownFields as string[]) : [];
+  return {
+    ...pkg,
+    crm,
+    memory: {
+      ...pkg.memory,
+      crmCustomerId: crm.customerId ?? null,
+      crmSummary: crm.summary ?? null,
+      crmKnownFields: knownFields,
+    },
+    personality: {
+      ...pkg.personality,
+      crm: {
+        returning: crm.returning,
+        displayName: crm.displayName,
+        isVip: crm.isVip,
+        preferences: crm.preferences,
+        loyalty: crm.loyalty,
+        segments: crm.segments,
+        birthdaySoon: crm.birthdaySoon,
+        anniversarySoon: crm.anniversarySoon,
+      },
     },
   };
 }

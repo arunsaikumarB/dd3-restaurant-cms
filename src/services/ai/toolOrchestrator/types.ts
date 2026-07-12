@@ -47,6 +47,8 @@ export type UnifiedContextPackage = {
   personality: Record<string, unknown>;
   restaurant: Record<string, unknown>;
   location: Record<string, unknown>;
+  /** Restaurant CRM personalization — attached by Context Aggregator enrichment */
+  crm?: Record<string, unknown>;
   meta: {
     packageId: string;
     planId: string;

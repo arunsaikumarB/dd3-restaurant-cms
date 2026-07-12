@@ -8,7 +8,9 @@ import type { OrchestratedContext } from "./types";
 import { SEMANTIC_TOOL_NAME } from "./types";
 import { createAndLogExecutionPlan } from "../planner";
 import { runToolOrchestrator } from "../toolOrchestrator";
+import { attachCrmToContextPackage } from "../toolOrchestrator/contextAggregator";
 import type { ToolOrchestratorResult } from "../toolOrchestrator";
+import { resolveCrmContext, syncCrmAfterReservation } from "../../restaurantOperations/crm";
 
 /**
  * Context Orchestrator — extends (does not replace) enrichAIRequest.
@@ -32,7 +34,7 @@ export async function orchestrateAIRequest(
   });
 
   // 2) Tool Orchestrator — execute the plan (sources + tools), never stop on single failure
-  const toolOrchestration = await runToolOrchestrator({
+  const toolOrchestrationBase = await runToolOrchestrator({
     plan: executionPlan,
     knowledge,
     message: request.message,
@@ -41,6 +43,51 @@ export async function orchestrateAIRequest(
     personality: preferences ? { preferences } : undefined,
     signal: request.signal,
   });
+
+  // 2b) Context Aggregator enrichment — CRM personalization (Planner never queries CRM)
+  let toolOrchestration: ToolOrchestratorResult = toolOrchestrationBase;
+  try {
+    const crm = await resolveCrmContext({
+      locationId: knowledge.locationId,
+      message: request.message,
+      conversationId: request.conversationId,
+    });
+    toolOrchestration = {
+      ...toolOrchestrationBase,
+      contextPackage: attachCrmToContextPackage(
+        toolOrchestrationBase.contextPackage,
+        crm as unknown as Record<string, unknown>,
+      ),
+    };
+
+    // Soft-link reservation outcomes into CRM without modifying Reservation Engine
+    const reservationTool = toolOrchestration.toolResults.find((r) => String(r.toolId) === "reservation");
+    const engine = (reservationTool?.result as { engine?: { ok?: boolean; reservation?: Record<string, unknown> } } | undefined)
+      ?.engine;
+    const reservation = engine?.reservation;
+    if (engine?.ok && reservation?.id && reservation.phone && reservation.customerName) {
+      void syncCrmAfterReservation({
+        locationId: knowledge.locationId,
+        reservationId: String(reservation.id),
+        customerName: String(reservation.customerName),
+        phone: String(reservation.phone),
+        email: (reservation.email as string | null) ?? null,
+        date: (reservation.date as string | null) ?? null,
+        time: (reservation.time as string | null) ?? null,
+        guests: reservation.guests != null ? Number(reservation.guests) : null,
+        occasion: (reservation.occasion as string | null) ?? null,
+        highChair: Boolean(reservation.highChair),
+        outdoor: (reservation.outdoorRequested as boolean | null) ?? null,
+        booth: (reservation.boothRequested as boolean | null) ?? null,
+        window: (reservation.windowRequested as boolean | null) ?? null,
+        dietary: (reservation.dietaryRestrictions as string[]) ?? [],
+        tableId: (reservation.tableId as string | null) ?? null,
+        status: String(reservation.status ?? "pending"),
+      });
+    }
+  } catch {
+    toolOrchestration = toolOrchestrationBase;
+  }
 
   // 3) Existing source plan (kept for backward-compatible meta)
   const plan = planContextSources(request.message);
@@ -108,6 +155,7 @@ export async function orchestrateAIRequest(
           workflow: executionPlan.workflow,
         },
         agentContextPackage: toolOrchestration.contextPackage,
+        agentCrmContext: toolOrchestration.contextPackage.crm ?? null,
         agentOrchestratorMeta: {
           packageId: toolOrchestration.packageId,
           mode: toolOrchestration.schedule.mode,

@@ -312,6 +312,16 @@ export function AIProvider({ children }: { children: ReactNode }) {
           const reflected = applyReflectionToResponse(replyText, reflection);
           const totalMs = Math.round(performance.now() - totalStarted);
 
+          // CRM memory — conversation learning (does not modify Planner / Reservation Engine)
+          void import("../../services/restaurantOperations/crm").then(({ syncCrmAfterConversation }) =>
+            syncCrmAfterConversation({
+              locationId,
+              message: trimmed,
+              reply: reflected,
+              conversationId: conversationIdRef.current,
+            }),
+          );
+
           // AI Operations Center — cross-stage workflow log (does not modify core engines)
           const toolResults = orchestrated.toolOrchestration?.toolResults ?? [];
           void persistWorkflow({
