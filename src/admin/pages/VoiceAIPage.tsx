@@ -37,15 +37,19 @@ import {
   getHospitality,
   getPersonality,
   getRecordingsForLocation,
+  getReservationAnalyticsSnapshot,
   getSessionTranscriptBundle,
   getSilenceRules,
   getVoiceAnalytics,
   getVoiceSettings,
   handleReceptionistSilence,
   interruptReceptionist,
+  listCallOutcomes,
   listCallSummaries,
   listEvents,
   listGreetingTemplates,
+  listReservationCalls,
+  listReservationEvents,
   listSttProviders,
   listTtsProviders,
   listVoiceSessions,
@@ -62,6 +66,7 @@ import {
   type PersonalityProfile,
   type SilenceRules,
   type VoiceAnalyticsSnapshot,
+  type VoiceReservationCall,
   type VoiceSession,
   type VoiceSettings,
 } from "../../services/voice";
@@ -87,6 +92,11 @@ type TabId =
   | "interruptions"
   | "summaries"
   | "faq"
+  | "reservation_calls"
+  | "reservation_live"
+  | "reservation_timeline"
+  | "reservation_analytics"
+  | "reservation_testing"
   | "advanced";
 
 const TABS: Array<{ id: TabId; label: string; icon: typeof Mic }> = [
@@ -100,6 +110,11 @@ const TABS: Array<{ id: TabId; label: string; icon: typeof Mic }> = [
   { id: "interruptions", label: "Interruptions", icon: Phone },
   { id: "summaries", label: "Call Summary", icon: ClipboardList },
   { id: "faq", label: "FAQ Testing", icon: BookOpen },
+  { id: "reservation_calls", label: "Reservation Calls", icon: ClipboardList },
+  { id: "reservation_live", label: "Live Reservation", icon: Radio },
+  { id: "reservation_timeline", label: "Reservation Timeline", icon: Timer },
+  { id: "reservation_analytics", label: "Reservation Analytics", icon: BarChart3 },
+  { id: "reservation_testing", label: "Reservation Testing", icon: FlaskConical },
   { id: "providers", label: "Providers", icon: PlugZap },
   { id: "voice", label: "Voice Settings", icon: Mic },
   { id: "languages", label: "Languages", icon: Languages },
@@ -161,12 +176,23 @@ export default function VoiceAIPage() {
   const [selectedSessionId, setSelectedSessionId] = useState("");
   const [sessionEvents, setSessionEvents] = useState<Awaited<ReturnType<typeof listEvents>>>([]);
   const [transcriptText, setTranscriptText] = useState("");
+  const [reservationCalls, setReservationCalls] = useState<VoiceReservationCall[]>([]);
+  const [reservationAnalytics, setReservationAnalytics] = useState<Awaited<
+    ReturnType<typeof getReservationAnalyticsSnapshot>
+  > | null>(null);
+  const [reservationOutcomes, setReservationOutcomes] = useState<
+    Awaited<ReturnType<typeof listCallOutcomes>>
+  >([]);
+  const [selectedReservationCallId, setSelectedReservationCallId] = useState("");
+  const [reservationTimeline, setReservationTimeline] = useState<
+    Awaited<ReturnType<typeof listReservationEvents>>
+  >([]);
 
   const refresh = useCallback(async () => {
     bootstrapVoiceLayer();
     ensureSttProvidersRegistered();
     ensureTtsProvidersRegistered();
-    const [s, a, sess, rec, p, h, sr, g, sums] = await Promise.all([
+    const [s, a, sess, rec, p, h, sr, g, sums, rCalls, rAnalytics, rOutcomes] = await Promise.all([
       getVoiceSettings(outlet),
       getVoiceAnalytics(outlet),
       listVoiceSessions(outlet, 50),
@@ -176,6 +202,9 @@ export default function VoiceAIPage() {
       getSilenceRules(outlet),
       listGreetingTemplates(outlet),
       listCallSummaries(outlet, 30),
+      listReservationCalls(outlet, 50),
+      getReservationAnalyticsSnapshot(outlet),
+      listCallOutcomes(outlet, 40),
     ]);
     setSettings(s);
     setAnalytics(a);
@@ -186,6 +215,9 @@ export default function VoiceAIPage() {
     setSilenceRules(sr);
     setGreetings((g as Array<Record<string, unknown>>) ?? []);
     setSummaries(sums);
+    setReservationCalls(rCalls);
+    setReservationAnalytics(rAnalytics);
+    setReservationOutcomes(rOutcomes);
     const first = g?.[0] as { template?: string } | undefined;
     if (first?.template) setGreetingDraft(first.template);
   }, [outlet]);
@@ -614,7 +646,7 @@ export default function VoiceAIPage() {
           <AdminCard>
             <h3 className="mb-3 text-sm font-semibold">Receptionist Testing</h3>
             <p className="mb-3 text-sm opacity-70">
-              Full call lifecycle: greeting → listen → Planner/RAG → speak. Reservation booking is deferred.
+              Full call lifecycle: greeting → listen → FAQ/Planner or Voice Reservation Agent → speak.
             </p>
             <div className="mb-3 flex flex-wrap gap-2">
               <AdminButton onClick={() => void startTest("web")}>Start Web Call</AdminButton>
@@ -681,7 +713,9 @@ export default function VoiceAIPage() {
                 "What are your hours?",
                 "Do you have vegetarian options?",
                 "Can we continue in Telugu?",
-                "I'd like to reserve a table",
+                "I'd like to reserve a table for tomorrow",
+                "Move my reservation from 7 PM to 8 PM",
+                "I need to cancel my reservation",
                 "Please repeat that",
                 "Goodbye",
               ].map((q) => (
@@ -720,13 +754,16 @@ export default function VoiceAIPage() {
         <AdminCard>
           <h3 className="mb-3 text-sm font-semibold">Receptionist</h3>
           <p className="text-sm opacity-80">
-            Cheffy answers calls as a trained front-desk host: greets naturally, classifies intent via Planner, answers
-            FAQs via Semantic RAG, handles silence/interruptions, and stores call summaries. Reservation execution is
-            Phase 3.
+            Cheffy greets callers, answers FAQs via Semantic RAG, and routes reservation intents to the Voice
+            Reservation Agent (create / modify / cancel / availability / waitlist) using the existing Reservation
+            Engine — no duplicated booking logic.
           </p>
-          <AdminButton className="mt-3" onClick={() => setTab("testing")}>
-            Open live testing
-          </AdminButton>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <AdminButton onClick={() => setTab("testing")}>Open live testing</AdminButton>
+            <AdminButton variant="outline" onClick={() => setTab("reservation_testing")}>
+              Reservation testing
+            </AdminButton>
+          </div>
         </AdminCard>
       )}
 
@@ -975,13 +1012,204 @@ export default function VoiceAIPage() {
         <AdminCard>
           <h3 className="mb-3 text-sm font-semibold">Advanced</h3>
           <p className="text-sm opacity-70">
-            Voice is transport-only. Reservation dialogues and human handoff are deferred to later Voice AI phases.
-            WhatsApp Voice, Mobile App, Drive-Thru, and Smart Kiosk channels share the same gateway contracts.
+            Voice orchestrates conversation only. Reservations reuse Restaurant Operations APIs. Live human call
+            transfer and outbound calling are deferred to later Voice AI milestones.
           </p>
           <pre className="mt-3 overflow-auto rounded-xl bg-black/5 p-3 text-xs dark:bg-white/5">
             {JSON.stringify(settings.metadata, null, 2)}
           </pre>
         </AdminCard>
+      )}
+
+      {tab === "reservation_calls" && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">Reservation Calls</h3>
+          <p className="mb-3 text-sm opacity-70">
+            Voice workflow state only — reservation truth remains in the Reservation Engine.
+          </p>
+          <ul className="max-h-[28rem] space-y-2 overflow-auto text-sm">
+            {reservationCalls.map((c) => (
+              <li key={c.id} className="border-b border-admin-border/30 pb-2">
+                <button
+                  type="button"
+                  className="text-left"
+                  onClick={() => {
+                    setSelectedReservationCallId(c.id);
+                    setTab("reservation_timeline");
+                    void listReservationEvents(c.id).then(setReservationTimeline);
+                  }}
+                >
+                  <AdminBadge variant={c.completedAt ? "success" : "warning"}>{c.stage}</AdminBadge>{" "}
+                  <span className="opacity-80">{c.workflow}</span> · {c.id.slice(0, 8)} ·{" "}
+                  {c.confirmationCode ?? "no code"} · {c.collected.customerName ?? "guest"}
+                </button>
+              </li>
+            ))}
+            {!reservationCalls.length && (
+              <li className="opacity-60">No voice reservation calls yet — apply migration 052 and run a test.</li>
+            )}
+          </ul>
+        </AdminCard>
+      )}
+
+      {tab === "reservation_live" && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">Live Reservation Status</h3>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Metric label="Active" value={reservationCalls.filter((c) => !c.completedAt).length} />
+            <Metric
+              label="Confirming"
+              value={reservationCalls.filter((c) => c.stage === "confirming" && !c.completedAt).length}
+            />
+            <Metric
+              label="Transfer recommended"
+              value={reservationCalls.filter((c) => c.transferRecommended && !c.completedAt).length}
+            />
+            <Metric label="Completed (session)" value={reservationCalls.filter((c) => c.stage === "completed").length} />
+          </div>
+          <ul className="mt-4 max-h-80 space-y-2 overflow-auto text-sm">
+            {reservationCalls
+              .filter((c) => !c.completedAt)
+              .map((c) => (
+                <li key={c.id}>
+                  {c.workflow} · {c.stage} · {c.collected.date ?? "—"} {c.collected.time ?? ""} · party{" "}
+                  {c.collected.guests ?? "?"}
+                </li>
+              ))}
+            {!reservationCalls.some((c) => !c.completedAt) && (
+              <li className="opacity-60">No active reservation conversations.</li>
+            )}
+          </ul>
+        </AdminCard>
+      )}
+
+      {tab === "reservation_timeline" && (
+        <AdminCard>
+          <h3 className="mb-3 text-sm font-semibold">Reservation Timeline</h3>
+          <AdminSelect
+            label="Call"
+            value={selectedReservationCallId}
+            onChange={(id) => {
+              setSelectedReservationCallId(id);
+              if (id) void listReservationEvents(id).then(setReservationTimeline);
+            }}
+            options={[
+              { value: "", label: "Select a reservation call…" },
+              ...reservationCalls.map((c) => ({
+                value: c.id,
+                label: `${c.id.slice(0, 8)} · ${c.workflow} · ${c.stage}`,
+              })),
+            ]}
+          />
+          <ul className="mt-4 max-h-96 space-y-2 overflow-auto text-sm">
+            {reservationTimeline.map((ev: Record<string, unknown>) => (
+              <li key={String(ev.id ?? Math.random())}>
+                <span className="opacity-60">{String(ev.created_at ?? "").slice(11, 19)}</span> ·{" "}
+                {String(ev.event_type ?? "")}{" "}
+                <code className="text-xs opacity-70">{JSON.stringify(ev.payload ?? {})}</code>
+              </li>
+            ))}
+            {!reservationTimeline.length && <li className="opacity-60">Select a call to view events.</li>}
+          </ul>
+        </AdminCard>
+      )}
+
+      {tab === "reservation_analytics" && reservationAnalytics && (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <AdminCard>
+            <h3 className="mb-3 text-sm font-semibold">Voice Reservation Analytics</h3>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Metric label="Total calls" value={reservationAnalytics.totalCalls} />
+              <Metric label="Completed" value={reservationAnalytics.completed} />
+              <Metric label="Waitlisted" value={reservationAnalytics.waitlisted} />
+              <Metric label="Cancelled flows" value={reservationAnalytics.cancelled} />
+              <Metric label="Transfer recommended" value={reservationAnalytics.transferRecommended} />
+              <Metric label="Active" value={reservationAnalytics.active} />
+            </div>
+          </AdminCard>
+          <AdminCard>
+            <h3 className="mb-3 text-sm font-semibold">Recent outcomes</h3>
+            <ul className="max-h-80 space-y-2 overflow-auto text-sm">
+              {reservationOutcomes.map((o: Record<string, unknown>) => (
+                <li key={String(o.id)}>
+                  {String(o.outcome_type ?? "")} · {String(o.confirmation_code ?? "—")} ·{" "}
+                  {String(o.summary ?? "").slice(0, 80)}
+                </li>
+              ))}
+              {!reservationOutcomes.length && <li className="opacity-60">No outcomes yet.</li>}
+            </ul>
+          </AdminCard>
+        </div>
+      )}
+
+      {tab === "reservation_testing" && (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <AdminCard>
+            <h3 className="mb-3 text-sm font-semibold">Reservation Testing</h3>
+            <p className="mb-3 text-sm opacity-70">
+              Uses the same receptionist lifecycle; reservation intents are owned by the Voice Reservation Agent and
+              Reservation Engine.
+            </p>
+            <div className="mb-3 flex flex-wrap gap-2">
+              <AdminButton onClick={() => void startTest("web")}>Start Web Call</AdminButton>
+              {testSession && (
+                <AdminButton
+                  variant="danger"
+                  onClick={async () => {
+                    await endReceptionistCall(testSession.id, "completed");
+                    setTestSession(null);
+                    void refresh();
+                  }}
+                >
+                  End Call
+                </AdminButton>
+              )}
+            </div>
+            <AdminTextarea value={testInput} onChange={(e) => setTestInput(e.target.value)} rows={2} />
+            <div className="mt-2 flex flex-wrap gap-2">
+              <AdminButton disabled={testBusy || !testSession} onClick={() => void runTurn()}>
+                {testBusy ? "Thinking…" : "Guest speaks"}
+              </AdminButton>
+              {[
+                "I'd like a table for tomorrow at South Plainfield",
+                "Party of 4 at 7 PM, name is Priya Sharma, phone 7325551212",
+                "Yes, that's correct",
+                "Move my reservation to 8 PM, confirmation DD-TEST01",
+                "Cancel my reservation, phone 7325551212",
+                "Are you available Friday evening?",
+                "Put me on the waitlist",
+                "It's a birthday dinner",
+              ].map((q) => (
+                <AdminButton key={q} size="sm" variant="outline" onClick={() => setTestInput(q)}>
+                  {q.slice(0, 42)}
+                  {q.length > 42 ? "…" : ""}
+                </AdminButton>
+              ))}
+            </div>
+            {testReply && (
+              <pre className="mt-4 whitespace-pre-wrap rounded-xl bg-black/5 p-3 text-sm dark:bg-white/5">
+                {testReply}
+              </pre>
+            )}
+          </AdminCard>
+          <AdminCard>
+            <h3 className="mb-3 text-sm font-semibold">Scenario checklist</h3>
+            <ul className="list-disc space-y-1 pl-5 text-sm opacity-80">
+              <li>Create reservation</li>
+              <li>Modify / cancel / lookup</li>
+              <li>Unknown vs returning customer (CRM phone)</li>
+              <li>No availability → alternatives / waitlist</li>
+              <li>Closed / blocked date</li>
+              <li>Large group / birthday / special requests</li>
+              <li>Interruption / language switch / transfer recommend</li>
+            </ul>
+            <ul className="mt-4 max-h-72 space-y-2 overflow-auto text-sm">
+              {timeline.map((line, i) => (
+                <li key={`${i}-${line.slice(0, 24)}`}>{line}</li>
+              ))}
+            </ul>
+          </AdminCard>
+        </div>
       )}
 
       {!settings && tab !== "analytics" && (

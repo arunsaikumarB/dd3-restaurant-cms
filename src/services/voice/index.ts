@@ -46,6 +46,7 @@ export {
 } from "./recording/recording";
 
 export * as receptionist from "./receptionist";
+export * as voiceReservation from "./reservation";
 export {
   startReceptionistCall,
   processReceptionistTurn,
@@ -66,6 +67,22 @@ export {
   getCallSummaryForSession,
   listEnabledLanguages,
 } from "./receptionist";
+
+export {
+  processReservationTurn,
+  isReservationIntent,
+  listReservationCalls,
+  listReservationEvents,
+  listCallOutcomes,
+  getReservationAnalyticsSnapshot,
+  getActiveReservationCall,
+} from "./reservation";
+export type {
+  VoiceReservationCall,
+  VoiceReservationTurnResult,
+  VoiceReservationWorkflow,
+  VoiceReservationStage,
+} from "./reservation";
 
 import { ensureSttProvidersRegistered as ensureStt } from "./stt/providers";
 import { ensureTtsProvidersRegistered as ensureTts } from "./tts/providers";

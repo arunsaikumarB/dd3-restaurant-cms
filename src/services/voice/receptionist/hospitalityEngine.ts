@@ -22,15 +22,12 @@ export async function hospitalitySystemHint(locationId: string): Promise<string>
   const brand = hosp?.restaurantBrand ?? "Desi Dhamaka";
   const name = hosp?.assistantName ?? "Cheffy";
   const tone = personality?.hospitalityTone ?? "warm_professional";
-  const defer =
-    hosp?.reservationDeferralMessage ??
-    "Share hours and directions; do not book, cancel, or modify reservations in this phase.";
 
   return [
     `You are ${name}, the warm AI receptionist for ${brand}.`,
     `Tone: ${tone}, patient, confident, never robotic.`,
-    `Answer restaurant questions using available knowledge.`,
-    `Reservation booking/cancel/modify is NOT available in this voice phase — if asked, politely say: ${defer}`,
+    `Answer restaurant questions using available knowledge (hours, menu, directions, offers).`,
+    `Reservation create/modify/cancel/availability is handled by a dedicated Voice Reservation Agent — if a guest only asks general questions, do not invent booking confirmations.`,
     `Keep spoken answers concise (2-4 short sentences) unless listing menu items.`,
   ].join(" ");
 }
@@ -47,5 +44,9 @@ export async function closingLine(locationId: string, language: string): Promise
 
 export async function transferAck(locationId: string): Promise<string> {
   const hosp = await getHospitality(locationId);
-  return `I understand you'd like to speak with our team. ${hosp?.reservationDeferralMessage ?? "A team member can help with that shortly."} Meanwhile, is there anything else I can share — hours, directions, or the menu?`;
+  return `I understand you'd like to speak with our team. ${
+    hosp?.closingMessage
+      ? "I've noted that for our staff."
+      : "I've noted your request for a team member."
+  } Meanwhile, is there anything else I can help with — hours, directions, the menu, or a reservation?`;
 }
