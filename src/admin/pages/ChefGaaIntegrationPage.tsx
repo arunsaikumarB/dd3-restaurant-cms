@@ -268,12 +268,13 @@ export default function ChefGaaIntegrationPage() {
     try {
       const response = await syncAllChefGaaLocations();
       await loadData({ silent: true });
-      showToast(
-        response.accepted
-          ? "ChefGaa Sync Completed Successfully"
-          : response.message,
-        response.accepted ? "success" : "error",
-      );
+      if (!response.accepted) {
+        showToast(response.message, "error");
+      } else if (response.message.toLowerCase().includes("queued")) {
+        showToast(response.message, "info");
+      } else {
+        showToast("ChefGaa Sync Completed Successfully", "success");
+      }
     } finally {
       setSyncingAll(false);
     }

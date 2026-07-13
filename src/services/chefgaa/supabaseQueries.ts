@@ -21,10 +21,8 @@ import type {
 } from "./types";
 
 const SYNC_RUNS_LIMIT = 150;
-
-function scopeLocationIds(scope: AdminLocationScope): LocationId[] {
-  return scope === "all" ? [...LOCATION_IDS] : [scope];
-}
+/** Runs stuck in `running` longer than this are treated as abandoned (timeout / crash). */
+const STALE_RUNNING_MS = 5 * 60 * 1000;
 
 function formatLocationName(locationId: string): string {
   if (locationId === "all") return "All Locations";
@@ -42,6 +40,7 @@ function mapRunStatusToResult(status: ChefGaaSyncRun["status"]): ChefGaaSyncResu
 }
 
 function buildRunMessage(run: ChefGaaSyncRun): string {
+  if (run.status === "running") return "Sync in progress…";
   if (run.error_summary) return run.error_summary;
   const parts: string[] = [];
   const categories = run.categories_created + run.categories_updated;
@@ -51,6 +50,46 @@ function buildRunMessage(run: ChefGaaSyncRun): string {
   if (run.prices_changed > 0) parts.push(`${run.prices_changed} price changes`);
   if (run.items_deactivated > 0) parts.push(`${run.items_deactivated} deactivated`);
   return parts.length > 0 ? parts.join(" · ") : "Sync completed with no catalog changes.";
+}
+
+function isStaleRunningRun(run: ChefGaaSyncRun, now = Date.now()): boolean {
+  if (run.status !== "running") return false;
+  const started = new Date(run.started_at).getTime();
+  if (!Number.isFinite(started)) return true;
+  return now - started > STALE_RUNNING_MS;
+}
+
+/** True only for an in-flight run that is not stale and not superseded by newer location metadata. */
+function isLocationActivelySyncing(
+  locationId: string,
+  runs: ChefGaaSyncRun[],
+  dbConfig: ChefGaaLocationConfig | undefined,
+  now = Date.now(),
+): boolean {
+  for (const run of runs) {
+    if (run.location_id !== locationId || run.status !== "running") continue;
+    if (isStaleRunningRun(run, now)) continue;
+    if (dbConfig?.last_sync_at) {
+      const lastSync = new Date(dbConfig.last_sync_at).getTime();
+      const started = new Date(run.started_at).getTime();
+      // Location already recorded a finished sync after this run started → orphaned row.
+      if (Number.isFinite(lastSync) && Number.isFinite(started) && lastSync >= started) {
+        continue;
+      }
+    }
+    const superseded = runs.some((other) => {
+      if (other.location_id !== locationId || other.status === "running") return false;
+      if (!other.finished_at) return false;
+      return new Date(other.finished_at).getTime() >= new Date(run.started_at).getTime();
+    });
+    if (superseded) continue;
+    return true;
+  }
+  return false;
+}
+
+function scopeLocationIds(scope: AdminLocationScope): LocationId[] {
+  return scope === "all" ? [...LOCATION_IDS] : [scope];
 }
 
 export function mapSyncRunToHistoryEntry(run: ChefGaaSyncRun): ChefGaaSyncHistoryEntry {
@@ -155,49 +194,62 @@ function latestRunByLocation(runs: ChefGaaSyncRun[]): Map<string, ChefGaaSyncRun
   return map;
 }
 
-function runningLocationIds(runs: ChefGaaSyncRun[]): Set<string> {
-  return new Set(runs.filter((run) => run.status === "running").map((run) => run.location_id));
-}
-
 export async function buildLocationSnapshots(
   configs: ChefGaaLocationConfig[],
   runs: ChefGaaSyncRun[],
 ): Promise<ChefGaaLocationSyncSnapshot[]> {
   const latestByLocation = latestRunByLocation(runs);
-  const running = runningLocationIds(runs);
   const staticConfigs = listChefGaaLocationConfigs();
+  const now = Date.now();
 
   const snapshots = await Promise.all(
     staticConfigs.map(async (staticConfig) => {
       const dbConfig = configs.find((row) => row.location_id === staticConfig.locationId);
       const lastRun = latestByLocation.get(staticConfig.locationId);
-      const healthStatus = deriveHealthStatus(dbConfig, running.has(staticConfig.locationId));
+      const finishedLastRun =
+        lastRun && lastRun.status !== "running" && !isStaleRunningRun(lastRun, now)
+          ? lastRun
+          : runs.find(
+              (r) =>
+                r.location_id === staticConfig.locationId &&
+                r.status !== "running",
+            );
+      const healthStatus = deriveHealthStatus(
+        dbConfig,
+        isLocationActivelySyncing(staticConfig.locationId, runs, dbConfig, now),
+      );
       const [categoryCount, menuItemCount] = await Promise.all([
         resolveChefGaaCatalogCount("menu_categories", staticConfig.locationId, dbConfig),
         resolveChefGaaCatalogCount("menu_items", staticConfig.locationId, dbConfig),
       ]);
+
+      const messageFromConfig = dbConfig?.last_sync_error || null;
 
       return {
         locationId: staticConfig.locationId,
         connectionStatus: deriveConnectionStatus(healthStatus),
         healthStatus,
         apiVersion: staticConfig.apiVersion,
-        lastSyncAt: dbConfig?.last_sync_at ?? lastRun?.finished_at ?? lastRun?.started_at ?? null,
+        lastSyncAt: dbConfig?.last_sync_at ?? finishedLastRun?.finished_at ?? finishedLastRun?.started_at ?? null,
         categoryCount,
         menuItemCount,
-        lastSyncDurationMs: dbConfig?.last_sync_duration_ms ?? lastRun?.duration_ms ?? null,
+        lastSyncDurationMs: dbConfig?.last_sync_duration_ms ?? finishedLastRun?.duration_ms ?? null,
         lastSyncResult: dbConfig?.last_sync_status
           ? mapRunStatusToResult(dbConfig.last_sync_status as ChefGaaSyncRun["status"])
-          : lastRun
-            ? mapRunStatusToResult(lastRun.status)
+          : finishedLastRun
+            ? mapRunStatusToResult(finishedLastRun.status)
             : null,
         lastSyncMessage:
-          dbConfig?.last_sync_error ??
-          (lastRun ? buildRunMessage(lastRun) : "No sync has been run for this location yet."),
+          messageFromConfig ??
+          (finishedLastRun
+            ? buildRunMessage(finishedLastRun)
+            : dbConfig?.last_sync_status === "success"
+              ? "Sync completed successfully."
+              : "No sync has been run for this location yet."),
         categoriesImported: categoryCount,
         menuImported: menuItemCount,
-        itemsUpdated: lastRun ? lastRun.items_updated : null,
-        itemsDeactivated: lastRun ? lastRun.items_deactivated : null,
+        itemsUpdated: finishedLastRun ? finishedLastRun.items_updated : null,
+        itemsDeactivated: finishedLastRun ? finishedLastRun.items_deactivated : null,
       } satisfies ChefGaaLocationSyncSnapshot;
     }),
   );

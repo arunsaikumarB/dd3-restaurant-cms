@@ -163,3 +163,24 @@ export async function updateLocationSyncMetadata(
 
   await locationConfigTable(supabase).update(updatePayload).eq("location_id", locationId);
 }
+
+/** Mark orphaned `running` rows as failed (Netlify timeout / crash). */
+export async function abandonStaleRunningRuns(staleAfterMs = 5 * 60 * 1000): Promise<number> {
+  const supabase = createChefGaaSyncClient();
+  const cutoff = new Date(Date.now() - staleAfterMs).toISOString();
+  const { data, error } = await syncRunsTable(supabase)
+    .update({
+      status: "failed",
+      finished_at: new Date().toISOString(),
+      error_summary: "Sync abandoned — run exceeded time limit or process ended unexpectedly.",
+    })
+    .eq("status", "running")
+    .lt("started_at", cutoff)
+    .select("id");
+
+  if (error) {
+    console.warn("abandonStaleRunningRuns:", error.message);
+    return 0;
+  }
+  return data?.length ?? 0;
+}

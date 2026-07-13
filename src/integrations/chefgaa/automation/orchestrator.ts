@@ -4,6 +4,7 @@ import { createChefGaaSyncClient } from "../supabaseClient";
 import { syncAll } from "../syncAll";
 import { syncLocation } from "../syncLocation";
 import type { SyncAllSummary, SyncLocationSummary, SyncTrigger } from "../types";
+import { abandonStaleRunningRuns } from "../syncLogger";
 import { runHealthChecksForLocations } from "./healthCheck";
 import { acquireSyncLock, isSyncLocked, releaseSyncLock } from "./lock";
 import { computeSyncMonitoringStats } from "./metrics";
@@ -148,6 +149,7 @@ async function runSyncExecution(
 export async function runOrchestratedSync(
   request: OrchestratorRequest,
 ): Promise<OrchestratorResult> {
+  await abandonStaleRunningRuns().catch(() => 0);
   const holder = `${request.trigger}:${request.locationId ?? "all"}:${Date.now()}`;
 
   if (request.skipIfLocked && (await isSyncLocked())) {
