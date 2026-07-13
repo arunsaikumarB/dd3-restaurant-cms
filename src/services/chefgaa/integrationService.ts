@@ -48,11 +48,22 @@ async function invokeChefGaaSyncApi(
       body: JSON.stringify({ locationId: locationId ?? null }),
     });
 
-    const payload = (await response.json()) as {
+    const raw = await response.text();
+    let payload: {
       accepted?: boolean;
       message?: string;
       status?: string;
-    };
+      error?: string;
+    } = {};
+    try {
+      payload = raw ? (JSON.parse(raw) as typeof payload) : {};
+    } catch {
+      invalidateChefGaaLiveCache();
+      return {
+        accepted: false,
+        message: `Sync API unavailable (${response.status}): ${raw.slice(0, 180) || "empty response"}. Use npm run sync:chefgaa locally if Netlify functions are down.`,
+      };
+    }
 
     invalidateChefGaaLiveCache();
 
@@ -60,11 +71,14 @@ async function invokeChefGaaSyncApi(
       accepted: Boolean(payload.accepted),
       message:
         payload.message ??
+        payload.error ??
         (payload.status === "queued"
           ? "Sync queued — will run after the current sync finishes."
           : payload.status === "already_running"
             ? "Already Running"
-            : "Sync request processed."),
+            : response.ok
+              ? "Sync request processed."
+              : `Sync failed (${response.status}).`),
     };
   } catch (error) {
     return {

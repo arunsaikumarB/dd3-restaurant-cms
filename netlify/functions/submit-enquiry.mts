@@ -4,12 +4,6 @@ import { DEFAULT_PUBLIC_LOCATION_ID, getLocationConfig, isLocationId } from "../
 import { buildEnquiryRecipients } from "../../src/config/enquiryRecipients";
 import type { Database } from "../../src/types/database";
 
-type HttpEvent = {
-  httpMethod?: string;
-  headers?: Record<string, string | undefined>;
-  body?: string | null;
-};
-
 type EnquiryBody = {
   source?: "contact" | "catering";
   location_id?: string;
@@ -27,11 +21,14 @@ function readEnv(key: string): string {
 }
 
 function jsonResponse(statusCode: number, body: Record<string, unknown>) {
-  return {
-    statusCode,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  };
+  return new Response(JSON.stringify(body), {
+    status: statusCode,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
 }
 
 function validateBody(body: EnquiryBody): { ok: true; data: Required<Pick<EnquiryBody, "name" | "email" | "phone" | "message">> & EnquiryBody } | { ok: false; error: string } {
@@ -161,18 +158,25 @@ async function sendEnquiryEmail(data: ReturnType<typeof validateBody> & { ok: tr
   }
 }
 
-export default async function handler(event: HttpEvent) {
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 204, body: "" };
+export default async function handler(req: Request) {
+  if (req.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+      },
+    });
   }
 
-  if (event.httpMethod !== "POST") {
+  if (req.method !== "POST") {
     return jsonResponse(405, { error: "Method not allowed" });
   }
 
   let body: EnquiryBody = {};
   try {
-    body = event.body ? JSON.parse(event.body) : {};
+    body = (await req.json()) as EnquiryBody;
   } catch {
     return jsonResponse(400, { error: "Invalid JSON body" });
   }
