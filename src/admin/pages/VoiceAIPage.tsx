@@ -31,6 +31,7 @@ import AdminTextarea from "../components/ui/Textarea";
 import AdminToast from "../components/ui/Toast";
 import AdminChart from "../components/ui/Chart";
 import VoiceHandoffPanels from "../components/voice/VoiceHandoffPanels";
+import VoiceOutboundPanels from "../components/voice/VoiceOutboundPanels";
 import { useLocation } from "../hooks/useLocation";
 import { DEFAULT_PUBLIC_LOCATION_ID, type LocationId } from "../../config/locations";
 import {
@@ -108,6 +109,17 @@ type TabId =
   | "agent_assist"
   | "escalation_analytics"
   | "callbacks"
+  | "outbound_campaigns"
+  | "campaign_builder"
+  | "outbound_schedules"
+  | "outbound_audience"
+  | "outbound_triggers"
+  | "call_templates"
+  | "outbound_compliance"
+  | "outbound_voicemail"
+  | "retry_policies"
+  | "outbound_analytics"
+  | "outbound_optouts"
   | "advanced";
 
 const TABS: Array<{ id: TabId; label: string; icon: typeof Mic }> = [
@@ -134,6 +146,17 @@ const TABS: Array<{ id: TabId; label: string; icon: typeof Mic }> = [
   { id: "agent_assist", label: "Agent Assist", icon: Sparkles },
   { id: "escalation_analytics", label: "Escalation Analytics", icon: BarChart3 },
   { id: "callbacks", label: "Callbacks", icon: Phone },
+  { id: "outbound_campaigns", label: "Outbound Campaigns", icon: Phone },
+  { id: "campaign_builder", label: "Campaign Builder", icon: FlaskConical },
+  { id: "outbound_schedules", label: "Schedules", icon: Timer },
+  { id: "outbound_audience", label: "Audience Builder", icon: Users },
+  { id: "outbound_triggers", label: "Triggers", icon: Sparkles },
+  { id: "call_templates", label: "Call Templates", icon: MessageCircle },
+  { id: "outbound_compliance", label: "Compliance", icon: Settings2 },
+  { id: "outbound_voicemail", label: "Voicemail", icon: Mic },
+  { id: "retry_policies", label: "Retry Policies", icon: Timer },
+  { id: "outbound_analytics", label: "Campaign Analytics", icon: BarChart3 },
+  { id: "outbound_optouts", label: "Opt-outs", icon: ClipboardList },
   { id: "providers", label: "Providers", icon: PlugZap },
   { id: "voice", label: "Voice Settings", icon: Mic },
   { id: "languages", label: "Languages", icon: Languages },
@@ -1033,8 +1056,9 @@ export default function VoiceAIPage() {
         <AdminCard>
           <h3 className="mb-3 text-sm font-semibold">Advanced</h3>
           <p className="text-sm opacity-70">
-            Voice orchestrates conversation only. Human handoff preserves full context for staff. Outbound calling is
-            deferred to the final Voice AI milestone.
+            Voice covers inbound receptionist, reservations, human handoff, and outbound campaigns. Live PSTN carrier
+            dialing can be attached to the same Voice Gateway phone sessions; this platform already schedules, complies,
+            scripts, and records outcomes.
           </p>
           <pre className="mt-3 overflow-auto rounded-xl bg-black/5 p-3 text-xs dark:bg-white/5">
             {JSON.stringify(settings.metadata, null, 2)}
@@ -1055,6 +1079,24 @@ export default function VoiceAIPage() {
         ] as TabId[]
       ).includes(tab) && (
         <VoiceHandoffPanels outlet={outlet} tab={tab} showToast={showToast} />
+      )}
+
+      {(
+        [
+          "outbound_campaigns",
+          "campaign_builder",
+          "outbound_schedules",
+          "outbound_audience",
+          "outbound_triggers",
+          "call_templates",
+          "outbound_compliance",
+          "outbound_voicemail",
+          "retry_policies",
+          "outbound_analytics",
+          "outbound_optouts",
+        ] as TabId[]
+      ).includes(tab) && (
+        <VoiceOutboundPanels outlet={outlet} tab={tab} showToast={showToast} />
       )}
 
       {tab === "reservation_calls" && (

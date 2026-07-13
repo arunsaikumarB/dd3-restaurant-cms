@@ -48,6 +48,7 @@ export {
 export * as receptionist from "./receptionist";
 export * as voiceReservation from "./reservation";
 export * as voiceHandoff from "./handoff";
+export * as voiceOutbound from "./outbound";
 export {
   startReceptionistCall,
   processReceptionistTurn,
@@ -133,6 +134,55 @@ export type {
   TransferContextPayload,
   HandoffStaffRole,
 } from "./handoff";
+
+export {
+  createCampaign,
+  createCampaignFromTrigger,
+  submitCampaignForApproval,
+  approveCampaign,
+  launchCampaign,
+  listLocationCampaigns,
+  queueManualCallback,
+  placeOutboundCall,
+  handleOutboundReservationIntent,
+  completeOutboundCall,
+  getOutboundAnalytics,
+  buildAudience,
+  listCampaigns,
+  getCampaign,
+  upsertCampaign,
+  listTemplates,
+  upsertTemplate,
+  listCampaignRuns,
+  listOutboundCalls,
+  getOutboundCall,
+  listOutboundOutcomes,
+  listRetries,
+  listOptOuts,
+  addOptOut,
+  getCompliance,
+  upsertCompliance,
+  listSchedulerJobs,
+  listJobs,
+  processDueJobs,
+  generateOutboundScript,
+  generateVoicemail,
+  validateOutboundCompliance,
+  planFromTrigger,
+} from "./outbound";
+export type {
+  OutboundCampaign,
+  OutboundCall,
+  OutboundCallType,
+  OutboundCampaignStatus,
+  CampaignTemplate,
+  CampaignRun,
+  OutboundAnalyticsSnapshot,
+  OutboundCompliance,
+  OptOutRecord,
+  AudienceFilter,
+  AudienceMember,
+} from "./outbound";
 
 import { ensureSttProvidersRegistered as ensureStt } from "./stt/providers";
 import { ensureTtsProvidersRegistered as ensureTts } from "./tts/providers";
