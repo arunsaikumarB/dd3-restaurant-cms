@@ -168,19 +168,26 @@ export async function updateLocationSyncMetadata(
 export async function abandonStaleRunningRuns(staleAfterMs = 5 * 60 * 1000): Promise<number> {
   const supabase = createChefGaaSyncClient();
   const cutoff = new Date(Date.now() - staleAfterMs).toISOString();
-  const { data, error } = await syncRunsTable(supabase)
-    .update({
+
+  const { data: staleRows, error: loadError } = await supabase
+    .from("chefgaa_sync_runs")
+    .select("id")
+    .eq("status", "running")
+    .lt("started_at", cutoff);
+
+  if (loadError || !staleRows?.length) {
+    if (loadError) console.warn("abandonStaleRunningRuns:", loadError.message);
+    return 0;
+  }
+
+  let abandoned = 0;
+  for (const row of staleRows as { id: string }[]) {
+    const { error } = await syncRunsTable(supabase).update({
       status: "failed",
       finished_at: new Date().toISOString(),
       error_summary: "Sync abandoned — run exceeded time limit or process ended unexpectedly.",
-    })
-    .eq("status", "running")
-    .lt("started_at", cutoff)
-    .select("id");
-
-  if (error) {
-    console.warn("abandonStaleRunningRuns:", error.message);
-    return 0;
+    }).eq("id", row.id);
+    if (!error) abandoned += 1;
   }
-  return data?.length ?? 0;
+  return abandoned;
 }
