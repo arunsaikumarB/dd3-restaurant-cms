@@ -49,6 +49,7 @@ export * as receptionist from "./receptionist";
 export * as voiceReservation from "./reservation";
 export * as voiceHandoff from "./handoff";
 export * as voiceOutbound from "./outbound";
+export * as geminiNative from "./providers/geminiNative";
 export {
   startReceptionistCall,
   processReceptionistTurn,
@@ -183,6 +184,19 @@ export type {
   AudienceFilter,
   AudienceMember,
 } from "./outbound";
+
+export {
+  ensureGeminiNativeRegistered,
+  speakWithGeminiNativeOrFallback,
+  fetchGeminiNativeHealth,
+  readGeminiNativeConfigFromMetadata,
+  openGeminiNativeSession,
+  interruptActiveSpeech,
+  setGeminiNativeRuntimeConfig,
+  getGeminiNativeRuntimeConfig,
+  DEFAULT_GEMINI_NATIVE_CONFIG,
+} from "./providers/geminiNative";
+export type { GeminiNativeConfig, GeminiNativeHealth } from "./providers/geminiNative";
 
 import { ensureSttProvidersRegistered as ensureStt } from "./stt/providers";
 import { ensureTtsProvidersRegistered as ensureTts } from "./tts/providers";

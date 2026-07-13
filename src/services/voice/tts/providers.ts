@@ -1,5 +1,6 @@
 import { registerTtsProvider, type TextToSpeechProvider, type TtsSpeakInput } from "./types";
 import type { TtsResult } from "../types";
+import { ensureGeminiNativeRegistered } from "../providers/geminiNative";
 
 const browserTts: TextToSpeechProvider = {
   id: "browser",
@@ -56,7 +57,6 @@ function stubTts(id: TtsResult["provider"], label: string): TextToSpeechProvider
     label,
     async speak(input) {
       const started = performance.now();
-      // Provider adapters register here; credentials wired via env in future milestones.
       void input;
       return {
         provider: id,
@@ -78,7 +78,7 @@ export function ensureTtsProvidersRegistered(): void {
   registerTtsProvider(stubTts("google", "Google Cloud TTS"));
   registerTtsProvider(stubTts("azure", "Azure TTS"));
   registerTtsProvider(stubTts("elevenlabs", "ElevenLabs"));
-  registerTtsProvider(stubTts("gemini_native", "Gemini Native Audio (future)"));
+  ensureGeminiNativeRegistered();
   registerTtsProvider(stubTts("openai_realtime", "OpenAI Realtime (future)"));
 }
 

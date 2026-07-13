@@ -46,20 +46,41 @@ async function speakText(
   ensureTtsProvidersRegistered();
   const settings = await getVoiceSettings(locationId);
   const personality = await getPersonality(locationId);
-  const tts = getTtsProvider(settings?.ttsProvider ?? "browser");
-  if (!tts) return 0;
+  const voiceSettings = {
+    voiceName: settings?.voiceName ?? "default",
+    voiceGender: settings?.voiceGender ?? "neutral",
+    voiceSpeed: personality?.speakingSpeed ?? settings?.voiceSpeed ?? 1,
+    voicePitch: settings?.voicePitch ?? 1,
+  };
+  const polished = polishForSpeech(text, personality?.pauseDurationMs ?? 350);
   await setCallState(sessionId, "speaking");
   const started = performance.now();
-  await tts.speak({
-    text: polishForSpeech(text, personality?.pauseDurationMs ?? 350),
-    language,
-    settings: {
-      voiceName: settings?.voiceName ?? "default",
-      voiceGender: settings?.voiceGender ?? "neutral",
-      voiceSpeed: personality?.speakingSpeed ?? settings?.voiceSpeed ?? 1,
-      voicePitch: settings?.voicePitch ?? 1,
-    },
-  });
+
+  if (settings?.ttsProvider === "gemini_native") {
+    const { speakWithGeminiNativeOrFallback, ensureGeminiNativeRegistered } = await import(
+      "../providers/geminiNative"
+    );
+    ensureGeminiNativeRegistered(settings.metadata);
+    await speakWithGeminiNativeOrFallback({
+      text: polished,
+      language,
+      settings: voiceSettings,
+      metadata: settings.metadata,
+      fallbackSpeak: async (providerId) => {
+        const fb = getTtsProvider(providerId as never);
+        if (!fb || fb.id === "gemini_native") return null;
+        return fb.speak({ text: polished, language, settings: voiceSettings });
+      },
+    });
+  } else {
+    const tts = getTtsProvider(settings?.ttsProvider ?? "browser");
+    if (!tts) {
+      await setCallState(sessionId, "listening");
+      return 0;
+    }
+    await tts.speak({ text: polished, language, settings: voiceSettings });
+  }
+
   await setCallState(sessionId, "listening");
   return Math.round(performance.now() - started);
 }

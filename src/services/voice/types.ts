@@ -20,7 +20,7 @@ export type CallState =
 
 export type VoiceLanguage = "en" | "hi" | "te" | "auto";
 
-export type SttProviderId = "browser" | "google" | "deepgram" | "azure" | "assemblyai";
+export type SttProviderId = "browser" | "google" | "deepgram" | "azure" | "assemblyai" | "gemini_native";
 export type TtsProviderId = "browser" | "google" | "azure" | "elevenlabs" | "gemini_native" | "openai_realtime";
 
 export type VoiceSettings = {

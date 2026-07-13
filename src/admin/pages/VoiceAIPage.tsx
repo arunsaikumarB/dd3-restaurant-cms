@@ -32,6 +32,7 @@ import AdminToast from "../components/ui/Toast";
 import AdminChart from "../components/ui/Chart";
 import VoiceHandoffPanels from "../components/voice/VoiceHandoffPanels";
 import VoiceOutboundPanels from "../components/voice/VoiceOutboundPanels";
+import GeminiNativeAudioPanel from "../components/voice/GeminiNativeAudioPanel";
 import { useLocation } from "../hooks/useLocation";
 import { DEFAULT_PUBLIC_LOCATION_ID, type LocationId } from "../../config/locations";
 import {
@@ -120,6 +121,7 @@ type TabId =
   | "retry_policies"
   | "outbound_analytics"
   | "outbound_optouts"
+  | "gemini_native"
   | "advanced";
 
 const TABS: Array<{ id: TabId; label: string; icon: typeof Mic }> = [
@@ -157,6 +159,7 @@ const TABS: Array<{ id: TabId; label: string; icon: typeof Mic }> = [
   { id: "retry_policies", label: "Retry Policies", icon: Timer },
   { id: "outbound_analytics", label: "Campaign Analytics", icon: BarChart3 },
   { id: "outbound_optouts", label: "Opt-outs", icon: ClipboardList },
+  { id: "gemini_native", label: "Gemini Native Audio", icon: Mic },
   { id: "providers", label: "Providers", icon: PlugZap },
   { id: "voice", label: "Voice Settings", icon: Mic },
   { id: "languages", label: "Languages", icon: Languages },
@@ -428,6 +431,14 @@ export default function VoiceAIPage() {
             </AdminButton>
           </div>
         </AdminCard>
+      )}
+
+      {tab === "gemini_native" && settings && (
+        <GeminiNativeAudioPanel
+          settings={settings}
+          patchSettings={patchSettings}
+          showToast={showToast}
+        />
       )}
 
       {tab === "providers" && settings && (

@@ -160,29 +160,61 @@ export async function processVoiceTurn(input: ProcessVoiceTurnInput): Promise<Vo
   let ttsResult = null;
   if (input.speak !== false) {
     await setCallState(session.id, "speaking");
-    const ttsProvider = getTtsProvider(ttsId);
     const ttsStarted = performance.now();
-    if (ttsProvider) {
-      ttsResult = await ttsProvider.speak({
+    const voiceSettings = {
+      voiceName: settings?.voiceName ?? "default",
+      voiceGender: settings?.voiceGender ?? "neutral",
+      voiceSpeed: settings?.voiceSpeed ?? 1,
+      voicePitch: settings?.voicePitch ?? 1,
+    };
+
+    if (ttsId === "gemini_native") {
+      const { speakWithGeminiNativeOrFallback, ensureGeminiNativeRegistered } = await import(
+        "../providers/geminiNative"
+      );
+      ensureGeminiNativeRegistered(settings?.metadata);
+      ttsResult = await speakWithGeminiNativeOrFallback({
         text: speechText,
         language,
-        settings: {
-          voiceName: settings?.voiceName ?? "default",
-          voiceGender: settings?.voiceGender ?? "neutral",
-          voiceSpeed: settings?.voiceSpeed ?? 1,
-          voicePitch: settings?.voicePitch ?? 1,
-        },
+        settings: voiceSettings,
         signal: input.signal,
+        metadata: settings?.metadata,
+        fallbackSpeak: async (providerId) => {
+          const fb = getTtsProvider(providerId as never);
+          if (!fb || fb.id === "gemini_native") return null;
+          return fb.speak({
+            text: speechText,
+            language,
+            settings: voiceSettings,
+            signal: input.signal,
+          });
+        },
       });
-      ttsMs = ttsResult.latencyMs || Math.round(performance.now() - ttsStarted);
+    } else {
+      const ttsProvider = getTtsProvider(ttsId);
+      if (ttsProvider) {
+        ttsResult = await ttsProvider.speak({
+          text: speechText,
+          language,
+          settings: voiceSettings,
+          signal: input.signal,
+        });
+      }
+    }
+
+    ttsMs = ttsResult?.latencyMs || Math.round(performance.now() - ttsStarted);
+    if (ttsResult) {
       await insertProviderMetric({
         locationId: session.locationId,
         sessionId: session.id,
-        provider: ttsProvider.id,
+        provider: ttsResult.provider,
         providerKind: "tts",
         operation: "speak",
         latencyMs: ttsMs,
         success: true,
+        metadata: {
+          fallbackUsed: Boolean((ttsResult as { fallbackUsed?: boolean }).fallbackUsed),
+        },
       });
     }
   }
@@ -221,6 +253,12 @@ export async function processVoiceTurn(input: ProcessVoiceTurnInput): Promise<Vo
 
 export async function stopTtsForSession(sessionId: string): Promise<void> {
   ensureTtsProvidersRegistered();
+  try {
+    const { interruptActiveSpeech } = await import("../providers/geminiNative");
+    interruptActiveSpeech();
+  } catch {
+    /* optional */
+  }
   const session = await getSession(sessionId);
   const settings = session ? await getVoiceSettings(session.locationId) : null;
   const tts = getTtsProvider(settings?.ttsProvider ?? "browser");

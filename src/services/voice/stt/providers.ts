@@ -1,5 +1,6 @@
 import { registerSttProvider, type SpeechToTextProvider } from "./types";
 import type { SttResult } from "../types";
+import { ensureGeminiNativeRegistered } from "../providers/geminiNative";
 
 function textResult(text: string, language: string, provider: SttResult["provider"], latencyMs: number): SttResult {
   return {
@@ -85,4 +86,5 @@ export function ensureSttProvidersRegistered(): void {
   registerSttProvider(stubStt("deepgram", "Deepgram"));
   registerSttProvider(stubStt("azure", "Azure Speech"));
   registerSttProvider(stubStt("assemblyai", "AssemblyAI"));
+  ensureGeminiNativeRegistered();
 }
