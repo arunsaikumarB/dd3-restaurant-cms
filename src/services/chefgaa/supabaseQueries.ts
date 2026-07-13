@@ -59,6 +59,26 @@ function isStaleRunningRun(run: ChefGaaSyncRun, now = Date.now()): boolean {
   return now - started > STALE_RUNNING_MS;
 }
 
+/** Tombstones written by abandonStaleRunningRuns — not real catalog sync outcomes. */
+function isAbandonedCleanupRun(run: ChefGaaSyncRun): boolean {
+  return (
+    run.status === "failed" &&
+    typeof run.error_summary === "string" &&
+    run.error_summary.startsWith("Sync abandoned")
+  );
+}
+
+/** Prefer the latest real finished run; skip abandoned cleanup rows for card summary. */
+function pickDisplayRun(
+  locationId: string,
+  runs: ChefGaaSyncRun[],
+): ChefGaaSyncRun | undefined {
+  const finished = runs.filter(
+    (r) => r.location_id === locationId && r.status !== "running",
+  );
+  return finished.find((r) => !isAbandonedCleanupRun(r)) ?? finished[0];
+}
+
 /** True only for an in-flight run that is not stale and not superseded by newer location metadata. */
 function isLocationActivelySyncing(
   locationId: string,
@@ -184,36 +204,17 @@ export async function fetchChefGaaSyncRunsFromDb(limit = SYNC_RUNS_LIMIT): Promi
   return data as ChefGaaSyncRun[];
 }
 
-function latestRunByLocation(runs: ChefGaaSyncRun[]): Map<string, ChefGaaSyncRun> {
-  const map = new Map<string, ChefGaaSyncRun>();
-  for (const run of runs) {
-    if (!map.has(run.location_id)) {
-      map.set(run.location_id, run);
-    }
-  }
-  return map;
-}
-
 export async function buildLocationSnapshots(
   configs: ChefGaaLocationConfig[],
   runs: ChefGaaSyncRun[],
 ): Promise<ChefGaaLocationSyncSnapshot[]> {
-  const latestByLocation = latestRunByLocation(runs);
   const staticConfigs = listChefGaaLocationConfigs();
   const now = Date.now();
 
   const snapshots = await Promise.all(
     staticConfigs.map(async (staticConfig) => {
       const dbConfig = configs.find((row) => row.location_id === staticConfig.locationId);
-      const lastRun = latestByLocation.get(staticConfig.locationId);
-      const finishedLastRun =
-        lastRun && lastRun.status !== "running" && !isStaleRunningRun(lastRun, now)
-          ? lastRun
-          : runs.find(
-              (r) =>
-                r.location_id === staticConfig.locationId &&
-                r.status !== "running",
-            );
+      const displayRun = pickDisplayRun(staticConfig.locationId, runs);
       const healthStatus = deriveHealthStatus(
         dbConfig,
         isLocationActivelySyncing(staticConfig.locationId, runs, dbConfig, now),
@@ -223,33 +224,59 @@ export async function buildLocationSnapshots(
         resolveChefGaaCatalogCount("menu_items", staticConfig.locationId, dbConfig),
       ]);
 
-      const messageFromConfig = dbConfig?.last_sync_error || null;
+      const configError =
+        dbConfig?.last_sync_error &&
+        !dbConfig.last_sync_error.startsWith("Sync abandoned")
+          ? dbConfig.last_sync_error
+          : null;
+
+      const runIsNewerThanConfig =
+        Boolean(displayRun?.finished_at && dbConfig?.last_sync_at) &&
+        new Date(displayRun!.finished_at!).getTime() > new Date(dbConfig!.last_sync_at!).getTime() &&
+        !isAbandonedCleanupRun(displayRun!);
+
+      let lastSyncResult: ChefGaaSyncResult | null = null;
+      let lastSyncMessage: string;
+
+      if (runIsNewerThanConfig && displayRun) {
+        lastSyncResult = mapRunStatusToResult(displayRun.status);
+        lastSyncMessage = buildRunMessage(displayRun);
+      } else if (dbConfig?.last_sync_status) {
+        lastSyncResult = mapRunStatusToResult(dbConfig.last_sync_status as ChefGaaSyncRun["status"]);
+        lastSyncMessage =
+          configError ??
+          (displayRun && !isAbandonedCleanupRun(displayRun)
+            ? buildRunMessage(displayRun)
+            : null) ??
+          (dbConfig.last_sync_status === "success"
+            ? "Sync completed successfully."
+            : dbConfig.last_sync_status === "partial"
+              ? "Sync completed with warnings."
+              : "Last sync failed.");
+      } else if (displayRun && !isAbandonedCleanupRun(displayRun)) {
+        lastSyncResult = mapRunStatusToResult(displayRun.status);
+        lastSyncMessage = buildRunMessage(displayRun);
+      } else {
+        lastSyncResult = null;
+        lastSyncMessage = "No sync has been run for this location yet.";
+      }
 
       return {
         locationId: staticConfig.locationId,
         connectionStatus: deriveConnectionStatus(healthStatus),
         healthStatus,
         apiVersion: staticConfig.apiVersion,
-        lastSyncAt: dbConfig?.last_sync_at ?? finishedLastRun?.finished_at ?? finishedLastRun?.started_at ?? null,
+        lastSyncAt: dbConfig?.last_sync_at ?? displayRun?.finished_at ?? displayRun?.started_at ?? null,
         categoryCount,
         menuItemCount,
-        lastSyncDurationMs: dbConfig?.last_sync_duration_ms ?? finishedLastRun?.duration_ms ?? null,
-        lastSyncResult: dbConfig?.last_sync_status
-          ? mapRunStatusToResult(dbConfig.last_sync_status as ChefGaaSyncRun["status"])
-          : finishedLastRun
-            ? mapRunStatusToResult(finishedLastRun.status)
-            : null,
-        lastSyncMessage:
-          messageFromConfig ??
-          (finishedLastRun
-            ? buildRunMessage(finishedLastRun)
-            : dbConfig?.last_sync_status === "success"
-              ? "Sync completed successfully."
-              : "No sync has been run for this location yet."),
+        lastSyncDurationMs: dbConfig?.last_sync_duration_ms ?? displayRun?.duration_ms ?? null,
+        lastSyncResult,
+        lastSyncMessage,
         categoriesImported: categoryCount,
         menuImported: menuItemCount,
-        itemsUpdated: finishedLastRun ? finishedLastRun.items_updated : null,
-        itemsDeactivated: finishedLastRun ? finishedLastRun.items_deactivated : null,
+        itemsUpdated: displayRun && !isAbandonedCleanupRun(displayRun) ? displayRun.items_updated : null,
+        itemsDeactivated:
+          displayRun && !isAbandonedCleanupRun(displayRun) ? displayRun.items_deactivated : null,
       } satisfies ChefGaaLocationSyncSnapshot;
     }),
   );

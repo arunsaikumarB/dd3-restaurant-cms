@@ -297,11 +297,13 @@ export default function ChefGaaIntegrationPage() {
       const response = await syncChefGaaLocation(locationId);
       await loadData({ silent: true });
       if (response.accepted) {
-        showToast(`${config.name} — ChefGaa Sync Completed Successfully`, "success");
-      } else if (response.message.toLowerCase().includes("failed")) {
-        showToast(`${config.name} Sync Failed`, "error");
+        if (response.message.toLowerCase().includes("queued")) {
+          showToast(response.message, "info");
+        } else {
+          showToast(`${config.name} — ChefGaa Sync Completed Successfully`, "success");
+        }
       } else {
-        showToast(response.message, "error");
+        showToast(response.message || `${config.name} Sync Failed`, "error");
       }
     } finally {
       setSyncingLocationId(null);
