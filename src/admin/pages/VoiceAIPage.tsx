@@ -17,6 +17,8 @@ import {
   Timer,
   ClipboardList,
   BookOpen,
+  Users,
+  Headset,
 } from "lucide-react";
 import AdminBreadcrumbs from "../components/shared/Breadcrumbs";
 import PageHeader from "../components/shared/PageHeader";
@@ -28,6 +30,7 @@ import AdminSelect from "../components/ui/Select";
 import AdminTextarea from "../components/ui/Textarea";
 import AdminToast from "../components/ui/Toast";
 import AdminChart from "../components/ui/Chart";
+import VoiceHandoffPanels from "../components/voice/VoiceHandoffPanels";
 import { useLocation } from "../hooks/useLocation";
 import { DEFAULT_PUBLIC_LOCATION_ID, type LocationId } from "../../config/locations";
 import {
@@ -97,6 +100,14 @@ type TabId =
   | "reservation_timeline"
   | "reservation_analytics"
   | "reservation_testing"
+  | "human_handoff"
+  | "transfer_rules"
+  | "departments"
+  | "staff_routing"
+  | "live_calls"
+  | "agent_assist"
+  | "escalation_analytics"
+  | "callbacks"
   | "advanced";
 
 const TABS: Array<{ id: TabId; label: string; icon: typeof Mic }> = [
@@ -115,6 +126,14 @@ const TABS: Array<{ id: TabId; label: string; icon: typeof Mic }> = [
   { id: "reservation_timeline", label: "Reservation Timeline", icon: Timer },
   { id: "reservation_analytics", label: "Reservation Analytics", icon: BarChart3 },
   { id: "reservation_testing", label: "Reservation Testing", icon: FlaskConical },
+  { id: "human_handoff", label: "Human Handoff", icon: Headset },
+  { id: "transfer_rules", label: "Transfer Rules", icon: Settings2 },
+  { id: "departments", label: "Departments", icon: Users },
+  { id: "staff_routing", label: "Staff Routing", icon: Users },
+  { id: "live_calls", label: "Live Calls", icon: Radio },
+  { id: "agent_assist", label: "Agent Assist", icon: Sparkles },
+  { id: "escalation_analytics", label: "Escalation Analytics", icon: BarChart3 },
+  { id: "callbacks", label: "Callbacks", icon: Phone },
   { id: "providers", label: "Providers", icon: PlugZap },
   { id: "voice", label: "Voice Settings", icon: Mic },
   { id: "languages", label: "Languages", icon: Languages },
@@ -716,6 +735,8 @@ export default function VoiceAIPage() {
                 "I'd like to reserve a table for tomorrow",
                 "Move my reservation from 7 PM to 8 PM",
                 "I need to cancel my reservation",
+                "I'd like to speak to a manager",
+                "I have a complaint about my last visit",
                 "Please repeat that",
                 "Goodbye",
               ].map((q) => (
@@ -1012,13 +1033,28 @@ export default function VoiceAIPage() {
         <AdminCard>
           <h3 className="mb-3 text-sm font-semibold">Advanced</h3>
           <p className="text-sm opacity-70">
-            Voice orchestrates conversation only. Reservations reuse Restaurant Operations APIs. Live human call
-            transfer and outbound calling are deferred to later Voice AI milestones.
+            Voice orchestrates conversation only. Human handoff preserves full context for staff. Outbound calling is
+            deferred to the final Voice AI milestone.
           </p>
           <pre className="mt-3 overflow-auto rounded-xl bg-black/5 p-3 text-xs dark:bg-white/5">
             {JSON.stringify(settings.metadata, null, 2)}
           </pre>
         </AdminCard>
+      )}
+
+      {(
+        [
+          "human_handoff",
+          "transfer_rules",
+          "departments",
+          "staff_routing",
+          "live_calls",
+          "agent_assist",
+          "escalation_analytics",
+          "callbacks",
+        ] as TabId[]
+      ).includes(tab) && (
+        <VoiceHandoffPanels outlet={outlet} tab={tab} showToast={showToast} />
       )}
 
       {tab === "reservation_calls" && (

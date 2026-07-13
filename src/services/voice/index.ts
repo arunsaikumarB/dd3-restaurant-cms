@@ -47,6 +47,7 @@ export {
 
 export * as receptionist from "./receptionist";
 export * as voiceReservation from "./reservation";
+export * as voiceHandoff from "./handoff";
 export {
   startReceptionistCall,
   processReceptionistTurn,
@@ -83,6 +84,55 @@ export type {
   VoiceReservationWorkflow,
   VoiceReservationStage,
 } from "./reservation";
+
+export {
+  handleStaffTransferRequest,
+  maybeRecommendHandoff,
+  getHandoffDashboard,
+  getHandoffAnalytics,
+  acceptTransfer,
+  rejectTransfer,
+  completeTransfer,
+  missTransferAndCallback,
+  queueTransfer,
+  buildAgentAssist,
+  getLiveTranscript,
+  searchTranscript,
+  transcriptToText,
+  downloadTranscriptFilename,
+  listDepartments,
+  upsertDepartment,
+  listLiveAgents,
+  upsertLiveAgent,
+  updateAgentStatus,
+  listEscalationRules,
+  upsertEscalationRule,
+  listEscalations,
+  listTransfers,
+  listWaitingTransfers,
+  getTransfer,
+  listCallbacks,
+  enqueueCallback,
+  markCallbackDone,
+  listCallTasks,
+  insertStaffNote,
+  listStaffNotes,
+  listHandoffNotifications,
+  canAcceptTransfer,
+} from "./handoff";
+export type {
+  VoiceEscalation,
+  VoiceTransfer,
+  VoiceLiveAgent,
+  VoiceDepartment,
+  EscalationRule,
+  HandoffDashboardSnapshot,
+  HandoffAnalyticsSnapshot,
+  AgentAssistBundle,
+  CallbackQueueItem,
+  TransferContextPayload,
+  HandoffStaffRole,
+} from "./handoff";
 
 import { ensureSttProvidersRegistered as ensureStt } from "./stt/providers";
 import { ensureTtsProvidersRegistered as ensureTts } from "./tts/providers";

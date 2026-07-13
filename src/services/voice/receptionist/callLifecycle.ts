@@ -34,6 +34,7 @@ import { applyLanguageSwitch } from "./languageManager";
 import { generateCallSummary } from "./summaryGenerator";
 import { getPersonality } from "./repository";
 import { processReservationTurn } from "../reservation";
+import { handleStaffTransferRequest, maybeRecommendHandoff } from "../handoff";
 import type { ReceptionistLiveState, ReceptionistTurnResult, VoiceMemory } from "./types";
 
 async function speakText(
@@ -171,11 +172,45 @@ export async function processReceptionistTurn(input: {
   }
 
   if (control === "transfer_request") {
-    const msg = await transferAck(session.locationId);
+    const handoff = await handleStaffTransferRequest({
+      sessionId: session.id,
+      locationId: session.locationId,
+      message: input.transcript,
+      plannerGoal: mem.plannerGoal,
+      customerName: mem.customerName,
+      language,
+      confidence: input.confidence,
+      misunderstandingCount: mem.misunderstandings,
+      phone:
+        (typeof session.metadata?.callerPhone === "string" ? session.metadata.callerPhone : null) ??
+        (typeof session.metadata?.phone === "string" ? session.metadata.phone : null),
+    });
+    const msg = handoff.assistantText || (await transferAck(session.locationId));
     rememberUserTurn(mem, input.transcript, "speak_to_manager");
     rememberAssistantTurn(mem, msg, mem.plannerGoal);
-    await setCallState(session.id, "escalation");
+    await setCallState(session.id, handoff.queued ? "waiting" : "escalation");
+    await insertTranscript({
+      sessionId: session.id,
+      role: "user",
+      text: input.transcript,
+      isFinal: true,
+      confidence: input.confidence ?? null,
+      language,
+    });
+    await insertTranscript({
+      sessionId: session.id,
+      role: "assistant",
+      text: msg,
+      isFinal: true,
+      language,
+    });
+    await insertEvent(session.id, "handoff_staff_request", {
+      escalationId: handoff.escalationId,
+      transferId: handoff.transferId,
+      reason: handoff.reason,
+    });
     if (input.speak !== false) await speakText(session.id, session.locationId, language, msg);
+    // AI stays on the line — return to listening while transfer waits
     await setCallState(session.id, "listening");
     return localResult(session.id, mem, input.transcript, msg, language, "speak_to_manager", "transfer_request");
   }
@@ -240,6 +275,32 @@ export async function processReceptionistTurn(input: {
   });
 
   if (reservationTurn.handled) {
+    let assistantText = reservationTurn.assistantText;
+
+    if (reservationTurn.transferRecommended) {
+      const soft = await maybeRecommendHandoff({
+        sessionId: session.id,
+        locationId: session.locationId,
+        message: input.transcript,
+        plannerGoal: `reservation_${reservationTurn.workflow}`,
+        customerName: mem.customerName,
+        language,
+        confidence: input.confidence,
+        misunderstandingCount: mem.misunderstandings,
+        reservationTransferRecommended: true,
+        reservationTransferReason: reservationTurn.transferReason,
+        phone:
+          (typeof session.metadata?.callerPhone === "string" ? session.metadata.callerPhone : null) ??
+          (typeof session.metadata?.phone === "string" ? session.metadata.phone : null),
+      });
+      if (soft.escalated && soft.assistantText && !reservationTurn.awaitingConfirmation) {
+        // Soft recommend only — append unless already covered
+        if (!/team|staff|manager|transfer/i.test(assistantText)) {
+          assistantText = `${assistantText} ${soft.assistantText}`.trim();
+        }
+      }
+    }
+
     await insertTranscript({
       sessionId: session.id,
       role: "user",
@@ -251,7 +312,7 @@ export async function processReceptionistTurn(input: {
     await insertTranscript({
       sessionId: session.id,
       role: "assistant",
-      text: reservationTurn.assistantText,
+      text: assistantText,
       isFinal: true,
       language,
     });
@@ -264,10 +325,7 @@ export async function processReceptionistTurn(input: {
     });
 
     const personality = await getPersonality(session.locationId);
-    const spokenText = polishForSpeech(
-      reservationTurn.assistantText,
-      personality?.pauseDurationMs ?? 350,
-    );
+    const spokenText = polishForSpeech(assistantText, personality?.pauseDurationMs ?? 350);
     rememberUserTurn(mem, input.transcript, `reservation_${reservationTurn.workflow}`);
     rememberAssistantTurn(mem, spokenText, `reservation_${reservationTurn.workflow}`);
     mem.currentGoal = `reservation_${reservationTurn.workflow}`;
@@ -284,7 +342,7 @@ export async function processReceptionistTurn(input: {
       handledLocally: true,
       control: null,
       userText: input.transcript,
-      assistantText: reservationTurn.assistantText,
+      assistantText,
       spokenText,
       intent: `reservation_${reservationTurn.workflow}`,
       plannerGoal: `reservation_${reservationTurn.workflow}`,
@@ -298,6 +356,18 @@ export async function processReceptionistTurn(input: {
 
   const hospitality = await hospitalitySystemHint(session.locationId);
 
+  // Soft escalation signals on FAQ path (complaint / refund / etc.) — recommend only
+  const softEsc = await maybeRecommendHandoff({
+    sessionId: session.id,
+    locationId: session.locationId,
+    message: input.transcript,
+    plannerGoal: mem.plannerGoal,
+    customerName: mem.customerName,
+    language,
+    confidence: input.confidence,
+    misunderstandingCount: mem.misunderstandings,
+  });
+
   const turn = await processVoiceTurn({
     sessionId: session.id,
     transcript: input.transcript,
@@ -307,7 +377,12 @@ export async function processReceptionistTurn(input: {
     signal: input.signal,
   });
 
-  const assistantText = turn.assistantText;
+  let assistantText = turn.assistantText;
+  if (softEsc.escalated && softEsc.assistantText && !softEsc.queued) {
+    if (!/team|staff|manager|transfer/i.test(assistantText.slice(-120))) {
+      assistantText = `${assistantText} ${softEsc.assistantText}`.trim();
+    }
+  }
 
   const personality = await getPersonality(session.locationId);
   const spokenText = polishForSpeech(assistantText, personality?.pauseDurationMs ?? 350);
