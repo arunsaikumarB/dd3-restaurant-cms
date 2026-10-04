@@ -29,6 +29,13 @@
 # swap in each form's real recipient when ready.
 # (Site configuration → Environment variables → Production / Deploy previews)
 
+# Public function guards (server only). See .env.example.
+# ALLOWED_ORIGINS — extra browser origins, comma-separated. Same-origin
+# requests are always allowed. VITE_SITE_URL, URL, and DEPLOY_PRIME_URL
+# are included automatically.
+# RATE_LIMIT_WINDOW_SECONDS, RATE_LIMIT_AI_CONCIERGE, RATE_LIMIT_SUBMIT_ENQUIRY,
+# RATE_LIMIT_SEMANTIC_SEARCH, MAX_BODY_BYTES_*, MODEL_TIMEOUT_MS, SMTP_TIMEOUT_MS
+
 # netlify/edge-functions/seo-head.ts — server-injects per-page SEO tags (title,
 # meta description, focus keyword, OG, canonical, robots) into the HTML before
 # it's served, so they're visible in View Source / to non-JS crawlers (social
@@ -44,30 +51,72 @@
   to = "/index.html"
   status = 200
 
+# Security headers are repeated on each path. Netlify uses the first matching
+# header rule and does not merge it with a broader /* rule, so cache-specific
+# paths would otherwise drop CSP/HSTS.
+# CSP allows this SPA: self scripts, inline styles (motion/layout), Google Fonts,
+# Supabase (REST + realtime), https images (CMS, ChefGaa, Storage), and Google Maps embeds.
+# upgrade-insecure-requests is omitted so `netlify dev` on http://localhost still loads.
+
 # Long-cache hashed assets from Vite
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://www.google.com https://maps.google.com https://maps.googleapis.com; worker-src 'self' blob:"
 
 # HTML shell — always revalidate (SPA)
 [[headers]]
   for = "/index.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://www.google.com https://maps.google.com https://maps.googleapis.com; worker-src 'self' blob:"
 
 # SEO files — short cache so demo URL changes propagate after redeploy
 [[headers]]
   for = "/robots.txt"
   [headers.values]
     Cache-Control = "public, max-age=3600"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://www.google.com https://maps.google.com https://maps.googleapis.com; worker-src 'self' blob:"
 
 [[headers]]
   for = "/sitemap.xml"
   [headers.values]
     Cache-Control = "public, max-age=3600"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://www.google.com https://maps.google.com https://maps.googleapis.com; worker-src 'self' blob:"
 
 [[headers]]
   for = "/llms.txt"
   [headers.values]
     Cache-Control = "public, max-age=3600"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://www.google.com https://maps.google.com https://maps.googleapis.com; worker-src 'self' blob:"
+
+# Every other path, including SPA routes rewritten to index.html.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://www.google.com https://maps.google.com https://maps.googleapis.com; worker-src 'self' blob:"

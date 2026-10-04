@@ -1,9 +1,18 @@
+import { verifyAdminAccessToken } from "../../src/integrations/chefgaa/automation/verifyAdmin";
 import { embedTexts } from "./lib/semanticEmbeddings";
 import { chunkText, extractTextFromBuffer, estimateTokens } from "./lib/semanticTextExtractor";
 import { createSemanticServiceClient, jsonResponse, readEnv } from "./lib/semanticSupabase";
+import {
+  corsFor,
+  isBodyTooLarge,
+  maxBodyBytes,
+  readHeader,
+  type CorsDecision,
+} from "./lib/requestGuards";
 
 type HttpEvent = {
   httpMethod?: string;
+  headers?: Record<string, string | undefined>;
   body?: string | null;
 };
 
@@ -14,28 +23,54 @@ type IndexBody = {
 
 const BUCKET = "semantic-knowledge";
 
+function respond(status: number, body: Record<string, unknown>, cors: CorsDecision) {
+  return jsonResponse(status, body, cors.headers);
+}
+
 export default async function handler(event: HttpEvent) {
+  const cors = corsFor(event.headers);
+
   if (event.httpMethod === "OPTIONS") {
-    return jsonResponse(204, {});
+    if (!cors.allowed) return respond(403, { error: "Origin not allowed." }, cors);
+    return { statusCode: 204, headers: cors.headers, body: "" };
   }
   if (event.httpMethod !== "POST") {
-    return jsonResponse(405, { error: "Method not allowed" });
+    return respond(405, { error: "Method not allowed" }, cors);
+  }
+  if (!cors.allowed) {
+    return respond(403, { error: "Origin not allowed." }, cors);
+  }
+
+  const maxBytes = maxBodyBytes("semantic-index");
+  if (isBodyTooLarge(event.body, maxBytes, readHeader(event.headers, "content-length"))) {
+    return respond(413, { error: "Request body is too large." }, cors);
+  }
+
+  const authHeader = readHeader(event.headers, "authorization");
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+  if (!token) {
+    return respond(401, { error: "Admin access required." }, cors);
+  }
+
+  const auth = await verifyAdminAccessToken(token);
+  if (!auth.ok) {
+    return respond(401, { error: auth.error ?? "Admin access required." }, cors);
   }
 
   let body: IndexBody = {};
   try {
     body = event.body ? JSON.parse(event.body) : {};
   } catch {
-    return jsonResponse(400, { error: "Invalid JSON body" });
+    return respond(400, { error: "Invalid JSON body" }, cors);
   }
 
   const documentId = body.documentId;
   if (!documentId) {
-    return jsonResponse(400, { error: "documentId is required" });
+    return respond(400, { error: "documentId is required" }, cors);
   }
 
   if (!readEnv("GEMINI_API_KEY")) {
-    return jsonResponse(503, { error: "GEMINI_API_KEY is not configured for embeddings." });
+    return respond(503, { error: "GEMINI_API_KEY is not configured for embeddings." }, cors);
   }
 
   const supabase = createSemanticServiceClient();
@@ -47,7 +82,7 @@ export default async function handler(event: HttpEvent) {
     .maybeSingle();
 
   if (docError || !doc) {
-    return jsonResponse(404, { error: "Document not found" });
+    return respond(404, { error: "Document not found" }, cors);
   }
 
   const versionNumber = body.versionNumber ?? doc.current_version;
@@ -145,13 +180,13 @@ export default async function handler(event: HttpEvent) {
         .eq("id", job.id);
     }
 
-    return jsonResponse(200, {
+    return respond(200, {
       ok: true,
       documentId,
       versionNumber,
       chunkCount: chunks.length,
       tokenEstimate,
-    });
+    }, cors);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Indexing failed";
 
@@ -171,6 +206,6 @@ export default async function handler(event: HttpEvent) {
         .eq("id", job.id);
     }
 
-    return jsonResponse(500, { error: message });
+    return respond(500, { error: message }, cors);
   }
 }

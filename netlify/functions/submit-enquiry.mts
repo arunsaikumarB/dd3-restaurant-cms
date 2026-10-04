@@ -3,6 +3,18 @@ import nodemailer from "nodemailer";
 import { DEFAULT_PUBLIC_LOCATION_ID, getLocationConfig, isLocationId } from "../../src/config/locations";
 import { buildEnquiryRecipients } from "../../src/config/enquiryRecipients";
 import type { Database } from "../../src/types/database";
+import {
+  clientIp,
+  corsFor,
+  DEFAULT_SMTP_TIMEOUT_MS,
+  enforceRateLimit,
+  isBodyTooLarge,
+  maxBodyBytes,
+  readHeader,
+  readPositiveInt,
+  withTimeout,
+  type CorsDecision,
+} from "./lib/requestGuards";
 
 type HttpEvent = {
   httpMethod?: string;
@@ -26,10 +38,19 @@ function readEnv(key: string): string {
   return process.env[key]?.trim() ?? "";
 }
 
-function jsonResponse(statusCode: number, body: Record<string, unknown>) {
+function jsonResponse(
+  statusCode: number,
+  body: Record<string, unknown>,
+  cors?: CorsDecision,
+  extraHeaders?: Record<string, string>,
+) {
   return {
     statusCode,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...cors?.headers,
+      ...extraHeaders,
+    },
     body: JSON.stringify(body),
   };
 }
@@ -141,45 +162,79 @@ async function sendEnquiryEmail(data: ReturnType<typeof validateBody> & { ok: tr
 
   detailLines.push("", "Message:", data.data.message);
 
+  const timeoutMs = readPositiveInt("SMTP_TIMEOUT_MS", DEFAULT_SMTP_TIMEOUT_MS);
   const transporter = nodemailer.createTransport({
     host: smtpHost,
     port: smtpPort,
     secure: smtpPort === 465,
     auth: { user: smtpUser, pass: smtpPassword },
+    connectionTimeout: timeoutMs,
+    greetingTimeout: timeoutMs,
+    socketTimeout: timeoutMs,
   });
 
   try {
-    await transporter.sendMail({
-      from: fromEmail,
-      to: toEmail,
-      replyTo: data.data.email,
-      subject,
-      text: detailLines.join("\n"),
-    });
+    await withTimeout(
+      transporter.sendMail({
+        from: fromEmail,
+        to: toEmail,
+        replyTo: data.data.email,
+        subject,
+        text: detailLines.join("\n"),
+      }),
+      timeoutMs,
+    );
   } catch (err) {
     console.error("SMTP email failed:", err instanceof Error ? err.message : err);
+  } finally {
+    try {
+      transporter.close();
+    } catch {
+      /* the socket may already be closed after a timeout */
+    }
   }
 }
 
 export default async function handler(event: HttpEvent) {
+  const cors = corsFor(event.headers);
+
   if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 204, body: "" };
+    if (!cors.allowed) return jsonResponse(403, { error: "Origin not allowed." }, cors);
+    return { statusCode: 204, headers: cors.headers, body: "" };
   }
 
   if (event.httpMethod !== "POST") {
-    return jsonResponse(405, { error: "Method not allowed" });
+    return jsonResponse(405, { error: "Method not allowed" }, cors);
+  }
+  if (!cors.allowed) {
+    return jsonResponse(403, { error: "Origin not allowed." }, cors);
+  }
+
+  const maxBytes = maxBodyBytes("submit-enquiry");
+  if (isBodyTooLarge(event.body, maxBytes, readHeader(event.headers, "content-length"))) {
+    return jsonResponse(413, { error: "Request body is too large." }, cors);
   }
 
   let body: EnquiryBody = {};
   try {
     body = event.body ? JSON.parse(event.body) : {};
   } catch {
-    return jsonResponse(400, { error: "Invalid JSON body" });
+    return jsonResponse(400, { error: "Invalid JSON body" }, cors);
   }
 
   const validated = validateBody(body);
   if (!validated.ok) {
-    return jsonResponse(400, { error: validated.error });
+    return jsonResponse(400, { error: validated.error }, cors);
+  }
+
+  const limit = await enforceRateLimit("submit-enquiry", clientIp(event.headers));
+  if (!limit.ok) {
+    return jsonResponse(
+      429,
+      { error: "Too many requests. Please try again shortly." },
+      cors,
+      { "Retry-After": String(limit.retryAfterSeconds) },
+    );
   }
 
   try {
@@ -187,12 +242,12 @@ export default async function handler(event: HttpEvent) {
     await sendEnquiryEmail(validated);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unable to submit enquiry.";
-    return jsonResponse(500, { error: message });
+    return jsonResponse(500, { error: message }, cors);
   }
 
   const firstName = validated.data.name.split(" ")[0];
   return jsonResponse(200, {
     success: true,
     message: `Thank you, ${firstName}. We'll be in touch shortly.`,
-  });
+  }, cors);
 }

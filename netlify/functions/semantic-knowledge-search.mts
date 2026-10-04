@@ -1,8 +1,18 @@
 import { embedQuery } from "./lib/semanticEmbeddings";
 import { createSemanticServiceClient, jsonResponse, readEnv } from "./lib/semanticSupabase";
+import {
+  clientIp,
+  corsFor,
+  enforceRateLimit,
+  isBodyTooLarge,
+  maxBodyBytes,
+  readHeader,
+  type CorsDecision,
+} from "./lib/requestGuards";
 
 type HttpEvent = {
   httpMethod?: string;
+  headers?: Record<string, string | undefined>;
   body?: string | null;
 };
 
@@ -13,28 +23,53 @@ type SearchBody = {
   matchCount?: number;
 };
 
+function respond(status: number, body: Record<string, unknown>, cors: CorsDecision, extra?: Record<string, string>) {
+  return jsonResponse(status, body, { ...cors.headers, ...extra });
+}
+
 export default async function handler(event: HttpEvent) {
+  const cors = corsFor(event.headers);
+
   if (event.httpMethod === "OPTIONS") {
-    return jsonResponse(204, {});
+    if (!cors.allowed) return respond(403, { error: "Origin not allowed." }, cors);
+    return { statusCode: 204, headers: cors.headers, body: "" };
   }
   if (event.httpMethod !== "POST") {
-    return jsonResponse(405, { error: "Method not allowed" });
+    return respond(405, { error: "Method not allowed" }, cors);
+  }
+  if (!cors.allowed) {
+    return respond(403, { error: "Origin not allowed." }, cors);
+  }
+
+  const maxBytes = maxBodyBytes("semantic-search");
+  if (isBodyTooLarge(event.body, maxBytes, readHeader(event.headers, "content-length"))) {
+    return respond(413, { error: "Request body is too large." }, cors);
+  }
+
+  const limit = await enforceRateLimit("semantic-search", clientIp(event.headers));
+  if (!limit.ok) {
+    return respond(
+      429,
+      { error: "Too many requests. Please try again shortly." },
+      cors,
+      { "Retry-After": String(limit.retryAfterSeconds) },
+    );
   }
 
   let body: SearchBody = {};
   try {
     body = event.body ? JSON.parse(event.body) : {};
   } catch {
-    return jsonResponse(400, { error: "Invalid JSON body" });
+    return respond(400, { error: "Invalid JSON body" }, cors);
   }
 
   const query = body.query?.trim();
   if (!query) {
-    return jsonResponse(400, { error: "query is required" });
+    return respond(400, { error: "query is required" }, cors);
   }
 
   if (!readEnv("GEMINI_API_KEY")) {
-    return jsonResponse(200, {
+    return respond(200, {
       available: false,
       query,
       chunks: [],
@@ -42,7 +77,7 @@ export default async function handler(event: HttpEvent) {
       tokenEstimate: 0,
       cached: false,
       reason: "embeddings_unconfigured",
-    });
+    }, cors);
   }
 
   try {
@@ -83,17 +118,17 @@ export default async function handler(event: HttpEvent) {
 
     const tokenEstimate = chunks.reduce((n, c) => n + Math.ceil(c.content.length / 4), 0);
 
-    return jsonResponse(200, {
+    return respond(200, {
       available: chunks.length > 0,
       query,
       chunks,
       categories: body.categories ?? [],
       tokenEstimate,
       cached: false,
-    });
+    }, cors);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Search failed";
-    return jsonResponse(200, {
+    return respond(200, {
       available: false,
       query,
       chunks: [],
@@ -101,6 +136,6 @@ export default async function handler(event: HttpEvent) {
       tokenEstimate: 0,
       cached: false,
       reason: message,
-    });
+    }, cors);
   }
 }

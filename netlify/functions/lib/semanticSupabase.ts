@@ -16,14 +16,16 @@ export function createSemanticServiceClient() {
   });
 }
 
-export function jsonResponse(statusCode: number, body: Record<string, unknown>) {
+export function jsonResponse(
+  statusCode: number,
+  body: Record<string, unknown>,
+  extraHeaders?: Record<string, string>,
+) {
   return {
     statusCode,
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      ...extraHeaders,
     },
     body: JSON.stringify(body),
   };
