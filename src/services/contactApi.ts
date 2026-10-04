@@ -15,6 +15,13 @@ export interface ContactPayload {
 
 const ENQUIRY_API_URL = "/.netlify/functions/submit-enquiry";
 
+class EnquiryRejectedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "EnquiryRejectedError";
+  }
+}
+
 export async function submitContact(
   payload: ContactPayload,
 ): Promise<{ success: boolean; message: string }> {
@@ -45,6 +52,11 @@ export async function submitContact(
       };
     }
 
+    if (response.status === 403 || response.status === 413 || response.status === 429) {
+      const errorBody = (await response.json().catch(() => null)) as { error?: string } | null;
+      throw new EnquiryRejectedError(errorBody?.error || "Unable to send your message.");
+    }
+
     if (response.status >= 500 && isSupabaseConfigured()) {
       await createPublicEnquiry(enquiry);
       return {
@@ -56,6 +68,7 @@ export async function submitContact(
     const errorBody = (await response.json().catch(() => null)) as { error?: string } | null;
     throw new Error(errorBody?.error || "Unable to send your message.");
   } catch (err) {
+    if (err instanceof EnquiryRejectedError) throw err;
     if (isSupabaseConfigured()) {
       try {
         await createPublicEnquiry(enquiry);

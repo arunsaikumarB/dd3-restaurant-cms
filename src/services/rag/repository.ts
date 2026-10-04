@@ -156,9 +156,14 @@ export async function queueSemanticIndex(documentId: string, versionNumber?: num
   });
   if (error) throw error;
 
+  const { data: sessionData } = await supabase().auth.getSession();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const accessToken = sessionData.session?.access_token;
+  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+
   void fetch(SEMANTIC_API.index, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ documentId, versionNumber: version }),
   }).catch(() => undefined);
 }

@@ -1,5 +1,11 @@
+import { fetchWithTimeout, readJsonWithTimeout, readPositiveInt, withTimeout, DEFAULT_MODEL_TIMEOUT_MS } from "./requestGuards";
+
 function readEnv(key: string): string {
   return process.env[key]?.trim() ?? "";
+}
+
+function embeddingTimeoutMs(): number {
+  return readPositiveInt("MODEL_TIMEOUT_MS", DEFAULT_MODEL_TIMEOUT_MS);
 }
 
 export function readGeminiApiKey(): string {
@@ -20,7 +26,8 @@ export async function embedTexts(texts: string[]): Promise<number[][]> {
     const batch = texts.slice(i, i + batchSize);
     const results = await Promise.all(
       batch.map(async (text) => {
-        const response = await fetch(
+        const timeoutMs = embeddingTimeoutMs();
+        const response = await fetchWithTimeout(
           `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:embedContent`,
           {
             method: "POST",
@@ -33,14 +40,15 @@ export async function embedTexts(texts: string[]): Promise<number[][]> {
               content: { parts: [{ text: text.slice(0, 8000) }] },
             }),
           },
+          timeoutMs,
         );
 
         if (!response.ok) {
-          const err = await response.text();
+          const err = await withTimeout(response.text(), timeoutMs).catch(() => "");
           throw new Error(`Embedding failed (${response.status}): ${err}`);
         }
 
-        const body = (await response.json()) as { embedding?: { values?: number[] } };
+        const body = await readJsonWithTimeout<{ embedding?: { values?: number[] } }>(response, timeoutMs);
         const values = body.embedding?.values;
         if (!values?.length) throw new Error("Empty embedding response.");
         return values;

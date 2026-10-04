@@ -2,6 +2,17 @@ import type { Context } from "@netlify/functions";
 import { readServerAIConfig, resolveRequestModel } from "./lib/aiConfig";
 import { logConciergeEvent } from "./lib/aiLogger";
 import { buildCheffySystemPrompt } from "./lib/cheffySystemPrompt";
+import {
+  clientIp,
+  corsFor,
+  DEFAULT_MODEL_TIMEOUT_MS,
+  enforceRateLimit,
+  fetchWithTimeout,
+  isBodyTooLarge,
+  maxBodyBytes,
+  readJsonWithTimeout,
+  readPositiveInt,
+} from "./lib/requestGuards";
 
 type ChatTurn = { role: "user" | "assistant"; content: string };
 
@@ -29,10 +40,10 @@ type RequestBody = {
   stream?: boolean;
 };
 
-const json = (body: unknown, status = 200) =>
+const json = (body: unknown, status = 200, extraHeaders?: Record<string, string>) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...extraHeaders },
   });
 
 const sse = (body: ReadableStream<Uint8Array>) =>
@@ -47,6 +58,16 @@ const sse = (body: ReadableStream<Uint8Array>) =>
 
 function encodeSse(payload: unknown): Uint8Array {
   return new TextEncoder().encode(`data: ${JSON.stringify(payload)}\n\n`);
+}
+
+function modelTimeoutMs(): number {
+  return readPositiveInt("MODEL_TIMEOUT_MS", DEFAULT_MODEL_TIMEOUT_MS);
+}
+
+function withCors(res: Response, cors: Record<string, string>): Response {
+  const headers = new Headers(res.headers);
+  for (const [key, value] of Object.entries(cors)) headers.set(key, value);
+  return new Response(res.body, { status: res.status, headers });
 }
 
 function resolveProvider(body: RequestBody, config: ReturnType<typeof readServerAIConfig>): string {
@@ -88,22 +109,26 @@ async function callGemini(
     ? `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse`
     : `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
-  return fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-goog-api-key": apiKey,
-    },
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: system }] },
-      contents: buildGeminiContents(history, message),
-      generationConfig: {
-        temperature: generation.temperature,
-        topP: generation.topP,
-        maxOutputTokens: generation.maxOutputTokens,
+  return fetchWithTimeout(
+    url,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
       },
-    }),
-  });
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: system }] },
+        contents: buildGeminiContents(history, message),
+        generationConfig: {
+          temperature: generation.temperature,
+          topP: generation.topP,
+          maxOutputTokens: generation.maxOutputTokens,
+        },
+      }),
+    },
+    modelTimeoutMs(),
+  );
 }
 
 function pipeGeminiStream(upstream: Response): ReadableStream<Uint8Array> {
@@ -197,7 +222,10 @@ async function handleGemini(body: RequestBody, message: string, stream: boolean)
   if (!upstream.ok) {
     let detail = "Gemini upstream error";
     try {
-      const errBody = (await upstream.json()) as { error?: { message?: string } };
+      const errBody = await readJsonWithTimeout<{ error?: { message?: string } }>(
+        upstream,
+        modelTimeoutMs(),
+      );
       detail = errBody.error?.message ?? detail;
     } catch {
       /* ignore */
@@ -227,10 +255,10 @@ async function handleGemini(body: RequestBody, message: string, stream: boolean)
     return sse(pipeGeminiStream(upstream));
   }
 
-  const data = (await upstream.json()) as {
+  const data = await readJsonWithTimeout<{
     candidates?: { content?: { parts?: { text?: string }[] } }[];
     usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number };
-  };
+  }>(upstream, modelTimeoutMs());
 
   const text = (data.candidates?.[0]?.content?.parts ?? [])
     .map((p) => p.text ?? "")
@@ -273,22 +301,26 @@ async function callClaude(
   messages: ReturnType<typeof buildMessages>,
   stream: boolean,
 ): Promise<Response> {
-  return fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
+  return fetchWithTimeout(
+    "https://api.anthropic.com/v1/messages",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 1024,
+        temperature: 0.4,
+        stream,
+        system,
+        messages,
+      }),
     },
-    body: JSON.stringify({
-      model,
-      max_tokens: 1024,
-      temperature: 0.4,
-      stream,
-      system,
-      messages,
-    }),
-  });
+    modelTimeoutMs(),
+  );
 }
 
 function pipeClaudeStream(upstream: Response): ReadableStream<Uint8Array> {
@@ -375,20 +407,24 @@ async function callOpenAI(
     { role: "user", content: message },
   ];
 
-  return fetch(`${baseUrl}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+  return fetchWithTimeout(
+    `${baseUrl}/chat/completions`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        temperature: 0.4,
+        max_tokens: 1024,
+        stream,
+      }),
     },
-    body: JSON.stringify({
-      model,
-      messages,
-      temperature: 0.4,
-      max_tokens: 1024,
-      stream,
-    }),
-  });
+    modelTimeoutMs(),
+  );
 }
 
 function pipeOpenAIStream(upstream: Response): ReadableStream<Uint8Array> {
@@ -499,9 +535,9 @@ async function handleOpenAI(body: RequestBody, message: string, stream: boolean)
     return sse(pipeOpenAIStream(upstream));
   }
 
-  const data = (await upstream.json()) as {
+  const data = await readJsonWithTimeout<{
     choices?: { message?: { content?: string } }[];
-  };
+  }>(upstream, modelTimeoutMs());
   const content = data.choices?.[0]?.message?.content?.trim();
   if (!content) return json({ error: "Empty completion", code: "empty_response" }, 502);
   return json({ content });
@@ -534,9 +570,9 @@ async function handleClaude(body: RequestBody, message: string, stream: boolean)
     return sse(pipeClaudeStream(upstream));
   }
 
-  const data = (await upstream.json()) as {
+  const data = await readJsonWithTimeout<{
     content?: { type: string; text?: string }[];
-  };
+  }>(upstream, modelTimeoutMs());
   const text = (data.content ?? [])
     .filter((block) => block.type === "text")
     .map((block) => block.text ?? "")
@@ -548,19 +584,49 @@ async function handleClaude(body: RequestBody, message: string, stream: boolean)
 }
 
 export default async (req: Request, _context: Context) => {
+  const cors = corsFor(req.headers);
+  const finish = (res: Response) => withCors(res, cors.headers);
+
+  if (req.method === "OPTIONS") {
+    if (!cors.allowed) return finish(json({ error: "Origin not allowed", code: "origin_not_allowed" }, 403));
+    return finish(new Response(null, { status: 204 }));
+  }
+  if (!cors.allowed) {
+    return finish(json({ error: "Origin not allowed", code: "origin_not_allowed" }, 403));
+  }
   if (req.method !== "POST") {
-    return json({ error: "Method not allowed", code: "method_not_allowed" }, 405);
+    return finish(json({ error: "Method not allowed", code: "method_not_allowed" }, 405));
+  }
+
+  const maxBytes = maxBodyBytes("ai-concierge");
+  const declaredLength = req.headers.get("content-length") ?? "";
+  if (isBodyTooLarge("", maxBytes, declaredLength)) {
+    return finish(json({ error: "Request body is too large.", code: "payload_too_large" }, 413));
+  }
+
+  const raw = await req.text();
+  if (isBodyTooLarge(raw, maxBytes)) {
+    return finish(json({ error: "Request body is too large.", code: "payload_too_large" }, 413));
+  }
+
+  const limit = await enforceRateLimit("ai-concierge", clientIp(req.headers));
+  if (!limit.ok) {
+    return finish(
+      json({ error: "Too many requests. Please try again shortly.", code: "rate_limited" }, 429, {
+        "Retry-After": String(limit.retryAfterSeconds),
+      }),
+    );
   }
 
   let body: RequestBody;
   try {
-    body = (await req.json()) as RequestBody;
+    body = (raw ? JSON.parse(raw) : {}) as RequestBody;
   } catch {
-    return json({ error: "Invalid request", code: "invalid_request" }, 400);
+    return finish(json({ error: "Invalid request", code: "invalid_request" }, 400));
   }
 
   const message = (body.message ?? "").trim();
-  if (!message) return json({ error: "Empty message", code: "empty_message" }, 400);
+  if (!message) return finish(json({ error: "Empty message", code: "empty_message" }, 400));
 
   const config = readServerAIConfig();
   const provider = resolveProvider(body, config);
@@ -568,17 +634,17 @@ export default async (req: Request, _context: Context) => {
 
   try {
     if (provider === "gemini") {
-      return await handleGemini(body, message, stream);
+      return finish(await handleGemini(body, message, stream));
     }
     if (provider === "openai") {
-      return await handleOpenAI(body, message, stream);
+      return finish(await handleOpenAI(body, message, stream));
     }
     if (provider === "claude") {
-      return await handleClaude(body, message, stream);
+      return finish(await handleClaude(body, message, stream));
     }
 
-    return json({ error: `Provider "${provider}" is not supported`, code: "unsupported_provider" }, 400);
+    return finish(json({ error: `Provider "${provider}" is not supported`, code: "unsupported_provider" }, 400));
   } catch {
-    return json({ error: "AI service unreachable", code: "service_unreachable" }, 502);
+    return finish(json({ error: "AI service unreachable", code: "service_unreachable" }, 502));
   }
 };
